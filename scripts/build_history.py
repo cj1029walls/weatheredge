@@ -18,10 +18,12 @@ hr=total HRs, so=total strikeouts.
 
 No third-party dependencies — runs on a bare GitHub Actions Python.
 """
-import csv, io, json, os, statistics, sys, time, urllib.request, zipfile
+import csv, functools, io, json, os, statistics, sys, time, urllib.request, zipfile
 from datetime import date
 sys.path.insert(0, os.path.dirname(__file__))
 from parks import PARKS, RETRO_TO_CODE, wind_rel_angle
+
+print = functools.partial(print, flush=True)   # live logs on CI
 
 SEASONS = list(range(2019, date.today().year))   # completed seasons only
 OUT = os.path.join(os.path.dirname(__file__), "..", "data", "parks_history.json")
@@ -36,22 +38,35 @@ ARCHIVE_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&lon
 F_DATE, F_VTEAM, F_HTEAM, F_VSCORE, F_HSCORE, F_DAYNIGHT = 0, 3, 6, 9, 10, 12
 F_VHR, F_VSO, F_HHR, F_HSO = 25, 32, 53, 60
 
-def fetch(url, tries=3):
+CHADWICK_URL = "https://raw.githubusercontent.com/chadwickbureau/retrosheet/master/gamelog/GL{year}.TXT"
+
+def fetch(url, tries=4, timeout=60):
     for i in range(tries):
         try:
+            t0 = time.time()
             req = urllib.request.Request(url, headers={"User-Agent": "weatheredge-build/1.0"})
-            with urllib.request.urlopen(req, timeout=120) as r:
-                return r.read()
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                data = r.read()
+            print(f"    fetched {url.split('?')[0]} ({len(data)//1024} KB, {time.time()-t0:.1f}s)")
+            return data
         except Exception as e:
+            print(f"    retry {i+1}/{tries} for {url.split('?')[0]}: {e}")
             if i == tries - 1:
                 raise
-            time.sleep(3 * (i + 1))
+            time.sleep(8 * (i + 1))
 
 def load_season(year):
-    raw = fetch(GL_URL.format(year=year))
-    zf = zipfile.ZipFile(io.BytesIO(raw))
-    name = [n for n in zf.namelist() if n.lower().endswith(".txt")][0]
-    rows = list(csv.reader(io.TextIOWrapper(io.BytesIO(zf.read(name)), encoding="latin-1")))
+    # Prefer retrosheet.org; fall back to the Chadwick Bureau GitHub mirror,
+    # which is fast and reliable from CI runners.
+    try:
+        raw = fetch(GL_URL.format(year=year), tries=2, timeout=45)
+        zf = zipfile.ZipFile(io.BytesIO(raw))
+        name = [n for n in zf.namelist() if n.lower().endswith(".txt")][0]
+        data = zf.read(name)
+    except Exception as e:
+        print(f"  {year}: retrosheet.org unavailable ({e}); using Chadwick mirror")
+        data = fetch(CHADWICK_URL.format(year=year), tries=3, timeout=45)
+    rows = list(csv.reader(io.TextIOWrapper(io.BytesIO(data), encoding="latin-1")))
     return rows
 
 def season_games(year):
@@ -88,9 +103,9 @@ def park_weather(code, years):
     """Hourly weather dict keyed 'YYYY-MM-DDTHH' for the park, local time."""
     meta = PARKS[code]
     out = {}
-    # chunk by ~3 seasons per request to stay well under response limits
-    for i in range(0, len(years), 3):
-        chunk = years[i:i+3]
+    # chunk by 2 seasons per request — smaller responses are served faster
+    for i in range(0, len(years), 2):
+        chunk = years[i:i+2]
         url = ARCHIVE_URL.format(lat=meta["lat"], lon=meta["lon"],
                                  start=f"{chunk[0]}-03-01", end=f"{chunk[-1]}-11-15",
                                  tz=meta["tz"].replace("/", "%2F"))
@@ -100,7 +115,7 @@ def park_weather(code, years):
                                         h["dew_point_2m"], h["wind_speed_10m"],
                                         h["wind_direction_10m"]):
             out[t[:13]] = (temp, dew, ws, wd)
-        time.sleep(1)
+        time.sleep(1.5)
     return out
 
 def main():
