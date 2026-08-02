@@ -14,8 +14,10 @@ Games without a pinned line use the median total of their matched sample
 
 No third-party dependencies.
 """
-import argparse, json, os, statistics, sys, urllib.request
+import argparse, functools, json, os, statistics, sys, time, urllib.error, urllib.request
 from datetime import datetime, timezone, timedelta
+
+print = functools.partial(print, flush=True)
 sys.path.insert(0, os.path.dirname(__file__))
 from parks import PARKS, MLBID_TO_CODE, wind_rel_angle, wind_sector, wind_label
 
@@ -33,10 +35,27 @@ FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}
 
 ET = timezone(timedelta(hours=-4))  # ET (DST); slate dates only, precision not critical
 
-def get_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "weatheredge-build/1.0"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())
+def get_json(url, tries=5):
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "weatheredge-build/1.0"})
+            with urllib.request.urlopen(req, timeout=45) as r:
+                return json.loads(r.read())
+        except Exception as e:
+            if i == tries - 1:
+                raise
+            wait = 45 if (isinstance(e, urllib.error.HTTPError) and e.code == 429) else 8 * (i + 1)
+            print(f"    retry {i+1}/{tries} in {wait}s: {e}")
+            time.sleep(wait)
+
+_FC_CACHE = {}
+def get_forecast(meta):
+    key = meta["name"]
+    if key not in _FC_CACHE:
+        _FC_CACHE[key] = get_json(FC_URL.format(lat=meta["lat"], lon=meta["lon"],
+                                                tz=meta["tz"].replace("/", "%2F")))
+        time.sleep(1)
+    return _FC_CACHE[key]
 
 def sky_of(cloud, precip_prob, hour_local):
     night = hour_local >= 20 or hour_local < 6
@@ -90,8 +109,7 @@ def build_game(g, hist_all, league, lines, offline):
     if offline:
         fc = json.load(open(os.path.join(FIXTURES, f"forecast_{home}.json")))
     else:
-        fc = get_json(FC_URL.format(lat=meta["lat"], lon=meta["lon"],
-                                    tz=meta["tz"].replace("/", "%2F")))
+        fc = get_forecast(meta)
     h = fc["hourly"]
     # find the hourly index at the park-local first-pitch hour
     import zoneinfo
@@ -203,6 +221,10 @@ def main():
                 if built: games.append(built)
             except Exception as e:
                 print(f"  skip {g.get('gamePk')}: {e}")
+
+    scheduled = sum(len(day.get("games", [])) for day in sched.get("dates", []))
+    if scheduled and not games:
+        sys.exit(f"All {scheduled} scheduled games failed to build — refusing to publish an empty slate.")
 
     label = datetime.strptime(date_str, "%Y-%m-%d").strftime("%A, %B %-d")
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
