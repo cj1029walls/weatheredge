@@ -143,6 +143,29 @@ def pct_delta(a, b):
     if not b: return 0
     return round((a - b) / b * 100)
 
+WET_IN = 0.05   # inches over the ~3h game window = "wet game"
+
+def wet_split(hist, line):
+    """Park-wide wet vs dry splits (needs history built with precip data)."""
+    games = [g for g in hist["games"] if "p" in g]
+    if not games:
+        return None
+    wet = [g for g in games if g["p"] >= WET_IN]
+    dry = [g for g in games if g["p"] < WET_IN]
+    if len(wet) < 5 or not dry:
+        return None
+    def s(rows):
+        return dict(n=len(rows),
+                    r=round(statistics.mean(x["r"] for x in rows), 2),
+                    hr=round(statistics.mean(x["hr"] for x in rows), 2),
+                    so=round(statistics.mean(x["so"] for x in rows), 2))
+    out = dict(wet=s(wet), dry=s(dry))
+    if line:
+        n = len(wet)
+        out["wetOver"] = round(sum(1 for x in wet if x["r"] > line) / n * 100)
+        out["wetUnder"] = round(sum(1 for x in wet if x["r"] < line) / n * 100)
+    return out
+
 def build_game(g, hist_all, league, lines, offline):
     home_id = g["teams"]["home"]["team"]["id"]
     away_id = g["teams"]["away"]["team"]["id"]
@@ -194,7 +217,9 @@ def build_game(g, hist_all, league, lines, offline):
                time=time_str, sortTime=sort_time,
                temp=temp, wind=0 if dome else wind, dir="—" if dome else deg_to_compass(wdir),
                windAngle=round(rel), windLabel="ROOF CLOSED" if dome else wind_label(rel),
-               dew=dew, sky=sky, skyIcon=icon, dome=dome, gamePk=game_pk)
+               dew=dew, sky=sky, skyIcon=icon, dome=dome, gamePk=game_pk,
+               rain=None if pprob is None else round(pprob),
+               cloud=None if cloud is None else round(cloud))
 
     if not hist or not hist["avg"]["n"]:
         out.update(sample=0, hr=0, runs=0, ks=0, hrGm=0, hrPark=0,
@@ -233,8 +258,10 @@ def build_game(g, hist_all, league, lines, offline):
                 under=round(under / n * 100) if n else 0,
                 push=max(0, 100 - (round(over / n * 100) + round(under / n * 100))) if n else 0),
         total=line or 0, lineSource=line_source, note=note,
-        matches=[dict(d=x["d"], t=x["t"], w=x["w"], r=x["r"], hr=x["hr"])
+        matches=[dict(d=x["d"], t=x["t"], w=x["w"], r=x["r"], hr=x["hr"],
+                      **({"p": x["p"]} if "p" in x else {}))
                  for x in sorted(rows, key=lambda x: x["d"], reverse=True)[:15]],
+        rainHist=None if dome else wet_split(hist, line),
     )
     if dome:
         out["hr"] = out["runs"] = out["ks"] = 0

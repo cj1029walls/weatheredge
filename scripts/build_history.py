@@ -13,8 +13,8 @@ Output: data/parks_history.json
     "_built":  "YYYY-MM-DD", "_seasons": [..] }
 
 Game fields: d=YYYYMMDD, dn=D/N, t=temp°F, dew=dewpoint°F, w=wind mph,
-rel=wind blow-toward angle relative to CF axis (deg), r=total runs,
-hr=total HRs, so=total strikeouts.
+rel=wind blow-toward angle relative to CF axis (deg), p=precip inches over
+the ~3h game window (0 = dry), r=total runs, hr=total HRs, so=total strikeouts.
 
 No third-party dependencies — runs on a bare GitHub Actions Python.
 """
@@ -31,8 +31,8 @@ OUT = os.path.join(os.path.dirname(__file__), "..", "data", "parks_history.json"
 GL_URL = "https://www.retrosheet.org/gamelogs/gl{year}.zip"
 ARCHIVE_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
                "&start_date={start}&end_date={end}"
-               "&hourly=temperature_2m,dew_point_2m,wind_speed_10m,wind_direction_10m"
-               "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone={tz}")
+               "&hourly=temperature_2m,dew_point_2m,wind_speed_10m,wind_direction_10m,precipitation"
+               "&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone={tz}")
 
 # Retrosheet game-log fixed field positions (0-indexed). See glfields.txt.
 F_DATE, F_VTEAM, F_HTEAM, F_VSCORE, F_HSCORE, F_DAYNIGHT = 0, 3, 6, 9, 10, 12
@@ -111,10 +111,11 @@ def park_weather(code, years):
                                  tz=meta["tz"].replace("/", "%2F"))
         data = json.loads(fetch(url))
         h = data["hourly"]
-        for t, temp, dew, ws, wd in zip(h["time"], h["temperature_2m"],
-                                        h["dew_point_2m"], h["wind_speed_10m"],
-                                        h["wind_direction_10m"]):
-            out[t[:13]] = (temp, dew, ws, wd)
+        prec = h.get("precipitation", [None] * len(h["time"]))
+        for t, temp, dew, ws, wd, pr in zip(h["time"], h["temperature_2m"],
+                                            h["dew_point_2m"], h["wind_speed_10m"],
+                                            h["wind_direction_10m"], prec):
+            out[t[:13]] = (temp, dew, ws, wd, pr)
         time.sleep(1.5)
     return out
 
@@ -142,14 +143,21 @@ def main():
         rows = []
         for d, dn, runs, hr, so in games:
             hour = 13 if dn == "D" else 19
-            key = f"{d[:4]}-{d[4:6]}-{d[6:8]}T{hour:02d}"
-            w = wx.get(key)
-            if not w or any(v is None for v in w):
+            day_key = f"{d[:4]}-{d[4:6]}-{d[6:8]}"
+            w = wx.get(f"{day_key}T{hour:02d}")
+            if not w or any(v is None for v in w[:4]):
                 continue
-            temp, dew, ws, wd = w
+            temp, dew, ws, wd, _ = w
+            # precip over the ~3h game window (first pitch + 2h)
+            precip = 0.0
+            for hh in range(hour, hour + 3):
+                slot = wx.get(f"{day_key}T{hh:02d}")
+                if slot and slot[4] is not None:
+                    precip += slot[4]
             rel = round(wind_rel_angle(wd, meta["bearing"]))
             rows.append(dict(d=d, dn=dn, t=round(temp), dew=round(dew),
-                             w=round(ws), rel=rel, r=runs, hr=hr, so=so))
+                             w=round(ws), rel=rel, p=round(precip, 2),
+                             r=runs, hr=hr, so=so))
             league["r"].append(runs); league["hr"].append(hr); league["so"].append(so)
         avg = dict(r=round(statistics.mean(x["r"] for x in rows), 2),
                    hr=round(statistics.mean(x["hr"] for x in rows), 2),
