@@ -28,6 +28,10 @@ OUT = os.path.join(ROOT, "site", "data.json")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
 SCHED_URL = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={date}"
+BOX_URL = "https://statsapi.mlb.com/api/v1/game/{pk}/boxscore"
+PREDS_DIR = os.path.join(ROOT, "data", "predictions")
+ACCURACY = os.path.join(ROOT, "data", "accuracy.json")
+SITE_ACCURACY = os.path.join(ROOT, "site", "accuracy.json")
 FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
           "&hourly=temperature_2m,dew_point_2m,wind_speed_10m,wind_direction_10m,"
           "cloud_cover,precipitation_probability"
@@ -183,13 +187,14 @@ def build_game(g, hist_all, league, lines, offline):
 
     hist = hist_all.get(home)
     game_id = f"{away.lower()}-{home.lower()}-{g.get('gamePk', 0) % 1000}"
+    game_pk = g.get("gamePk")
     out = dict(id=game_id, away=away, home=home,
                park=meta["name"] + ("" if meta["roof"] == "open" else
                                     " · roof closed" if dome else " · roof open"),
                time=time_str, sortTime=sort_time,
                temp=temp, wind=0 if dome else wind, dir="—" if dome else deg_to_compass(wdir),
                windAngle=round(rel), windLabel="ROOF CLOSED" if dome else wind_label(rel),
-               dew=dew, sky=sky, skyIcon=icon, dome=dome)
+               dew=dew, sky=sky, skyIcon=icon, dome=dome, gamePk=game_pk)
 
     if not hist or not hist["avg"]["n"]:
         out.update(sample=0, hr=0, runs=0, ks=0, hrGm=0, hrPark=0,
@@ -234,6 +239,93 @@ def build_game(g, hist_all, league, lines, offline):
     if dome:
         out["hr"] = out["runs"] = out["ks"] = 0
     return out
+
+def archive_predictions(date_str, games):
+    os.makedirs(PREDS_DIR, exist_ok=True)
+    slim = [dict(gamePk=g.get("gamePk"), away=g["away"], home=g["home"],
+                 total=g.get("total"), lineSource=g.get("lineSource"),
+                 ou=g["ou"], hr=g["hr"], runs=g["runs"], ks=g["ks"],
+                 hrPark=g.get("hrPark"), dome=g.get("dome", False), sample=g.get("sample"))
+            for g in games]
+    with open(os.path.join(PREDS_DIR, f"{date_str}.json"), "w") as f:
+        json.dump(dict(date=date_str, games=slim), f, separators=(",", ":"))
+
+def grade_day(date_str, preds):
+    """Grade one archived day against official MLB final scores + box scores."""
+    sched = get_json(SCHED_URL.format(date=date_str), tries=3)
+    finals = {}
+    for day in sched.get("dates", []):
+        for g in day.get("games", []):
+            if g.get("status", {}).get("abstractGameState") != "Final":
+                continue
+            a, h = g["teams"]["away"].get("score"), g["teams"]["home"].get("score")
+            if a is not None and h is not None:
+                finals[g["gamePk"]] = a + h
+    graded = []
+    for p in preds["games"]:
+        pk = p.get("gamePk")
+        if pk not in finals:
+            continue
+        total, line = finals[pk], p.get("total") or 0
+        hr = so = None
+        try:
+            box = get_json(BOX_URL.format(pk=pk), tries=2)
+            bt = box["teams"]
+            hr = (bt["away"]["teamStats"]["batting"]["homeRuns"]
+                  + bt["home"]["teamStats"]["batting"]["homeRuns"])
+            so = (bt["away"]["teamStats"]["batting"]["strikeOuts"]
+                  + bt["home"]["teamStats"]["batting"]["strikeOuts"])
+            time.sleep(0.4)
+        except Exception as e:
+            print(f"    boxscore {pk}: {e}")
+        ou_res = "push" if total == line else ("over" if total > line else "under")
+        lean = ("over" if p["ou"]["over"] > p["ou"]["under"] + 3
+                else "under" if p["ou"]["under"] > p["ou"]["over"] + 3 else None)
+        lean_ok = None if (not lean or not line or ou_res == "push") else (lean == ou_res)
+        hr_call = "boost" if p["hr"] >= 8 else ("suppress" if p["hr"] <= -8 else None)
+        hr_ok = None
+        if hr_call and hr is not None and p.get("hrPark"):
+            hr_ok = (hr_call == ("boost" if hr > p["hrPark"] else "suppress"))
+        graded.append(dict(m=f'{p["away"]}@{p["home"]}', line=line, src=p.get("lineSource"),
+                           total=total, ou=ou_res, lean=lean, leanOk=lean_ok,
+                           hrPred=p["hr"], hrAct=hr, hrPark=p.get("hrPark"),
+                           hrCall=hr_call, hrOk=hr_ok, soAct=so, dome=p.get("dome", False)))
+    return graded
+
+def summarize(games):
+    lw = sum(1 for g in games if g["leanOk"] is True)
+    ll = sum(1 for g in games if g["leanOk"] is False)
+    hw = sum(1 for g in games if g["hrOk"] is True)
+    hl = sum(1 for g in games if g["hrOk"] is False)
+    errs = [abs(g["total"] - g["line"]) for g in games if g["line"]]
+    return dict(n=len(games), leanW=lw, leanL=ll, hrW=hw, hrL=hl,
+                avgErr=round(sum(errs) / len(errs), 2) if errs else None)
+
+def grade_pending(today_str):
+    acc = json.load(open(ACCURACY)) if os.path.exists(ACCURACY) else {"days": {}}
+    if not os.path.isdir(PREDS_DIR):
+        return acc
+    for fname in sorted(os.listdir(PREDS_DIR)):
+        d = fname[:-5]
+        if d >= today_str or d in acc["days"]:
+            continue
+        try:
+            preds = json.load(open(os.path.join(PREDS_DIR, fname)))
+            graded = grade_day(d, preds)
+        except Exception as e:
+            print(f"  grading {d} failed ({e}) — will retry next run")
+            continue
+        if graded:
+            acc["days"][d] = dict(games=graded, summary=summarize(graded))
+            print(f"  graded {d}: {acc['days'][d]['summary']}")
+    allg = [g for day in acc["days"].values() for g in day["games"]]
+    acc["cumulative"] = summarize(allg)
+    acc["updated"] = today_str
+    with open(ACCURACY, "w") as f:
+        json.dump(acc, f, separators=(",", ":"))
+    with open(SITE_ACCURACY, "w") as f:
+        json.dump(acc, f, separators=(",", ":"))
+    return acc
 
 def deg_to_compass(deg):
     dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
@@ -284,6 +376,12 @@ def main():
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
     print(f"Wrote {OUT}: {len(games)} games for {date_str}")
+
+    archive_predictions(date_str, games)
+    if not args.offline:
+        grade_pending(date_str)
+    elif os.path.exists(ACCURACY):
+        import shutil; shutil.copy(ACCURACY, SITE_ACCURACY)
 
 if __name__ == "__main__":
     main()
