@@ -25,6 +25,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Build today's data.json (schedule + forecasts + history match)
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/daily_build.py
       - uses: actions/upload-pages-artifact@v3
         with:
