@@ -132,7 +132,9 @@
   .edge-badge{font-size:10.5px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase}
   .edge-hr{background:#147a43;color:#d9f4e3}
   .edge-under{background:#47566d;color:#e2e8f2}
+  .edge-rain{background:#2450b8;color:#dde7fb}
   .edge-neutral{background:var(--gray-bg);color:var(--muted)}
+  .rain-cmp{font-size:13px;color:var(--ink);background:var(--blue-bg);border-radius:10px;padding:10px 13px;margin-top:10px;line-height:1.5}
   @media(max-width:960px){
     .hero{grid-template-columns:1fr}
     .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
@@ -308,7 +310,7 @@
   <section class="view" id="view-method">
     <div class="method">
       <h3>Real games. Real weather. Real results.</h3>
-      <p>For every game on today's slate, we take the forecast at first pitch — temperature, wind speed and direction relative to the park's orientation, dew point, and sky cover — and find every game played at <b>that same ballpark in similar conditions</b> since 2019.</p>
+      <p>For every game on today's slate, we take the forecast at first pitch — temperature, wind speed and direction relative to the park's orientation, dew point, sky cover, and rain chances — and find every game played at <b>that same ballpark in similar conditions</b> since 2019.</p>
       <p>Then we simply report what actually happened in those games: how many home runs flew, how many runs scored, how many hitters struck out — and how often the game went over or under the closing total. No projections, no simulations, no black box. Just history, matched to today.</p>
       <h4>Reading the sample badge</h4>
       <div class="pill-row">
@@ -342,42 +344,43 @@
 ================================================================== */
 const SAMPLE_GAMES = [
   {id:"tb-stl", away:"TB", home:"STL", park:"Busch Stadium", time:"4:15 PM ET", sortTime:1615,
-   temp:91, wind:14, dir:"SW", windAngle:35, windLabel:"OUT TO RF", dew:60, sky:"Overcast", skyIcon:"☁️",
+   temp:91, wind:14, dir:"SW", windAngle:35, windLabel:"OUT TO RF", dew:60, sky:"Rain risk", skyIcon:"🌧️", rain:64, cloud:92,
    sample:15, hr:16, runs:10, ks:-3, hrGm:2.3, hrPark:2.0,
+   rainHist:{wet:{n:41,r:8.2,hr:1.7,so:17.6}, dry:{n:512,r:9.3,hr:2.1,so:16.9}, wetOver:34, wetUnder:59},
    mlb:{hr:1, runs:4, ks:-8}, ou:{under:27, push:26, over:47}, total:8.5},
 
   {id:"wsh-chc", away:"WSH", home:"CHC", park:"Wrigley Field", time:"2:20 PM ET", sortTime:1420,
-   temp:84, wind:13, dir:"SSW", windAngle:10, windLabel:"OUT TO CF", dew:64, sky:"Sunny", skyIcon:"☀️",
+   temp:84, wind:13, dir:"SSW", windAngle:10, windLabel:"OUT TO CF", dew:64, sky:"Sunny", skyIcon:"☀️", rain:4, cloud:12,
    sample:49, hr:24, runs:14, ks:-4, hrGm:2.9, hrPark:2.3,
    mlb:{hr:19, runs:11, ks:-6}, ou:{under:25, push:7, over:68}, total:9.0},
 
   {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
-   temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅",
+   temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅", rain:18, cloud:55,
    sample:44, hr:12, runs:8, ks:-2, hrGm:2.5, hrPark:2.2,
    mlb:{hr:8, runs:6, ks:-4}, ou:{under:30, push:12, over:58}, total:9.5},
 
   {id:"phi-nym", away:"PHI", home:"NYM", park:"Citi Field", time:"7:10 PM ET", sortTime:1910,
-   temp:86, wind:9, dir:"S", windAngle:170, windLabel:"IN FROM CF", dew:65, sky:"Clear", skyIcon:"🌙",
+   temp:86, wind:9, dir:"S", windAngle:170, windLabel:"IN FROM CF", dew:65, sky:"Clear", skyIcon:"🌙", rain:5, cloud:15,
    sample:22, hr:-6, runs:-3, ks:1, hrGm:1.7, hrPark:1.8,
    mlb:{hr:-9, runs:-5, ks:0}, ou:{under:51, push:9, over:40}, total:8.0},
 
   {id:"cin-col", away:"CIN", home:"COL", park:"Coors Field", time:"8:40 PM ET", sortTime:2040,
-   temp:93, wind:10, dir:"S", windAngle:20, windLabel:"OUT TO RF", dew:48, sky:"Sunny", skyIcon:"☀️",
+   temp:93, wind:10, dir:"S", windAngle:20, windLabel:"OUT TO RF", dew:48, sky:"Sunny", skyIcon:"☀️", rain:8, cloud:10,
    sample:27, hr:9, runs:12, ks:-5, hrGm:3.1, hrPark:2.8,
    mlb:{hr:28, runs:31, ks:-12}, ou:{under:33, push:9, over:58}, total:11.5},
 
   {id:"cws-min", away:"CWS", home:"MIN", park:"Target Field", time:"7:40 PM ET", sortTime:1940,
-   temp:83, wind:10, dir:"SSW", windAngle:40, windLabel:"OUT TO RF", dew:61, sky:"Partly cloudy", skyIcon:"⛅",
+   temp:83, wind:10, dir:"SSW", windAngle:40, windLabel:"OUT TO RF", dew:61, sky:"Partly cloudy", skyIcon:"⛅", rain:24, cloud:60,
    sample:19, hr:7, runs:4, ks:-2, hrGm:2.2, hrPark:2.1,
    mlb:{hr:3, runs:1, ks:-3}, ou:{under:36, push:12, over:52}, total:9.0},
 
   {id:"bal-tor", away:"BAL", home:"TOR", park:"Rogers Centre · roof open", time:"7:07 PM ET", sortTime:1907,
-   temp:81, wind:8, dir:"SE", windAngle:300, windLabel:"CROSS R→L", dew:63, sky:"Clear", skyIcon:"🌙",
+   temp:81, wind:8, dir:"SE", windAngle:300, windLabel:"CROSS R→L", dew:63, sky:"Clear", skyIcon:"🌙", rain:2, cloud:8,
    sample:12, hr:5, runs:3, ks:-1, hrGm:2.4, hrPark:2.3,
    mlb:{hr:4, runs:2, ks:-2}, ou:{under:40, push:13, over:47}, total:8.5},
 
   {id:"det-mil", away:"DET", home:"MIL", park:"Am Fam Field · roof open", time:"7:40 PM ET", sortTime:1940,
-   temp:78, wind:7, dir:"NW", windAngle:195, windLabel:"IN FROM LF", dew:56, sky:"Clear", skyIcon:"🌙",
+   temp:78, wind:7, dir:"NW", windAngle:195, windLabel:"IN FROM LF", dew:56, sky:"Clear", skyIcon:"🌙", rain:3, cloud:10,
    sample:31, hr:-4, runs:-2, ks:1, hrGm:2.1, hrPark:2.2,
    mlb:{hr:-3, runs:-3, ks:0}, ou:{under:44, push:11, over:45}, total:8.0},
 
@@ -387,17 +390,17 @@ const SAMPLE_GAMES = [
    mlb:{hr:-6, runs:-4, ks:2}, ou:{under:46, push:10, over:44}, total:8.5},
 
   {id:"lad-sd", away:"LAD", home:"SD", park:"Petco Park", time:"9:40 PM ET", sortTime:2140,
-   temp:71, wind:8, dir:"W", windAngle:185, windLabel:"IN FROM CF", dew:62, sky:"Marine layer", skyIcon:"🌫️",
+   temp:71, wind:8, dir:"W", windAngle:185, windLabel:"IN FROM CF", dew:62, sky:"Marine layer", skyIcon:"🌫️", rain:12, cloud:78,
    sample:61, hr:-14, runs:-9, ks:3, hrGm:1.6, hrPark:1.9,
    mlb:{hr:-19, runs:-13, ks:5}, ou:{under:55, push:10, over:35}, total:7.5},
 
   {id:"atl-sf", away:"ATL", home:"SF", park:"Oracle Park", time:"9:45 PM ET", sortTime:2145,
-   temp:63, wind:16, dir:"WSW", windAngle:160, windLabel:"IN FROM RF", dew:55, sky:"Fog rolling in", skyIcon:"🌫️",
+   temp:63, wind:16, dir:"WSW", windAngle:160, windLabel:"IN FROM RF", dew:55, sky:"Fog rolling in", skyIcon:"🌫️", rain:15, cloud:88,
    sample:58, hr:-18, runs:-10, ks:2, hrGm:1.3, hrPark:1.6,
    mlb:{hr:-26, runs:-15, ks:4}, ou:{under:58, push:9, over:33}, total:7.0},
 
   {id:"kc-sea", away:"KC", home:"SEA", park:"T-Mobile Park · roof open", time:"9:40 PM ET", sortTime:2140,
-   temp:72, wind:6, dir:"N", windAngle:210, windLabel:"IN FROM LF", dew:52, sky:"Clear", skyIcon:"🌙",
+   temp:72, wind:6, dir:"N", windAngle:210, windLabel:"IN FROM LF", dew:52, sky:"Clear", skyIcon:"🌙", rain:6, cloud:20,
    sample:52, hr:-11, runs:-7, ks:3, hrGm:1.7, hrPark:1.9,
    mlb:{hr:-15, runs:-10, ks:6}, ou:{under:57, push:8, over:35}, total:7.0}
 ];
@@ -491,6 +494,7 @@ function parkSVG(g, size){
 /* ---------- slate summary ---------- */
 function edgeBadge(g){
   if(g.dome) return `<span class="edge-badge edge-neutral">Roof closed</span>`;
+  if((g.rain||0)>=55) return `<span class="edge-badge edge-rain">☔ Rain risk</span>`;
   if(g.hr>=12) return `<span class="edge-badge edge-hr">HR weather</span>`;
   if(g.ou.under>=50) return `<span class="edge-badge edge-under">Under weather</span>`;
   return "";
@@ -536,7 +540,7 @@ function rowHTML(g){
     : `<span class="pill ${cls(g.hr)}">HR ${pct(g.hr)}</span><span class="pill ${cls(g.runs)}">R ${pct(g.runs)}</span><span class="pill ${cls(g.ks)}">K ${pct(g.ks)}</span>`;
   const wx = g.dome
     ? `<div class="w">🏟️ roof closed<br>weather sealed out</div>`
-    : `<div class="w">${g.wind} mph ${g.dir}<br>${g.windLabel.toLowerCase()} · dew ${g.dew}°</div>`;
+    : `<div class="w">${g.wind} mph ${g.dir}<br>${g.windLabel.toLowerCase()} · dew ${g.dew}°${(g.rain!=null&&g.rain>=15)?`<br>☔ ${g.rain}% rain`:""}</div>`;
   return `<div class="b-row" data-game="${g.id}">
     <div class="b-time">${g.time.replace(" ET","")}<span>ET</span></div>
     <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-park">${g.park}</div></div>
@@ -587,7 +591,7 @@ function renderHero(){
       <div class="hero-tag">⚡ Edge of the day</div>
       <div class="hero-teams">${g.away} <span class="at">@</span> ${g.home}</div>
       <div class="hero-meta">${g.time} · ${g.park}</div>
-      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span><span class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}</span></div>
+      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>☔ <b>${g.rain}%</b> rain</span>`:""}<span class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}</span></div>
       <div class="hero-imp">
         <div class="hi-row"><span class="l">Home runs</span>${heroBar(g.hr)}<span class="hi-val ${cls(g.hr)}">${pct(g.hr)}</span></div>
         <div class="hi-row"><span class="l">Runs</span>${heroBar(g.runs)}<span class="hi-val ${cls(g.runs)}">${pct(g.runs)}</span></div>
@@ -618,7 +622,7 @@ function renderCompare(){
     return `<tr data-game="${g.id}">
       <td><span class="tbl-teams">${g.away} @ ${g.home}</span><br><span class="tbl-park">${g.park}</span></td>
       <td>${g.time}</td>
-      <td>${g.dome?"🏟️ roof closed":`${g.temp}° · ${g.wind} mph ${g.dir}`}</td>
+      <td>${g.dome?"🏟️ roof closed":`${g.temp}° · ${g.wind} mph ${g.dir}${(g.rain!=null&&g.rain>=15)?` · ☔${g.rain}%`:""}`}</td>
       <td>${g.dome?chip(0):chip(g.hr)}</td>
       <td>${g.dome?chip(0):chip(g.runs)}</td>
       <td>${g.dome?chip(0):chip(g.ks)}</td>
@@ -673,7 +677,7 @@ function histTable(g){
     const body = g.matches.map(m=>{
       const dstr = `${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
       const res = m.r>line ? "over" : (m.r<line ? "under" : "push");
-      return `<tr><td>${dstr}</td><td>at ${g.home}</td><td>${m.t}°</td><td>${m.w} mph</td><td>${line||"—"}</td><td><b>${m.r}</b></td><td><span class="res-chip ${res}">${res.toUpperCase()}</span></td></tr>`;
+      return `<tr><td>${dstr}</td><td>at ${g.home}</td><td>${m.t}°${m.p>=0.05?' 💧':''}</td><td>${m.w} mph</td><td>${line||"—"}</td><td><b>${m.r}</b></td><td><span class="res-chip ${res}">${res.toUpperCase()}</span></td></tr>`;
     }).join("");
     return `
     <div class="hit-summary">
@@ -703,6 +707,26 @@ function histTable(g){
       <th>Date</th><th>Game</th><th>Temp</th><th>Wind</th><th>Total</th><th>Final</th><th>Result</th>
     </tr></thead><tbody>${body}</tbody></table>
     ${rows.length>12?`<div class="hist-note">Showing 12 most recent of ${rows.length} matched games at ${g.park.split("·")[0].trim()}.</div>`:""}`;
+}
+
+/* ---------- rain history section (modal) ---------- */
+function rainSec(g){
+  if(g.dome || g.rain==null || g.rain<20 || !g.rainHist) return "";
+  const rh = g.rainHist;
+  const boxes = rh.wetOver!=null ? `
+    <div class="hit-summary">
+      <div class="hit-box over"><div class="n">${rh.wetOver}%</div><div class="l">over in wet games</div></div>
+      <div class="hit-box under"><div class="n">${rh.wetUnder}%</div><div class="l">under in wet games</div></div>
+      <div class="hit-box push"><div class="n">${rh.wet.n}</div><div class="l">wet games here</div></div>
+    </div>` : "";
+  return `<div class="m-sec">
+    <h5>☔ Rain at ${g.park.split("·")[0].trim()} — ${g.rain}% chance at first pitch${g.rain>=55?' · <span style="color:var(--red)">delay risk</span>':''}</h5>
+    ${boxes}
+    <div class="rain-cmp">Wet games at this park average <b>${rh.wet.r.toFixed(1)} runs</b> and <b>${rh.wet.hr.toFixed(1)} HR</b>,
+    vs <b>${rh.dry.r.toFixed(1)} runs</b> / <b>${rh.dry.hr.toFixed(1)} HR</b> when dry —
+    against today's total of <b>${g.total?g.total.toFixed(1):"—"}</b>.
+    A wet game = measurable rain during the game window since 2019.</div>
+  </div>`;
 }
 
 /* ---------- meters (vs MLB average) ---------- */
@@ -892,26 +916,53 @@ function initPark3D(g, canvas, slot="modal"){
     roof.scale.y = 0.45; roof.position.set(0,2,-140); scene.add(roof);
   }
 
-  /* wind streaks */
+  /* wind — long arcing gusts: few, slow, smooth curved trails that fade
+     in, sweep across the park with a gentle bend, and fade out */
   let wind = null;
   if(!dome && g.wind>2){
-    const N=90, TAIL=10;
-    const a=g.windAngle*Math.PI/180;
-    const dir=new THREE.Vector3(Math.sin(a),0,-Math.cos(a));
-    const perp=new THREE.Vector3(-dir.z,0,dir.x);
+    const N=24, TAIL=30;
+    const base=g.windAngle*Math.PI/180;
+    const mkGust=(init)=>({
+      p:new THREE.Vector3((Math.random()-0.5)*620, 14+Math.random()*115, 90-Math.random()*600),
+      ang: base + (Math.random()-0.5)*0.5,
+      curve:(Math.random()-0.5)*0.22,          // gentle per-gust bend (rad/s)
+      speedMul: 0.75 + Math.random()*0.5,
+      bobPhase: Math.random()*Math.PI*2,
+      life: 3.6 + Math.random()*2.6,
+      t: init ? Math.random()*3 : 0,
+    });
     const parts=[];
     for(let i=0;i<N;i++){
-      const p=new THREE.Vector3((Math.random()-0.5)*640, 8+Math.random()*130, 100-Math.random()*620);
-      parts.push({p, phase:Math.random()*Math.PI*2, hist:Array.from({length:TAIL},()=>p.clone())});
+      const gp=mkGust(true);
+      gp.hist=Array.from({length:TAIL},()=>gp.p.clone());
+      parts.push(gp);
     }
     const segs=N*(TAIL-1);
     const geo=new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(segs*6),3));
     geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(segs*6),3));
-    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.55:0.85});
-    wind={mesh:new THREE.LineSegments(geo,mat), parts, dir, perp, tail:TAIL,
-          speed:g.wind*2.2, t:0, headCol:new THREE.Color(0xffffff), bgCol:COL.bg.clone()};
+    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.5:0.8});
+    wind={mesh:new THREE.LineSegments(geo,mat), parts, tail:TAIL, mkGust,
+          speed:55 + g.wind*9, headCol:new THREE.Color(0xffffff), bgCol:COL.bg.clone()};
     scene.add(wind.mesh);
+  }
+
+  /* rain — falling streaks, tilted with the wind, when rain risk is real */
+  let rain = null;
+  if(!dome && (g.rain||0) >= 45){
+    const RN = Math.round(90 + Math.min(1,(g.rain-45)/45)*130);
+    const a=g.windAngle*Math.PI/180;
+    const tilt = Math.min(0.45, (g.wind||0)*0.03);
+    const vel = new THREE.Vector3(Math.sin(a)*tilt, -1, -Math.cos(a)*tilt).normalize();
+    const drops=[];
+    for(let i=0;i<RN;i++)
+      drops.push(new THREE.Vector3((Math.random()-0.5)*680, Math.random()*185, 110-Math.random()*640));
+    const rgeo=new THREE.BufferGeometry();
+    rgeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(RN*6),3));
+    const rcol = new THREE.Color().setHSL(hue, Math.min(0.25,sat), night?0.55:0.72);
+    rain={mesh:new THREE.LineSegments(rgeo, new THREE.LineBasicMaterial({color:rcol, transparent:true, opacity:0.38})),
+          drops, vel, len:9, speed:330};
+    scene.add(rain.mesh);
   }
 
   /* camera + drag orbit — high angle behind home, like the reference */
@@ -942,25 +993,31 @@ function initPark3D(g, canvas, slot="modal"){
     idleT += dt;
     if(!dragging && idleT>2.5) theta += dt*0.07;
     if(wind){
-      wind.t += dt;
       const pos = wind.mesh.geometry.attributes.position.array;
       const col = wind.mesh.geometry.attributes.color.array;
-      const sway = 26 + 160/Math.max(5, g.wind);   // lighter breeze meanders more
       let k = 0;
       wind.parts.forEach(pt=>{
-        pt.p.addScaledVector(wind.dir, wind.speed*dt*10);
-        pt.p.addScaledVector(wind.perp, Math.sin(wind.t*1.5 + pt.phase)*sway*dt);
-        pt.p.y += Math.cos(wind.t*0.8 + pt.phase*1.6)*6*dt;
-        if(Math.abs(pt.p.x)>340 || pt.p.z<-580 || pt.p.z>130 || pt.p.y<4 || pt.p.y>170){
-          pt.p.set((Math.random()-0.5)*640, 8+Math.random()*130, 100-Math.random()*620);
+        pt.t += dt;
+        pt.ang += pt.curve*dt;                      // the arc: heading bends slowly
+        const sp = wind.speed*pt.speedMul;
+        pt.p.x += Math.sin(pt.ang)*sp*dt;
+        pt.p.z += -Math.cos(pt.ang)*sp*dt;
+        pt.p.y += Math.sin(pt.t*0.7 + pt.bobPhase)*7*dt;   // soft rise & fall
+        const out = Math.abs(pt.p.x)>380 || pt.p.z<-620 || pt.p.z>160 || pt.p.y<6 || pt.p.y>175;
+        if(pt.t>pt.life || out){
+          const n = wind.mkGust(false);
+          pt.p.copy(n.p); pt.ang=n.ang; pt.curve=n.curve; pt.speedMul=n.speedMul;
+          pt.bobPhase=n.bobPhase; pt.life=n.life; pt.t=0;
           pt.hist.forEach(h=>h.copy(pt.p));
         }
         const tailv = pt.hist.pop(); tailv.copy(pt.p); pt.hist.unshift(tailv);
+        /* fade the whole gust in and out over its life so it breathes */
+        const env = Math.min(1, pt.t/0.9, Math.max(0,(pt.life-pt.t))/0.9);
         for(let sgi=0; sgi<wind.tail-1; sgi++){
           const A=pt.hist[sgi], B=pt.hist[sgi+1];
           pos[k*6]=A.x;   pos[k*6+1]=A.y; pos[k*6+2]=A.z;
           pos[k*6+3]=B.x; pos[k*6+4]=B.y; pos[k*6+5]=B.z;
-          const f1=Math.pow(1-sgi/(wind.tail-1),1.6), f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.6);
+          const f1=Math.pow(1-sgi/(wind.tail-1),1.9)*env, f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.9)*env;
           col[k*6]  =wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f1;
           col[k*6+1]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f1;
           col[k*6+2]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f1;
@@ -972,6 +1029,16 @@ function initPark3D(g, canvas, slot="modal"){
       });
       wind.mesh.geometry.attributes.position.needsUpdate = true;
       wind.mesh.geometry.attributes.color.needsUpdate = true;
+    }
+    if(rain){
+      const pos = rain.mesh.geometry.attributes.position.array;
+      rain.drops.forEach((d,i)=>{
+        d.addScaledVector(rain.vel, rain.speed*dt);
+        if(d.y < 1){ d.set((Math.random()-0.5)*680, 170+Math.random()*20, 110-Math.random()*640); }
+        pos[i*6]=d.x;                       pos[i*6+1]=d.y;                       pos[i*6+2]=d.z;
+        pos[i*6+3]=d.x+rain.vel.x*rain.len; pos[i*6+4]=d.y+rain.vel.y*rain.len;   pos[i*6+5]=d.z+rain.vel.z*rain.len;
+      });
+      rain.mesh.geometry.attributes.position.needsUpdate = true;
     }
     place();
     renderer.render(scene, cam);
@@ -1019,6 +1086,7 @@ function openModal(g){
           <div class="wx-item"><div class="big">${g.temp}<sup>°F</sup></div><div class="lab">${g.dome?"indoor":"temp"}</div></div>
           <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">${g.dome?"wind":g.dir+" · "+g.windLabel.toLowerCase()}</div></div>
           <div class="wx-item"><div class="big">${g.dew}<sup>°</sup></div><div class="lab">dew point</div></div>
+          ${(!g.dome&&g.rain!=null)?`<div class="wx-item"><div class="big">${g.rain}<sup>%</sup></div><div class="lab">rain chance${g.rain>=55?' · <b style="color:var(--red)">delay risk</b>':''}</div></div>`:""}
           <div style="margin-left:auto;text-align:right">
             <div class="sky" style="font-weight:700;color:var(--info,var(--blue))">${g.skyIcon} ${g.sky}</div>
             <div class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample} games</div>
@@ -1035,6 +1103,7 @@ function openModal(g){
         ${meter("Runs",`MLB avg ${LIVE?LIVE.league.r:9.0}/gm`,g.mlb.runs)}
         ${meter("Ks",`MLB avg ${LIVE?LIVE.league.so:16.8}/gm`,g.mlb.ks)}
       </div>
+      ${rainSec(g)}
       <div class="m-sec">
         <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}</h5>
         ${histTable(g)}
