@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeatherEdge MLB — Weather-Driven Baseball Insights</title>
+<style>
+  :root{
+    /* "Blueprint" — locked palette: cobalt-indigo + royal blue accent,
+       green/red impact language, slate under, amber bolt */
+    --navy:#152451; --navy2:#24409c; --navy3:#3a5bc4;
+    --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
+    --green:#178a3f; --green-deep:#10682e; --green-bg:#e6f5eb; --green-bg2:#d5efdd;
+    --red:#d33131; --red-deep:#a92525; --red-bg:#fdecec; --red-bg2:#f9dbdb;
+    /* under / neutral-cool = slate */
+    --blue:#5b6b83; --blue-deep:#47566d; --blue-bg:#edf0f5;
+    --purple:#5b6b83; --purple-bg:#edf0f5;
+    /* over / brand accent = royal blue */
+    --gold:#2f62e8; --gold-deep:#2450b8; --gold-bg:#e8eefc;
+    --info:#2f62e8;
+    --amber:#e0a11d; --amber-bg:#fdf5e3;
+    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#ffffff; --line:#e4e8ef;
+    --line-strong:#c3cde0; --hover:#f0f4fb; --body2:#3e4a5e;
+    --note-bg:#fdf5e3; --note-border:#f0dfb2; --note-text:#8a6207;
+    --ou1:#4a79f2; --ou2:#2450b8;
+    --bolt1:#f5b52e; --bolt2:#d98a12;
+    --meterp1:#5fbf8a; --meterp2:#178a3f; --metern1:#d33131; --metern2:#eda3a3;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
+    --shadow-hover:0 2px 4px rgba(21,36,81,.08),0 10px 28px rgba(21,36,81,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--surface); color:var(--ink); line-height:1.45;
+  }
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+    color:#fff; padding:26px 24px 0;
+  }
+  .header-inner{max-width:1240px;margin:0 auto}
+  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand h1{font-size:26px;font-weight:800;letter-spacing:.4px;display:flex;align-items:center;gap:10px}
+  .brand h1 .bolt{display:inline-flex;width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--bolt1),var(--bolt2));align-items:center;justify-content:center;font-size:19px}
+  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
+  .brand .tagline b{color:#e8c877;font-weight:600}
+  .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
+  .date-chip b{color:#fff}
+  /* tabs */
+  nav{display:flex;gap:4px;margin-top:22px}
+  nav button{
+    appearance:none;border:0;background:transparent;color:#95a1b5;font-size:14px;font-weight:600;
+    padding:11px 18px;border-radius:10px 10px 0 0;cursor:pointer;letter-spacing:.2px;
+  }
+  nav button:hover{color:#fff}
+  nav button.active{background:var(--surface);color:var(--ink)}
+  /* ---------- slate summary strip ---------- */
+  main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
+  .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
+  .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
+  .sum-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
+  .sum-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
+  .sum-card .k{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .sum-card .v{font-size:19px;font-weight:800;margin-top:3px}
+  .sum-card .s{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .v .pos{color:var(--green)} .v .neg{color:var(--red)}
+  /* ---------- controls ---------- */
+  .controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .controls h2{font-size:15px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .sort-wrap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  select{
+    appearance:none;background:var(--card) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%2378859a"/></svg>') no-repeat right 12px center;
+    border:1px solid var(--line);border-radius:9px;padding:8px 32px 8px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;box-shadow:var(--shadow)
+  }
+  /* ---------- hero: edge of the day ---------- */
+  .hero{display:grid;grid-template-columns:1.15fr 1fr;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px;border:1px solid var(--line)}
+  .hero-3d{position:relative;min-height:350px;background:#10151f}
+  .hero-3d canvas{width:100%;height:100%;display:block;cursor:grab}
+  .hero-3d canvas:active{cursor:grabbing}
+  .hero-info{padding:24px 26px;display:flex;flex-direction:column;gap:12px}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold-deep);background:var(--gold-bg);padding:5px 12px;border-radius:16px;width:fit-content}
+  .hero-teams{font-size:34px;font-weight:800;letter-spacing:.3px;line-height:1.1}
+  .hero-teams .at{font-weight:300;color:var(--faint)}
+  .hero-meta{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-top:-4px}
+  .hero-wx{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--body2);align-items:center}
+  .hero-wx b{font-size:15px}
+  .hero-imp{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .hi-row{display:grid;grid-template-columns:88px 1fr 62px;align-items:center;gap:12px}
+  .hi-row .l{font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--muted);text-transform:uppercase}
+  .hi-bar{height:10px;background:var(--gray-bg);border-radius:6px;position:relative}
+  .hi-bar .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--line-strong);border-radius:2px}
+  .hi-bar .f{position:absolute;top:0;bottom:0;border-radius:6px}
+  .hi-val{font-weight:800;font-size:15px;text-align:right}
+  .hi-val.pos{color:var(--green)} .hi-val.neg{color:var(--red)} .hi-val.neu{color:var(--muted)}
+  .hero-foot{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:8px;flex-wrap:wrap}
+  .hero-lean{display:flex;align-items:center;gap:12px}
+  .hero-lean .txt b{display:block;font-size:16px}
+  .hero-lean .txt span{font-size:12px;color:var(--muted)}
+  .hero-cta{margin-left:auto;appearance:none;border:0;background:linear-gradient(135deg,var(--ou1),var(--ou2));color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:10px;cursor:pointer;letter-spacing:.3px}
+  .hero-cta:hover{filter:brightness(1.08)}
+  /* ---------- slate board rows ---------- */
+  .board{display:flex;flex-direction:column;gap:10px}
+  .b-row{display:grid;grid-template-columns:76px 1.45fr 1.5fr 1.9fr 1.25fr 108px;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px;cursor:pointer;transition:.14s;box-shadow:var(--shadow)}
+  .b-row:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover);transform:translateY(-1px)}
+  .b-time{font-size:15px;font-weight:800}
+  .b-time span{display:block;font-size:10px;color:var(--faint);font-weight:700;letter-spacing:1px}
+  .b-teams{font-size:17px;font-weight:800}
+  .b-teams .at{font-weight:300;color:var(--faint)}
+  .b-park{font-size:11.5px;color:var(--muted)}
+  .b-wx{display:flex;align-items:center;gap:10px}
+  .b-wx .t{font-size:17px;font-weight:800}
+  .b-wx .w{font-size:11.5px;color:var(--muted);line-height:1.3}
+  .b-imp{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:8px;white-space:nowrap}
+  .pill.pos{background:var(--green-bg);color:var(--green)}
+  .pill.neg{background:var(--red-bg);color:var(--red)}
+  .pill.neu{background:var(--gray-bg);color:var(--muted)}
+  .b-ou{display:flex;align-items:center;gap:10px}
+  .b-ou .txt b{display:block;font-size:13px}
+  .b-ou .txt span{font-size:11px;color:var(--muted)}
+  .b-badge{text-align:right}
+  .b-badge .edge-badge{white-space:nowrap;font-size:9.5px;padding:4px 8px}
+  .wx-item .big{font-size:22px;font-weight:800}
+  .wx-item .big sup{font-size:12px;font-weight:600;color:var(--muted)}
+  .wx-item .lab{font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+  .sample{display:inline-flex;align-items:center;gap:5px;margin-top:4px;font-size:11.5px;font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .dot.strong{background:var(--green)}.dot.fair{background:var(--amber)}.dot.limited{background:var(--red)}
+  .edge-badge{font-size:10.5px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase}
+  .edge-hr{background:#147a43;color:#d9f4e3}
+  .edge-under{background:#47566d;color:#e2e8f2}
+  .edge-neutral{background:var(--gray-bg);color:var(--muted)}
+  @media(max-width:960px){
+    .hero{grid-template-columns:1fr}
+    .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
+    .b-imp{grid-column:1/-1}
+    .b-ou{grid-column:1/2/span 2}
+    .b-badge{display:none}
+  }
+  /* ---------- compare table ---------- */
+  .table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:860px}
+  thead th{
+    position:sticky;top:0;background:var(--navy);color:#a3aec2;font-size:11px;letter-spacing:.8px;text-transform:uppercase;
+    padding:12px 14px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap
+  }
+  thead th:first-child,thead th:nth-child(2),thead th:nth-child(3){text-align:left}
+  thead th:hover{color:#fff}
+  thead th .arr{font-size:9px;margin-left:4px}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  tbody td:first-child,tbody td:nth-child(2),tbody td:nth-child(3){text-align:left}
+  tbody tr{cursor:pointer;transition:background .1s}
+  tbody tr:hover{background:var(--hover)}
+  .cell-chip{display:inline-block;min-width:56px;text-align:center;padding:4px 8px;border-radius:8px;font-weight:800;font-size:12.5px}
+  .cell-chip.pos{background:var(--green-bg);color:var(--green)}
+  .cell-chip.neg{background:var(--red-bg);color:var(--red)}
+  .cell-chip.neu{background:var(--gray-bg);color:var(--muted)}
+  .lean-cell{font-weight:800}
+  .lean-cell.over{color:var(--gold)} .lean-cell.under{color:var(--blue-deep)} .lean-cell.none{color:var(--faint);font-weight:600}
+  .tbl-teams{font-weight:800;font-size:14px}
+  .tbl-park{color:var(--muted);font-size:12px}
+  /* ---------- method ---------- */
+  .method{max-width:760px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 34px;margin:0 auto}
+  .method h3{font-size:20px;font-weight:800;margin-bottom:12px}
+  .method h4{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+  .method p{font-size:14.5px;color:var(--body2);margin-bottom:12px}
+  .method .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .pill{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;font-weight:600}
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(13,25,41,.55);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:34px 16px;z-index:50;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:18px;max-width:860px;width:100%;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35);animation:pop .18s ease-out}
+  @keyframes pop{from{transform:translateY(10px);opacity:.4}to{transform:none;opacity:1}}
+  .m-head{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start}
+  .m-head .teams{font-size:30px;font-weight:800;letter-spacing:.5px}
+  .m-head .meta{color:#93a1b8;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:600;margin-top:4px}
+  .m-close{appearance:none;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex:0 0 auto}
+  .m-close:hover{background:rgba(255,255,255,.24)}
+  .m-body{padding:20px 26px 28px}
+  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px}
+  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
+  .m-cond{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .m-cond .wx-item .big{font-size:27px}
+  .m-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .m-tile{border-radius:12px;padding:14px 16px}
+  .m-tile .t-lab{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+  .m-tile .t-val{font-size:32px;font-weight:800;letter-spacing:-1px;margin:2px 0 6px}
+  .m-tile .t-sub{display:flex;gap:14px;font-size:11.5px}
+  .m-tile .t-sub b{display:block;font-size:14px}
+  .m-tile.pos{background:var(--green-bg)} .m-tile.pos .t-lab,.m-tile.pos .t-sub{color:var(--green-deep)} .m-tile.pos .t-val{color:var(--green)}
+  .m-tile.neg{background:var(--red-bg)} .m-tile.neg .t-lab,.m-tile.neg .t-sub{color:var(--red-deep)} .m-tile.neg .t-val{color:var(--red)}
+  .m-tile.neu{background:var(--gray-bg)} .m-tile.neu .t-lab,.m-tile.neu .t-sub{color:var(--muted)} .m-tile.neu .t-val{color:var(--muted)}
+  /* mlb-average meters */
+  .meter-row{display:grid;grid-template-columns:120px 1fr 58px;align-items:center;gap:14px;margin-bottom:13px}
+  .meter-row:last-child{margin-bottom:2px}
+  .meter-lab{font-size:12.5px;font-weight:700}
+  .meter-lab span{color:var(--muted);font-weight:500;font-size:11.5px;display:block}
+  .meter{position:relative;height:12px;background:var(--gray-bg);border-radius:8px}
+  .meter .fill{position:absolute;top:0;bottom:0;border-radius:8px}
+  .meter .fill.pos{background:linear-gradient(90deg,var(--meterp1),var(--meterp2))}
+  .meter .fill.neg{background:linear-gradient(90deg,var(--metern1),var(--metern2))}
+  .p3d-dims{position:absolute;left:16px;bottom:10px;color:rgba(255,255,255,.65);font-size:11px;letter-spacing:.5px;pointer-events:none}
+  .meter .mid{position:absolute;top:-4px;bottom:-4px;left:50%;width:2px;background:#c2ccd8;border-radius:2px}
+  .meter-val{font-size:14px;font-weight:800;text-align:right}
+  .meter-val.pos{color:var(--green)} .meter-val.neg{color:var(--red)} .meter-val.neu{color:var(--muted)}
+  /* history table */
+  .hist-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:0}
+  .hist-table th{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);position:static;background:none;cursor:default}
+  .hist-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .hist-table th:nth-child(n+3),.hist-table td:nth-child(n+3){text-align:right}
+  .res-chip{display:inline-block;padding:2.5px 9px;border-radius:8px;font-weight:800;font-size:10.5px;letter-spacing:.4px}
+  .res-chip.over{background:var(--gold-bg);color:var(--gold-deep)}
+  .res-chip.under{background:var(--blue-bg);color:var(--blue-deep)}
+  .res-chip.push{background:var(--gray-bg);color:var(--muted)}
+  .hist-note{font-size:11.5px;color:var(--faint);margin-top:8px}
+  /* 3D park view */
+  .park3d-wrap{position:relative;height:330px;background:#10151f;border-radius:11px;overflow:hidden}
+  .park3d-wrap canvas{width:100%;height:100%;display:block;cursor:grab}
+  .park3d-wrap canvas:active{cursor:grabbing}
+  .p3d-hud{position:absolute;top:14px;left:16px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55);pointer-events:none}
+  .p3d-hud .t{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
+  .p3d-hud .w{font-size:15px;font-weight:800;margin-top:3px}
+  .p3d-badge{position:absolute;top:14px;right:16px;background:rgba(8,12,20,.42);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.7px;padding:5px 11px;border-radius:14px;text-transform:uppercase;pointer-events:none}
+  .p3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none}
+  .hit-summary{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .hit-box{flex:1;min-width:120px;border-radius:11px;padding:11px 14px;text-align:center}
+  .hit-box .n{font-size:22px;font-weight:800}
+  .hit-box .l{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
+  .hit-box.over{background:var(--gold-bg)} .hit-box.over .n{color:var(--gold-deep)} .hit-box.over .l{color:var(--gold-deep)}
+  .hit-box.under{background:var(--blue-bg)} .hit-box.under .n,.hit-box.under .l{color:var(--blue-deep)}
+  .hit-box.push{background:var(--gray-bg)} .hit-box.push .n,.hit-box.push .l{color:var(--muted)}
+  footer{max-width:1240px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--faint);text-align:center}
+  .view{display:none}.view.active{display:block}
+  @media(max-width:640px){
+    .gc-head .teams{font-size:18px}
+    .m-tiles{grid-template-columns:1fr}
+    .brand h1{font-size:22px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <h1><span class="bolt">⚡</span> WeatherEdge <span style="font-weight:300;color:#93a1b8">MLB</span></h1>
+        <div class="tagline">Not a model. Not a simulation. <b>Real data for a real edge.</b></div>
+      </div>
+      <div class="date-chip">Slate for <b id="date-label">Tuesday, July 28</b> · <span id="game-count"></span> games</div>
+    </div>
+    <nav>
+      <button class="active" data-view="slate">Today's Slate</button>
+      <button data-view="compare">Compare All Games</button>
+      <button data-view="method">How It Works</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — live slate loads automatically when the daily build has run.</span></div>
+
+  <!-- ======== SLATE VIEW ======== -->
+  <section class="view active" id="view-slate">
+    <div class="summary-strip" id="summary-strip"></div>
+    <section class="hero" id="hero"></section>
+    <div class="controls">
+      <h2>Weather impact vs each park</h2>
+      <div class="sort-wrap">
+        Sort by
+        <select id="sort-select">
+          <option value="time">First pitch</option>
+          <option value="hr">HR boost</option>
+          <option value="runs">Run boost</option>
+          <option value="ks">K boost</option>
+          <option value="over">Over lean</option>
+          <option value="under">Under lean</option>
+        </select>
+      </div>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <!-- ======== COMPARE VIEW ======== -->
+  <section class="view" id="view-compare">
+    <div class="controls"><h2>Every game, one board — click a column to rank it</h2></div>
+    <div class="table-card">
+      <table id="cmp-table">
+        <thead><tr>
+          <th data-k="teams">Game</th>
+          <th data-k="time">First pitch</th>
+          <th data-k="wx">Conditions</th>
+          <th data-k="hr">HR impact</th>
+          <th data-k="runs">Runs</th>
+          <th data-k="ks">Strikeouts</th>
+          <th data-k="lean">O/U lean</th>
+          <th data-k="total">Avg total</th>
+        </tr></thead>
+        <tbody id="cmp-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ======== METHOD VIEW ======== -->
+  <section class="view" id="view-method">
+    <div class="method">
+      <h3>Real games. Real weather. Real results.</h3>
+      <p>For every game on today's slate, we take the forecast at first pitch — temperature, wind speed and direction relative to the park's orientation, dew point, and sky cover — and find every game played at <b>that same ballpark in similar conditions</b> since 2019.</p>
+      <p>Then we simply report what actually happened in those games: how many home runs flew, how many runs scored, how many hitters struck out — and how often the game went over or under the closing total. No projections, no simulations, no black box. Just history, matched to today.</p>
+      <h4>Reading the sample badge</h4>
+      <div class="pill-row">
+        <span class="pill"><span class="dot strong"></span> Strong — 40+ matched games</span>
+        <span class="pill"><span class="dot fair"></span> Fair — 15–39 matched games</span>
+        <span class="pill"><span class="dot limited"></span> Limited — under 15 games</span>
+      </div>
+      <h4>Park-specific vs. league-wide</h4>
+      <p><b>Weather impact vs this park</b> compares today's conditions to that park's own average — the sharpest signal, since every park plays differently. <b>Vs MLB average</b> puts the same game on a league-wide scale so you can compare across the whole slate.</p>
+      <h4>Domes & retractable roofs</h4>
+      <p>When a roof is closed, weather is neutral by definition — we flag it and show the park's indoor baselines instead of a false edge.</p>
+      <h4>What's next</h4>
+      <p>This preview runs on representative sample data. The live build connects the MLB schedule, hourly forecasts, and the full 2019-present game log so every number on this page updates automatically each morning and again 90 minutes before first pitch.</p>
+    </div>
+  </section>
+</main>
+
+<footer>WeatherEdge MLB · Prototype v0.1 · Weather-adjusted insights are informational, not betting advice.</footer>
+
+<!-- ======== MODAL ======== -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ==================================================================
+   SAMPLE DATA — representative slate for Tue, Jul 28
+   windAngle: degrees clockwise from straight out to CF (0 = out to CF,
+   90 = out to RF line side, 180 = blowing in, 270 = out to LF side)
+================================================================== */
+const SAMPLE_GAMES = [
+  {id:"tb-stl", away:"TB", home:"STL", park:"Busch Stadium", time:"4:15 PM ET", sortTime:1615,
+   temp:91, wind:14, dir:"SW", windAngle:35, windLabel:"OUT TO RF", dew:60, sky:"Overcast", skyIcon:"☁️",
+   sample:15, hr:16, runs:10, ks:-3, hrGm:2.3, hrPark:2.0,
+   mlb:{hr:1, runs:4, ks:-8}, ou:{under:27, push:26, over:47}, total:8.5},
+
+  {id:"wsh-chc", away:"WSH", home:"CHC", park:"Wrigley Field", time:"2:20 PM ET", sortTime:1420,
+   temp:84, wind:13, dir:"SSW", windAngle:10, windLabel:"OUT TO CF", dew:64, sky:"Sunny", skyIcon:"☀️",
+   sample:49, hr:24, runs:14, ks:-4, hrGm:2.9, hrPark:2.3,
+   mlb:{hr:19, runs:11, ks:-6}, ou:{under:25, push:7, over:68}, total:9.0},
+
+  {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
+   temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅",
+   sample:44, hr:12, runs:8, ks:-2, hrGm:2.5, hrPark:2.2,
+   mlb:{hr:8, runs:6, ks:-4}, ou:{under:30, push:12, over:58}, total:9.5},
+
+  {id:"phi-nym", away:"PHI", home:"NYM", park:"Citi Field", time:"7:10 PM ET", sortTime:1910,
+   temp:86, wind:9, dir:"S", windAngle:170, windLabel:"IN FROM CF", dew:65, sky:"Clear", skyIcon:"🌙",
+   sample:22, hr:-6, runs:-3, ks:1, hrGm:1.7, hrPark:1.8,
+   mlb:{hr:-9, runs:-5, ks:0}, ou:{under:51, push:9, over:40}, total:8.0},
+
+  {id:"cin-col", away:"CIN", home:"COL", park:"Coors Field", time:"8:40 PM ET", sortTime:2040,
+   temp:93, wind:10, dir:"S", windAngle:20, windLabel:"OUT TO RF", dew:48, sky:"Sunny", skyIcon:"☀️",
+   sample:27, hr:9, runs:12, ks:-5, hrGm:3.1, hrPark:2.8,
+   mlb:{hr:28, runs:31, ks:-12}, ou:{under:33, push:9, over:58}, total:11.5},
+
+  {id:"cws-min", away:"CWS", home:"MIN", park:"Target Field", time:"7:40 PM ET", sortTime:1940,
+   temp:83, wind:10, dir:"SSW", windAngle:40, windLabel:"OUT TO RF", dew:61, sky:"Partly cloudy", skyIcon:"⛅",
+   sample:19, hr:7, runs:4, ks:-2, hrGm:2.2, hrPark:2.1,
+   mlb:{hr:3, runs:1, ks:-3}, ou:{under:36, push:12, over:52}, total:9.0},
+
+  {id:"bal-tor", away:"BAL", home:"TOR", park:"Rogers Centre · roof open", time:"7:07 PM ET", sortTime:1907,
+   temp:81, wind:8, dir:"SE", windAngle:300, windLabel:"CROSS R→L", dew:63, sky:"Clear", skyIcon:"🌙",
+   sample:12, hr:5, runs:3, ks:-1, hrGm:2.4, hrPark:2.3,
+   mlb:{hr:4, runs:2, ks:-2}, ou:{under:40, push:13, over:47}, total:8.5},
+
+  {id:"det-mil", away:"DET", home:"MIL", park:"Am Fam Field · roof open", time:"7:40 PM ET", sortTime:1940,
+   temp:78, wind:7, dir:"NW", windAngle:195, windLabel:"IN FROM LF", dew:56, sky:"Clear", skyIcon:"🌙",
+   sample:31, hr:-4, runs:-2, ks:1, hrGm:2.1, hrPark:2.2,
+   mlb:{hr:-3, runs:-3, ks:0}, ou:{under:44, push:11, over:45}, total:8.0},
+
+  {id:"hou-tex", away:"HOU", home:"TEX", park:"Globe Life Field", time:"8:05 PM ET", sortTime:2005,
+   dome:true, temp:101, wind:0, dir:"—", windAngle:0, windLabel:"ROOF CLOSED", dew:70, sky:"Indoor", skyIcon:"🏟️",
+   sample:74, hr:0, runs:0, ks:0, hrGm:2.1, hrPark:2.1,
+   mlb:{hr:-6, runs:-4, ks:2}, ou:{under:46, push:10, over:44}, total:8.5},
+
+  {id:"lad-sd", away:"LAD", home:"SD", park:"Petco Park", time:"9:40 PM ET", sortTime:2140,
+   temp:71, wind:8, dir:"W", windAngle:185, windLabel:"IN FROM CF", dew:62, sky:"Marine layer", skyIcon:"🌫️",
+   sample:61, hr:-14, runs:-9, ks:3, hrGm:1.6, hrPark:1.9,
+   mlb:{hr:-19, runs:-13, ks:5}, ou:{under:55, push:10, over:35}, total:7.5},
+
+  {id:"atl-sf", away:"ATL", home:"SF", park:"Oracle Park", time:"9:45 PM ET", sortTime:2145,
+   temp:63, wind:16, dir:"WSW", windAngle:160, windLabel:"IN FROM RF", dew:55, sky:"Fog rolling in", skyIcon:"🌫️",
+   sample:58, hr:-18, runs:-10, ks:2, hrGm:1.3, hrPark:1.6,
+   mlb:{hr:-26, runs:-15, ks:4}, ou:{under:58, push:9, over:33}, total:7.0},
+
+  {id:"kc-sea", away:"KC", home:"SEA", park:"T-Mobile Park · roof open", time:"9:40 PM ET", sortTime:2140,
+   temp:72, wind:6, dir:"N", windAngle:210, windLabel:"IN FROM LF", dew:52, sky:"Clear", skyIcon:"🌙",
+   sample:52, hr:-11, runs:-7, ks:3, hrGm:1.7, hrPark:1.9,
+   mlb:{hr:-15, runs:-10, ks:6}, ou:{under:57, push:8, over:35}, total:7.0}
+];
+
+let GAMES = SAMPLE_GAMES;
+let LIVE = null;   // set when data.json loads
+
+/* ==================================================================
+   ALL 30 PARKS — real outfield dimensions (ft) at LF line / LCF / CF /
+   RCF / RF line, wall heights (ft), roof flags. Signature quirks kept:
+   Green Monster, Crawford Boxes, Clemente Wall, Oracle's alley, etc.
+================================================================== */
+const PARKS = {
+  ARI:{name:"Chase Field",              dims:[330,374,407,374,334], walls:[8,8,25,8,9],    roof:true},
+  ATH:{name:"Sutter Health Park",       dims:[330,396,403,386,325], walls:[8,8,8,8,8]},
+  ATL:{name:"Truist Park",              dims:[335,385,400,375,325], walls:[8,8,8,8,16]},
+  BAL:{name:"Camden Yards",             dims:[333,364,410,373,318], walls:[7,7,7,8,21]},
+  BOS:{name:"Fenway Park",              dims:[310,379,390,380,302], walls:[37,37,17,5,3]},
+  CHC:{name:"Wrigley Field",            dims:[355,368,400,368,353], walls:[15,11,11,11,15]},
+  CIN:{name:"Great American Ball Park", dims:[328,379,404,370,325], walls:[12,8,8,8,8]},
+  CLE:{name:"Progressive Field",        dims:[325,370,405,375,325], walls:[19,19,9,9,9]},
+  COL:{name:"Coors Field",              dims:[347,390,415,375,350], walls:[8,8,8,13,14]},
+  CWS:{name:"Rate Field",               dims:[330,375,400,375,335], walls:[8,8,8,8,8]},
+  DET:{name:"Comerica Park",            dims:[345,370,412,365,330], walls:[8,8,9,9,8]},
+  HOU:{name:"Daikin Park",              dims:[315,362,409,373,326], walls:[19,19,9,9,7],   roof:true},
+  KC: {name:"Kauffman Stadium",         dims:[330,387,410,387,330], walls:[8,8,8,8,8]},
+  LAA:{name:"Angel Stadium",            dims:[330,387,396,370,330], walls:[8,8,8,18,18]},
+  LAD:{name:"Dodger Stadium",           dims:[330,385,395,385,330], walls:[8,8,8,8,8]},
+  MIA:{name:"loanDepot park",           dims:[344,386,400,387,335], walls:[10,10,10,10,10],roof:true},
+  MIL:{name:"American Family Field",    dims:[344,371,400,374,345], walls:[8,8,8,8,8],     retract:true},
+  MIN:{name:"Target Field",             dims:[339,377,404,367,328], walls:[8,8,8,23,23]},
+  NYM:{name:"Citi Field",               dims:[335,370,408,380,330], walls:[8,8,8,8,8]},
+  NYY:{name:"Yankee Stadium",           dims:[318,399,408,385,314], walls:[8,8,8,8,8]},
+  PHI:{name:"Citizens Bank Park",       dims:[329,374,401,369,330], walls:[12,12,6,12,12]},
+  PIT:{name:"PNC Park",                 dims:[325,389,399,375,320], walls:[6,10,10,21,21]},
+  SD: {name:"Petco Park",               dims:[336,390,396,391,322], walls:[4,8,8,8,10]},
+  SEA:{name:"T-Mobile Park",            dims:[331,378,401,381,326], walls:[8,8,8,8,8],     retract:true},
+  SF: {name:"Oracle Park",              dims:[339,364,391,415,309], walls:[8,8,8,8,25]},
+  STL:{name:"Busch Stadium",            dims:[336,375,400,375,335], walls:[8,8,8,8,8]},
+  TB: {name:"Tropicana Field",          dims:[315,370,404,370,322], walls:[10,10,10,10,10],roof:true},
+  TEX:{name:"Globe Life Field",         dims:[329,372,407,374,326], walls:[8,8,8,8,8],     roof:true},
+  TOR:{name:"Rogers Centre",            dims:[328,375,400,375,328], walls:[10,10,10,10,10],retract:true},
+  WSH:{name:"Nationals Park",           dims:[336,377,402,370,335], walls:[8,8,8,8,8]},
+};
+
+const TEAMS = ["ARI","ATL","BAL","BOS","CHC","CIN","CLE","COL","CWS","DET","HOU","KC","LAA","LAD","MIA","MIL","MIN","NYM","NYY","OAK","PHI","PIT","SD","SEA","SF","STL","TB","TEX","TOR","WSH"];
+
+/* ---------- wind arrow colors ---------- */
+const WIND_COLORS = {out:"#178a3f", in:"#5b6b83"};
+
+/* ---------- helpers ---------- */
+function mulberry32(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)}
+const pct = v => (v>0?"+":"")+v+"%";
+const cls = v => v>0?"pos":(v<0?"neg":"neu");
+function sampleInfo(n){ if(n>=40) return {cls:"strong",word:"Strong sample"}; if(n>=15) return {cls:"fair",word:"Fair sample"}; return {cls:"limited",word:"Limited sample"}; }
+
+/* park diagram with wind arrow */
+function parkSVG(g, size){
+  const s = size, c = s/2;
+  if(g.dome){
+    return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
+      <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#eef1f5" stroke="#dde3ea"/>
+      <g transform="translate(${c},${c*1.12}) scale(${s/86})">
+        <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#e0e6ed" stroke="#c8d1dc" stroke-width="2"/>
+        <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#f6f8fa" stroke="#c8d1dc" stroke-width="1.6"/>
+      </g>
+      <text x="${c}" y="${s*0.22}" text-anchor="middle" font-size="${s*0.14}" font-weight="800" fill="#9aa6b5">🏟️</text>
+    </svg>`;
+  }
+  const ang = (g.windAngle-90)*Math.PI/180; // 0 => up
+  const len = s*0.30;
+  const x1 = c - Math.cos(ang)*len*0.55, y1 = c*1.08 - Math.sin(ang)*len*0.55;
+  const x2 = c + Math.cos(ang)*len,      y2 = c*1.08 + Math.sin(ang)*len;
+  const blowingIn = g.windAngle>120 && g.windAngle<240;
+  const arrColor = blowingIn ? WIND_COLORS.in : WIND_COLORS.out;
+  const mid = `arr-${g.id}-${size}`;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
+    <defs><marker id="${mid}" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="${arrColor}"/></marker></defs>
+    <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#eaf6ee" stroke="#d3e8da"/>
+    <g transform="translate(${c},${c*1.12}) scale(${s/86})">
+      <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#dcefe2" stroke="#b7d9c3" stroke-width="2"/>
+      <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#fdfefd" stroke="#b7d9c3" stroke-width="1.6"/>
+      <circle cx="0" cy="0" r="2.6" fill="#b7d9c3"/>
+    </g>
+    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${arrColor}" stroke-width="${Math.max(2,s*0.045)}" stroke-linecap="round" marker-end="url(#${mid})"/>
+  </svg>`;
+}
+
+/* ---------- slate summary ---------- */
+function edgeBadge(g){
+  if(g.dome) return `<span class="edge-badge edge-neutral">Roof closed</span>`;
+  if(g.hr>=12) return `<span class="edge-badge edge-hr">HR weather</span>`;
+  if(g.ou.under>=50) return `<span class="edge-badge edge-under">Under weather</span>`;
+  return "";
+}
+function renderSummary(){
+  let live = GAMES.filter(g=>!g.dome);
+  if(!live.length) live = GAMES;
+  if(!live.length){ document.getElementById("summary-strip").innerHTML=""; return; }
+  const bestHR = [...live].sort((a,b)=>b.hr-a.hr)[0];
+  const bestUnder = [...live].sort((a,b)=>b.ou.under-a.ou.under)[0];
+  const bestOver = [...live].sort((a,b)=>b.ou.over-a.ou.over)[0];
+  const bestK = [...live].sort((a,b)=>b.ks-a.ks)[0];
+  const html = [
+    {k:"Best HR conditions", v:`${bestHR.away} @ ${bestHR.home} <span class="pos">${pct(bestHR.hr)}</span>`, s:bestHR.windLabel.toLowerCase()+" · "+bestHR.wind+" mph", id:bestHR.id},
+    {k:"Strongest over lean", v:`${bestOver.away} @ ${bestOver.home} <span class="pos">${bestOver.ou.over}%</span>`, s:"historical over rate in these conditions", id:bestOver.id},
+    {k:"Strongest under lean", v:`${bestUnder.away} @ ${bestUnder.home} <span class="neg">${bestUnder.ou.under}%</span>`, s:bestUnder.sky.toLowerCase()+" · "+bestUnder.temp+"° at first pitch", id:bestUnder.id},
+    {k:"Best K conditions", v:`${bestK.away} @ ${bestK.home} <span class="pos">${pct(bestK.ks)} Ks</span>`, s:"cool, heavy air suppresses carry", id:bestK.id},
+  ].map(c=>`<div class="sum-card" data-game="${c.id}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s}</div></div>`).join("");
+  document.getElementById("summary-strip").innerHTML = html;
+}
+
+/* ---------- hero + board ---------- */
+function gaugeSVG(g, size=48){
+  const r=17, c=2*Math.PI*r;
+  const o=g.ou.over/100*c, p=g.ou.push/100*c, u=g.ou.under/100*c;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46">
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#2f62e8" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#c7d0dd" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#8b99ad" stroke-width="6" stroke-dasharray="${u} ${c}" stroke-dashoffset="${-(o+p)}" transform="rotate(-90 23 23)"/>
+    <text x="23" y="27" text-anchor="middle" font-size="12" font-weight="800" fill="#1a2333">${g.total.toFixed(1)}</text>
+  </svg>`;
+}
+function leanTxt(g){
+  return g.ou.over>g.ou.under+3 ? `<b style="color:var(--gold-deep)">OVER ${g.ou.over}%</b>`
+    : g.ou.under>g.ou.over+3 ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
+    : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
+}
+function rowHTML(g){
+  const si = sampleInfo(g.sample);
+  const imp = g.dome
+    ? `<span class="pill neu">HR —</span><span class="pill neu">R —</span><span class="pill neu">K —</span>`
+    : `<span class="pill ${cls(g.hr)}">HR ${pct(g.hr)}</span><span class="pill ${cls(g.runs)}">R ${pct(g.runs)}</span><span class="pill ${cls(g.ks)}">K ${pct(g.ks)}</span>`;
+  const wx = g.dome
+    ? `<div class="w">🏟️ roof closed<br>weather sealed out</div>`
+    : `<div class="w">${g.wind} mph ${g.dir}<br>${g.windLabel.toLowerCase()} · dew ${g.dew}°</div>`;
+  return `<div class="b-row" data-game="${g.id}">
+    <div class="b-time">${g.time.replace(" ET","")}<span>ET</span></div>
+    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-park">${g.park}</div></div>
+    <div class="b-wx">${parkSVG(g,46)}<div><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div></div>
+    <div class="b-imp">${imp}</div>
+    <div class="b-ou">${gaugeSVG(g)}<div class="txt">${leanTxt(g)}<span>${si.word} · ${g.sample} gms</span></div></div>
+    <div class="b-badge">${edgeBadge(g)}</div>
+  </div>`;
+}
+function renderBoard(){
+  const mode = document.getElementById("sort-select").value;
+  const sorted = [...GAMES].sort((a,b)=>{
+    switch(mode){
+      case "hr": return b.hr-a.hr;
+      case "runs": return b.runs-a.runs;
+      case "ks": return b.ks-a.ks;
+      case "over": return b.ou.over-a.ou.over;
+      case "under": return b.ou.under-a.ou.under;
+      default: return a.sortTime-b.sortTime;
+    }
+  });
+  document.getElementById("board").innerHTML = sorted.map(rowHTML).join("");
+}
+function heroBar(v){
+  const half = Math.min(Math.abs(v),35)/35*50;
+  const f = v>=0
+    ? `<div class="f" style="left:50%;width:${half}%;background:linear-gradient(90deg,var(--meterp1),var(--meterp2))"></div>`
+    : `<div class="f" style="right:50%;width:${half}%;background:linear-gradient(90deg,var(--metern2),var(--metern1))"></div>`;
+  return `<div class="hi-bar">${v===0?"":f}<div class="mid"></div></div>`;
+}
+function renderHero(){
+  let live = GAMES.filter(x=>!x.dome);
+  if(!live.length) live = GAMES;
+  if(!live.length){ document.getElementById("hero").innerHTML=""; return; }
+  const g = [...live].sort((a,b)=>Math.abs(b.hr)-Math.abs(a.hr))[0];
+  const si = sampleInfo(g.sample);
+  const pk = PARKS[g.home] || {dims:[335,375,400,375,335]};
+  document.getElementById("hero").innerHTML = `
+    <div class="hero-3d">
+      <canvas id="hero3d"></canvas>
+      <div class="p3d-hud"><div class="t">${g.park.split("·")[0].trim()} · live view</div>
+        <div class="w">💨 ${g.wind} mph ${g.dir} · ${g.windLabel.toLowerCase()}</div></div>
+      <div class="p3d-badge">${g.skyIcon} ${g.sky}</div>
+      <div class="p3d-dims">${pk.dims[0]}′ LF · ${pk.dims[2]}′ CF · ${pk.dims[4]}′ RF</div>
+      <div class="p3d-hint">drag to look around</div>
+    </div>
+    <div class="hero-info">
+      <div class="hero-tag">⚡ Edge of the day</div>
+      <div class="hero-teams">${g.away} <span class="at">@</span> ${g.home}</div>
+      <div class="hero-meta">${g.time} · ${g.park}</div>
+      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span><span class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}</span></div>
+      <div class="hero-imp">
+        <div class="hi-row"><span class="l">Home runs</span>${heroBar(g.hr)}<span class="hi-val ${cls(g.hr)}">${pct(g.hr)}</span></div>
+        <div class="hi-row"><span class="l">Runs</span>${heroBar(g.runs)}<span class="hi-val ${cls(g.runs)}">${pct(g.runs)}</span></div>
+        <div class="hi-row"><span class="l">Strikeouts</span>${heroBar(g.ks)}<span class="hi-val ${cls(g.ks)}">${pct(g.ks)}</span></div>
+      </div>
+      <div class="hero-foot">
+        <div class="hero-lean">${gaugeSVG(g,54)}<div class="txt">${leanTxt(g)}<span>in ${g.sample} similar games · avg total ${g.total.toFixed(1)}</span></div></div>
+        <button class="hero-cta" data-game="${g.id}">Full breakdown →</button>
+      </div>
+    </div>`;
+  const cv = document.getElementById("hero3d");
+  if(cv) initPark3D(g, cv, "hero");
+}/* ---------- compare table ---------- */
+let cmpSort = {k:"hr", dir:-1};
+function chip(v){ return v===0 ? `<span class="cell-chip neu">—</span>` : `<span class="cell-chip ${cls(v)}">${pct(v)}</span>`; }
+function renderCompare(){
+  const rows = [...GAMES].sort((a,b)=>{
+    const k=cmpSort.k, d=cmpSort.dir;
+    const val = g => k==="teams" ? g.away : k==="time" ? g.sortTime : k==="wx" ? g.temp
+      : k==="lean" ? g.ou.over-g.ou.under : k==="total" ? g.total : g[k];
+    const va=val(a), vb=val(b);
+    return (va<vb?-1:va>vb?1:0)*d;
+  });
+  document.getElementById("cmp-body").innerHTML = rows.map(g=>{
+    const lean = g.ou.over>g.ou.under+3 ? `<span class="lean-cell over">OVER ${g.ou.over}%</span>`
+      : g.ou.under>g.ou.over+3 ? `<span class="lean-cell under">UNDER ${g.ou.under}%</span>`
+      : `<span class="lean-cell none">even</span>`;
+    return `<tr data-game="${g.id}">
+      <td><span class="tbl-teams">${g.away} @ ${g.home}</span><br><span class="tbl-park">${g.park}</span></td>
+      <td>${g.time}</td>
+      <td>${g.dome?"🏟️ roof closed":`${g.temp}° · ${g.wind} mph ${g.dir}`}</td>
+      <td>${g.dome?chip(0):chip(g.hr)}</td>
+      <td>${g.dome?chip(0):chip(g.runs)}</td>
+      <td>${g.dome?chip(0):chip(g.ks)}</td>
+      <td>${lean}</td>
+      <td><b>${g.total.toFixed(1)}</b></td>
+    </tr>`;
+  }).join("");
+  document.querySelectorAll("#cmp-table thead th").forEach(th=>{
+    const arr = th.querySelector(".arr"); if(arr) arr.remove();
+    if(th.dataset.k===cmpSort.k){
+      const s=document.createElement("span"); s.className="arr"; s.textContent=cmpSort.dir<0?"▼":"▲"; th.appendChild(s);
+    }
+  });
+}
+document.querySelectorAll("#cmp-table thead th").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const k=th.dataset.k;
+    if(cmpSort.k===k) cmpSort.dir*=-1; else cmpSort={k,dir:k==="teams"||k==="time"||k==="wx"?1:-1};
+    renderCompare();
+  });
+});
+
+/* ---------- historical similar games (seeded, consistent with O/U %) ---------- */
+function histRows(g){
+  const rnd = mulberry32(hashStr(g.id));
+  const n = g.sample;
+  let over = Math.round(g.ou.over/100*n), under = Math.round(g.ou.under/100*n);
+  let push = n - over - under; if(push<0){push=0; under=n-over;}
+  const results = [...Array(over).fill("over"),...Array(under).fill("under"),...Array(push).fill("push")];
+  for(let i=results.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[results[i],results[j]]=[results[j],results[i]];}
+  const months=["Apr","May","Jun","Jul","Aug","Sep"];
+  const rows = results.map(res=>{
+    const yr = 2019+Math.floor(rnd()*7); // 2019–2025
+    const mo = months[Math.floor(rnd()*months.length)];
+    const day = 1+Math.floor(rnd()*28);
+    let away = TEAMS[Math.floor(rnd()*TEAMS.length)];
+    while(away===g.home) away = TEAMS[Math.floor(rnd()*TEAMS.length)];
+    const temp = g.temp + Math.round((rnd()-0.5)*8);
+    const wind = Math.max(0, g.wind + Math.round((rnd()-0.5)*6));
+    let line = g.total + (Math.round((rnd()-0.5)*3))*0.5;
+    let final;
+    if(res==="push"){ line = Math.round(line); final = line; }
+    else if(res==="over"){ final = Math.ceil(line) + Math.floor(rnd()*6); if(final<=line) final=Math.floor(line)+1; }
+    else { final = Math.floor(line) - Math.floor(rnd()*5); if(final>=line) final=Math.ceil(line)-1; if(final<1) final=Math.max(1,Math.floor(line)-1); }
+    return {date:`${mo} ${day}, ${yr}`, yr, matchup:`${away} @ ${g.home}`, temp, wind, line:line.toFixed(1), final, res};
+  }).sort((a,b)=>b.yr-a.yr);
+  return rows;
+}
+function histTable(g){
+  if(g.matches && g.matches.length){
+    const line = g.total;
+    const body = g.matches.map(m=>{
+      const dstr = `${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
+      const res = m.r>line ? "over" : (m.r<line ? "under" : "push");
+      return `<tr><td>${dstr}</td><td>at ${g.home}</td><td>${m.t}°</td><td>${m.w} mph</td><td>${line||"—"}</td><td><b>${m.r}</b></td><td><span class="res-chip ${res}">${res.toUpperCase()}</span></td></tr>`;
+    }).join("");
+    return `
+    <div class="hit-summary">
+      <div class="hit-box over"><div class="n">${g.ou.over}%</div><div class="l">went over</div></div>
+      <div class="hit-box under"><div class="n">${g.ou.under}%</div><div class="l">went under</div></div>
+      <div class="hit-box push"><div class="n">${g.ou.push}%</div><div class="l">pushed</div></div>
+    </div>
+    <table class="hist-table"><thead><tr>
+      <th>Date</th><th>Game</th><th>Temp</th><th>Wind</th><th>Total</th><th>Final</th><th>Result</th>
+    </tr></thead><tbody>${body}</tbody></table>
+    <div class="hist-note">${g.sample>g.matches.length?`Showing ${g.matches.length} most recent of ${g.sample} matched games. `:""}${g.note?"Match window: "+g.note+". ":""}${g.lineSource==="est"?"Total is the matched-sample median (no book line pinned).":""}</div>`;
+  }
+  const rows = histRows(g);
+  const shown = rows.slice(0,12);
+  const body = shown.map(r=>`<tr>
+      <td>${r.date}</td><td>${r.matchup}</td><td>${r.temp}°</td><td>${r.wind} mph</td>
+      <td>${r.line}</td><td><b>${r.final}</b></td>
+      <td><span class="res-chip ${r.res}">${r.res.toUpperCase()}</span></td>
+    </tr>`).join("");
+  return `
+    <div class="hit-summary">
+      <div class="hit-box over"><div class="n">${g.ou.over}%</div><div class="l">went over</div></div>
+      <div class="hit-box under"><div class="n">${g.ou.under}%</div><div class="l">went under</div></div>
+      <div class="hit-box push"><div class="n">${g.ou.push}%</div><div class="l">pushed</div></div>
+    </div>
+    <table class="hist-table"><thead><tr>
+      <th>Date</th><th>Game</th><th>Temp</th><th>Wind</th><th>Total</th><th>Final</th><th>Result</th>
+    </tr></thead><tbody>${body}</tbody></table>
+    ${rows.length>12?`<div class="hist-note">Showing 12 most recent of ${rows.length} matched games at ${g.park.split("·")[0].trim()}.</div>`:""}`;
+}
+
+/* ---------- meters (vs MLB average) ---------- */
+function meter(label, sub, v){
+  const max = 35; // scale bound
+  const half = Math.min(Math.abs(v), max)/max*50;
+  const fill = v>=0
+    ? `<div class="fill pos" style="left:50%;width:${half}%"></div>`
+    : `<div class="fill neg" style="right:50%;width:${half}%"></div>`;
+  return `<div class="meter-row">
+    <div class="meter-lab">${label}<span>${sub}</span></div>
+    <div class="meter">${v===0?"":fill}<div class="mid"></div></div>
+    <div class="meter-val ${cls(v)}">${v===0?"even":pct(v)}</div>
+  </div>`;
+}
+
+/* ==================================================================
+   3D PARK ENGINE — stylized stadium from real dimensions + live wx
+================================================================== */
+let modal3D = null, hero3D = null;
+function disposeP3D(inst){
+  if(!inst) return;
+  cancelAnimationFrame(inst.raf);
+  inst.scene.traverse(o=>{
+    if(o.geometry) o.geometry.dispose();
+    const mats = Array.isArray(o.material)?o.material:(o.material?[o.material]:[]);
+    mats.forEach(m=>{ if(m.map) m.map.dispose(); m.dispose(); });
+  });
+  inst.renderer.dispose();
+}
+function destroyPark3D(){ disposeP3D(modal3D); modal3D = null; }
+function makeWallLabel(txt){
+  const cv=document.createElement("canvas"); cv.width=128; cv.height=64;
+  const cx=cv.getContext("2d");
+  cx.font="700 40px -apple-system,Segoe UI,Arial"; cx.textAlign="center"; cx.textBaseline="middle";
+  cx.fillStyle="rgba(20,28,44,0.92)"; cx.fillText(txt,64,34);
+  const tex=new THREE.CanvasTexture(cv);
+  return new THREE.Mesh(new THREE.PlaneGeometry(26,13),
+    new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false}));
+}
+function initPark3D(g, canvas, slot="modal"){
+  if(typeof THREE === "undefined"){
+    canvas.parentElement.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%">${parkSVG(g,140)}</div>`;
+    return;
+  }
+  if(slot==="hero"){ disposeP3D(hero3D); hero3D = null; } else destroyPark3D();
+  const park = PARKS[g.home] || {dims:[335,375,400,375,335], walls:[8,8,8,8,8]};
+  const W = canvas.clientWidth || 780, H = canvas.clientHeight || 330;
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  renderer.setSize(W, H, false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  const scene = new THREE.Scene();
+
+  const night = g.sortTime >= 1900;
+  const foggy = /fog|marine/i.test(g.sky);
+  const dome = !!g.dome;
+
+  /* ---- weather-tinted monochrome palette (Home Run Report style) ----
+     the whole scene lives in ONE hue; conditions pick it:
+     hot = ember/crimson · mild = deep navy · cool = steel · fog = misty slate · dome = graphite */
+  let hue, sat;
+  if(dome){ hue=0.62; sat=0.10; }
+  else if(foggy){ hue=0.58; sat=0.12; }
+  else if(g.temp>=88){ hue=0.985; sat=0.42; }
+  else if(g.temp<=72){ hue=0.575; sat=0.35; }
+  else { hue=0.62; sat=0.40; }
+  const dim = night ? 0.035 : 0;
+  const L = (l)=> new THREE.Color().setHSL(hue, sat, Math.max(0.04, l-dim));
+  const COL = {
+    bg:      L(0.10),
+    apron:   L(0.24),
+    grass:   L(0.31),
+    track:   L(0.205),
+    dirt:    L(0.225),
+    diamond: L(0.275),
+    mound:   L(0.19),
+  };
+  scene.background = COL.bg;
+  scene.fog = foggy ? new THREE.Fog(COL.bg, 260, 900) : new THREE.Fog(COL.bg, 900, 1900);
+  const M = c => new THREE.MeshBasicMaterial({color:c});
+
+  /* geometry: 2D layout has +y toward CF; mapped to 3D as (x, 0, -y) */
+  const angles = [-45,-22.5,0,22.5,45].map(a=>a*Math.PI/180);
+  const pts2 = park.dims.map((r,i)=>new THREE.Vector2(Math.sin(angles[i])*r, Math.cos(angles[i])*r));
+  const curve = new THREE.SplineCurve(pts2);
+  const samples = curve.getPoints(72);
+
+  /* foul-territory apron — rounded pad the field sits on */
+  const apron = new THREE.Mesh(new THREE.CircleGeometry(148, 48), M(COL.apron));
+  apron.rotation.x = -Math.PI/2; apron.position.set(0,-0.15,-30); scene.add(apron);
+
+  /* outfield grass fan */
+  const shape = new THREE.Shape();
+  shape.moveTo(0,0);
+  samples.forEach(p=>shape.lineTo(p.x,p.y));
+  shape.lineTo(0,0);
+  const grass = new THREE.Mesh(new THREE.ShapeGeometry(shape), M(COL.grass));
+  grass.rotation.x = -Math.PI/2; grass.position.y = 0.05; scene.add(grass);
+
+  /* warning track — darker band hugging the wall */
+  const inner = samples.map(p=>{ const r=Math.hypot(p.x,p.y), s=(r-17)/r; return new THREE.Vector2(p.x*s,p.y*s); });
+  const ringPts = [...samples, ...inner.slice().reverse()];
+  const track = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(ringPts)), M(COL.track));
+  track.rotation.x = -Math.PI/2; track.position.y = 0.12; scene.add(track);
+
+  /* infield dirt arc + inner diamond + mound */
+  const dirt = new THREE.Mesh(new THREE.CircleGeometry(95, 44), M(COL.dirt));
+  dirt.rotation.x = -Math.PI/2; dirt.position.set(0, 0.18, -60.5); scene.add(dirt);
+  const dShape = new THREE.Shape();
+  dShape.moveTo(0,10); dShape.lineTo(53.6,63.6); dShape.lineTo(0,117.3); dShape.lineTo(-53.6,63.6); dShape.lineTo(0,10);
+  const diamond = new THREE.Mesh(new THREE.ShapeGeometry(dShape), M(COL.diamond));
+  diamond.rotation.x = -Math.PI/2; diamond.position.y = 0.26; scene.add(diamond);
+  const mound = new THREE.Mesh(new THREE.CircleGeometry(9.5, 24), M(COL.mound));
+  mound.rotation.x = -Math.PI/2; mound.position.set(0, 0.34, -60.5); scene.add(mound);
+  const rubber = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.3,0.7), M(0xf4f6fa));
+  rubber.position.set(0, 0.6, -60.5); scene.add(rubber);
+
+  /* home plate circle + plate */
+  const homeC = new THREE.Mesh(new THREE.CircleGeometry(13, 24), M(COL.mound));
+  homeC.rotation.x = -Math.PI/2; homeC.position.set(0, 0.34, 0); scene.add(homeC);
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(1.9,0.3,1.9), M(0xf4f6fa));
+  plate.position.set(0, 0.6, 0); scene.add(plate);
+
+  /* bases — white pads rotated 45° */
+  [[63.64,-63.64],[0,-127.28],[-63.64,-63.64]].forEach(([x,z])=>{
+    const b = new THREE.Mesh(new THREE.BoxGeometry(3.6,0.7,3.6), M(0xf4f6fa));
+    b.rotation.y = Math.PI/4; b.position.set(x, 0.6, z); scene.add(b);
+  });
+
+  /* foul lines — crisp white chalk to each pole */
+  [[park.dims[0], 1],[park.dims[4], -1]].forEach(([len, side])=>{
+    const line = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.15, len), M(0xf4f6fa));
+    line.rotation.y = side * Math.PI/4;
+    line.position.set(-side*0.3536*len, 0.4, -0.3536*len);
+    scene.add(line);
+  });
+
+  /* outfield wall — glowing white ribbon with real per-section heights */
+  const hAt = t => { const f=t*4, i=Math.min(3,Math.floor(f)), u=f-i; return park.walls[i]*(1-u)+park.walls[i+1]*u; };
+  const wv=[], wi=[];
+  const HSCALE = 1.7;
+  samples.forEach((p,i)=>{ const h=hAt(i/(samples.length-1))*HSCALE; wv.push(p.x,0,-p.y, p.x,h,-p.y); });
+  for(let i=0;i<samples.length-1;i++){ const a=i*2; wi.push(a,a+2,a+1, a+1,a+2,a+3); }
+  const wallGeo = new THREE.BufferGeometry();
+  wallGeo.setAttribute("position", new THREE.Float32BufferAttribute(wv,3));
+  wallGeo.setIndex(wi); wallGeo.computeVertexNormals();
+  scene.add(new THREE.Mesh(wallGeo, new THREE.MeshBasicMaterial({color:0xf4f6fa, side:THREE.DoubleSide})));
+  /* wall cap — thin top edge catches the eye like the reference renders */
+  const capPts = samples.map((p,i)=>new THREE.Vector3(p.x, hAt(i/(samples.length-1))*HSCALE+0.25, -p.y));
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(capPts),
+    new THREE.LineBasicMaterial({color:0xffffff})));
+
+  /* wall shadow skirt — soft dark base line grounding the wall */
+  const skv=[], ski=[];
+  samples.forEach(p=>{ const r=Math.hypot(p.x,p.y), s=(r+7)/r; skv.push(p.x,0.02,-p.y, p.x*s,0.02,-p.y*s); });
+  for(let i=0;i<samples.length-1;i++){ const a=i*2; ski.push(a,a+2,a+1, a+1,a+2,a+3); }
+  const skirtGeo = new THREE.BufferGeometry();
+  skirtGeo.setAttribute("position", new THREE.Float32BufferAttribute(skv,3));
+  skirtGeo.setIndex(ski);
+  scene.add(new THREE.Mesh(skirtGeo, new THREE.MeshBasicMaterial({color:L(0.14), side:THREE.DoubleSide})));
+
+  /* foul poles — tall bright yellow */
+  [[0,1],[4,-1]].forEach(([di, side])=>{
+    const d = park.dims[di];
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.9,0.9,46,8), M(0xffd94a));
+    pole.position.set(-side*0.707*d, 23, -0.707*d); scene.add(pole);
+  });
+
+  /* wall distance markers — real numbers on the wall face */
+  [0,1,2,3,4].forEach(i=>{
+    const p = pts2[i], r = Math.hypot(p.x,p.y), s=(r-2.5)/r;
+    const lbl = makeWallLabel(String(park.dims[i]));
+    const h = park.walls[i]*HSCALE;
+    lbl.position.set(p.x*s, Math.min(h*0.55, h-3)+3.5, -p.y*s);
+    lbl.lookAt(0, lbl.position.y, 0);
+    scene.add(lbl);
+  });
+
+  /* dome roof shell */
+  if(dome){
+    const roof = new THREE.Mesh(new THREE.SphereGeometry(400,36,18,0,Math.PI*2,0,Math.PI/2),
+      new THREE.MeshBasicMaterial({color:0xe8ecf2, transparent:true, opacity:0.10, side:THREE.DoubleSide}));
+    roof.scale.y = 0.45; roof.position.set(0,2,-140); scene.add(roof);
+  }
+
+  /* wind streaks */
+  let wind = null;
+  if(!dome && g.wind>2){
+    const N=150, len=6+g.wind*0.8;
+    const a=g.windAngle*Math.PI/180;
+    const dir=new THREE.Vector3(Math.sin(a),0,-Math.cos(a));
+    const heads=[];
+    for(let i=0;i<N;i++) heads.push(new THREE.Vector3((Math.random()-0.5)*640, 8+Math.random()*130, 100-Math.random()*620));
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(N*6),3));
+    const mat=new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity: foggy?0.4:0.62});
+    wind={mesh:new THREE.LineSegments(geo,mat), heads, dir, len, speed:g.wind*2.4};
+    scene.add(wind.mesh);
+  }
+
+  /* camera + drag orbit — high angle behind home, like the reference */
+  const cam = new THREE.PerspectiveCamera(36, W/H, 1, 3200);
+  const target = new THREE.Vector3(0, 6, -150);
+  let theta=0, el=0.62, dragging=false, lastX=0, lastY=0, idleT=0;
+  function place(){
+    const r=545;
+    cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r, target.y+Math.sin(el)*r, target.z+Math.cos(theta)*Math.cos(el)*r);
+    cam.lookAt(target);
+  }
+  canvas.addEventListener("pointerdown", e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    theta -= (e.clientX-lastX)*0.006;
+    el = Math.min(1.15, Math.max(0.22, el + (e.clientY-lastY)*0.004));
+    lastX=e.clientX; lastY=e.clientY; idleT=0;
+  });
+  canvas.addEventListener("pointerup", ()=>dragging=false);
+  canvas.addEventListener("pointercancel", ()=>dragging=false);
+
+  const clock = new THREE.Clock();
+  const inst = {renderer, scene, raf:0};
+  if(slot==="hero") hero3D = inst; else modal3D = inst;
+  (function tick(){
+    inst.raf = requestAnimationFrame(tick);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    idleT += dt;
+    if(!dragging && idleT>2.5) theta += dt*0.07;
+    if(wind){
+      const arr = wind.mesh.geometry.attributes.position.array;
+      wind.heads.forEach((h,i)=>{
+        h.addScaledVector(wind.dir, wind.speed*dt*10);
+        if(Math.abs(h.x)>340 || h.z<-580 || h.z>130)
+          h.set((Math.random()-0.5)*640, 8+Math.random()*140, 100-Math.random()*620);
+        arr[i*6]=h.x; arr[i*6+1]=h.y; arr[i*6+2]=h.z;
+        arr[i*6+3]=h.x-wind.dir.x*wind.len; arr[i*6+4]=h.y; arr[i*6+5]=h.z-wind.dir.z*wind.len;
+      });
+      wind.mesh.geometry.attributes.position.needsUpdate = true;
+    }
+    place();
+    renderer.render(scene, cam);
+  })();
+}
+
+/* ---------- modal ---------- */
+const overlay = document.getElementById("overlay");
+const modal = document.getElementById("modal");
+function openModal(g){
+  const si = sampleInfo(g.sample);
+  const pk = PARKS[g.home] || {dims:[335,375,400,375,335]};
+  const mTiles = g.dome
+    ? `<div class="m-tile neu"><div class="t-lab">Home runs</div><div class="t-val">—</div><div class="t-sub"><span>Roof closed — no weather effect vs this park's indoor baseline</span></div></div>
+       <div class="m-tile neu"><div class="t-lab">Runs</div><div class="t-val">—</div><div class="t-sub"><span>Indoor baseline</span></div></div>
+       <div class="m-tile neu"><div class="t-lab">Strikeouts</div><div class="t-val">—</div><div class="t-sub"><span>Indoor baseline</span></div></div>`
+    : `<div class="m-tile ${cls(g.hr)}"><div class="t-lab">Home runs</div><div class="t-val">${pct(g.hr)}</div>
+         <div class="t-sub"><span><b>${g.hrGm.toFixed(1)}</b> HR/gm these conditions</span><span><b>${g.hrPark.toFixed(1)}</b> HR/gm park avg</span></div></div>
+       <div class="m-tile ${cls(g.runs)}"><div class="t-lab">Runs</div><div class="t-val">${pct(g.runs)}</div>
+         <div class="t-sub"><span>vs this park's average</span></div></div>
+       <div class="m-tile ${cls(g.ks)}"><div class="t-lab">Strikeouts</div><div class="t-val">${pct(g.ks)}</div>
+         <div class="t-sub"><span>vs this park's average</span></div></div>`;
+  modal.innerHTML = `
+    <div class="m-head">
+      <div><div class="teams">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
+      <div class="meta">${g.time} · ${g.park}</div></div>
+      <button class="m-close" aria-label="Close">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="m-sec" style="padding:6px">
+        <div class="park3d-wrap">
+          <canvas id="park3d-canvas"></canvas>
+          <div class="p3d-hud">
+            <div class="t">${g.park.split("·")[0].trim()} · stylized live view</div>
+            <div class="w">${g.dome ? "🏟️ Roof closed — weather sealed out" : `💨 ${g.wind} mph ${g.dir} · ${g.windLabel.toLowerCase()}`}</div>
+          </div>
+          <div class="p3d-badge">${g.skyIcon} ${g.sky}</div>
+          <div class="p3d-dims">${pk.dims[0]}′ LF · ${pk.dims[1]}′ LC · ${pk.dims[2]}′ CF · ${pk.dims[3]}′ RC · ${pk.dims[4]}′ RF</div>
+          <div class="p3d-hint">drag to look around</div>
+        </div>
+      </div>
+      <div class="m-sec">
+        <h5>First-pitch forecast</h5>
+        <div class="m-cond">
+          <div class="wx-item"><div class="big">${g.temp}<sup>°F</sup></div><div class="lab">${g.dome?"indoor":"temp"}</div></div>
+          <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">${g.dome?"wind":g.dir+" · "+g.windLabel.toLowerCase()}</div></div>
+          <div class="wx-item"><div class="big">${g.dew}<sup>°</sup></div><div class="lab">dew point</div></div>
+          <div style="margin-left:auto;text-align:right">
+            <div class="sky" style="font-weight:700;color:var(--info,var(--blue))">${g.skyIcon} ${g.sky}</div>
+            <div class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample} games</div>
+          </div>
+        </div>
+      </div>
+      <div class="m-sec">
+        <h5>Weather impact vs ${g.park.split("·")[0].trim()}</h5>
+        <div class="m-tiles">${mTiles}</div>
+      </div>
+      <div class="m-sec">
+        <h5>Vs MLB average — all games, all parks</h5>
+        ${meter("HR",`MLB avg ${LIVE?LIVE.league.hr:2.37}/gm`,g.mlb.hr)}
+        ${meter("Runs",`MLB avg ${LIVE?LIVE.league.r:9.0}/gm`,g.mlb.runs)}
+        ${meter("Ks",`MLB avg ${LIVE?LIVE.league.so:16.8}/gm`,g.mlb.ks)}
+      </div>
+      <div class="m-sec">
+        <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}</h5>
+        ${histTable(g)}
+      </div>
+    </div>`;
+  overlay.classList.add("open");
+  document.body.style.overflow="hidden";
+  modal.querySelector(".m-close").addEventListener("click", closeModal);
+  const cv = modal.querySelector("#park3d-canvas");
+  if(cv) initPark3D(g, cv);
+}
+function closeModal(){ destroyPark3D(); overlay.classList.remove("open"); document.body.style.overflow=""; }
+overlay.addEventListener("click", e=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+
+/* ---------- interactions ---------- */
+document.addEventListener("click", e=>{
+  const el = e.target.closest("[data-game]");
+  if(el){ const g = GAMES.find(x=>x.id===el.dataset.game); if(g) openModal(g); }
+});
+document.getElementById("sort-select").addEventListener("change", renderBoard);
+document.querySelectorAll("nav button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById("view-"+b.dataset.view).classList.add("active");
+  });
+});
+
+/* ---------- init ---------- */
+async function loadLive(){
+  try{
+    const res = await fetch("data.json?_=" + Date.now());
+    if(!res.ok) return;
+    const d = await res.json();
+    if(!d.games || !d.games.length) return;
+    GAMES = d.games; LIVE = d;
+    document.getElementById("date-label").textContent = d.dateLabel;
+    const note = document.getElementById("proto-note");
+    note.innerHTML = `🟢 <span><b>Live</b> — real schedule, first-pitch forecasts & park history${(d.seasons&&d.seasons.length)?` (${d.seasons[0]}–${d.seasons[d.seasons.length-1]})`:""}. Updated ${d.generated}.</span>`;
+    renderAll();
+  }catch(e){ /* stay on sample data */ }
+}
+function renderAll(){
+  document.getElementById("game-count").textContent = GAMES.length;
+  renderSummary();
+  renderHero();
+  renderBoard();
+  renderCompare();
+}
+renderAll();
+loadLive();
+</script>
+</body>
+</html>
