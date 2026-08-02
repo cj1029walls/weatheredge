@@ -1,6 +1,6 @@
-# WeatherEdge MLB
+# DFS Radar
 
-Weather-driven MLB insights. Not a model, not a simulation — real data for a real edge.
+MLB weather edges for DFS — live at [dfsradar.com](https://dfsradar.com). Not a model, not a simulation — real data for a real edge. Part of the DFS Kitchen product family.
 
 For every game on today's slate, the site shows the first-pitch forecast at that park
 and what **actually happened** in historically similar weather at the same park since
