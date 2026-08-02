@@ -769,16 +769,20 @@ function initPark3D(g, canvas, slot="modal"){
   else if(g.temp>=88){ hue=0.985; sat=0.42; }
   else if(g.temp<=72){ hue=0.575; sat=0.35; }
   else { hue=0.62; sat=0.40; }
-  const dim = night ? 0.035 : 0;
-  const L = (l)=> new THREE.Color().setHSL(hue, sat, Math.max(0.04, l-dim));
+  /* day games get an airy, brighter scene; night games go deep and floodlit —
+     the white wall and streamlines pop against the dark. Domes keep graphite. */
+  const LT = dome ? {bg:0.10, apron:0.24, grass:0.31, track:0.205, dirt:0.225, diamond:0.275, mound:0.19}
+           : night ? {bg:0.055, apron:0.175, grass:0.235, track:0.15, dirt:0.165, diamond:0.205, mound:0.135}
+                   : {bg:0.145, apron:0.29, grass:0.365, track:0.25, dirt:0.27, diamond:0.325, mound:0.235};
+  const L = (l)=> new THREE.Color().setHSL(hue, sat, Math.max(0.04, l));
   const COL = {
-    bg:      L(0.10),
-    apron:   L(0.24),
-    grass:   L(0.31),
-    track:   L(0.205),
-    dirt:    L(0.225),
-    diamond: L(0.275),
-    mound:   L(0.19),
+    bg:      L(LT.bg),
+    apron:   L(LT.apron),
+    grass:   L(LT.grass),
+    track:   L(LT.track),
+    dirt:    L(LT.dirt),
+    diamond: L(LT.diamond),
+    mound:   L(LT.mound),
   };
   scene.background = COL.bg;
   scene.fog = foggy ? new THREE.Fog(COL.bg, 260, 900) : new THREE.Fog(COL.bg, 900, 1900);
@@ -891,15 +895,22 @@ function initPark3D(g, canvas, slot="modal"){
   /* wind streaks */
   let wind = null;
   if(!dome && g.wind>2){
-    const N=150, len=6+g.wind*0.8;
+    const N=90, TAIL=10;
     const a=g.windAngle*Math.PI/180;
     const dir=new THREE.Vector3(Math.sin(a),0,-Math.cos(a));
-    const heads=[];
-    for(let i=0;i<N;i++) heads.push(new THREE.Vector3((Math.random()-0.5)*640, 8+Math.random()*130, 100-Math.random()*620));
+    const perp=new THREE.Vector3(-dir.z,0,dir.x);
+    const parts=[];
+    for(let i=0;i<N;i++){
+      const p=new THREE.Vector3((Math.random()-0.5)*640, 8+Math.random()*130, 100-Math.random()*620);
+      parts.push({p, phase:Math.random()*Math.PI*2, hist:Array.from({length:TAIL},()=>p.clone())});
+    }
+    const segs=N*(TAIL-1);
     const geo=new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(N*6),3));
-    const mat=new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity: foggy?0.4:0.62});
-    wind={mesh:new THREE.LineSegments(geo,mat), heads, dir, len, speed:g.wind*2.4};
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(segs*6),3));
+    geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(segs*6),3));
+    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.55:0.85});
+    wind={mesh:new THREE.LineSegments(geo,mat), parts, dir, perp, tail:TAIL,
+          speed:g.wind*2.2, t:0, headCol:new THREE.Color(0xffffff), bgCol:COL.bg.clone()};
     scene.add(wind.mesh);
   }
 
@@ -931,15 +942,36 @@ function initPark3D(g, canvas, slot="modal"){
     idleT += dt;
     if(!dragging && idleT>2.5) theta += dt*0.07;
     if(wind){
-      const arr = wind.mesh.geometry.attributes.position.array;
-      wind.heads.forEach((h,i)=>{
-        h.addScaledVector(wind.dir, wind.speed*dt*10);
-        if(Math.abs(h.x)>340 || h.z<-580 || h.z>130)
-          h.set((Math.random()-0.5)*640, 8+Math.random()*140, 100-Math.random()*620);
-        arr[i*6]=h.x; arr[i*6+1]=h.y; arr[i*6+2]=h.z;
-        arr[i*6+3]=h.x-wind.dir.x*wind.len; arr[i*6+4]=h.y; arr[i*6+5]=h.z-wind.dir.z*wind.len;
+      wind.t += dt;
+      const pos = wind.mesh.geometry.attributes.position.array;
+      const col = wind.mesh.geometry.attributes.color.array;
+      const sway = 26 + 160/Math.max(5, g.wind);   // lighter breeze meanders more
+      let k = 0;
+      wind.parts.forEach(pt=>{
+        pt.p.addScaledVector(wind.dir, wind.speed*dt*10);
+        pt.p.addScaledVector(wind.perp, Math.sin(wind.t*1.5 + pt.phase)*sway*dt);
+        pt.p.y += Math.cos(wind.t*0.8 + pt.phase*1.6)*6*dt;
+        if(Math.abs(pt.p.x)>340 || pt.p.z<-580 || pt.p.z>130 || pt.p.y<4 || pt.p.y>170){
+          pt.p.set((Math.random()-0.5)*640, 8+Math.random()*130, 100-Math.random()*620);
+          pt.hist.forEach(h=>h.copy(pt.p));
+        }
+        const tailv = pt.hist.pop(); tailv.copy(pt.p); pt.hist.unshift(tailv);
+        for(let sgi=0; sgi<wind.tail-1; sgi++){
+          const A=pt.hist[sgi], B=pt.hist[sgi+1];
+          pos[k*6]=A.x;   pos[k*6+1]=A.y; pos[k*6+2]=A.z;
+          pos[k*6+3]=B.x; pos[k*6+4]=B.y; pos[k*6+5]=B.z;
+          const f1=Math.pow(1-sgi/(wind.tail-1),1.6), f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.6);
+          col[k*6]  =wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f1;
+          col[k*6+1]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f1;
+          col[k*6+2]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f1;
+          col[k*6+3]=wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f2;
+          col[k*6+4]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f2;
+          col[k*6+5]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f2;
+          k++;
+        }
       });
       wind.mesh.geometry.attributes.position.needsUpdate = true;
+      wind.mesh.geometry.attributes.color.needsUpdate = true;
     }
     place();
     renderer.render(scene, cam);
