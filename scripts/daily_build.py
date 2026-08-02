@@ -35,6 +35,54 @@ FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}
 
 ET = timezone(timedelta(hours=-4))  # ET (DST); slate dates only, precision not critical
 
+# ---- The Odds API (free tier) — real consensus totals ----
+ODDS_URL = ("https://api.the-odds-api.com/v4/sports/baseball_mlb/odds"
+            "?apiKey={key}&regions=us&markets=totals&oddsFormat=american")
+ODDS_TEAM_NAMES = {
+    "Arizona Diamondbacks":"ARI", "Athletics":"ATH", "Oakland Athletics":"ATH",
+    "Atlanta Braves":"ATL", "Baltimore Orioles":"BAL", "Boston Red Sox":"BOS",
+    "Chicago Cubs":"CHC", "Cincinnati Reds":"CIN", "Cleveland Guardians":"CLE",
+    "Colorado Rockies":"COL", "Chicago White Sox":"CWS", "Detroit Tigers":"DET",
+    "Houston Astros":"HOU", "Kansas City Royals":"KC", "Los Angeles Angels":"LAA",
+    "Los Angeles Dodgers":"LAD", "Miami Marlins":"MIA", "Milwaukee Brewers":"MIL",
+    "Minnesota Twins":"MIN", "New York Mets":"NYM", "New York Yankees":"NYY",
+    "Philadelphia Phillies":"PHI", "Pittsburgh Pirates":"PIT", "San Diego Padres":"SD",
+    "Seattle Mariners":"SEA", "San Francisco Giants":"SF", "St. Louis Cardinals":"STL",
+    "Tampa Bay Rays":"TB", "Texas Rangers":"TEX", "Toronto Blue Jays":"TOR",
+    "Washington Nationals":"WSH",
+}
+
+def fetch_book_lines():
+    """One call → {"AWAY@HOME": consensus total}. Median across all US books.
+    Free tier budget: 3 runs/day ≈ 93 calls/month of the 500 allowed.
+    Missing key or any failure → {} (build falls back to sample-median estimates)."""
+    key = os.environ.get("ODDS_API_KEY")
+    if not key:
+        print("odds api: no ODDS_API_KEY set — using estimated totals")
+        return {}
+    try:
+        events = get_json(ODDS_URL.format(key=key), tries=3)
+    except Exception as e:
+        print(f"odds api unavailable ({e}) — using estimated totals")
+        return {}
+    out = {}
+    for ev in events:
+        away = ODDS_TEAM_NAMES.get(ev.get("away_team"))
+        home = ODDS_TEAM_NAMES.get(ev.get("home_team"))
+        if not away or not home:
+            continue
+        points = []
+        for bk in ev.get("bookmakers", []):
+            for mk in bk.get("markets", []):
+                if mk.get("key") == "totals":
+                    for oc in mk.get("outcomes", []):
+                        if oc.get("name") == "Over" and oc.get("point") is not None:
+                            points.append(oc["point"])
+        if points:
+            out[f"{away}@{home}"] = statistics.median(points)
+    print(f"odds api: real totals for {len(out)} games")
+    return out
+
 def get_json(url, tries=5):
     for i in range(tries):
         try:
@@ -206,7 +254,9 @@ def main():
             sys.exit("data/parks_history.json missing — run the 'Build history' workflow first.")
     hist_all = json.load(open(hist_path))
     league = hist_all["_league"]
-    lines = json.load(open(LINES)) if os.path.exists(LINES) else {}
+    lines = {} if args.offline else fetch_book_lines()
+    if os.path.exists(LINES):
+        lines.update(json.load(open(LINES)))   # manual pins always win
 
     if args.offline:
         sched = json.load(open(os.path.join(FIXTURES, "schedule.json")))
