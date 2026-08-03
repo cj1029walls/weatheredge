@@ -396,6 +396,8 @@
       <p>The headline game at the top of the slate is the open-air game where today's weather pushes <b>home-run expectation furthest from that park's own average</b> — in either direction. A +20% HR day at a park and a −20% HR day are both edges; domes never qualify. It's simply the biggest weather signal on the board, not a pick.</p>
       <h4>Probable pitchers in these conditions</h4>
       <p>Each breakdown also shows both probable pitchers' <b>real career starts in weather like today's</b> — strikeouts, home runs allowed, and ERA per 9 innings in similar conditions vs. their overall numbers. Same philosophy: actual game logs, not projections.</p>
+      <h4>Conditions MVP</h4>
+      <p>Each breakdown highlights the hitter on each team who has <b>slugged best in weather like today's</b> — three seasons of real game logs across all parks, matched to our weather history, minimum 25 at-bats. Rosters and logs refresh weekly.</p>
       <h4>Park-specific vs. league-wide</h4>
       <p><b>Weather impact vs this park</b> compares today's conditions to that park's own average — the sharpest signal, since every park plays differently. <b>Vs MLB average</b> puts the same game on a league-wide scale so you can compare across the whole slate.</p>
       <h4>Domes & retractable roofs</h4>
@@ -432,7 +434,9 @@ const SAMPLE_GAMES = [
    sample:49, hr:24, runs:14, ks:-4, hrGm:2.9, hrPark:2.3,
    mlb:{hr:19, runs:11, ks:-6}, ou:{under:25, push:7, over:68}, total:9.0,
    pitchers:{away:{name:"MacKenzie Gore", sim:{n:9,ip:51.3,k9:10.2,hr9:0.88,era:3.16}, all:{n:64,ip:340.2,k9:9.6,hr9:1.19,era:3.71}, note:"±8° temp, ±8 mph wind"},
-             home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}}},
+             home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}},
+   mvp:{away:{name:"James Wood", slg:0.612, hr:9, ab:98, games:27, allSlg:0.488},
+        home:{name:"Seiya Suzuki", slg:0.577, hr:7, ab:104, games:29, allSlg:0.503}}},
 
   {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
    temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅", rain:18, cloud:55,
@@ -811,6 +815,27 @@ function pitcherSec(g){
   return `<div class="m-sec">
     <h5>Probable pitchers in these conditions<span class="tip" data-tip="Each pitcher's real starts from the last three seasons in weather like today's (±8° temp, ±8 mph wind), joined to our park weather history. Green = better than his overall number in these conditions, red = worse. Shown alongside the park data — not blended into it."><span class="info-i">i</span></span></h5>
     <div class="p-grid">${pitcherCard(g.away, g.pitchers.away)}${pitcherCard(g.home, g.pitchers.home)}</div>
+  </div>`;
+}
+
+/* ---------- conditions MVP section (modal) ---------- */
+function slg3(v){ return v.toFixed(3).replace(/^0\./, "."); }
+function mvpCard(teamCode, m){
+  if(!m) return `<div class="p-card"><div class="p-side">${teamCode}</div><div class="p-name" style="color:var(--muted)">No hitter with 25+ AB in similar weather yet</div></div>`;
+  return `<div class="p-card"><div class="p-side">${teamCode}</div><div>
+    <div class="p-name">🔥 ${m.name}</div>
+    <div class="p-nums">
+      <span class="${m.slg>m.allSlg?"pos":""}"><b>${slg3(m.slg)}</b> SLG</span>
+      <span><b>${m.hr}</b> HR</span>
+      <span><b>${m.ab}</b> AB</span>
+      <span class="p-n">${m.games} games in similar weather · overall SLG ${slg3(m.allSlg)}</span>
+    </div></div></div>`;
+}
+function mvpSec(g){
+  if(!g.mvp || (!g.mvp.away && !g.mvp.home)) return "";
+  return `<div class="m-sec">
+    <h5>Conditions MVP — hottest bat in this weather<span class="tip" data-tip="Each team's current hitter with the best slugging percentage in weather like today's (±8° temp, ±8 mph wind) — three seasons of real game logs across all parks, minimum 25 at-bats. Green = slugging better in these conditions than overall."><span class="info-i">i</span></span></h5>
+    <div class="p-grid">${mvpCard(g.away, g.mvp.away)}${mvpCard(g.home, g.mvp.home)}</div>
   </div>`;
 }
 
@@ -1193,6 +1218,7 @@ function openModal(g){
         </div>
       </div>
       ${pitcherSec(g)}
+      ${mvpSec(g)}
       <div class="m-sec">
         <h5>Weather impact vs ${g.park.split("·")[0].trim()}<span class="tip" data-tip="How the matched similar-weather sample compares to this park's own all-conditions average. Every park plays differently, so this is the sharpest signal."><span class="info-i">i</span></span></h5>
         <div class="m-tiles">${mTiles}</div>
