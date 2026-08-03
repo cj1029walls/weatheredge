@@ -28,7 +28,10 @@ OUT = os.path.join(ROOT, "site", "data.json")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
 SCHED_URL = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={date}"
+SCHED_PP_URL = SCHED_URL + "&hydrate=probablePitcher"
 BOX_URL = "https://statsapi.mlb.com/api/v1/game/{pk}/boxscore"
+GAMELOG_URL = ("https://statsapi.mlb.com/api/v1/people/{pid}/stats"
+               "?stats=gameLog&group=pitching&season={season}")
 PREDS_DIR = os.path.join(ROOT, "data", "predictions")
 ACCURACY = os.path.join(ROOT, "data", "accuracy.json")
 SITE_ACCURACY = os.path.join(ROOT, "site", "accuracy.json")
@@ -145,6 +148,82 @@ def pct_delta(a, b):
 
 WET_IN = 0.05   # inches over the ~3h game window = "wet game"
 
+# ---- probable pitchers: real starts in similar conditions ----
+_PITCH_CACHE = {}
+
+def _ip_to_float(ip):
+    try:
+        whole, _, frac = str(ip).partition(".")
+        return int(whole) + int(frac or 0) / 3.0
+    except (ValueError, TypeError):
+        return 0.0
+
+def _pitcher_starts(pid, seasons):
+    """[(d, park_code, ip, so, hr, er), ...] from statsapi game logs."""
+    if pid in _PITCH_CACHE:
+        return _PITCH_CACHE[pid]
+    starts = []
+    for season in seasons:
+        try:
+            data = get_json(GAMELOG_URL.format(pid=pid, season=season), tries=2)
+        except Exception as e:
+            print(f"    pitcher {pid} {season}: {e}")
+            continue
+        for s in (data.get("stats") or [{}])[0].get("splits", []):
+            st = s.get("stat", {})
+            ip = _ip_to_float(st.get("inningsPitched", 0))
+            if ip <= 0:
+                continue
+            home_id = (s.get("team") if s.get("isHome") else s.get("opponent") or {}).get("id")
+            code = MLBID_TO_CODE.get(home_id)
+            d = (s.get("date") or "").replace("-", "")
+            if not code or len(d) != 8:
+                continue
+            starts.append((d, code, ip, st.get("strikeOuts", 0) or 0,
+                           st.get("homeRuns", 0) or 0, st.get("earnedRuns", 0) or 0))
+        time.sleep(0.3)
+    _PITCH_CACHE[pid] = starts
+    return starts
+
+def _per9(rows):
+    ip = sum(r[2] for r in rows)
+    if ip <= 0:
+        return None
+    return dict(n=len(rows), ip=round(ip, 1),
+                k9=round(sum(r[3] for r in rows) / ip * 9, 1),
+                hr9=round(sum(r[4] for r in rows) / ip * 9, 2),
+                era=round(sum(r[5] for r in rows) / ip * 9, 2))
+
+def pitcher_conditions(pp, hist_all, temp, wind, dome, seasons):
+    """One probable pitcher's real starts in similar weather vs overall."""
+    if not pp or not pp.get("id"):
+        return None
+    starts = _pitcher_starts(pp["id"], seasons)
+    if not starts:
+        return None
+    # join each start to that park's historical first-pitch weather
+    wx_starts = []
+    for d, code, ip, so, hr, er in starts:
+        hist = hist_all.get(code)
+        if not hist:
+            continue
+        g = next((x for x in hist["games"] if x["d"] == d), None)
+        if g:
+            wx_starts.append((g["t"], g["w"], ip, so, hr, er))
+    overall = _per9([(0, 0, ip, so, hr, er) for d, c, ip, so, hr, er in starts])
+    if dome:
+        return dict(name=pp.get("fullName", "TBD"), sim=None, all=overall,
+                    note="roof closed — weather-neutral")
+    sim_rows = [(t, w, ip, so, hr, er) for t, w, ip, so, hr, er in wx_starts
+                if abs(t - temp) <= 8 and abs(w - wind) <= 8]
+    note = "±8° temp, ±8 mph wind"
+    if len(sim_rows) < 5:
+        sim_rows = [(t, w, ip, so, hr, er) for t, w, ip, so, hr, er in wx_starts
+                    if abs(t - temp) <= 10]
+        note = "±10° temp (widened)"
+    sim = _per9(sim_rows) if len(sim_rows) >= 3 else None
+    return dict(name=pp.get("fullName", "TBD"), sim=sim, all=overall, note=note)
+
 def wet_split(hist, line):
     """Park-wide wet vs dry splits (needs history built with precip data)."""
     games = [g for g in hist["games"] if "p" in g]
@@ -251,7 +330,7 @@ def build_game(g, hist_all, league, lines, offline):
     out.update(
         sample=n,
         hr=pct_delta(m_hr, avg["hr"]), runs=pct_delta(m_r, avg["r"]), ks=pct_delta(m_so, avg["so"]),
-        hrGm=round(m_hr, 1), hrPark=avg["hr"],
+        hrGm=round(m_hr, 1), hrPark=avg["hr"], soPark=avg["so"],
         mlb=dict(hr=pct_delta(m_hr, league["hr"]), runs=pct_delta(m_r, league["r"]),
                  ks=pct_delta(m_so, league["so"])),
         ou=dict(over=round(over / n * 100) if n else 0,
@@ -265,14 +344,30 @@ def build_game(g, hist_all, league, lines, offline):
     )
     if dome:
         out["hr"] = out["runs"] = out["ks"] = 0
+
+    # probable pitchers — real starts in similar conditions (display-only)
+    pp_away = g["teams"]["away"].get("probablePitcher")
+    pp_home = g["teams"]["home"].get("probablePitcher")
+    if not offline and (pp_away or pp_home):
+        seasons = [datetime.now(ET).year - 2, datetime.now(ET).year - 1,
+                   datetime.now(ET).year]
+        out["pitchers"] = dict(
+            away=pitcher_conditions(pp_away, hist_all, temp, wind, dome, seasons),
+            home=pitcher_conditions(pp_home, hist_all, temp, wind, dome, seasons))
+    else:
+        out["pitchers"] = None
     return out
 
 def archive_predictions(date_str, games):
     os.makedirs(PREDS_DIR, exist_ok=True)
+    live = [g for g in games if not g.get("dome")]
+    edge_pk = max(live, key=lambda g: abs(g["hr"]))["gamePk"] if live else None
     slim = [dict(gamePk=g.get("gamePk"), away=g["away"], home=g["home"],
                  total=g.get("total"), lineSource=g.get("lineSource"),
                  ou=g["ou"], hr=g["hr"], runs=g["runs"], ks=g["ks"],
-                 hrPark=g.get("hrPark"), dome=g.get("dome", False), sample=g.get("sample"))
+                 hrPark=g.get("hrPark"), soPark=g.get("soPark"),
+                 edge=(g.get("gamePk") == edge_pk),
+                 dome=g.get("dome", False), sample=g.get("sample"))
             for g in games]
     with open(os.path.join(PREDS_DIR, f"{date_str}.json"), "w") as f:
         json.dump(dict(date=date_str, games=slim), f, separators=(",", ":"))
@@ -313,10 +408,17 @@ def grade_day(date_str, preds):
         hr_ok = None
         if hr_call and hr is not None and p.get("hrPark"):
             hr_ok = (hr_call == ("boost" if hr > p["hrPark"] else "suppress"))
+        k_call = "boost" if p["ks"] >= 6 else ("suppress" if p["ks"] <= -6 else None)
+        k_ok = None
+        if k_call and so is not None and p.get("soPark"):
+            k_ok = (k_call == ("boost" if so > p["soPark"] else "suppress"))
         graded.append(dict(m=f'{p["away"]}@{p["home"]}', line=line, src=p.get("lineSource"),
                            total=total, ou=ou_res, lean=lean, leanOk=lean_ok,
                            hrPred=p["hr"], hrAct=hr, hrPark=p.get("hrPark"),
-                           hrCall=hr_call, hrOk=hr_ok, soAct=so, dome=p.get("dome", False)))
+                           hrCall=hr_call, hrOk=hr_ok,
+                           kPred=p["ks"], soAct=so, soPark=p.get("soPark"),
+                           kCall=k_call, kOk=k_ok,
+                           edge=p.get("edge", False), dome=p.get("dome", False)))
     return graded
 
 def summarize(games):
@@ -324,8 +426,13 @@ def summarize(games):
     ll = sum(1 for g in games if g["leanOk"] is False)
     hw = sum(1 for g in games if g["hrOk"] is True)
     hl = sum(1 for g in games if g["hrOk"] is False)
+    kw = sum(1 for g in games if g.get("kOk") is True)
+    kl = sum(1 for g in games if g.get("kOk") is False)
+    ew = sum(1 for g in games if g.get("edge") and g["hrOk"] is True)
+    el = sum(1 for g in games if g.get("edge") and g["hrOk"] is False)
     errs = [abs(g["total"] - g["line"]) for g in games if g["line"]]
     return dict(n=len(games), leanW=lw, leanL=ll, hrW=hw, hrL=hl,
+                kW=kw, kL=kl, edgeW=ew, edgeL=el,
                 avgErr=round(sum(errs) / len(errs), 2) if errs else None)
 
 def grade_pending(today_str):
@@ -380,7 +487,7 @@ def main():
     if args.offline:
         sched = json.load(open(os.path.join(FIXTURES, "schedule.json")))
     else:
-        sched = get_json(SCHED_URL.format(date=date_str))
+        sched = get_json(SCHED_PP_URL.format(date=date_str))
 
     games = []
     for day in sched.get("dates", []):
