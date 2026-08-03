@@ -23,6 +23,7 @@ from parks import PARKS, MLBID_TO_CODE, wind_rel_angle, wind_sector, wind_label
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 HISTORY = os.path.join(ROOT, "data", "parks_history.json")
+HITTERS = os.path.join(ROOT, "data", "hitters_history.json")
 LINES = os.path.join(ROOT, "data", "lines.json")
 OUT = os.path.join(ROOT, "site", "data.json")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
@@ -148,6 +149,29 @@ def pct_delta(a, b):
 
 WET_IN = 0.05   # inches over the ~3h game window = "wet game"
 
+# ---- conditions MVP: each team's hottest bat in this weather ----
+def conditions_mvp(team, temp, wind, hitters_all):
+    """Best slugger in similar weather (±8° / ±8 mph, min 25 AB)."""
+    if not hitters_all:
+        return None
+    tm = hitters_all.get(team)
+    if not tm:
+        return None
+    best = None
+    for p in tm["players"].values():
+        sim = [r for r in p["g"] if abs(r[0] - temp) <= 8 and abs(r[1] - wind) <= 8]
+        ab = sum(r[2] for r in sim)
+        if ab < 25:
+            continue
+        slg = sum(r[3] for r in sim) / ab
+        all_ab = sum(r[2] for r in p["g"])
+        cand = dict(name=p["name"], slg=round(slg, 3),
+                    hr=sum(r[4] for r in sim), ab=ab, games=len(sim),
+                    allSlg=round(sum(r[3] for r in p["g"]) / all_ab, 3) if all_ab else 0)
+        if best is None or slg > best["slg"]:
+            best = cand
+    return best
+
 # ---- probable pitchers: real starts in similar conditions ----
 _PITCH_CACHE = {}
 
@@ -245,7 +269,7 @@ def wet_split(hist, line):
         out["wetUnder"] = round(sum(1 for x in wet if x["r"] < line) / n * 100)
     return out
 
-def build_game(g, hist_all, league, lines, offline):
+def build_game(g, hist_all, league, lines, offline, hitters_all=None):
     home_id = g["teams"]["home"]["team"]["id"]
     away_id = g["teams"]["away"]["team"]["id"]
     home = MLBID_TO_CODE.get(home_id)
@@ -356,6 +380,11 @@ def build_game(g, hist_all, league, lines, offline):
             home=pitcher_conditions(pp_home, hist_all, temp, wind, dome, seasons))
     else:
         out["pitchers"] = None
+
+    # conditions MVP — each team's best slugger in similar weather
+    out["mvp"] = None if dome else dict(
+        away=conditions_mvp(away, temp, wind, hitters_all),
+        home=conditions_mvp(home, temp, wind, hitters_all))
     return out
 
 def archive_predictions(date_str, games):
@@ -480,6 +509,12 @@ def main():
             sys.exit("data/parks_history.json missing — run the 'Build history' workflow first.")
     hist_all = json.load(open(hist_path))
     league = hist_all["_league"]
+    hitters_all = json.load(open(HITTERS)) if os.path.exists(HITTERS) else None
+    if hitters_all:
+        print(f"hitter history loaded (built {hitters_all.get('_built')})")
+    else:
+        print("no hitter history yet — Conditions MVP will be blank until the "
+              "'Build hitter history' workflow runs")
     lines = {} if args.offline else fetch_book_lines()
     if os.path.exists(LINES):
         lines.update(json.load(open(LINES)))   # manual pins always win
@@ -493,7 +528,7 @@ def main():
     for day in sched.get("dates", []):
         for g in day.get("games", []):
             try:
-                built = build_game(g, hist_all, league, lines, args.offline)
+                built = build_game(g, hist_all, league, lines, args.offline, hitters_all)
                 if built: games.append(built)
             except Exception as e:
                 print(f"  skip {g.get('gamePk')}: {e}")
