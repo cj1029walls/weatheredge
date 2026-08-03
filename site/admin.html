@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DFS Radar — Accuracy Dashboard</title>
+<title>DFSRADAR — Accuracy Dashboard</title>
 <meta name="robots" content="noindex">
 <style>
   :root{
@@ -48,17 +48,18 @@
   .chip.w{background:var(--green-bg);color:var(--green)}
   .chip.l{background:var(--red-bg);color:var(--red)}
   .chip.n{background:var(--gray-bg);color:var(--muted)}
+  .chip.e{background:var(--blue-bg);color:var(--blue-deep)}
   .empty{padding:44px;text-align:center;color:var(--muted)}
   .empty b{display:block;font-size:16px;color:var(--ink);margin-bottom:6px}
 </style>
 </head>
 <body>
 <header><div class="hd">
-  <h1>📡 DFS <span>RADAR</span> · Accuracy Dashboard</h1>
+  <h1>DFS<span>RADAR</span> · Accuracy Dashboard</h1>
   <a href="./">← back to today's slate</a>
 </div></header>
 <main>
-  <div class="note">Graded automatically each morning against official MLB final scores and box scores. <b>O/U leans</b> count only games where the sample leaned ≥3 points to one side (pushes excluded). <b>HR calls</b> count only games where weather moved the HR expectation ≥8% vs park average — a call is correct when the actual HR total lands on the called side of the park's average.</div>
+  <div class="note">Graded automatically each morning against official MLB final scores and box scores. <b>O/U leans</b> count only games where the sample leaned ≥3 points to one side (pushes excluded). <b>HR calls</b> count games where weather moved the HR expectation ≥8% vs park average; <b>K calls</b> where it moved strikeout expectation ≥6% — a call is correct when the actual total lands on the called side of the park's average. <b>Edge of the day</b> tracks the headline game's HR call specifically.</div>
   <div class="tiles" id="tiles"></div>
   <div class="card" id="days-card"><div class="empty" id="empty"><b>No graded days yet</b>Accuracy appears here after the first full day of predictions is graded (tomorrow morning's build).</div></div>
 </main>
@@ -79,15 +80,20 @@ async function load(){
     <div class="tile"><div class="k">Days graded</div><div class="v">${days.length}</div><div class="s">${c.n||0} games scored</div></div>
     <div class="tile"><div class="k">O/U lean record</div><div class="v"><span class="${cls(c.leanW,c.leanL)}">${c.leanW||0}–${c.leanL||0}</span></div><div class="s">${pct(c.leanW||0,c.leanL||0)} hit rate on leaned games</div></div>
     <div class="tile"><div class="k">HR call record</div><div class="v"><span class="${cls(c.hrW,c.hrL)}">${c.hrW||0}–${c.hrL||0}</span></div><div class="s">${pct(c.hrW||0,c.hrL||0)} vs park average</div></div>
+    <div class="tile"><div class="k">K call record</div><div class="v"><span class="${cls(c.kW||0,c.kL||0)}">${c.kW||0}–${c.kL||0}</span></div><div class="s">${pct(c.kW||0,c.kL||0)} vs park average</div></div>
+    <div class="tile"><div class="k">Edge of the day</div><div class="v"><span class="${cls(c.edgeW||0,c.edgeL||0)}">${c.edgeW||0}–${c.edgeL||0}</span></div><div class="s">${pct(c.edgeW||0,c.edgeL||0)} on headline games</div></div>
     <div class="tile"><div class="k">Avg total error</div><div class="v">${c.avgErr!=null?c.avgErr:"—"}</div><div class="s">runs, |final − line|</div></div>`;
   const rows = days.map(d=>{
     const day = acc.days[d], s = day.summary;
     const games = day.games.map(g=>{
       const leanChip = g.leanOk===true? '<span class="chip w">LEAN ✓</span>' : g.leanOk===false? '<span class="chip l">LEAN ✗</span>' : '<span class="chip n">no lean</span>';
       const hrChip = g.hrOk===true? '<span class="chip w">HR ✓</span>' : g.hrOk===false? '<span class="chip l">HR ✗</span>' : '<span class="chip n">no call</span>';
-      return `<div class="g-row"><b>${g.m}</b><span>${g.total} runs vs ${g.line||"—"} (${g.ou}${g.src==="est"?" · est line":""})</span>
+      const kChip = g.kOk===true? '<span class="chip w">K ✓</span>' : g.kOk===false? '<span class="chip l">K ✗</span>' : '<span class="chip n">no K call</span>';
+      const edgeTag = g.edge? '<span class="chip e">⚡ EDGE</span>' : '';
+      return `<div class="g-row"><b>${g.m}</b>${edgeTag}<span>${g.total} runs vs ${g.line||"—"} (${g.ou}${g.src==="est"?" · est line":""})</span>
         <span>${g.lean?("leaned "+g.lean):"even"}</span>${leanChip}
-        <span>HR ${g.hrAct!=null?g.hrAct:"?"} vs park ${g.hrPark||"—"}${g.hrCall?(" · called "+g.hrCall):""}</span>${hrChip}</div>`;
+        <span>HR ${g.hrAct!=null?g.hrAct:"?"} vs park ${g.hrPark||"—"}${g.hrCall?(" · called "+g.hrCall):""}</span>${hrChip}
+        <span>K ${g.soAct!=null?g.soAct:"?"} vs park ${g.soPark?Math.round(g.soPark):"—"}${g.kCall?(" · called "+g.kCall):""}</span>${kChip}</div>`;
     }).join("");
     return `<details><summary><table><tbody><tr>
       <td style="width:130px">${d}</td>

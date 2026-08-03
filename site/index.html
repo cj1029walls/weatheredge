@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DFS Radar — MLB Weather Edges for DFS</title>
-<meta name="description" content="DFS Radar tracks MLB weather for DFS players: park-specific weather impact on home runs, runs, and strikeouts, plus over/under hit rates from historically similar games. Real data for a real edge.">
+<title>DFSRADAR — MLB Weather Edges for DFS</title>
+<meta name="description" content="DFSRADAR tracks MLB weather for DFS players: park-specific weather impact on home runs, runs, and strikeouts, plus over/under hit rates from historically similar games. Real data for a real edge.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
 <style>
   :root{
     /* "Blueprint" — locked palette: cobalt-indigo + royal blue accent,
@@ -36,6 +37,42 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--surface); color:var(--ink); line-height:1.45;
   }
+  /* ---------- announce strip ---------- */
+  .announce{
+    background:linear-gradient(90deg,#0e1a3d,#2450b8 55%,#0e1a3d);
+    color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;
+    padding:8px 14px;
+  }
+  .announce b{color:#fff;font-weight:700}
+  .announce .soon{
+    display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;
+    font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ffd94a;
+  }
+  /* ---------- info tooltips ---------- */
+  .tip{position:relative;cursor:help}
+  .info-i{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:15px;height:15px;border-radius:50%;background:var(--gray-bg);
+    color:var(--muted);font-size:10px;font-weight:800;font-style:normal;
+    vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong);
+  }
+  .tip.on-dark .info-i{background:rgba(255,255,255,.14);color:#c8d5f2;border-color:rgba(255,255,255,.3)}
+  .tip::after{
+    content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;
+    transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;
+    font-size:11.5px;font-weight:500;line-height:1.55;letter-spacing:.1px;
+    text-transform:none;padding:10px 12px;border-radius:10px;
+    box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;
+    transition:opacity .15s;z-index:90;text-align:left;white-space:normal;
+  }
+  .tip::before{
+    content:"";position:absolute;bottom:calc(100% + 3px);left:50%;
+    transform:translateX(-50%);border:6px solid transparent;
+    border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90;
+  }
+  .tip:hover::after,.tip:hover::before{opacity:1}
+  .tip.tip-right::after{left:auto;right:-10px;transform:none}
   /* ---------- header ---------- */
   header{
     background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
@@ -43,8 +80,9 @@
   }
   .header-inner{max-width:1240px;margin:0 auto}
   .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .brand h1{font-size:26px;font-weight:800;letter-spacing:.4px;display:flex;align-items:center;gap:10px}
-  .brand h1 .bolt{display:inline-flex;width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--bolt1),var(--bolt2));align-items:center;justify-content:center;font-size:19px}
+  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
+  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
   .brand .tagline b{color:#e8c877;font-weight:600}
   .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
@@ -135,6 +173,17 @@
   .edge-rain{background:#2450b8;color:#dde7fb}
   .edge-neutral{background:var(--gray-bg);color:var(--muted)}
   .rain-cmp{font-size:13px;color:var(--ink);background:var(--blue-bg);border-radius:10px;padding:10px 13px;margin-top:10px;line-height:1.5}
+  /* probable pitchers */
+  .p-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+  .p-card{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .p-side{font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--muted);background:var(--gray-bg);border-radius:8px;padding:4px 8px;height:fit-content}
+  .p-name{font-weight:800;font-size:14.5px;margin-bottom:5px}
+  .p-nums{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;align-items:baseline}
+  .p-nums b{font-size:16px}
+  .p-nums .pos b{color:var(--green)} .p-nums .neg b{color:var(--red)}
+  .p-nums .p-n{font-size:11.5px;color:var(--muted);width:100%}
+  .p-nums.p-na{font-size:12.5px;color:var(--muted)}
+  .p-all{font-size:11.5px;color:var(--muted);margin-top:5px}
   @media(max-width:960px){
     .hero{grid-template-columns:1fr}
     .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
@@ -244,12 +293,37 @@
 </style>
 </head>
 <body>
+<div class="announce">📡 Expanding coverage — weather edges for <b>PGA</b> · <b>CFB</b> · <b>NFL</b> · <b>NASCAR</b> and more outdoor sports <span class="soon">coming soon</span></div>
 
 <header>
   <div class="header-inner">
     <div class="brand-row">
       <div class="brand">
-        <h1><span class="bolt">📡</span> DFS <span style="font-weight:300;color:#93a1b8">RADAR</span></h1>
+        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
+          <defs>
+            <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
+              <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/>
+              <stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
+          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
+          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
+          <g>
+            <path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
+            <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/>
+          </g>
+          <circle cx="29.5" cy="13.5" r="2.3" fill="#ffd94a">
+            <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="13" cy="28.5" r="1.9" fill="#6ee7a0">
+            <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
+        </svg>DFS<span class="brand-rad">RADAR</span></h1>
         <div class="tagline">MLB weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
       </div>
       <div class="date-chip">Slate for <b id="date-label">Tuesday, July 28</b> · <span id="game-count"></span> games</div>
@@ -270,7 +344,7 @@
     <div class="summary-strip" id="summary-strip"></div>
     <section class="hero" id="hero"></section>
     <div class="controls">
-      <h2>Weather impact vs each park</h2>
+      <h2>Weather impact vs each park<span class="tip" data-tip="HR, R, and K show how home runs, runs, and strikeouts in historically similar weather at that park compare to the park's own average. Green = weather boosts it, red = weather suppresses it."><span class="info-i">i</span></span></h2>
       <div class="sort-wrap">
         Sort by
         <select id="sort-select">
@@ -318,17 +392,21 @@
         <span class="pill"><span class="dot fair"></span> Fair — 15–39 matched games</span>
         <span class="pill"><span class="dot limited"></span> Limited — under 15 games</span>
       </div>
+      <h4>What is the "Edge of the day"?</h4>
+      <p>The headline game at the top of the slate is the open-air game where today's weather pushes <b>home-run expectation furthest from that park's own average</b> — in either direction. A +20% HR day at a park and a −20% HR day are both edges; domes never qualify. It's simply the biggest weather signal on the board, not a pick.</p>
+      <h4>Probable pitchers in these conditions</h4>
+      <p>Each breakdown also shows both probable pitchers' <b>real career starts in weather like today's</b> — strikeouts, home runs allowed, and ERA per 9 innings in similar conditions vs. their overall numbers. Same philosophy: actual game logs, not projections.</p>
       <h4>Park-specific vs. league-wide</h4>
       <p><b>Weather impact vs this park</b> compares today's conditions to that park's own average — the sharpest signal, since every park plays differently. <b>Vs MLB average</b> puts the same game on a league-wide scale so you can compare across the whole slate.</p>
       <h4>Domes & retractable roofs</h4>
       <p>When a roof is closed, weather is neutral by definition — we flag it and show the park's indoor baselines instead of a false edge.</p>
       <h4>Always current</h4>
-      <p>DFS Radar rebuilds automatically three times a day — every morning and again before the afternoon and evening slates — pulling the live MLB schedule, first-pitch forecasts at every park, real sportsbook totals, and the full 2019-present game log. Built for DFS players by the team behind DFS Books.</p>
+      <p>DFSRADAR rebuilds automatically three times a day — every morning and again before the afternoon and evening slates — pulling the live MLB schedule, first-pitch forecasts at every park, real sportsbook totals, and the full 2019-present game log. Built for DFS players by the team behind DFS Books.</p>
     </div>
   </section>
 </main>
 
-<footer>DFS Radar · MLB weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
+<footer>DFSRADAR · MLB weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
 
 <!-- ======== MODAL ======== -->
 <div class="overlay" id="overlay">
@@ -352,7 +430,9 @@ const SAMPLE_GAMES = [
   {id:"wsh-chc", away:"WSH", home:"CHC", park:"Wrigley Field", time:"2:20 PM ET", sortTime:1420,
    temp:84, wind:13, dir:"SSW", windAngle:10, windLabel:"OUT TO CF", dew:64, sky:"Sunny", skyIcon:"☀️", rain:4, cloud:12,
    sample:49, hr:24, runs:14, ks:-4, hrGm:2.9, hrPark:2.3,
-   mlb:{hr:19, runs:11, ks:-6}, ou:{under:25, push:7, over:68}, total:9.0},
+   mlb:{hr:19, runs:11, ks:-6}, ou:{under:25, push:7, over:68}, total:9.0,
+   pitchers:{away:{name:"MacKenzie Gore", sim:{n:9,ip:51.3,k9:10.2,hr9:0.88,era:3.16}, all:{n:64,ip:340.2,k9:9.6,hr9:1.19,era:3.71}, note:"±8° temp, ±8 mph wind"},
+             home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}}},
 
   {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
    temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅", rain:18, cloud:55,
@@ -588,17 +668,17 @@ function renderHero(){
       <div class="p3d-hint">drag to look around</div>
     </div>
     <div class="hero-info">
-      <div class="hero-tag">⚡ Edge of the day</div>
+      <div class="hero-tag">⚡ Edge of the day<span class="tip" data-tip="The open-air game where today's weather pushes home-run expectation furthest from that park's own average — the biggest weather signal on the slate, in either direction. Not a pick."><span class="info-i">i</span></span></div>
       <div class="hero-teams">${g.away} <span class="at">@</span> ${g.home}</div>
       <div class="hero-meta">${g.time} · ${g.park}</div>
-      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>☔ <b>${g.rain}%</b> rain</span>`:""}<span class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}</span></div>
+      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>☔ <b>${g.rain}%</b> rain</span>`:""}<span class="sample tip" data-tip="Matched games at this park since 2019 with weather like today's (±6° temp, ±6 mph wind, same wind direction — the window widens if fewer than 12 match). Strong = 40+, Fair = 15–39, Limited = under 15."><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}<span class="info-i">i</span></span></div>
       <div class="hero-imp">
         <div class="hi-row"><span class="l">Home runs</span>${heroBar(g.hr)}<span class="hi-val ${cls(g.hr)}">${pct(g.hr)}</span></div>
         <div class="hi-row"><span class="l">Runs</span>${heroBar(g.runs)}<span class="hi-val ${cls(g.runs)}">${pct(g.runs)}</span></div>
         <div class="hi-row"><span class="l">Strikeouts</span>${heroBar(g.ks)}<span class="hi-val ${cls(g.ks)}">${pct(g.ks)}</span></div>
       </div>
       <div class="hero-foot">
-        <div class="hero-lean">${gaugeSVG(g,54)}<div class="txt">${leanTxt(g)}<span>in ${g.sample} similar games · avg total ${g.total.toFixed(1)}</span></div></div>
+        <div class="hero-lean">${gaugeSVG(g,54)}<div class="txt">${leanTxt(g)}<span>in ${g.sample} similar games · ${g.lineSource==="book"?"book total":"est. total"} ${g.total.toFixed(1)}<span class="tip" data-tip="How often historically similar games at this park finished over or under today's total. The ring: royal = over share, slate = under, gray = push. Center number is the total — from real sportsbooks when available, otherwise the matched sample's balanced midpoint (marked est.)."><span class="info-i">i</span></span></span></div></div>
         <button class="hero-cta" data-game="${g.id}">Full breakdown →</button>
       </div>
     </div>`;
@@ -707,6 +787,31 @@ function histTable(g){
       <th>Date</th><th>Game</th><th>Temp</th><th>Wind</th><th>Total</th><th>Final</th><th>Result</th>
     </tr></thead><tbody>${body}</tbody></table>
     ${rows.length>12?`<div class="hist-note">Showing 12 most recent of ${rows.length} matched games at ${g.park.split("·")[0].trim()}.</div>`:""}`;
+}
+
+/* ---------- probable pitchers section (modal) ---------- */
+function pitcherCard(teamCode, p){
+  if(!p) return `<div class="p-card"><div class="p-side">${teamCode}</div><div class="p-name" style="color:var(--muted)">Probable not yet announced</div></div>`;
+  let simHtml;
+  if(p.sim){
+    const kUp = p.all && p.sim.k9 > p.all.k9, hrDown = p.all && p.sim.hr9 < p.all.hr9;
+    simHtml = `<div class="p-nums">
+      <span class="${p.all?(kUp?"pos":"neg"):""}"><b>${p.sim.k9}</b> K/9</span>
+      <span class="${p.all?(hrDown?"pos":"neg"):""}"><b>${p.sim.hr9}</b> HR/9</span>
+      <span><b>${p.sim.era}</b> ERA</span>
+      <span class="p-n">${p.sim.n} starts (${p.sim.ip} IP) in similar weather</span></div>`;
+  } else {
+    simHtml = `<div class="p-nums p-na">${p.note==="roof closed — weather-neutral"?"Roof closed — weather-neutral":"Not enough career starts in similar conditions yet"}</div>`;
+  }
+  const all = p.all ? `<div class="p-all">Overall: ${p.all.k9} K/9 · ${p.all.hr9} HR/9 · ${p.all.era} ERA over ${p.all.n} games</div>` : "";
+  return `<div class="p-card"><div class="p-side">${teamCode}</div><div><div class="p-name">${p.name}</div>${simHtml}${all}</div></div>`;
+}
+function pitcherSec(g){
+  if(!g.pitchers || (!g.pitchers.away && !g.pitchers.home)) return "";
+  return `<div class="m-sec">
+    <h5>Probable pitchers in these conditions<span class="tip" data-tip="Each pitcher's real starts from the last three seasons in weather like today's (±8° temp, ±8 mph wind), joined to our park weather history. Green = better than his overall number in these conditions, red = worse. Shown alongside the park data — not blended into it."><span class="info-i">i</span></span></h5>
+    <div class="p-grid">${pitcherCard(g.away, g.pitchers.away)}${pitcherCard(g.home, g.pitchers.home)}</div>
+  </div>`;
 }
 
 /* ---------- rain history section (modal) ---------- */
@@ -916,34 +1021,27 @@ function initPark3D(g, canvas, slot="modal"){
     roof.scale.y = 0.45; roof.position.set(0,2,-140); scene.add(roof);
   }
 
-  /* wind — long arcing gusts: few, slow, smooth curved trails that fade
-     in, sweep across the park with a gentle bend, and fade out */
+  /* wind — nullschool-style particle flow: hundreds of thin streaks
+     drifting along the wind field with organic curl, trails fading behind */
   let wind = null;
   if(!dome && g.wind>2){
-    const N=24, TAIL=30;
+    const N=240, TAIL=8;
     const base=g.windAngle*Math.PI/180;
-    const mkGust=(init)=>({
-      p:new THREE.Vector3((Math.random()-0.5)*620, 14+Math.random()*115, 90-Math.random()*600),
-      ang: base + (Math.random()-0.5)*0.5,
-      curve:(Math.random()-0.5)*0.22,          // gentle per-gust bend (rad/s)
-      speedMul: 0.75 + Math.random()*0.5,
-      bobPhase: Math.random()*Math.PI*2,
-      life: 3.6 + Math.random()*2.6,
-      t: init ? Math.random()*3 : 0,
-    });
+    const spawn=()=>new THREE.Vector3((Math.random()-0.5)*700, 8+Math.random()*135, 115-Math.random()*660);
     const parts=[];
     for(let i=0;i<N;i++){
-      const gp=mkGust(true);
-      gp.hist=Array.from({length:TAIL},()=>gp.p.clone());
-      parts.push(gp);
+      const p=spawn();
+      parts.push({p, age:Math.random()*3, life:2.2+Math.random()*2.4,
+                  hist:Array.from({length:TAIL},()=>p.clone())});
     }
     const segs=N*(TAIL-1);
     const geo=new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(segs*6),3));
     geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(segs*6),3));
-    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.5:0.8});
-    wind={mesh:new THREE.LineSegments(geo,mat), parts, tail:TAIL, mkGust,
-          speed:55 + g.wind*9, headCol:new THREE.Color(0xffffff), bgCol:COL.bg.clone()};
+    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.45:0.7});
+    wind={mesh:new THREE.LineSegments(geo,mat), parts, tail:TAIL, base, spawn, t:0,
+          speed:46 + g.wind*6.5,
+          headCol:new THREE.Color(night?0xdfe9ff:0xffffff), bgCol:COL.bg.clone()};
     scene.add(wind.mesh);
   }
 
@@ -993,31 +1091,32 @@ function initPark3D(g, canvas, slot="modal"){
     idleT += dt;
     if(!dragging && idleT>2.5) theta += dt*0.07;
     if(wind){
+      wind.t += dt;
       const pos = wind.mesh.geometry.attributes.position.array;
       const col = wind.mesh.geometry.attributes.color.array;
       let k = 0;
       wind.parts.forEach(pt=>{
-        pt.t += dt;
-        pt.ang += pt.curve*dt;                      // the arc: heading bends slowly
-        const sp = wind.speed*pt.speedMul;
-        pt.p.x += Math.sin(pt.ang)*sp*dt;
-        pt.p.z += -Math.cos(pt.ang)*sp*dt;
-        pt.p.y += Math.sin(pt.t*0.7 + pt.bobPhase)*7*dt;   // soft rise & fall
-        const out = Math.abs(pt.p.x)>380 || pt.p.z<-620 || pt.p.z>160 || pt.p.y<6 || pt.p.y>175;
-        if(pt.t>pt.life || out){
-          const n = wind.mkGust(false);
-          pt.p.copy(n.p); pt.ang=n.ang; pt.curve=n.curve; pt.speedMul=n.speedMul;
-          pt.bobPhase=n.bobPhase; pt.life=n.life; pt.t=0;
+        pt.age += dt;
+        /* flow field: base wind direction + smooth positional curl so
+           neighbouring particles bend together like a fluid */
+        const curl = 0.42*Math.sin(pt.p.x*0.010 + wind.t*0.5)
+                   + 0.30*Math.sin(pt.p.z*0.0065 - wind.t*0.33);
+        const a = wind.base + curl;
+        pt.p.x += Math.sin(a)*wind.speed*dt;
+        pt.p.z += -Math.cos(a)*wind.speed*dt;
+        const out = Math.abs(pt.p.x)>390 || pt.p.z<-640 || pt.p.z>170;
+        if(pt.age>pt.life || out){
+          pt.p.copy(wind.spawn()); pt.age=0; pt.life=2.2+Math.random()*2.4;
           pt.hist.forEach(h=>h.copy(pt.p));
         }
         const tailv = pt.hist.pop(); tailv.copy(pt.p); pt.hist.unshift(tailv);
-        /* fade the whole gust in and out over its life so it breathes */
-        const env = Math.min(1, pt.t/0.9, Math.max(0,(pt.life-pt.t))/0.9);
+        /* alpha: quick fade-in, fade-out at end of life — no popping */
+        const env = Math.max(0, Math.min(1, pt.age/0.35, (pt.life-pt.age)/0.55));
         for(let sgi=0; sgi<wind.tail-1; sgi++){
           const A=pt.hist[sgi], B=pt.hist[sgi+1];
           pos[k*6]=A.x;   pos[k*6+1]=A.y; pos[k*6+2]=A.z;
           pos[k*6+3]=B.x; pos[k*6+4]=B.y; pos[k*6+5]=B.z;
-          const f1=Math.pow(1-sgi/(wind.tail-1),1.9)*env, f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.9)*env;
+          const f1=Math.pow(1-sgi/(wind.tail-1),1.5)*env, f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.5)*env;
           col[k*6]  =wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f1;
           col[k*6+1]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f1;
           col[k*6+2]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f1;
@@ -1093,19 +1192,20 @@ function openModal(g){
           </div>
         </div>
       </div>
+      ${pitcherSec(g)}
       <div class="m-sec">
-        <h5>Weather impact vs ${g.park.split("·")[0].trim()}</h5>
+        <h5>Weather impact vs ${g.park.split("·")[0].trim()}<span class="tip" data-tip="How the matched similar-weather sample compares to this park's own all-conditions average. Every park plays differently, so this is the sharpest signal."><span class="info-i">i</span></span></h5>
         <div class="m-tiles">${mTiles}</div>
       </div>
       <div class="m-sec">
-        <h5>Vs MLB average — all games, all parks</h5>
+        <h5>Vs MLB average — all games, all parks<span class="tip" data-tip="The same matched games measured against the league-wide average since 2019 — park and weather combined, so you can compare games across the whole slate on one scale."><span class="info-i">i</span></span></h5>
         ${meter("HR",`MLB avg ${LIVE?LIVE.league.hr:2.37}/gm`,g.mlb.hr)}
         ${meter("Runs",`MLB avg ${LIVE?LIVE.league.r:9.0}/gm`,g.mlb.runs)}
         ${meter("Ks",`MLB avg ${LIVE?LIVE.league.so:16.8}/gm`,g.mlb.ks)}
       </div>
       ${rainSec(g)}
       <div class="m-sec">
-        <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}</h5>
+        <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}<span class="tip" data-tip="Real final scores from games at this park in weather like today's. Over/under is computed against today's total, so it updates when the line moves. 💧 marks games with measurable rain."><span class="info-i">i</span></span></h5>
         ${histTable(g)}
       </div>
     </div>`;
