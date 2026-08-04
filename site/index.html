@@ -98,9 +98,14 @@
   /* ---------- slate summary strip ---------- */
   main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
-  .brief-card{background:var(--card);border-left:4px solid var(--gold);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;margin-bottom:18px}
-  .brief-head{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-  .brief-body{font-size:13.5px;line-height:1.65;color:var(--body2)}
+  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
+  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
+  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;animation:bpulse 2.2s ease-in-out infinite}
+  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .brief-head .tip .info-i{background:rgba(255,255,255,.13);color:#c8d5f2;border-color:rgba(255,255,255,.3)}
+  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
+  .brief-body b{color:#fff;font-weight:700}
   .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
   .sum-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
   .sum-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
@@ -198,6 +203,7 @@
   .hr-rain.warn{color:var(--red);font-weight:800}
   .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
   .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .wet-tag{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:var(--blue-bg);color:var(--blue-deep);border-radius:6px;padding:1px 5px;vertical-align:1px}
   .hr-ic{font-size:12px}
   /* delay outlook chip */
   .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
@@ -217,6 +223,21 @@
     .b-ou{grid-column:1/2/span 2}
     .b-badge{display:none}
   }
+  /* ---------- weather report cards ---------- */
+  #wx-board{display:flex;flex-direction:column;gap:12px}
+  .wxc{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 18px;cursor:pointer;border:1px solid transparent;transition:.15s}
+  .wxc:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
+  .wxc-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .wxc-time{font-size:15px;font-weight:800;line-height:1.1}
+  .wxc-time span{display:block;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:1px}
+  .wxc-teams{font-size:16px;font-weight:800}
+  .wxc-teams .at{font-weight:300;color:var(--faint)}
+  .wxc-park{font-size:11.5px;color:var(--muted)}
+  .wxc-dome{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .wxc-foot{display:flex;flex-wrap:wrap;gap:4px;font-size:12px;color:var(--body2);margin-top:10px}
+  .wxc-foot b{letter-spacing:.5px}
+  .wfx-low{color:var(--blue)} .wfx-medium{color:var(--gold-deep)} .wfx-high{color:#d97708} .wfx-extreme{color:var(--red)}
+  .wxc-link{margin-left:auto;color:var(--gold-deep);font-weight:700}
   /* ---------- compare table ---------- */
   .table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
   table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:860px}
@@ -257,7 +278,11 @@
   .m-close{appearance:none;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex:0 0 auto}
   .m-close:hover{background:rgba(255,255,255,.24)}
   .m-body{padding:20px 26px 28px}
-  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px}
+  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
+  .sub-h{font-size:10px;font-weight:800;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase;margin:15px 0 9px;padding-top:13px;border-top:1px dashed var(--line)}
+  .sub-h:first-of-type{margin-top:2px;padding-top:0;border-top:0}
+  .league-row{font-size:12.5px;color:var(--muted);margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
+  .league-row b.pos{color:var(--green)} .league-row b.neg{color:var(--red)} .league-row b.neu{color:var(--ink)}
   .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
   .m-cond{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
   .m-cond .wx-item .big{font-size:27px}
@@ -356,6 +381,7 @@
     </div>
     <nav>
       <button class="active" data-view="slate">Today's Slate</button>
+      <button data-view="weather">Weather Report</button>
       <button data-view="compare">Compare All Games</button>
       <button data-view="method">How It Works</button>
     </nav>
@@ -366,7 +392,7 @@
   <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — live slate loads automatically when the daily build has run.</span></div>
 
   <div class="brief-card" id="brief-card" style="display:none">
-    <div class="brief-head">📡 Today's read<span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
+    <div class="brief-head"><span class="pulse"></span>Today's read — live from the radar<span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
     <div class="brief-body" id="brief-body"></div>
   </div>
 
@@ -389,6 +415,12 @@
       </div>
     </div>
     <div class="board" id="board"></div>
+  </section>
+
+  <!-- ======== WEATHER VIEW ======== -->
+  <section class="view" id="view-weather">
+    <div class="controls"><h2>Stadium weather report<span class="tip" data-tip="The full forecast for every park on the slate — hour by hour from before first pitch through the game, with delay outlook and how much wind matters at each stadium. Click any game for the full breakdown."><span class="info-i">i</span></span></h2></div>
+    <div id="wx-board"></div>
   </section>
 
   <!-- ======== COMPARE VIEW ======== -->
@@ -616,9 +648,9 @@ function parkSVG(g, size){
 /* ---------- slate summary ---------- */
 function edgeBadge(g){
   if(g.dome) return `<span class="edge-badge edge-neutral">Roof closed</span>`;
-  if(g.delay && g.delay.level==="severe") return `<span class="edge-badge edge-rain" style="background:#a92525">⛔ PPD risk</span>`;
-  if(g.delay && g.delay.level==="likely") return `<span class="edge-badge edge-rain">☔ Delay likely</span>`;
-  if((g.rain||0)>=55) return `<span class="edge-badge edge-rain">☔ Rain risk</span>`;
+  if(g.delay && g.delay.level==="severe") return `<span class="edge-badge edge-rain" style="background:#a92525">PPD risk</span>`;
+  if(g.delay && g.delay.level==="likely") return `<span class="edge-badge edge-rain">Delay likely</span>`;
+  if((g.rain||0)>=55) return `<span class="edge-badge edge-rain">Rain risk</span>`;
   if(g.hr>=12) return `<span class="edge-badge edge-hr">HR weather</span>`;
   if(g.ou.under>=50) return `<span class="edge-badge edge-under">Under weather</span>`;
   return "";
@@ -663,8 +695,8 @@ function rowHTML(g){
     ? `<span class="pill neu">HR —</span><span class="pill neu">R —</span><span class="pill neu">K —</span>`
     : `<span class="pill ${cls(g.hr)}">HR ${pct(g.hr)}</span><span class="pill ${cls(g.runs)}">R ${pct(g.runs)}</span><span class="pill ${cls(g.ks)}">K ${pct(g.ks)}</span>`;
   const wx = g.dome
-    ? `<div class="w">🏟️ roof closed<br>weather sealed out</div>`
-    : `<div class="w">${g.wind} mph ${g.dir}<br>${g.windLabel.toLowerCase()} · dew ${g.dew}°${(g.rain!=null&&g.rain>=15)?`<br>☔ ${g.rain}% rain`:""}</div>`;
+    ? `<div class="w">roof closed<br>weather sealed out</div>`
+    : `<div class="w">${g.wind} mph ${g.dir}<br>${g.windLabel.toLowerCase()} · dew ${g.dew}°${(g.rain!=null&&g.rain>=15)?`<br>Rain ${g.rain}%`:""}</div>`;
   return `<div class="b-row" data-game="${g.id}">
     <div class="b-time">${g.time.replace(" ET","")}<span>ET</span></div>
     <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-park">${g.park}</div></div>
@@ -706,7 +738,7 @@ function renderHero(){
     <div class="hero-3d">
       <canvas id="hero3d"></canvas>
       <div class="p3d-hud"><div class="t">${g.park.split("·")[0].trim()} · live view</div>
-        <div class="w">💨 ${g.wind} mph ${g.dir} · ${g.windLabel.toLowerCase()}</div></div>
+        <div class="w">Wind ${g.wind} mph ${g.dir} · ${g.windLabel.toLowerCase()}</div></div>
       <div class="p3d-badge">${g.skyIcon} ${g.sky}</div>
       <div class="p3d-dims">${pk.dims[0]}′ LF · ${pk.dims[2]}′ CF · ${pk.dims[4]}′ RF</div>
       <div class="p3d-hint">drag to look around</div>
@@ -715,7 +747,7 @@ function renderHero(){
       <div class="hero-tag">⚡ Edge of the day<span class="tip" data-tip="The open-air game where today's weather pushes home-run expectation furthest from that park's own average — the biggest weather signal on the slate, in either direction. Not a pick."><span class="info-i">i</span></span></div>
       <div class="hero-teams">${g.away} <span class="at">@</span> ${g.home}</div>
       <div class="hero-meta">${g.time} · ${g.park}</div>
-      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>☔ <b>${g.rain}%</b> rain</span>`:""}<span class="sample tip" data-tip="Matched games at this park since 2019 with weather like today's (±6° temp, ±6 mph wind, same wind direction — the window widens if fewer than 12 match). Strong = 40+, Fair = 15–39, Limited = under 15."><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}<span class="info-i">i</span></span></div>
+      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>rain <b>${g.rain}%</b></span>`:""}<span class="sample tip" data-tip="Matched games at this park since 2019 with weather like today's (±6° temp, ±6 mph wind, same wind direction — the window widens if fewer than 12 match). Strong = 40+, Fair = 15–39, Limited = under 15."><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}<span class="info-i">i</span></span></div>
       <div class="hero-imp">
         <div class="hi-row"><span class="l">Home runs</span>${heroBar(g.hr)}<span class="hi-val ${cls(g.hr)}">${pct(g.hr)}</span></div>
         <div class="hi-row"><span class="l">Runs</span>${heroBar(g.runs)}<span class="hi-val ${cls(g.runs)}">${pct(g.runs)}</span></div>
@@ -728,7 +760,39 @@ function renderHero(){
     </div>`;
   const cv = document.getElementById("hero3d");
   if(cv) initPark3D(g, cv, "hero");
-}/* ---------- compare table ---------- */
+}/* ---------- weather report view ---------- */
+function renderWeather(){
+  const el = document.getElementById("wx-board");
+  if(!el) return;
+  const DL = {clear:["dl-clear","No delay concern"], watch:["dl-watch","Worth monitoring"],
+              likely:["dl-likely","Delay likely"], severe:["dl-severe","Postponement risk"]};
+  el.innerHTML = [...GAMES].sort((a,b)=>a.sortTime-b.sortTime).map(g=>{
+    const head = `<div class="wxc-head">
+      <div class="wxc-time">${g.time.replace(" ET","")}<span>ET</span></div>
+      <div><div class="wxc-teams">${g.away} <span class="at">@</span> ${g.home}</div>
+      <div class="wxc-park">${g.park.split(" ·")[0]}</div></div>`;
+    if(g.dome){
+      return `<div class="wxc" data-game="${g.id}">${head}
+        <span class="edge-badge edge-neutral" style="margin-left:auto">Roof closed</span></div>
+        <div class="wxc-dome">Indoor baseline — weather sealed out. ${g.temp}° listed for reference only.</div></div>`;
+    }
+    const dl = g.delay ? DL[g.delay.level] : null;
+    const hours = (g.hourly||[]).map(h=>`
+      <div class="hr-cell ${h.fp?"hr-fp":""}">
+        <div class="hr-lab">${h.lab||""}${h.fp?" · 1st pitch":""}</div>
+        <div class="hr-t">${h.c?`<span class="hr-ic">${h.c}</span> `:""}${h.t}°</div>
+        <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
+        <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
+      </div>`).join("");
+    return `<div class="wxc" data-game="${g.id}">${head}
+        ${dl?`<span class="delay-chip ${dl[0]}" style="margin:0 0 0 auto">${dl[1].toUpperCase()}${g.delay.pct?` · peak rain ${g.delay.pct}%`:""}</span>`:""}</div>
+      <div class="hourly" style="margin-top:11px">${hours}</div>
+      <div class="wxc-foot">${g.windFx?`Wind factor here: <b class="wfx-${g.windFx.rating.toLowerCase()}">${g.windFx.rating}</b> · `:""}Wind ${g.wind} mph ${g.dir} (${g.windLabel.toLowerCase()}) · Humidity ${g.rh!=null?g.rh+"%":"—"} · Pressure ${g.pres!=null?g.pres+" hPa":"—"} · Dew ${g.dew}°<span class="wxc-link">Full breakdown →</span></div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- compare table ---------- */
 let cmpSort = {k:"hr", dir:-1};
 function chip(v){ return v===0 ? `<span class="cell-chip neu">—</span>` : `<span class="cell-chip ${cls(v)}">${pct(v)}</span>`; }
 function renderCompare(){
@@ -746,7 +810,7 @@ function renderCompare(){
     return `<tr data-game="${g.id}">
       <td><span class="tbl-teams">${g.away} @ ${g.home}</span><br><span class="tbl-park">${g.park}</span></td>
       <td>${g.time}</td>
-      <td>${g.dome?"🏟️ roof closed":`${g.temp}° · ${g.wind} mph ${g.dir}${(g.rain!=null&&g.rain>=15)?` · ☔${g.rain}%`:""}`}</td>
+      <td>${g.dome?"Roof closed":`${g.temp}° · ${g.wind} mph ${g.dir}${(g.rain!=null&&g.rain>=15)?` · Rain ${g.rain}%`:""}`}</td>
       <td>${g.dome?chip(0):chip(g.hr)}</td>
       <td>${g.dome?chip(0):chip(g.runs)}</td>
       <td>${g.dome?chip(0):chip(g.ks)}</td>
@@ -801,7 +865,7 @@ function histTable(g){
     const body = g.matches.map(m=>{
       const dstr = `${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
       const res = m.r>line ? "over" : (m.r<line ? "under" : "push");
-      return `<tr><td>${dstr}</td><td>at ${g.home}</td><td>${m.t}°${m.p>=0.05?' 💧':''}</td><td>${m.w} mph</td><td>${line||"—"}</td><td><b>${m.r}</b></td><td><span class="res-chip ${res}">${res.toUpperCase()}</span></td></tr>`;
+      return `<tr><td>${dstr}</td><td>at ${g.home}</td><td>${m.t}°${m.p>=0.05?' <span class="wet-tag">wet</span>':''}</td><td>${m.w} mph</td><td>${line||"—"}</td><td><b>${m.r}</b></td><td><span class="res-chip ${res}">${res.toUpperCase()}</span></td></tr>`;
     }).join("");
     return `
     <div class="hit-summary">
@@ -842,19 +906,19 @@ function hourlyStrip(g){
       <div class="hr-lab">${h.lab||labs[i]||""}${h.fp?" · 1st pitch":""}</div>
       <div class="hr-t">${h.c?`<span class="hr-ic">${h.c}</span> `:""}${h.t}°</div>
       <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
-      <div class="hr-rain ${h.rain>=45?"warn":""}">${h.rain!=null?"☔ "+h.rain+"%":"☔ —"}${h.rh!=null?` · 💧 ${h.rh}%`:""}</div>
+      <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
     </div>`).join("")}
     <div class="hr-note">Hour-by-hour at the park (local time)<span class="tip tip-right" data-tip="The forecast from an hour before first pitch through the whole game window — wind can shift and rain can arrive mid-game. Arrows show where the wind is blowing toward, relative to the park (↑ = out to center field)."><span class="info-i">i</span></span></div>
   </div>`;
 }
 function delayChip(g){
   if(g.dome || !g.delay) return "";
-  const M={clear:["✅","No delay concern","dl-clear"],
-           watch:["⚠️","Worth monitoring","dl-watch"],
-           likely:["☔","Delay likely","dl-likely"],
-           severe:["⛔","Postponement risk","dl-severe"]};
-  const [ic,txt,cls2]=M[g.delay.level]||M.clear;
-  return `<div class="delay-chip ${cls2}">${ic} DELAY OUTLOOK: <b>${txt}</b> — peak ${g.delay.pct}% rain chance in the game window<span class="tip" data-tip="Rated from the worst rain probability across the whole game window (an hour before first pitch through +3 hours): under 20% = clear, 20–44% = worth monitoring, 45–69% = delay likely, 70%+ = postponement risk."><span class="info-i">i</span></span></div>`;
+  const M={clear:["No delay concern","dl-clear"],
+           watch:["Worth monitoring","dl-watch"],
+           likely:["Delay likely","dl-likely"],
+           severe:["Postponement risk","dl-severe"]};
+  const [txt,cls2]=M[g.delay.level]||M.clear;
+  return `<div class="delay-chip ${cls2}">DELAY OUTLOOK: <b>${txt}</b> — peak ${g.delay.pct}% rain chance in the game window<span class="tip" data-tip="Rated from the worst rain probability across the whole game window (an hour before first pitch through +3 hours): under 20% = clear, 20–44% = worth monitoring, 45–69% = delay likely, 70%+ = postponement risk."><span class="info-i">i</span></span></div>`;
 }
 
 /* ---------- probable pitchers section (modal) ---------- */
@@ -874,12 +938,10 @@ function pitcherCard(teamCode, p){
   const all = p.all ? `<div class="p-all">Overall: ${p.all.k9} K/9 · ${p.all.hr9} HR/9 · ${p.all.era} ERA over ${p.all.n} games</div>` : "";
   return `<div class="p-card"><div class="p-side">${teamCode}</div><div><div class="p-name">${p.name}</div>${simHtml}${all}</div></div>`;
 }
-function pitcherSec(g){
+function pitcherBlock(g){
   if(!g.pitchers || (!g.pitchers.away && !g.pitchers.home)) return "";
-  return `<div class="m-sec">
-    <h5>Probable pitchers in these conditions<span class="tip" data-tip="Each pitcher's real starts from the last three seasons in weather like today's (±8° temp, ±8 mph wind), joined to our park weather history. Green = better than his overall number in these conditions, red = worse. Shown alongside the park data — not blended into it."><span class="info-i">i</span></span></h5>
-    <div class="p-grid">${pitcherCard(g.away, g.pitchers.away)}${pitcherCard(g.home, g.pitchers.home)}</div>
-  </div>`;
+  return `<div class="sub-h">Probable pitchers in these conditions<span class="tip" data-tip="Each pitcher's real starts from the last three seasons in weather like today's (±8° temp, ±8 mph wind), joined to our park weather history. Green = better than his overall number in these conditions, red = worse. Shown alongside the park data — not blended into it."><span class="info-i">i</span></span></div>
+    <div class="p-grid">${pitcherCard(g.away, g.pitchers.away)}${pitcherCard(g.home, g.pitchers.home)}</div>`;
 }
 
 /* ---------- conditions MVP section (modal) ---------- */
@@ -895,16 +957,19 @@ function mvpCard(teamCode, m){
       <span class="p-n">${m.games} games in similar weather · overall SLG ${slg3(m.allSlg)}</span>
     </div></div></div>`;
 }
-function mvpSec(g){
+function mvpBlock(g){
   if(!g.mvp || (!g.mvp.away && !g.mvp.home)) return "";
-  return `<div class="m-sec">
-    <h5>Conditions MVP — hottest bat in this weather<span class="tip" data-tip="Each team's current hitter with the best slugging percentage in weather like today's (±8° temp, ±8 mph wind) — three seasons of real game logs across all parks, minimum 25 at-bats. Green = slugging better in these conditions than overall."><span class="info-i">i</span></span></h5>
-    <div class="p-grid">${mvpCard(g.away, g.mvp.away)}${mvpCard(g.home, g.mvp.home)}</div>
-  </div>`;
+  return `<div class="sub-h">Conditions MVP — hottest bat in this weather<span class="tip" data-tip="Each team's current hitter with the best slugging percentage in weather like today's (±8° temp, ±8 mph wind) — three seasons of real game logs across all parks, minimum 25 at-bats. Green = slugging better in these conditions than overall."><span class="info-i">i</span></span></div>
+    <div class="p-grid">${mvpCard(g.away, g.mvp.away)}${mvpCard(g.home, g.mvp.home)}</div>`;
+}
+function intelSec(g){
+  const parts = [pitcherBlock(g), umpBlock(g), mvpBlock(g)].filter(Boolean);
+  if(!parts.length) return "";
+  return `<div class="m-sec"><h5>Matchup intel</h5>${parts.join("")}</div>`;
 }
 
 /* ---------- behind the plate (modal) ---------- */
-function umpSec(g){
+function umpBlock(g){
   if(!g.ump) return "";
   const u = g.ump;
   const tipTxt = "Tonight's home-plate umpire and what has actually happened in his games since 2019 — strikeouts, runs, and homers per game vs the league average. Zone size is real: some umps run K's several percent above or below the norm.";
@@ -916,10 +981,8 @@ function umpSec(g){
         <span class="${cls(u.dHr)}"><b>${pct(u.dHr)}</b> HR</span>
         <span class="p-n">${u.n} games behind the plate since 2019 · ${u.so} K/gm, ${u.r} runs/gm in his games vs league avg</span>
       </div>`;
-  return `<div class="m-sec">
-    <h5>Behind the plate<span class="tip" data-tip="${tipTxt}"><span class="info-i">i</span></span></h5>
-    <div class="p-card"><div class="p-side">HP UMP</div><div><div class="p-name">${u.name}</div>${body}</div></div>
-  </div>`;
+  return `<div class="sub-h">Behind the plate<span class="tip" data-tip="${tipTxt}"><span class="info-i">i</span></span></div>
+    <div class="p-card"><div class="p-side">HP UMP</div><div><div class="p-name">${u.name}</div>${body}</div></div>`;
 }
 
 /* ---------- park wind-factor chip (modal forecast) ---------- */
@@ -940,7 +1003,7 @@ function rainSec(g){
       <div class="hit-box push"><div class="n">${rh.wet.n}</div><div class="l">wet games here</div></div>
     </div>` : "";
   return `<div class="m-sec">
-    <h5>☔ Rain at ${g.park.split("·")[0].trim()} — ${g.rain}% chance at first pitch${g.rain>=55?' · <span style="color:var(--red)">delay risk</span>':''}</h5>
+    <h5>Rain at ${g.park.split("·")[0].trim()} — ${g.rain}% chance at first pitch${g.rain>=55?' · <span style="color:var(--red)">delay risk</span>':''}</h5>
     ${boxes}
     <div class="rain-cmp">Wet games at this park average <b>${rh.wet.r.toFixed(1)} runs</b> and <b>${rh.wet.hr.toFixed(1)} HR</b>,
     vs <b>${rh.dry.r.toFixed(1)} runs</b> / <b>${rh.dry.hr.toFixed(1)} HR</b> when dry —
@@ -1168,11 +1231,16 @@ function initPark3D(g, canvas, slot="modal"){
     }
     /* single solid ribbon per streak: each trail is a thin quad strip
        (real geometric width — no stacked-line doubling) */
-    const RIBBON_W = 2.6;
+    const RIBBON_W = 2.8;
     const vCount=N*TAIL*2;
     const geo=new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vCount*3),3));
-    geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(vCount*3),3));
+    /* RGBA vertex colors: constant wind-grey, alpha-only fades — the streak
+       never blends toward the background, so no dark tail */
+    const colArr=new Float32Array(vCount*4);
+    const GREY=new THREE.Color(0xa8b2c1);
+    for(let i=0;i<vCount;i++){ colArr[i*4]=GREY.r; colArr[i*4+1]=GREY.g; colArr[i*4+2]=GREY.b; colArr[i*4+3]=0; }
+    geo.setAttribute("color", new THREE.BufferAttribute(colArr,4));
     const idx=[];
     for(let p=0;p<N;p++){
       const o=p*TAIL*2;
@@ -1183,10 +1251,9 @@ function initPark3D(g, canvas, slot="modal"){
     }
     geo.setIndex(idx);
     const mat=new THREE.MeshBasicMaterial({vertexColors:true, transparent:true,
-      opacity: foggy?0.45:0.62, side:THREE.DoubleSide, depthWrite:false});
+      opacity: foggy?0.5:0.7, side:THREE.DoubleSide, depthWrite:false});
     wind={mesh:new THREE.Mesh(geo,mat), parts, tail:TAIL, base, spawn, t:0,
-          speed:46 + g.wind*6.5, w:RIBBON_W,
-          headCol:new THREE.Color(0x9ba6b6), bgCol:COL.bg.clone()};  // solid wind-grey
+          speed:46 + g.wind*6.5, w:RIBBON_W};
     scene.add(wind.mesh);
   }
 
@@ -1265,17 +1332,15 @@ function initPark3D(g, canvas, slot="modal"){
           const len=Math.hypot(dx,dz);
           let px, pz;
           if(len>0.0001){ px=-dz/len; pz=dx/len; } else { px=fbPerpX; pz=fbPerpZ; }
-          /* taper the ribbon toward its tail */
-          const half = wind.w*0.5*(0.35+0.65*(1-ti/(wind.tail-1)));
+          /* solid grey stroke that tapers to a point — the taper IS the fade */
+          const u = ti/(wind.tail-1);
+          const half = wind.w*0.5*Math.pow(1-u, 0.65);
           const v=(o+ti*2)*3;
           pos[v]  =P.x+px*half; pos[v+1]=P.y; pos[v+2]=P.z+pz*half;
           pos[v+3]=P.x-px*half; pos[v+4]=P.y; pos[v+5]=P.z-pz*half;
-          const f=Math.pow(1-ti/(wind.tail-1),1.1)*env;
-          const r=wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f;
-          const gg=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f;
-          const bb=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f;
-          col[v]=r; col[v+1]=gg; col[v+2]=bb;
-          col[v+3]=r; col[v+4]=gg; col[v+5]=bb;
+          const a4=(o+ti*2)*4;
+          const alpha = env*(0.9-0.35*u);
+          col[a4+3]=alpha; col[a4+7]=alpha;
         }
       });
       wind.mesh.geometry.attributes.position.needsUpdate = true;
@@ -1324,7 +1389,7 @@ function openModal(g){
           <canvas id="park3d-canvas"></canvas>
           <div class="p3d-hud">
             <div class="t">${g.park.split("·")[0].trim()} · stylized live view</div>
-            <div class="w">${g.dome ? "🏟️ Roof closed — weather sealed out" : `💨 ${g.wind} mph ${g.dir} · ${g.windLabel.toLowerCase()}`}</div>
+            <div class="w">${g.dome ? "Roof closed — weather sealed out" : `Wind ${g.wind} mph ${g.dir} · ${g.windLabel.toLowerCase()}`}</div>
           </div>
           <div class="p3d-badge">${g.skyIcon} ${g.sky}</div>
           <div class="p3d-dims">${pk.dims[0]}′ LF · ${pk.dims[1]}′ LC · ${pk.dims[2]}′ CF · ${pk.dims[3]}′ RC · ${pk.dims[4]}′ RF</div>
@@ -1349,22 +1414,15 @@ function openModal(g){
         ${delayChip(g)}
         ${windFxChip(g)}
       </div>
-      ${pitcherSec(g)}
-      ${umpSec(g)}
-      ${mvpSec(g)}
       <div class="m-sec">
         <h5>Weather impact vs ${g.park.split("·")[0].trim()}<span class="tip" data-tip="How the matched similar-weather sample compares to this park's own all-conditions average. Every park plays differently, so this is the sharpest signal."><span class="info-i">i</span></span></h5>
         <div class="m-tiles">${mTiles}</div>
+        <div class="league-row">On a league-wide scale (all parks, all games): HR <b class="${cls(g.mlb.hr)}">${pct(g.mlb.hr)}</b> · Runs <b class="${cls(g.mlb.runs)}">${pct(g.mlb.runs)}</b> · K's <b class="${cls(g.mlb.ks)}">${pct(g.mlb.ks)}</b> vs MLB average<span class="tip" data-tip="The same matched games measured against the league-wide average since 2019 — park and weather combined, so you can compare games across the whole slate on one scale."><span class="info-i">i</span></span></div>
       </div>
-      <div class="m-sec">
-        <h5>Vs MLB average — all games, all parks<span class="tip" data-tip="The same matched games measured against the league-wide average since 2019 — park and weather combined, so you can compare games across the whole slate on one scale."><span class="info-i">i</span></span></h5>
-        ${meter("HR",`MLB avg ${LIVE?LIVE.league.hr:2.37}/gm`,g.mlb.hr)}
-        ${meter("Runs",`MLB avg ${LIVE?LIVE.league.r:9.0}/gm`,g.mlb.runs)}
-        ${meter("Ks",`MLB avg ${LIVE?LIVE.league.so:16.8}/gm`,g.mlb.ks)}
-      </div>
+      ${intelSec(g)}
       ${rainSec(g)}
       <div class="m-sec">
-        <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}<span class="tip" data-tip="Real final scores from games at this park in weather like today's. Over/under is computed against today's total, so it updates when the line moves. 💧 marks games with measurable rain."><span class="info-i">i</span></span></h5>
+        <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}<span class="tip" data-tip="Real final scores from games at this park in weather like today's. Over/under is computed against today's total, so it updates when the line moves. A 'wet' tag marks games with measurable rain."><span class="info-i">i</span></span></h5>
         ${histTable(g)}
       </div>
     </div>`;
@@ -1405,7 +1463,10 @@ async function loadLive(){
     const note = document.getElementById("proto-note");
     note.innerHTML = `🟢 <span><b>Live</b> — real schedule, first-pitch forecasts & park history${(d.seasons&&d.seasons.length)?` (${d.seasons[0]}–${d.seasons[d.seasons.length-1]})`:""}. Updated ${d.generated}.</span>`;
     if(d.brief){
-      document.getElementById("brief-body").textContent = d.brief;
+      const safe = d.brief.replace(/[<>&]/g, c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+      document.getElementById("brief-body").innerHTML = safe
+        .replace(/\b([A-Z]{2,3} @ [A-Z]{2,3})\b/g, "<b>$1</b>")
+        .replace(/(\d+°|\d+%|\d+ mph)/g, "<b>$1</b>");
       document.getElementById("brief-card").style.display = "";
     }
     renderAll();
@@ -1416,6 +1477,7 @@ function renderAll(){
   renderSummary();
   renderHero();
   renderBoard();
+  renderWeather();
   renderCompare();
 }
 renderAll();
