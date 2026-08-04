@@ -354,13 +354,17 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
     if not dome:
         pp_arr = h.get("precipitation_probability", [None] * len(h["time"]))
         rh_arr = h.get("relative_humidity_2m", [None] * len(h["time"]))
-        for off in range(4):
+        cl_arr = h.get("cloud_cover", [None] * len(h["time"]))
+        for off in range(-1, 4):          # one hour pre-game through +3h
             j = idx + off
-            if j >= len(h["time"]):
-                break
+            if j < 0 or j >= len(h["time"]):
+                continue
             wd_j = h["wind_direction_10m"][j]
             pj, rj = pp_arr[j], rh_arr[j]
+            hh = datetime.fromisoformat(h["time"][j])
+            icon_j, _ = sky_of(cl_arr[j], pj, hh.hour)
             hourly.append(dict(
+                lab=hh.strftime("%-I %p"), fp=(off == 0), c=icon_j,
                 t=round(h["temperature_2m"][j]),
                 dew=round(h["dew_point_2m"][j]),
                 w=round(h["wind_speed_10m"][j]),
@@ -370,6 +374,13 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
                 rh=None if rj is None else round(rj)))
     rh0 = h.get("relative_humidity_2m", [None] * len(h["time"]))[idx]
     pres0 = h.get("surface_pressure", [None] * len(h["time"]))[idx]
+    # delay outlook: worst rain probability across the game window
+    delay = None
+    if not dome and hourly:
+        worst = max((x["rain"] or 0) for x in hourly)
+        level = ("clear" if worst < 20 else "watch" if worst < 45
+                 else "likely" if worst < 70 else "severe")
+        delay = dict(level=level, pct=worst)
     icon, sky = sky_of(cloud, pprob, fp_park.hour)
     if dome:
         icon, sky = "🏟️", "Indoor"
@@ -388,7 +399,7 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
                cloud=None if cloud is None else round(cloud),
                rh=None if rh0 is None else round(rh0),
                pres=None if pres0 is None else round(pres0),
-               hourly=hourly or None)
+               delay=delay, hourly=hourly or None)
 
     if not hist or not hist["avg"]["n"]:
         out.update(sample=0, hr=0, runs=0, ks=0, hrGm=0, hrPark=0,
