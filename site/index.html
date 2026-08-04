@@ -184,6 +184,16 @@
   .p-nums .p-n{font-size:11.5px;color:var(--muted);width:100%}
   .p-nums.p-na{font-size:12.5px;color:var(--muted)}
   .p-all{font-size:11.5px;color:var(--muted);margin-top:5px}
+  /* hour-by-hour forecast strip */
+  .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin-top:13px}
+  .hr-cell{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center}
+  .hr-lab{font-size:9.5px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
+  .hr-t{font-size:18px;font-weight:800;margin-top:2px}
+  .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px;white-space:nowrap}
+  .hr-arrow{display:inline-block;font-weight:800;color:var(--blue-deep)}
+  .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
+  .hr-rain.warn{color:var(--red);font-weight:800}
+  .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
   @media(max-width:960px){
     .hero{grid-template-columns:1fr}
     .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
@@ -436,7 +446,9 @@ const SAMPLE_GAMES = [
    pitchers:{away:{name:"MacKenzie Gore", sim:{n:9,ip:51.3,k9:10.2,hr9:0.88,era:3.16}, all:{n:64,ip:340.2,k9:9.6,hr9:1.19,era:3.71}, note:"±8° temp, ±8 mph wind"},
              home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}},
    mvp:{away:{name:"James Wood", slg:0.612, hr:9, ab:98, games:27, allSlg:0.488},
-        home:{name:"Seiya Suzuki", slg:0.577, hr:7, ab:104, games:29, allSlg:0.503}}},
+        home:{name:"Seiya Suzuki", slg:0.577, hr:7, ab:104, games:29, allSlg:0.503}},
+   hourly:[{t:84,dew:64,w:13,dir:"SSW",rel:10,rain:4},{t:83,dew:64,w:14,dir:"SSW",rel:14,rain:6},
+           {t:81,dew:63,w:12,dir:"SW",rel:28,rain:12},{t:79,dew:62,w:10,dir:"SW",rel:33,rain:18}]},
 
   {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
    temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅", rain:18, cloud:55,
@@ -793,6 +805,21 @@ function histTable(g){
     ${rows.length>12?`<div class="hist-note">Showing 12 most recent of ${rows.length} matched games at ${g.park.split("·")[0].trim()}.</div>`:""}`;
 }
 
+/* ---------- hour-by-hour strip (modal forecast) ---------- */
+function hourlyStrip(g){
+  if(g.dome || !g.hourly || !g.hourly.length) return "";
+  const labs=["1st pitch","+1 hr","+2 hr","+3 hr"];
+  return `<div class="hourly">${g.hourly.map((h,i)=>`
+    <div class="hr-cell">
+      <div class="hr-lab">${labs[i]||("+"+i+" hr")}</div>
+      <div class="hr-t">${h.t}°</div>
+      <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
+      <div class="hr-rain ${h.rain>=45?"warn":""}">${h.rain!=null?"☔ "+h.rain+"%":"☔ —"}</div>
+    </div>`).join("")}
+    <div class="hr-note">Hour-by-hour at the park<span class="tip tip-right" data-tip="The forecast across the whole game window, not just first pitch — wind can shift and rain can arrive mid-game. Arrows show where the wind is blowing toward, relative to the park (↑ = out to center field)."><span class="info-i">i</span></span></div>
+  </div>`;
+}
+
 /* ---------- probable pitchers section (modal) ---------- */
 function pitcherCard(teamCode, p){
   if(!p) return `<div class="p-card"><div class="p-side">${teamCode}</div><div class="p-name" style="color:var(--muted)">Probable not yet announced</div></div>`;
@@ -1039,6 +1066,23 @@ function initPark3D(g, canvas, slot="modal"){
     scene.add(lbl);
   });
 
+  /* team logo laid flat on the outfield grass */
+  const MLBID = {ARI:109,ATH:133,ATL:144,BAL:110,BOS:111,CHC:112,CIN:113,CLE:114,COL:115,
+    CWS:145,DET:116,HOU:117,KC:118,LAA:108,LAD:119,MIA:146,MIL:158,MIN:142,NYM:121,NYY:147,
+    PHI:143,PIT:134,SD:135,SEA:136,SF:137,STL:138,TB:139,TEX:140,TOR:141,WSH:120};
+  if(MLBID[g.home]){
+    new THREE.TextureLoader().load(
+      `https://midfield.mlbstatic.com/v1/team/${MLBID[g.home]}/spots/256`,
+      tex=>{
+        const logo=new THREE.Mesh(new THREE.PlaneGeometry(78,78),
+          new THREE.MeshBasicMaterial({map:tex, transparent:true, opacity:0.9, depthWrite:false}));
+        logo.rotation.x=-Math.PI/2;
+        logo.position.set(0, 0.3, -262);
+        scene.add(logo);
+      },
+      undefined, ()=>{} /* CORS/load failure → just skip the logo */);
+  }
+
   /* dome roof shell */
   if(dome){
     const roof = new THREE.Mesh(new THREE.SphereGeometry(400,36,18,0,Math.PI*2,0,Math.PI/2),
@@ -1050,24 +1094,28 @@ function initPark3D(g, canvas, slot="modal"){
      drifting along the wind field with organic curl, trails fading behind */
   let wind = null;
   if(!dome && g.wind>2){
-    const N=240, TAIL=8;
+    const N=130, TAIL=22;
     const base=g.windAngle*Math.PI/180;
     const spawn=()=>new THREE.Vector3((Math.random()-0.5)*700, 8+Math.random()*135, 115-Math.random()*660);
     const parts=[];
     for(let i=0;i<N;i++){
       const p=spawn();
-      parts.push({p, age:Math.random()*3, life:2.2+Math.random()*2.4,
+      parts.push({p, age:Math.random()*3, life:3+Math.random()*2.6,
                   hist:Array.from({length:TAIL},()=>p.clone())});
     }
     const segs=N*(TAIL-1);
     const geo=new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(segs*6),3));
     geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(segs*6),3));
-    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.45:0.7});
+    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.45:0.62});
     wind={mesh:new THREE.LineSegments(geo,mat), parts, tail:TAIL, base, spawn, t:0,
           speed:46 + g.wind*6.5,
-          headCol:new THREE.Color(night?0xdfe9ff:0xffffff), bgCol:COL.bg.clone()};
+          headCol:new THREE.Color(0x9ba6b6), bgCol:COL.bg.clone()};  // solid wind-grey
     scene.add(wind.mesh);
+    /* thickness: stack two extra passes of the same geometry */
+    [1.3, -1.3].forEach(dy=>{
+      const m=new THREE.LineSegments(geo, mat); m.position.y=dy; scene.add(m);
+    });
   }
 
   /* rain — falling streaks, tilted with the wind, when rain risk is real */
@@ -1141,7 +1189,7 @@ function initPark3D(g, canvas, slot="modal"){
           const A=pt.hist[sgi], B=pt.hist[sgi+1];
           pos[k*6]=A.x;   pos[k*6+1]=A.y; pos[k*6+2]=A.z;
           pos[k*6+3]=B.x; pos[k*6+4]=B.y; pos[k*6+5]=B.z;
-          const f1=Math.pow(1-sgi/(wind.tail-1),1.5)*env, f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.5)*env;
+          const f1=Math.pow(1-sgi/(wind.tail-1),1.1)*env, f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.1)*env;
           col[k*6]  =wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f1;
           col[k*6+1]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f1;
           col[k*6+2]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f1;
@@ -1216,6 +1264,7 @@ function openModal(g){
             <div class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample} games</div>
           </div>
         </div>
+        ${hourlyStrip(g)}
       </div>
       ${pitcherSec(g)}
       ${mvpSec(g)}
