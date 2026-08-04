@@ -98,6 +98,9 @@
   /* ---------- slate summary strip ---------- */
   main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
+  .brief-card{background:var(--card);border-left:4px solid var(--gold);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;margin-bottom:18px}
+  .brief-head{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .brief-body{font-size:13.5px;line-height:1.65;color:var(--body2)}
   .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
   .sum-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
   .sum-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
@@ -194,6 +197,11 @@
   .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
   .hr-rain.warn{color:var(--red);font-weight:800}
   .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
+  /* wind factor chip */
+  .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
+  .windfx b{letter-spacing:1px}
+  .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)}
+  .fx-high b{color:#d97708} .fx-extreme b{color:var(--red)}
   @media(max-width:960px){
     .hero{grid-template-columns:1fr}
     .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
@@ -349,6 +357,11 @@
 <main>
   <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — live slate loads automatically when the daily build has run.</span></div>
 
+  <div class="brief-card" id="brief-card" style="display:none">
+    <div class="brief-head">📡 Today's read<span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
+    <div class="brief-body" id="brief-body"></div>
+  </div>
+
   <!-- ======== SLATE VIEW ======== -->
   <section class="view active" id="view-slate">
     <div class="summary-strip" id="summary-strip"></div>
@@ -447,8 +460,11 @@ const SAMPLE_GAMES = [
              home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}},
    mvp:{away:{name:"James Wood", slg:0.612, hr:9, ab:98, games:27, allSlg:0.488},
         home:{name:"Seiya Suzuki", slg:0.577, hr:7, ab:104, games:29, allSlg:0.503}},
-   hourly:[{t:84,dew:64,w:13,dir:"SSW",rel:10,rain:4},{t:83,dew:64,w:14,dir:"SSW",rel:14,rain:6},
-           {t:81,dew:63,w:12,dir:"SW",rel:28,rain:12},{t:79,dew:62,w:10,dir:"SW",rel:33,rain:18}]},
+   hourly:[{t:84,dew:64,w:13,dir:"SSW",rel:10,rain:4,rh:58},{t:83,dew:64,w:14,dir:"SSW",rel:14,rain:6,rh:60},
+           {t:81,dew:63,w:12,dir:"SW",rel:28,rain:12,rh:64},{t:79,dew:62,w:10,dir:"SW",rel:33,rain:18,rh:67}],
+   rh:58, pres:1014,
+   ump:{name:"Pat Hoberg", n:412, r:8.7, hr:2.3, so:18.1, dSo:6, dR:-4, dHr:-3},
+   windFx:{rating:"EXTREME", pct10:16}},
 
   {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
    temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅", rain:18, cloud:55,
@@ -814,7 +830,7 @@ function hourlyStrip(g){
       <div class="hr-lab">${labs[i]||("+"+i+" hr")}</div>
       <div class="hr-t">${h.t}°</div>
       <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
-      <div class="hr-rain ${h.rain>=45?"warn":""}">${h.rain!=null?"☔ "+h.rain+"%":"☔ —"}</div>
+      <div class="hr-rain ${h.rain>=45?"warn":""}">${h.rain!=null?"☔ "+h.rain+"%":"☔ —"}${h.rh!=null?` · 💧 ${h.rh}%`:""}</div>
     </div>`).join("")}
     <div class="hr-note">Hour-by-hour at the park<span class="tip tip-right" data-tip="The forecast across the whole game window, not just first pitch — wind can shift and rain can arrive mid-game. Arrows show where the wind is blowing toward, relative to the park (↑ = out to center field)."><span class="info-i">i</span></span></div>
   </div>`;
@@ -864,6 +880,32 @@ function mvpSec(g){
     <h5>Conditions MVP — hottest bat in this weather<span class="tip" data-tip="Each team's current hitter with the best slugging percentage in weather like today's (±8° temp, ±8 mph wind) — three seasons of real game logs across all parks, minimum 25 at-bats. Green = slugging better in these conditions than overall."><span class="info-i">i</span></span></h5>
     <div class="p-grid">${mvpCard(g.away, g.mvp.away)}${mvpCard(g.home, g.mvp.home)}</div>
   </div>`;
+}
+
+/* ---------- behind the plate (modal) ---------- */
+function umpSec(g){
+  if(!g.ump) return "";
+  const u = g.ump;
+  const tipTxt = "Tonight's home-plate umpire and what has actually happened in his games since 2019 — strikeouts, runs, and homers per game vs the league average. Zone size is real: some umps run K's several percent above or below the norm.";
+  const body = (u.n==null)
+    ? `<div class="p-all">Newer umpire — no 30+ game history in our data yet.</div>`
+    : `<div class="p-nums">
+        <span class="${cls(u.dSo)}"><b>${pct(u.dSo)}</b> K's</span>
+        <span class="${cls(u.dR)}"><b>${pct(u.dR)}</b> runs</span>
+        <span class="${cls(u.dHr)}"><b>${pct(u.dHr)}</b> HR</span>
+        <span class="p-n">${u.n} games behind the plate since 2019 · ${u.so} K/gm, ${u.r} runs/gm in his games vs league avg</span>
+      </div>`;
+  return `<div class="m-sec">
+    <h5>Behind the plate<span class="tip" data-tip="${tipTxt}"><span class="info-i">i</span></span></h5>
+    <div class="p-card"><div class="p-side">HP UMP</div><div><div class="p-name">${u.name}</div>${body}</div></div>
+  </div>`;
+}
+
+/* ---------- park wind-factor chip (modal forecast) ---------- */
+function windFxChip(g){
+  if(g.dome || !g.windFx) return "";
+  const f = g.windFx;
+  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS PARK: <b>${f.rating}</b> — 10 mph blowing out ${f.pct10>=0?"adds":"cuts"} ~${Math.abs(f.pct10)}% HR here historically<span class="tip" data-tip="How much wind actually matters at this stadium, measured from every game here since 2019: the relationship between outward wind (toward center field) and home runs. Open, exposed parks rate HIGH or EXTREME; wind-shielded stadiums rate LOW."><span class="info-i">i</span></span></div>`;
 }
 
 /* ---------- rain history section (modal) ---------- */
@@ -1103,19 +1145,28 @@ function initPark3D(g, canvas, slot="modal"){
       parts.push({p, age:Math.random()*3, life:3+Math.random()*2.6,
                   hist:Array.from({length:TAIL},()=>p.clone())});
     }
-    const segs=N*(TAIL-1);
+    /* single solid ribbon per streak: each trail is a thin quad strip
+       (real geometric width — no stacked-line doubling) */
+    const RIBBON_W = 2.6;
+    const vCount=N*TAIL*2;
     const geo=new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(segs*6),3));
-    geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(segs*6),3));
-    const mat=new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity: foggy?0.45:0.62});
-    wind={mesh:new THREE.LineSegments(geo,mat), parts, tail:TAIL, base, spawn, t:0,
-          speed:46 + g.wind*6.5,
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vCount*3),3));
+    geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(vCount*3),3));
+    const idx=[];
+    for(let p=0;p<N;p++){
+      const o=p*TAIL*2;
+      for(let i=0;i<TAIL-1;i++){
+        const a=o+i*2, b=o+i*2+1, c=o+i*2+2, d=o+i*2+3;
+        idx.push(a,b,c, b,d,c);
+      }
+    }
+    geo.setIndex(idx);
+    const mat=new THREE.MeshBasicMaterial({vertexColors:true, transparent:true,
+      opacity: foggy?0.45:0.62, side:THREE.DoubleSide, depthWrite:false});
+    wind={mesh:new THREE.Mesh(geo,mat), parts, tail:TAIL, base, spawn, t:0,
+          speed:46 + g.wind*6.5, w:RIBBON_W,
           headCol:new THREE.Color(0x9ba6b6), bgCol:COL.bg.clone()};  // solid wind-grey
     scene.add(wind.mesh);
-    /* thickness: stack two extra passes of the same geometry */
-    [1.3, -1.3].forEach(dy=>{
-      const m=new THREE.LineSegments(geo, mat); m.position.y=dy; scene.add(m);
-    });
   }
 
   /* rain — falling streaks, tilted with the wind, when rain risk is real */
@@ -1167,8 +1218,8 @@ function initPark3D(g, canvas, slot="modal"){
       wind.t += dt;
       const pos = wind.mesh.geometry.attributes.position.array;
       const col = wind.mesh.geometry.attributes.color.array;
-      let k = 0;
-      wind.parts.forEach(pt=>{
+      const fbPerpX = Math.cos(wind.base), fbPerpZ = Math.sin(wind.base);
+      wind.parts.forEach((pt, pi)=>{
         pt.age += dt;
         /* flow field: base wind direction + smooth positional curl so
            neighbouring particles bend together like a fluid */
@@ -1185,18 +1236,25 @@ function initPark3D(g, canvas, slot="modal"){
         const tailv = pt.hist.pop(); tailv.copy(pt.p); pt.hist.unshift(tailv);
         /* alpha: quick fade-in, fade-out at end of life — no popping */
         const env = Math.max(0, Math.min(1, pt.age/0.35, (pt.life-pt.age)/0.55));
-        for(let sgi=0; sgi<wind.tail-1; sgi++){
-          const A=pt.hist[sgi], B=pt.hist[sgi+1];
-          pos[k*6]=A.x;   pos[k*6+1]=A.y; pos[k*6+2]=A.z;
-          pos[k*6+3]=B.x; pos[k*6+4]=B.y; pos[k*6+5]=B.z;
-          const f1=Math.pow(1-sgi/(wind.tail-1),1.1)*env, f2=Math.pow(1-(sgi+1)/(wind.tail-1),1.1)*env;
-          col[k*6]  =wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f1;
-          col[k*6+1]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f1;
-          col[k*6+2]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f1;
-          col[k*6+3]=wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f2;
-          col[k*6+4]=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f2;
-          col[k*6+5]=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f2;
-          k++;
+        const o = pi*wind.tail*2;
+        for(let ti=0; ti<wind.tail; ti++){
+          const P=pt.hist[ti];
+          const Q=pt.hist[ti+1] || pt.hist[ti-1] || P;
+          let dx=P.x-Q.x, dz=P.z-Q.z;
+          const len=Math.hypot(dx,dz);
+          let px, pz;
+          if(len>0.0001){ px=-dz/len; pz=dx/len; } else { px=fbPerpX; pz=fbPerpZ; }
+          /* taper the ribbon toward its tail */
+          const half = wind.w*0.5*(0.35+0.65*(1-ti/(wind.tail-1)));
+          const v=(o+ti*2)*3;
+          pos[v]  =P.x+px*half; pos[v+1]=P.y; pos[v+2]=P.z+pz*half;
+          pos[v+3]=P.x-px*half; pos[v+4]=P.y; pos[v+5]=P.z-pz*half;
+          const f=Math.pow(1-ti/(wind.tail-1),1.1)*env;
+          const r=wind.bgCol.r+(wind.headCol.r-wind.bgCol.r)*f;
+          const gg=wind.bgCol.g+(wind.headCol.g-wind.bgCol.g)*f;
+          const bb=wind.bgCol.b+(wind.headCol.b-wind.bgCol.b)*f;
+          col[v]=r; col[v+1]=gg; col[v+2]=bb;
+          col[v+3]=r; col[v+4]=gg; col[v+5]=bb;
         }
       });
       wind.mesh.geometry.attributes.position.needsUpdate = true;
@@ -1259,14 +1317,18 @@ function openModal(g){
           <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">${g.dome?"wind":g.dir+" · "+g.windLabel.toLowerCase()}</div></div>
           <div class="wx-item"><div class="big">${g.dew}<sup>°</sup></div><div class="lab">dew point</div></div>
           ${(!g.dome&&g.rain!=null)?`<div class="wx-item"><div class="big">${g.rain}<sup>%</sup></div><div class="lab">rain chance${g.rain>=55?' · <b style="color:var(--red)">delay risk</b>':''}</div></div>`:""}
+          ${(!g.dome&&g.rh!=null)?`<div class="wx-item"><div class="big">${g.rh}<sup>%</sup></div><div class="lab">humidity</div></div>`:""}
+          ${(!g.dome&&g.pres!=null)?`<div class="wx-item"><div class="big">${g.pres}<sup> hPa</sup></div><div class="lab">pressure</div></div>`:""}
           <div style="margin-left:auto;text-align:right">
             <div class="sky" style="font-weight:700;color:var(--info,var(--blue))">${g.skyIcon} ${g.sky}</div>
             <div class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample} games</div>
           </div>
         </div>
         ${hourlyStrip(g)}
+        ${windFxChip(g)}
       </div>
       ${pitcherSec(g)}
+      ${umpSec(g)}
       ${mvpSec(g)}
       <div class="m-sec">
         <h5>Weather impact vs ${g.park.split("·")[0].trim()}<span class="tip" data-tip="How the matched similar-weather sample compares to this park's own all-conditions average. Every park plays differently, so this is the sharpest signal."><span class="info-i">i</span></span></h5>
@@ -1320,6 +1382,10 @@ async function loadLive(){
     document.getElementById("date-label").textContent = d.dateLabel;
     const note = document.getElementById("proto-note");
     note.innerHTML = `🟢 <span><b>Live</b> — real schedule, first-pitch forecasts & park history${(d.seasons&&d.seasons.length)?` (${d.seasons[0]}–${d.seasons[d.seasons.length-1]})`:""}. Updated ${d.generated}.</span>`;
+    if(d.brief){
+      document.getElementById("brief-body").textContent = d.brief;
+      document.getElementById("brief-card").style.display = "";
+    }
     renderAll();
   }catch(e){ /* stay on sample data */ }
 }
