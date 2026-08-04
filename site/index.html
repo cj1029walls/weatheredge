@@ -197,6 +197,14 @@
   .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
   .hr-rain.warn{color:var(--red);font-weight:800}
   .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
+  .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .hr-ic{font-size:12px}
+  /* delay outlook chip */
+  .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
+  .dl-clear{background:var(--green-bg);color:var(--green-deep);border-color:#c4e5cf}
+  .dl-watch{background:var(--amber-bg);color:#8a6207;border-color:#eedfae}
+  .dl-likely{background:#fdeee0;color:#b45309;border-color:#f3d9b8}
+  .dl-severe{background:var(--red-bg);color:var(--red-deep);border-color:#f2c5c5}
   /* wind factor chip */
   .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
   .windfx b{letter-spacing:1px}
@@ -460,8 +468,10 @@ const SAMPLE_GAMES = [
              home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}},
    mvp:{away:{name:"James Wood", slg:0.612, hr:9, ab:98, games:27, allSlg:0.488},
         home:{name:"Seiya Suzuki", slg:0.577, hr:7, ab:104, games:29, allSlg:0.503}},
-   hourly:[{t:84,dew:64,w:13,dir:"SSW",rel:10,rain:4,rh:58},{t:83,dew:64,w:14,dir:"SSW",rel:14,rain:6,rh:60},
-           {t:81,dew:63,w:12,dir:"SW",rel:28,rain:12,rh:64},{t:79,dew:62,w:10,dir:"SW",rel:33,rain:18,rh:67}],
+   hourly:[{lab:"1 PM",c:"☀️",t:85,dew:64,w:12,dir:"SSW",rel:8,rain:2,rh:55},{lab:"2 PM",fp:true,c:"☀️",t:84,dew:64,w:13,dir:"SSW",rel:10,rain:4,rh:58},
+           {lab:"3 PM",c:"⛅",t:83,dew:64,w:14,dir:"SSW",rel:14,rain:6,rh:60},{lab:"4 PM",c:"⛅",t:81,dew:63,w:12,dir:"SW",rel:28,rain:12,rh:64},
+           {lab:"5 PM",c:"☁️",t:79,dew:62,w:10,dir:"SW",rel:33,rain:18,rh:67}],
+   delay:{level:"clear", pct:18},
    rh:58, pres:1014,
    ump:{name:"Pat Hoberg", n:412, r:8.7, hr:2.3, so:18.1, dSo:6, dR:-4, dHr:-3},
    windFx:{rating:"EXTREME", pct10:16}},
@@ -606,6 +616,8 @@ function parkSVG(g, size){
 /* ---------- slate summary ---------- */
 function edgeBadge(g){
   if(g.dome) return `<span class="edge-badge edge-neutral">Roof closed</span>`;
+  if(g.delay && g.delay.level==="severe") return `<span class="edge-badge edge-rain" style="background:#a92525">⛔ PPD risk</span>`;
+  if(g.delay && g.delay.level==="likely") return `<span class="edge-badge edge-rain">☔ Delay likely</span>`;
   if((g.rain||0)>=55) return `<span class="edge-badge edge-rain">☔ Rain risk</span>`;
   if(g.hr>=12) return `<span class="edge-badge edge-hr">HR weather</span>`;
   if(g.ou.under>=50) return `<span class="edge-badge edge-under">Under weather</span>`;
@@ -826,14 +838,23 @@ function hourlyStrip(g){
   if(g.dome || !g.hourly || !g.hourly.length) return "";
   const labs=["1st pitch","+1 hr","+2 hr","+3 hr"];
   return `<div class="hourly">${g.hourly.map((h,i)=>`
-    <div class="hr-cell">
-      <div class="hr-lab">${labs[i]||("+"+i+" hr")}</div>
-      <div class="hr-t">${h.t}°</div>
+    <div class="hr-cell ${h.fp?"hr-fp":""}">
+      <div class="hr-lab">${h.lab||labs[i]||""}${h.fp?" · 1st pitch":""}</div>
+      <div class="hr-t">${h.c?`<span class="hr-ic">${h.c}</span> `:""}${h.t}°</div>
       <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
       <div class="hr-rain ${h.rain>=45?"warn":""}">${h.rain!=null?"☔ "+h.rain+"%":"☔ —"}${h.rh!=null?` · 💧 ${h.rh}%`:""}</div>
     </div>`).join("")}
-    <div class="hr-note">Hour-by-hour at the park<span class="tip tip-right" data-tip="The forecast across the whole game window, not just first pitch — wind can shift and rain can arrive mid-game. Arrows show where the wind is blowing toward, relative to the park (↑ = out to center field)."><span class="info-i">i</span></span></div>
+    <div class="hr-note">Hour-by-hour at the park (local time)<span class="tip tip-right" data-tip="The forecast from an hour before first pitch through the whole game window — wind can shift and rain can arrive mid-game. Arrows show where the wind is blowing toward, relative to the park (↑ = out to center field)."><span class="info-i">i</span></span></div>
   </div>`;
+}
+function delayChip(g){
+  if(g.dome || !g.delay) return "";
+  const M={clear:["✅","No delay concern","dl-clear"],
+           watch:["⚠️","Worth monitoring","dl-watch"],
+           likely:["☔","Delay likely","dl-likely"],
+           severe:["⛔","Postponement risk","dl-severe"]};
+  const [ic,txt,cls2]=M[g.delay.level]||M.clear;
+  return `<div class="delay-chip ${cls2}">${ic} DELAY OUTLOOK: <b>${txt}</b> — peak ${g.delay.pct}% rain chance in the game window<span class="tip" data-tip="Rated from the worst rain probability across the whole game window (an hour before first pitch through +3 hours): under 20% = clear, 20–44% = worth monitoring, 45–69% = delay likely, 70%+ = postponement risk."><span class="info-i">i</span></span></div>`;
 }
 
 /* ---------- probable pitchers section (modal) ---------- */
@@ -1325,6 +1346,7 @@ function openModal(g){
           </div>
         </div>
         ${hourlyStrip(g)}
+        ${delayChip(g)}
         ${windFxChip(g)}
       </div>
       ${pitcherSec(g)}
