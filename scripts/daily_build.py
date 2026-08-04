@@ -29,7 +29,7 @@ OUT = os.path.join(ROOT, "site", "data.json")
 FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
 SCHED_URL = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={date}"
-SCHED_PP_URL = SCHED_URL + "&hydrate=probablePitcher"
+SCHED_PP_URL = SCHED_URL + "&hydrate=probablePitcher,officials"
 BOX_URL = "https://statsapi.mlb.com/api/v1/game/{pk}/boxscore"
 GAMELOG_URL = ("https://statsapi.mlb.com/api/v1/people/{pid}/stats"
                "?stats=gameLog&group=pitching&season={season}")
@@ -38,8 +38,9 @@ ACCURACY = os.path.join(ROOT, "data", "accuracy.json")
 SITE_ACCURACY = os.path.join(ROOT, "site", "accuracy.json")
 FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
           "&hourly=temperature_2m,dew_point_2m,wind_speed_10m,wind_direction_10m,"
-          "cloud_cover,precipitation_probability"
+          "cloud_cover,precipitation_probability,relative_humidity_2m,surface_pressure"
           "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone={tz}&forecast_days=3")
+UMPS = os.path.join(ROOT, "data", "umps_history.json")
 
 ET = timezone(timedelta(hours=-4))  # ET (DST); slate dates only, precision not critical
 
@@ -148,6 +149,46 @@ def pct_delta(a, b):
     return round((a - b) / b * 100)
 
 WET_IN = 0.05   # inches over the ~3h game window = "wet game"
+
+# ---- plate umpire: his games vs league, from Retrosheet history ----
+def ump_card(g_sched, umps_all):
+    officials = g_sched.get("officials") or []
+    plate = next((o for o in officials
+                  if o.get("officialType") == "Home Plate" and o.get("official")), None)
+    if not plate:
+        return None
+    name = plate["official"].get("fullName")
+    if not name:
+        return None
+    out = dict(name=name)
+    if umps_all and name in umps_all:
+        u, lg = umps_all[name], umps_all["_league"]
+        out.update(n=u["n"], r=u["r"], hr=u["hr"], so=u["so"],
+                   dR=pct_delta(u["r"], lg["r"]),
+                   dHr=pct_delta(u["hr"], lg["hr"]),
+                   dSo=pct_delta(u["so"], lg["so"]))
+    return out
+
+# ---- wind receptivity: how much outward wind moves HR at this park ----
+def wind_receptivity(hist):
+    """Regress HR on the outward wind component across the park's history.
+    Returns (rating, pct10) — pct10 = HR change per 10 mph of outward wind."""
+    import math
+    games = [g for g in hist["games"] if g.get("w") is not None]
+    if len(games) < 200:
+        return None
+    xs = [g["w"] * math.cos(math.radians(g["rel"])) for g in games]
+    ys = [g["hr"] for g in games]
+    n = len(xs)
+    mx, my = sum(xs) / n, sum(ys) / n
+    sxx = sum((x - mx) ** 2 for x in xs)
+    if not sxx or not my:
+        return None
+    slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx
+    pct10 = round(slope * 10 / my * 100)
+    a = abs(pct10)
+    rating = "LOW" if a < 4 else "MEDIUM" if a < 8 else "HIGH" if a < 14 else "EXTREME"
+    return dict(rating=rating, pct10=pct10)
 
 # ---- conditions MVP: each team's hottest bat in this weather ----
 def conditions_mvp(team, temp, wind, hitters_all):
@@ -269,7 +310,7 @@ def wet_split(hist, line):
         out["wetUnder"] = round(sum(1 for x in wet if x["r"] < line) / n * 100)
     return out
 
-def build_game(g, hist_all, league, lines, offline, hitters_all=None):
+def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=None):
     home_id = g["teams"]["home"]["team"]["id"]
     away_id = g["teams"]["away"]["team"]["id"]
     home = MLBID_TO_CODE.get(home_id)
@@ -312,19 +353,23 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None):
     hourly = []
     if not dome:
         pp_arr = h.get("precipitation_probability", [None] * len(h["time"]))
+        rh_arr = h.get("relative_humidity_2m", [None] * len(h["time"]))
         for off in range(4):
             j = idx + off
             if j >= len(h["time"]):
                 break
             wd_j = h["wind_direction_10m"][j]
-            pj = pp_arr[j]
+            pj, rj = pp_arr[j], rh_arr[j]
             hourly.append(dict(
                 t=round(h["temperature_2m"][j]),
                 dew=round(h["dew_point_2m"][j]),
                 w=round(h["wind_speed_10m"][j]),
                 dir=deg_to_compass(wd_j),
                 rel=round(wind_rel_angle(wd_j, meta["bearing"])),
-                rain=None if pj is None else round(pj)))
+                rain=None if pj is None else round(pj),
+                rh=None if rj is None else round(rj)))
+    rh0 = h.get("relative_humidity_2m", [None] * len(h["time"]))[idx]
+    pres0 = h.get("surface_pressure", [None] * len(h["time"]))[idx]
     icon, sky = sky_of(cloud, pprob, fp_park.hour)
     if dome:
         icon, sky = "🏟️", "Indoor"
@@ -341,6 +386,8 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None):
                dew=dew, sky=sky, skyIcon=icon, dome=dome, gamePk=game_pk,
                rain=None if pprob is None else round(pprob),
                cloud=None if cloud is None else round(cloud),
+               rh=None if rh0 is None else round(rh0),
+               pres=None if pres0 is None else round(pres0),
                hourly=hourly or None)
 
     if not hist or not hist["avg"]["n"]:
@@ -404,6 +451,10 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None):
     out["mvp"] = None if dome else dict(
         away=conditions_mvp(away, temp, wind, hitters_all),
         home=conditions_mvp(home, temp, wind, hitters_all))
+
+    # plate umpire + park wind receptivity
+    out["ump"] = ump_card(g, umps_all)
+    out["windFx"] = None if (dome or not hist) else wind_receptivity(hist)
     return out
 
 def archive_predictions(date_str, games):
@@ -509,6 +560,46 @@ def grade_pending(today_str):
         json.dump(acc, f, separators=(",", ":"))
     return acc
 
+def make_brief(games):
+    """Auto-generated slate write-up from today's data — no AI, just the numbers."""
+    live = [g for g in games if not g["dome"]]
+    parts = []
+    if live:
+        hot = max(live, key=lambda g: g["temp"])
+        cool = min(live, key=lambda g: g["temp"])
+        pk = lambda g: g["park"].split(" ·")[0]
+        parts.append(f"Temps run from {cool['temp']}° at {pk(cool)} up to "
+                     f"{hot['temp']}° at {pk(hot)}.")
+        wind = max(live, key=lambda g: abs(g["hr"]))
+        if abs(wind["hr"]) >= 10:
+            verb = "boosting" if wind["hr"] > 0 else "cutting"
+            parts.append(f"The wind story is {wind['away']} @ {wind['home']} — "
+                         f"{wind['wind']} mph {wind['windLabel'].lower()} at {pk(wind)}, "
+                         f"{verb} home-run expectation {abs(wind['hr'])}% vs that park's average.")
+        else:
+            parts.append("No standout wind edges on today's slate.")
+        rain = sorted([g for g in live if (g.get("rain") or 0) >= 45],
+                      key=lambda x: -x["rain"])
+        if rain:
+            parts.append("Rain risk: " + ", ".join(
+                f"{g['away']} @ {g['home']} ({g['rain']}%)" for g in rain) +
+                " — watch for delays.")
+        else:
+            parts.append("No serious rain threats.")
+        und = max(live, key=lambda g: g["ou"]["under"])
+        if und["ou"]["under"] >= 55:
+            parts.append(f"Sharpest under environment: {und['away']} @ {und['home']}, "
+                         f"under in {und['ou']['under']}% of similar-weather games.")
+        ov = max(live, key=lambda g: g["ou"]["over"])
+        if ov["ou"]["over"] >= 60:
+            parts.append(f"Best over environment: {ov['away']} @ {ov['home']}, "
+                         f"over {ov['ou']['over']}% historically.")
+    domes = sum(1 for g in games if g["dome"])
+    if domes:
+        parts.append(f"{domes} roof{'s' if domes > 1 else ''} closed — "
+                     "weather-neutral there.")
+    return " ".join(parts)
+
 def deg_to_compass(deg):
     dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
     return dirs[round(deg / 22.5) % 16]
@@ -529,6 +620,10 @@ def main():
     hist_all = json.load(open(hist_path))
     league = hist_all["_league"]
     hitters_all = json.load(open(HITTERS)) if os.path.exists(HITTERS) else None
+    umps_all = json.load(open(UMPS)) if os.path.exists(UMPS) else None
+    if not umps_all:
+        print("no umps_history.json yet — ump cards show name only until the "
+              "'Build history' workflow reruns")
     if hitters_all:
         print(f"hitter history loaded (built {hitters_all.get('_built')})")
     else:
@@ -547,7 +642,7 @@ def main():
     for day in sched.get("dates", []):
         for g in day.get("games", []):
             try:
-                built = build_game(g, hist_all, league, lines, args.offline, hitters_all)
+                built = build_game(g, hist_all, league, lines, args.offline, hitters_all, umps_all)
                 if built: games.append(built)
             except Exception as e:
                 print(f"  skip {g.get('gamePk')}: {e}")
@@ -560,6 +655,7 @@ def main():
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    date=date_str, dateLabel=label,
                    league=league, seasons=hist_all.get("_seasons", []),
+                   brief=make_brief(games),
                    games=sorted(games, key=lambda x: x["sortTime"]))
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))

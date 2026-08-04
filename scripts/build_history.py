@@ -27,6 +27,7 @@ print = functools.partial(print, flush=True)   # live logs on CI
 
 SEASONS = list(range(2019, date.today().year))   # completed seasons only
 OUT = os.path.join(os.path.dirname(__file__), "..", "data", "parks_history.json")
+UMPS_OUT = os.path.join(os.path.dirname(__file__), "..", "data", "umps_history.json")
 
 GL_URL = "https://www.retrosheet.org/gamelogs/gl{year}.zip"
 ARCHIVE_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
@@ -37,6 +38,7 @@ ARCHIVE_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&lon
 # Retrosheet game-log fixed field positions (0-indexed). See glfields.txt.
 F_DATE, F_VTEAM, F_HTEAM, F_VSCORE, F_HSCORE, F_DAYNIGHT = 0, 3, 6, 9, 10, 12
 F_VHR, F_VSO, F_HHR, F_HSO = 25, 32, 53, 60
+F_UMP_NAME = 78   # home-plate umpire name ("First Last")
 
 CHADWICK_URL = "https://raw.githubusercontent.com/chadwickbureau/retrosheet/master/gamelog/GL{year}.TXT"
 
@@ -69,6 +71,8 @@ def load_season(year):
     rows = list(csv.reader(io.TextIOWrapper(io.BytesIO(data), encoding="latin-1")))
     return rows
 
+UMPS = {}   # plate ump name -> [total_r, total_hr, total_so, n]  (ALL games, all parks)
+
 def season_games(year):
     """Yield (team_code, yyyymmdd, day_night, runs, hr, so) for qualifying games."""
     rows = load_season(year)
@@ -85,6 +89,15 @@ def season_games(year):
         except (ValueError, IndexError):
             continue
         total_hr += hr
+        # plate-ump aggregate uses EVERY parsed game (all parks, all seasons)
+        try:
+            ump = row[F_UMP_NAME].strip()
+            # must look like "First Last" — guards against landing on an ID column
+            if ump and " " in ump and ump != "(none)":
+                s = UMPS.setdefault(ump, [0, 0, 0, 0])
+                s[0] += runs; s[1] += hr; s[2] += so; s[3] += 1
+        except IndexError:
+            pass
         code = RETRO_TO_CODE.get(home_retro)
         if not code:
             continue
@@ -176,6 +189,23 @@ def main():
     with open(OUT, "w") as f:
         json.dump(history, f, separators=(",", ":"))
     print(f"Wrote {OUT} — league avgs {history['_league']}")
+
+    # plate-umpire aggregates (min 30 games behind the plate)
+    if 40 <= len(UMPS) <= 400:
+        league_n = sum(s[3] for s in UMPS.values())
+        umps = {name: dict(r=round(s[0] / s[3], 2), hr=round(s[1] / s[3], 2),
+                           so=round(s[2] / s[3], 2), n=s[3])
+                for name, s in UMPS.items() if s[3] >= 30}
+        umps["_league"] = dict(
+            r=round(sum(s[0] for s in UMPS.values()) / league_n, 2),
+            hr=round(sum(s[1] for s in UMPS.values()) / league_n, 2),
+            so=round(sum(s[2] for s in UMPS.values()) / league_n, 2), n=league_n)
+        with open(UMPS_OUT, "w") as f:
+            json.dump(umps, f, separators=(",", ":"))
+        print(f"Wrote {UMPS_OUT} — {len(umps) - 1} umpires with 30+ games")
+    else:
+        print(f"UMP SANITY: parsed {len(UMPS)} distinct plate umps — field layout "
+              "may be off; skipping umps_history.json")
 
 if __name__ == "__main__":
     main()
