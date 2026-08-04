@@ -187,7 +187,7 @@ def wind_receptivity(hist):
     slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx
     pct10 = round(slope * 10 / my * 100)
     a = abs(pct10)
-    rating = "LOW" if a < 4 else "MEDIUM" if a < 8 else "HIGH" if a < 14 else "EXTREME"
+    rating = "LOW" if a < 5 else "MEDIUM" if a < 12 else "HIGH" if a < 25 else "EXTREME"
     return dict(rating=rating, pct10=pct10)
 
 # ---- conditions MVP: each team's hottest bat in this weather ----
