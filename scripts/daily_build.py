@@ -307,6 +307,24 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None):
 
     rel = wind_rel_angle(wdir, meta["bearing"])
     dome = roof_closed(meta, temp, pprob)
+
+    # hour-by-hour through the game window (first pitch + 3h)
+    hourly = []
+    if not dome:
+        pp_arr = h.get("precipitation_probability", [None] * len(h["time"]))
+        for off in range(4):
+            j = idx + off
+            if j >= len(h["time"]):
+                break
+            wd_j = h["wind_direction_10m"][j]
+            pj = pp_arr[j]
+            hourly.append(dict(
+                t=round(h["temperature_2m"][j]),
+                dew=round(h["dew_point_2m"][j]),
+                w=round(h["wind_speed_10m"][j]),
+                dir=deg_to_compass(wd_j),
+                rel=round(wind_rel_angle(wd_j, meta["bearing"])),
+                rain=None if pj is None else round(pj)))
     icon, sky = sky_of(cloud, pprob, fp_park.hour)
     if dome:
         icon, sky = "🏟️", "Indoor"
@@ -322,7 +340,8 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None):
                windAngle=round(rel), windLabel="ROOF CLOSED" if dome else wind_label(rel),
                dew=dew, sky=sky, skyIcon=icon, dome=dome, gamePk=game_pk,
                rain=None if pprob is None else round(pprob),
-               cloud=None if cloud is None else round(cloud))
+               cloud=None if cloud is None else round(cloud),
+               hourly=hourly or None)
 
     if not hist or not hist["avg"]["n"]:
         out.update(sample=0, hr=0, runs=0, ks=0, hrGm=0, hrPark=0,
