@@ -384,6 +384,8 @@ function renderAll(){
     document.getElementById("brief-body").innerHTML = safe
       .replace(/\b([A-Z]{2,3} @ [A-Z]{2,3})\b/g,"<b>$1</b>").replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
     document.getElementById("brief-card").style.display="";
+  } else {
+    document.getElementById("brief-card").style.display="none";
   }
 }
 async function loadLive(){
