@@ -310,7 +310,7 @@ function pgaScene(){
   const M=c=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide});
   scene.background=L(LT.bg);
   scene.fog=new THREE.Fog(L(LT.bg),wet?200:420,wet?520:900);
-  const cam=new THREE.PerspectiveCamera(38,W/H,0.1,900);
+  const cam=new THREE.PerspectiveCamera(38,W/H,2,500);
   /* layout: tee at -z, green at +z */
   const len=hole.par===3?72:hole.par===4?98:120;
   const bend=(hole.dl||0)*(hole.par===3?4:16);
@@ -345,7 +345,7 @@ function pgaScene(){
     for(let i=0;i<=STEPS;i++){
       const t=t0+(t1-t0)*i/STEPS,p=curve.getPoint(t),d=curve.getTangent(t);
       const px=-d.z,pz=d.x,w=fwW(t);
-      pos.push(p.x+px*w,0.03,p.z+pz*w,p.x-px*w,0.03,p.z-pz*w);
+      pos.push(p.x+px*w,0.22,p.z+pz*w,p.x-px*w,0.22,p.z-pz*w);
       if(i<STEPS){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}
     }
     const g=new THREE.BufferGeometry();
@@ -355,10 +355,10 @@ function pgaScene(){
   }
   /* green: collar + concentric mow rings */
   const collar=new THREE.Mesh(new THREE.CircleGeometry(9.2,48),M(L(LT.collar)));
-  collar.rotation.x=-Math.PI/2;collar.position.set(gpos.x,0.06,gpos.z);scene.add(collar);
+  collar.rotation.x=-Math.PI/2;collar.position.set(gpos.x,0.34,gpos.z);scene.add(collar);
   for(let r=0;r<4;r++){
     const ring=new THREE.Mesh(new THREE.CircleGeometry(7.8-r*1.95,44),M(L(r%2?LT.grn2:LT.grn1)));
-    ring.rotation.x=-Math.PI/2;ring.position.set(gpos.x,0.07+r*0.012,gpos.z);scene.add(ring);
+    ring.rotation.x=-Math.PI/2;ring.position.set(gpos.x,0.42+r*0.05,gpos.z);scene.add(ring);
   }
   /* bunkers: organic light-sand blobs */
   const bSpots=[[gpos.x-8.5,gpos.z-5,3.6,11],[gpos.x+9,gpos.z+0.5,3.1,29],[gpos.x+3.5,gpos.z-10.5,2.7,53]];
@@ -366,7 +366,7 @@ function pgaScene(){
   bSpots.forEach(s=>{
     const {shape}=blobShape(0,0,s[2],0.3,s[3]);
     const m=new THREE.Mesh(new THREE.ShapeGeometry(shape),M(L(LT.sand)));
-    m.rotation.x=-Math.PI/2;m.position.set(s[0],0.05,s[1]);scene.add(m);
+    m.rotation.x=-Math.PI/2;m.position.set(s[0],0.30,s[1]);scene.add(m);
   });
   /* water: deep glassy blob with white shoreline */
   if(hole.water&&hole.water!=="none"){
@@ -376,8 +376,8 @@ function pgaScene(){
     else{wx+=16;wz-=3;rw=10;}
     const {shape,pts}=blobShape(0,0,rw,0.22,97);
     const wmesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),M(L(LT.water)));
-    wmesh.rotation.x=-Math.PI/2;wmesh.position.set(wx,0.02,wz);scene.add(wmesh);
-    const lp=[];pts.forEach(p=>lp.push(p.x+wx,0.09,p.y*1+wz));
+    wmesh.rotation.x=-Math.PI/2;wmesh.position.set(wx,0.14,wz);scene.add(wmesh);
+    const lp=[];pts.forEach(p=>lp.push(p.x+wx,0.26,p.y*1+wz));
     const lg=new THREE.BufferGeometry();lg.setAttribute("position",new THREE.Float32BufferAttribute(lp,3));
     scene.add(new THREE.LineLoop(lg,new THREE.LineBasicMaterial({color:0xf4f6fa,transparent:true,opacity:0.75})));
   }
@@ -458,9 +458,10 @@ function pgaScene(){
   
   function tick(){
     t0+=1;
-    const sway=Math.sin(t0*0.0014)*len*0.16;
-    cam.position.set(tee.x+sway, len*0.42, tee.z-len*0.30);
-    cam.lookAt(gpos.x,0,gpos.z*0.9);
+    const ang=t0*0.00115;
+    const orad=len*(1.0+Math.sin(t0*0.0006)*0.08);
+    cam.position.set(Math.sin(ang)*orad, len*(0.48+Math.sin(t0*0.00045)*0.05), Math.cos(ang)*orad+len*0.05);
+    cam.lookAt(bend*0.3,0,len*0.05);
     /* waving flag */
     const fp=flagGeo.attributes.position.array;
     for(let i=0;i<fp.length;i+=3){
