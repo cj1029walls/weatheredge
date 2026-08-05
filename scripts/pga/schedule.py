@@ -8,6 +8,9 @@ announcements). Dates below are the 2026 playoffs + FedExCup Fall.
 """
 
 EVENTS = [
+    dict(name="Wyndham Championship", course="Sedgefield Country Club",
+         city="Greensboro, NC", lat=36.048, lon=-79.888, tz="America/New_York",
+         r1="2026-08-06", end="2026-08-09", team=False),
     dict(name="FedEx St. Jude Championship", course="TPC Southwind",
          city="Memphis, TN", lat=35.062, lon=-89.853, tz="America/Chicago",
          r1="2026-08-13", end="2026-08-16", team=False),
