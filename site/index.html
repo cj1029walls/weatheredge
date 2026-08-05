@@ -85,6 +85,11 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
   .brand .tagline b{color:#e8c877;font-weight:600}
+  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
+  .sport-tabs{display:flex;gap:6px;margin-top:14px}
+  .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
+  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+  .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
   .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
   .date-chip b{color:#fff}
   /* tabs */
@@ -344,7 +349,7 @@
 </style>
 </head>
 <body>
-<div class="announce">📡 Expanding coverage — weather edges for <b>PGA</b> · <b>CFB</b> · <b>NFL</b> · <b>NASCAR</b> and more outdoor sports <span class="soon">coming soon</span></div>
+<div class="announce">📡 <b>NFL</b> + <b>CFB</b> weather are live — <b>PGA</b> · <b>NASCAR</b> and more outdoor sports <span class="soon">coming soon</span></div>
 
 <header>
   <div class="header-inner">
@@ -374,8 +379,11 @@
             <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/>
           </circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
-        </svg>DFS<span class="brand-rad">RADAR</span></h1>
+        </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">MLB</span></h1>
         <div class="tagline">MLB weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
+        <div class="sport-tabs">
+          <a class="on" href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a>
+        </div>
       </div>
       <div class="date-chip">Slate for <b id="date-label">Tuesday, July 28</b> · <span id="game-count"></span> games</div>
     </div>
