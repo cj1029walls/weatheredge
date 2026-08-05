@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFSRADAR — NASCAR Weather Edges for DFS</title>
+<meta name="description" content="DFSRADAR NASCAR: race-day weather for DFS — rain and delay risk at this week's track (ovals don't run wet), green-flag conditions, and the temp swing that changes grip through the race.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
+<style>
+  :root{
+    --navy:#152451; --navy2:#24409c; --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
+    --green:#178a3f; --green-deep:#10682e; --green-bg:#e6f5eb;
+    --red:#d33131; --red-deep:#a92525; --red-bg:#fdecec;
+    --blue:#5b6b83; --blue-deep:#47566d; --blue-bg:#edf0f5;
+    --gold:#2f62e8; --gold-deep:#2450b8; --gold-bg:#e8eefc;
+    --amber-bg:#fdf5e3;
+    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#fff; --line:#e4e8ef;
+    --line-strong:#c3cde0; --body2:#3e4a5e;
+    --note-bg:#fdf5e3; --note-border:#f0dfb2; --note-text:#8a6207;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
+    --shadow-hover:0 2px 4px rgba(21,36,81,.08),0 10px 28px rgba(21,36,81,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
+  .announce{background:linear-gradient(90deg,#0e1a3d,#2450b8 55%,#0e1a3d);color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;padding:8px 14px}
+  .announce b{color:#fff}
+  .announce .soon{display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ffd94a}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 22px}
+  .header-inner{max-width:1100px;margin:0 auto}
+  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
+  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
+  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
+  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
+  .brand .tagline b{color:#e8c877;font-weight:600}
+  .sport-tabs{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+  .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
+  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+  .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  main{max-width:1100px;margin:0 auto;padding:22px 24px 70px}
+  .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
+  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
+  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
+  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;animation:bpulse 2.2s ease-in-out infinite}
+  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
+  .brief-body b{color:#fff}
+  .tip{position:relative;cursor:help}
+  .info-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray-bg);color:var(--muted);font-size:10px;font-weight:800;vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong)}
+  .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;font-size:11.5px;font-weight:500;line-height:1.55;text-transform:none;letter-spacing:.1px;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;transition:opacity .15s;z-index:90;text-align:left;white-space:normal}
+  .tip::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90}
+  .tip:hover::after,.tip:hover::before{opacity:1}
+  .event-hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .event-hero .name{font-size:22px;font-weight:800}
+  .event-hero .sub{font-size:13px;color:var(--muted);margin-top:3px}
+  .event-hero .when{text-align:right}
+  .event-hero .when b{font-size:16px}
+  .event-hero .when span{display:block;font-size:11.5px;color:var(--muted)}
+  .po-pill{display:inline-block;margin-left:10px;font-size:10px;font-weight:800;letter-spacing:.8px;background:var(--gold-bg);color:var(--gold-deep);border-radius:14px;padding:3px 10px;text-transform:uppercase;vertical-align:3px}
+  .sec-h{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px}
+  .wx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .wx-tile{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 16px}
+  .wx-tile .k{font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .wx-tile .v{font-size:25px;font-weight:800;margin-top:3px}
+  .wx-tile .s{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .delay-hero{margin-top:14px;border-radius:var(--radius);padding:16px 20px;font-size:14px;font-weight:600;line-height:1.6}
+  .delay-hero b{font-size:16px}
+  .dl-clear{background:var(--green-bg);color:var(--green-deep)}
+  .dl-watch{background:var(--amber-bg);color:#8a6207}
+  .dl-likely{background:#fdeee0;color:#b45309}
+  .dl-severe{background:var(--red-bg);color:var(--red-deep)}
+  .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px;margin-top:13px}
+  .hr-cell{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center;box-shadow:var(--shadow)}
+  .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .hr-lab{font-size:9.5px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
+  .hr-t{font-size:18px;font-weight:800;margin-top:2px}
+  .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px}
+  .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
+  .hr-rain.warn{color:var(--red);font-weight:800}
+  .ondeck{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .od-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+  .od-card .k{font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .od-card .v{font-size:15px;font-weight:800;margin-top:3px}
+  .od-card .s{font-size:12px;color:var(--muted);margin-top:2px}
+  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-top:20px}
+  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
+  .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
+  .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
+  footer{max-width:1100px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--faint);text-align:center}
+</style>
+</head>
+<body>
+<div class="announce">📡 DFSRADAR covers <b>MLB · NFL · CFB · PGA · NASCAR</b> — more outdoor sports <span class="soon">coming soon</span></div>
+<header>
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
+          <defs><linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
+            <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/><stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
+          </linearGradient></defs>
+          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
+          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
+          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
+          <g><path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
+          <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
+          <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
+          <circle cx="29.5" cy="13.5" r="2.3" fill="#ffd94a"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
+          <circle cx="13" cy="28.5" r="1.9" fill="#6ee7a0"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
+        </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">NASCAR</span></h1>
+        <div class="tagline">Race-day weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
+        <div class="sport-tabs">
+          <a href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a class="on" href="/nascar/">NASCAR</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — the live race loads automatically when the daily build has run.</span></div>
+
+  <div class="brief-card" id="brief-card" style="display:none">
+    <div class="brief-head"><span class="pulse"></span>Race-day read — live from the radar<span class="tip" data-tip="Auto-generated on every build from the race-window forecast — rain risk, green-flag conditions, and the temp swing straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
+    <div class="brief-body" id="brief-body"></div>
+  </div>
+
+  <div id="content"></div>
+
+  <div class="m-sec" style="margin-top:26px">
+    <h5>How it works</h5>
+    <p style="font-size:14px;line-height:1.7;color:var(--body2)">Cup cars don't race ovals in the rain — and every remaining 2026 points race is on an oval. So the rain number IS the story: showers push races into the night or to Monday, and a delayed race is a different DFS slate. We pull the hourly forecast at this week's track for the full race window: rain risk hour by hour (peak drives the delay outlook), green-flag conditions, wind and gusts, and the <b>temp swing</b> from green flag to the finish — the track cools, grip comes up, and handling changes with it. Rebuilt every morning as race day approaches.</p>
+  </div>
+</main>
+
+<footer>DFSRADAR · NASCAR weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
+
+<script>
+const SAMPLE = {generated:"preview",
+ brief:"Iowa Corn 350 at Iowa Speedway: 88° and sunny at the green flag, wind 9 mph (gusts 16). No rain threat — this one runs on time. Track cools 13° through the window — grip picks up late, watch for handling swings.",
+ race:{name:"Iowa Corn 350", track:"Iowa Speedway", city:"Newton, IA", playoff:false,
+  day:"Sunday, August 9", time:"3:30 PM ET", inWindow:true,
+  temp:88, wind:9, gust:16, rain:10, rh:48, sky:"Sunny", tempSwing:13,
+  delay:{level:"clear", pct:10},
+  hourly:[{lab:"1 PM",t:86,w:8,rain:5},{lab:"2 PM",t:88,w:9,rain:8},{lab:"3 PM",fp:true,t:88,w:9,rain:10},{lab:"4 PM",t:87,w:10,rain:10},{lab:"5 PM",t:84,w:9,rain:8},{lab:"6 PM",t:80,w:8,rain:5},{lab:"7 PM",t:75,w:6,rain:4}]},
+ onDeck:[{name:"Cook Out 400", track:"Richmond Raceway", city:"Richmond, VA", date:"Sat Aug 15", playoff:false},
+         {name:"Dollar Tree 301", track:"New Hampshire Motor Speedway", city:"Loudon, NH", date:"Sun Aug 23", playoff:false},
+         {name:"Coke Zero Sugar 400", track:"Daytona International Speedway", city:"Daytona Beach, FL", date:"Sat Aug 29", playoff:false}]};
+
+let DATA = SAMPLE;
+const DL={clear:["RUNS ON TIME","No delay concern — rain stays away from the race window.","dl-clear"],
+          watch:["WORTH MONITORING","Some rain around the window. Ovals don't run wet — keep an eye on it.","dl-watch"],
+          likely:["DELAY LIKELY","Real rain risk in the window. Expect stoppages — late-race strategy changes everything.","dl-likely"],
+          severe:["POSTPONEMENT RISK","Heavy rain risk. Ovals can't run in it — Monday is in play.","dl-severe"]};
+function renderAll(){
+  const c=document.getElementById("content");
+  let html="";
+  if(DATA.race){
+    const g=DATA.race;
+    html+=`<div class="event-hero">
+      <div><div class="name">${g.name}${g.playoff?'<span class="po-pill">Playoffs</span>':""}</div>
+      <div class="sub">${g.track} · ${g.city}</div></div>
+      <div class="when"><b>${g.day}</b><span>Green flag ${g.time}</span></div>
+    </div>`;
+    if(g.inWindow){
+      const [dt,ds,dc]=DL[g.delay.level]||DL.clear;
+      html+=`<div class="delay-hero ${dc}"><b>DELAY OUTLOOK: ${dt}</b> — peak ${g.delay.pct}% rain in the race window. ${ds}</div>`;
+      html+=`<div class="sec-h">Green-flag conditions</div>
+      <div class="wx-grid">
+        <div class="wx-tile"><div class="k">Temp</div><div class="v">${g.temp}°</div><div class="s">${g.sky}</div></div>
+        <div class="wx-tile"><div class="k">Wind</div><div class="v">${g.wind} mph</div><div class="s">gusts to ${g.gust}</div></div>
+        <div class="wx-tile"><div class="k">Rain chance</div><div class="v">${g.rain!=null?g.rain+"%":"—"}</div><div class="s">at the green flag</div></div>
+        <div class="wx-tile"><div class="k">Temp swing</div><div class="v">${g.tempSwing}°</div><div class="s">green flag → finish · grip comes up as it cools<span class="tip" data-tip="Track temperature falls through the race window. Cooler track = more grip. A big swing means handling changes lap by lap — an edge for drivers who adjust."><span class="info-i">i</span></span></div></div>
+      </div>`;
+      if(g.hourly&&g.hourly.length){
+        html+=`<div class="sec-h">Race window · hour by hour</div>
+        <div class="hourly">${g.hourly.map(h=>`
+          <div class="hr-cell ${h.fp?"hr-fp":""}">
+            <div class="hr-lab">${h.lab}${h.fp?" · green":""}</div>
+            <div class="hr-t">${h.t}°</div>
+            <div class="hr-w">${h.w} mph wind</div>
+            <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}</div>
+          </div>`).join("")}</div>`;
+      }
+    } else {
+      html+=`<div class="empty-season"><b>Forecast window opens soon</b>Race-day forecasts appear once race day is inside the 16-day horizon — then sharpen daily.</div>`;
+    }
+  } else {
+    html+=`<div class="empty-season"><b>Season complete</b>The next race loads here automatically when the new schedule begins.</div>`;
+  }
+  if(DATA.onDeck && DATA.onDeck.length){
+    html+=`<div class="sec-h">On deck</div><div class="ondeck">${DATA.onDeck.map(o=>`
+      <div class="od-card"><div class="k">${o.date}${o.playoff?" · Playoffs":""}</div><div class="v">${o.name}</div><div class="s">${o.track} · ${o.city}</div></div>`).join("")}</div>`;
+  }
+  c.innerHTML=html;
+  if(DATA.brief){
+    const safe=DATA.brief.replace(/[<>&]/g,ch=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[ch]));
+    document.getElementById("brief-body").innerHTML=safe.replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
+    document.getElementById("brief-card").style.display="";
+  } else {
+    document.getElementById("brief-card").style.display="none";
+  }
+}
+async function loadLive(){
+  try{
+    const r=await fetch("data.json?_="+Date.now());
+    if(!r.ok) return;
+    DATA=await r.json();
+    document.getElementById("proto-note").innerHTML=
+      `🟢 <span><b>Live</b> — real schedule & track forecasts, delay outlook from the hourly numbers. Updated ${DATA.generated}.</span>`;
+    renderAll();
+  }catch(e){}
+}
+renderAll();
+loadLive();
+</script>
+</body>
+</html>
