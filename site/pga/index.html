@@ -174,14 +174,14 @@ const SAMPLE = {generated:"preview",
  brief:"Thursday is the wind day — 18 mph average, gusts to 29. Thursday: PM wave faces 7 mph more wind — edge to the morning wave. No serious rain threats this week.",
  event:{hole:{n:11,par:3,yds:158,dl:0,water:"left"}, name:"FedEx St. Jude Championship", course:"TPC Southwind", city:"Memphis, TN", team:false, dates:"Aug 13–16", r1:"2026-08-13", end:"2026-08-16"},
  rounds:[
-  {name:"Round 1 · Thu", date:"Thu Aug 13", inWindow:true, temp:91, wind:18, gust:29, rain:15, sky:"Sunny", delay:"clear",
+  {name:"Round 1 · Thu", date:"Thu Aug 13", inWindow:true, temp:86, wind:18, gust:29, rain:15, sky:"Sunny", delay:"clear",
    am:{wind:11, gust:18, temp:86, rain:5}, pm:{wind:18, gust:29, temp:94, rain:15},
    waveEdge:{calmer:"AM", diff:7, txt:"PM wave faces 7 mph more wind — edge to the morning wave"}},
-  {name:"Round 2 · Fri", date:"Fri Aug 14", inWindow:true, temp:92, wind:12, gust:20, rain:20, sky:"Partly cloudy", delay:"watch",
+  {name:"Round 2 · Fri", date:"Fri Aug 14", inWindow:true, temp:85, wind:12, gust:20, rain:20, sky:"Partly cloudy", delay:"watch",
    am:{wind:10, gust:16, temp:87, rain:8}, pm:{wind:13, gust:20, temp:95, rain:20}},
-  {name:"Round 3 · Sat", date:"Sat Aug 15", inWindow:true, temp:89, wind:9, gust:15, rain:35, sky:"Partly cloudy", delay:"watch",
+  {name:"Round 3 · Sat", date:"Sat Aug 15", inWindow:true, temp:84, wind:9, gust:15, rain:35, sky:"Partly cloudy", delay:"watch",
    am:{wind:8, gust:13, temp:85, rain:20}, pm:{wind:10, gust:15, temp:92, rain:35}},
-  {name:"Round 4 · Sun", date:"Sun Aug 16", inWindow:true, temp:87, wind:7, gust:12, rain:55, sky:"Rain risk", delay:"likely",
+  {name:"Round 4 · Sun", date:"Sun Aug 16", inWindow:true, temp:83, wind:7, gust:12, rain:55, sky:"Rain risk", delay:"likely",
    am:{wind:6, gust:10, temp:83, rain:30}, pm:{wind:8, gust:12, temp:89, rain:55}}
  ],
  onDeck:[{name:"BMW Championship", course:"Bellerive Country Club", city:"Town and Country, MO", dates:"Aug 20–23"},
@@ -250,30 +250,38 @@ async function loadLive(){
     renderAll();
   }catch(e){}
 }
-/* ---- 3D signature hole ---- */
+/* ---- 3D signature hole (weather-tinted monochrome, radar style) ---- */
 let G3=null;
-function shortName(n){
-  n=(n||"").replace(/Championship|Classic|Open|The /g,"").trim();
-  return (n.split(" ").slice(0,2).join(" ")||"DFSRADAR").toUpperCase();
-}
-function bannerTex(big,small,accent){
-  const c=document.createElement("canvas");c.width=512;c.height=128;
+function evSpriteTex(big,small){
+  const c=document.createElement("canvas");c.width=640;c.height=150;
   const x=c.getContext("2d");
-  x.fillStyle="#152451";x.fillRect(0,0,512,128);
-  x.fillStyle=accent||"#ff6b1a";x.fillRect(0,0,10,128);
-  x.fillStyle="#fff";x.font="800 44px -apple-system,Segoe UI,Arial";x.textBaseline="middle";
-  x.fillText(big.slice(0,20),28,52);
-  x.fillStyle="#8fa8d8";x.font="700 22px -apple-system,Segoe UI,Arial";
-  x.fillText(small,28,96);
+  const r=26;x.fillStyle="rgba(13,24,48,0.92)";
+  x.beginPath();x.moveTo(r,0);x.lineTo(640-r,0);x.arcTo(640,0,640,r,r);x.lineTo(640,150-r);x.arcTo(640,150,640-r,150,r);
+  x.lineTo(r,150);x.arcTo(0,150,0,150-r,r);x.lineTo(0,r);x.arcTo(0,0,r,0,r);x.fill();
+  x.fillStyle="#ff6b1a";x.fillRect(0,0,9,150);
+  x.fillStyle="#f4f6fa";x.font="800 52px -apple-system,Segoe UI,Arial";x.textBaseline="middle";
+  x.fillText(big.slice(0,22),32,56);
+  x.fillStyle="#8fa8d8";x.font="700 30px -apple-system,Segoe UI,Arial";
+  x.fillText(small,32,112);
   const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;
 }
-function flagTex(txt){
-  const c=document.createElement("canvas");c.width=256;c.height=128;
+function holeFlagTex(txt){
+  const c=document.createElement("canvas");c.width=200;c.height=120;
   const x=c.getContext("2d");
-  x.fillStyle="#ffd94a";x.fillRect(0,0,256,128);
-  x.fillStyle="#152451";x.font="800 54px -apple-system,Segoe UI,Arial";x.textBaseline="middle";x.textAlign="center";
-  x.fillText(txt,128,66);
+  x.fillStyle="#f4f6fa";x.fillRect(0,0,200,120);
+  x.fillStyle="#152451";x.font="800 74px -apple-system,Segoe UI,Arial";
+  x.textBaseline="middle";x.textAlign="center";x.fillText(txt,100,64);
   return new THREE.CanvasTexture(c);
+}
+function blobShape(cx,cy,r,irr,seed){
+  const pts=[];let s=seed;
+  const rnd=()=>{s=(s*9301+49297)%233280;return s/233280;};
+  for(let i=0;i<9;i++){
+    const a=i/9*Math.PI*2, rr=r*(1-irr+rnd()*irr*2);
+    pts.push(new THREE.Vector2(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr*0.78));
+  }
+  const curve=new THREE.SplineCurve([...pts,pts[0]]);
+  return {shape:new THREE.Shape(curve.getPoints(40)), pts:curve.getPoints(40)};
 }
 function pgaScene(){
   const wrap=document.getElementById("p3d-wrap");
@@ -286,152 +294,200 @@ function pgaScene(){
   const scene=new THREE.Scene();
   const hole=(DATA.event&&DATA.event.hole)||{n:15,par:5,yds:545,dl:1,water:"front"};
   const rd=(DATA.rounds||[]).find(r=>r.inWindow);
-  const windMph=rd?rd.wind:8, rainPct=rd?(rd.rain||0):0;
+  const windMph=rd?rd.wind:8, rainPct=rd?(rd.rain||0):0, temp=rd?rd.temp:80;
+  const wet=rainPct>=55;
   const desert=!!hole.desert;
-  const sky=rainPct>=45?0x8e9bad:0xc4dcf0;
-  scene.background=new THREE.Color(sky);
-  scene.fog=new THREE.Fog(sky,120,300);
-  const cam=new THREE.PerspectiveCamera(36,W/H,0.1,600);
-  scene.add(new THREE.HemisphereLight(0xdfeaff,desert?0x6a5c40:0x3f6035,rainPct>=45?0.75:0.95));
-  const sun=new THREE.DirectionalLight(0xfff2d8,rainPct>=45?0.5:0.9);
-  sun.position.set(-40,60,-30);scene.add(sun);
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(420,420),
-    new THREE.MeshLambertMaterial({color:desert?0x8a7a5c:0x35602c}));
-  ground.rotation.x=-Math.PI/2;ground.position.y=-0.06;scene.add(ground);
-  // hole geometry: tee -> green along z with dogleg
-  const len=hole.par===3?70:hole.par===4?96:118;
-  const bend=(hole.dl||0)*(hole.par===3?4:15);
-  const tee=new THREE.Vector3(-bend*0.3,0,-len*0.52);
+  /* one weather-tinted hue, MLB-style */
+  let hue,sat;
+  if(wet){hue=0.58;sat=0.12;}
+  else if(temp>=90){hue=0.985;sat=0.30;}
+  else if(temp<=68){hue=0.575;sat=0.35;}
+  else{hue=desert?0.09:0.36;sat=desert?0.22:0.38;}
+  if(!wet&&temp<88&&temp>68&&!desert){hue=0.62;sat=0.40;}
+  const LT={bg:0.13,apron:0.175,rough:0.235,fair1:0.375,fair2:0.35,collar:0.415,grn1:0.485,grn2:0.46,
+            tree1:0.19,tree2:0.155,water:0.07,sand:desert?0.07:0.82};
+  const L=l=>new THREE.Color().setHSL(hue,sat,Math.max(0.04,l));
+  const M=c=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide});
+  scene.background=L(LT.bg);
+  scene.fog=new THREE.Fog(L(LT.bg),wet?200:420,wet?520:900);
+  const cam=new THREE.PerspectiveCamera(38,W/H,0.1,900);
+  /* layout: tee at -z, green at +z */
+  const len=hole.par===3?72:hole.par===4?98:120;
+  const bend=(hole.dl||0)*(hole.par===3?4:16);
+  const tee=new THREE.Vector3(-bend*0.35,0,-len*0.52);
   const mid=new THREE.Vector3(bend,0,0);
-  const gpos=new THREE.Vector3(bend*0.35,0,len*0.52);
+  const gpos=new THREE.Vector3(bend*0.3,0,len*0.52);
   const curve=new THREE.CatmullRomCurve3([tee,mid,gpos]);
-  const SEG=46, fw=[];
-  for(let i=0;i<=SEG;i++){
-    const t=i/SEG, p=curve.getPoint(t), d=curve.getTangent(t);
-    const perp=new THREE.Vector3(-d.z,0,d.x).normalize();
-    const w=hole.par===3?(3.2+2.2*Math.sin(t*Math.PI)):(4.5+5.5*Math.sin(Math.min(1,t*1.25)*Math.PI));
-    fw.push({p,perp,w});
+  /* apron pad the hole sits on */
+  const apron=new THREE.Mesh(new THREE.CircleGeometry(len*0.95,56),M(L(LT.apron)));
+  apron.rotation.x=-Math.PI/2;apron.position.set(0,-0.2,len*0.06);scene.add(apron);
+  /* rough corridor */
+  const SEG=60;
+  function stripGeo(w0fn,y){
+    const pos=[],idx=[];
+    for(let i=0;i<=SEG;i++){
+      const t=i/SEG,p=curve.getPoint(t),d=curve.getTangent(t);
+      const px=-d.z,pz=d.x,w=w0fn(t);
+      pos.push(p.x+px*w,y,p.z+pz*w,p.x-px*w,y,p.z-pz*w);
+      if(i<SEG){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}
+    }
+    const g=new THREE.BufferGeometry();
+    g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+    g.setIndex(idx);return g;
   }
-  const fgeo=new THREE.BufferGeometry(), fpos=new Float32Array((SEG+1)*2*3), fidx=[];
-  fw.forEach((s,i)=>{
-    const a=s.p.clone().addScaledVector(s.perp,-s.w), b=s.p.clone().addScaledVector(s.perp,s.w);
-    fpos.set([a.x,0.01,a.z,b.x,0.01,b.z],i*6);
-    if(i<SEG){const k=i*2;fidx.push(k,k+1,k+2,k+1,k+3,k+2);}
-  });
-  fgeo.setAttribute("position",new THREE.BufferAttribute(fpos,3));fgeo.setIndex(fidx);fgeo.computeVertexNormals();
-  scene.add(new THREE.Mesh(fgeo,new THREE.MeshLambertMaterial({color:0x4d8a3d})));
-  // green + fringe
-  const fringe=new THREE.Mesh(new THREE.CircleGeometry(9.6,40),new THREE.MeshLambertMaterial({color:0x548a44}));
-  fringe.rotation.x=-Math.PI/2;fringe.position.set(gpos.x,0.02,gpos.z);scene.add(fringe);
-  const grn=new THREE.Mesh(new THREE.CircleGeometry(7.4,40),new THREE.MeshLambertMaterial({color:0x67ad55}));
-  grn.rotation.x=-Math.PI/2;grn.position.set(gpos.x,0.035,gpos.z);scene.add(grn);
-  // tee box
-  const tb=new THREE.Mesh(new THREE.BoxGeometry(5,0.35,3.2),new THREE.MeshLambertMaterial({color:0x4d8a3d}));
-  tb.position.set(tee.x,0.18,tee.z);scene.add(tb);
-  // bunkers (dark volcanic rock at desert venues)
-  const bCol=desert?0x38322b:0xe8dcb2;
-  const bSpots=[[gpos.x-9,gpos.z-4],[gpos.x+9.5,gpos.z+1],[gpos.x+4,gpos.z-10]];
+  const fwW=t=>hole.par===3?(3.4+2.4*Math.sin(t*Math.PI)):(4.8+5.8*Math.sin(Math.min(1,t*1.22)*Math.PI));
+  scene.add(new THREE.Mesh(stripGeo(t=>fwW(t)+7.5,-0.05),M(L(LT.rough))));
+  /* fairway with mow stripes: alternate bands */
+  const mats=[M(L(LT.fair1)),M(L(LT.fair2))];
+  for(let b=0;b<10;b++){
+    const t0=b/10,t1=(b+1)/10;
+    const pos=[],idx=[];const STEPS=6;
+    for(let i=0;i<=STEPS;i++){
+      const t=t0+(t1-t0)*i/STEPS,p=curve.getPoint(t),d=curve.getTangent(t);
+      const px=-d.z,pz=d.x,w=fwW(t);
+      pos.push(p.x+px*w,0.03,p.z+pz*w,p.x-px*w,0.03,p.z-pz*w);
+      if(i<STEPS){const k=i*2;idx.push(k,k+1,k+2,k+1,k+3,k+2);}
+    }
+    const g=new THREE.BufferGeometry();
+    g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+    g.setIndex(idx);
+    scene.add(new THREE.Mesh(g,mats[b%2]));
+  }
+  /* green: collar + concentric mow rings */
+  const collar=new THREE.Mesh(new THREE.CircleGeometry(9.2,48),M(L(LT.collar)));
+  collar.rotation.x=-Math.PI/2;collar.position.set(gpos.x,0.06,gpos.z);scene.add(collar);
+  for(let r=0;r<4;r++){
+    const ring=new THREE.Mesh(new THREE.CircleGeometry(7.8-r*1.95,44),M(L(r%2?LT.grn2:LT.grn1)));
+    ring.rotation.x=-Math.PI/2;ring.position.set(gpos.x,0.07+r*0.012,gpos.z);scene.add(ring);
+  }
+  /* bunkers: organic light-sand blobs */
+  const bSpots=[[gpos.x-8.5,gpos.z-5,3.6,11],[gpos.x+9,gpos.z+0.5,3.1,29],[gpos.x+3.5,gpos.z-10.5,2.7,53]];
+  if(hole.par>3)bSpots.push([mid.x+fwW(0.5)+3,mid.z+6,3.3,71]);
   bSpots.forEach(s=>{
-    const b=new THREE.Mesh(new THREE.SphereGeometry(3.4,20,14),new THREE.MeshLambertMaterial({color:bCol}));
-    b.scale.set(1,0.12,0.75);b.position.set(s[0],0.05,s[1]);
-    b.rotation.y=Math.random()*3;scene.add(b);
+    const {shape}=blobShape(0,0,s[2],0.3,s[3]);
+    const m=new THREE.Mesh(new THREE.ShapeGeometry(shape),M(L(LT.sand)));
+    m.rotation.x=-Math.PI/2;m.position.set(s[0],0.05,s[1]);scene.add(m);
   });
-  // water
+  /* water: deep glassy blob with white shoreline */
   if(hole.water&&hole.water!=="none"){
-    const wm=new THREE.MeshLambertMaterial({color:0x3f6fb8});
-    const wp=new THREE.Mesh(new THREE.PlaneGeometry(hole.water==="front"?26:14,hole.water==="front"?11:26),wm);
-    wp.rotation.x=-Math.PI/2;wp.position.y=0.008;
-    if(hole.water==="front")wp.position.set(gpos.x-2,0.008,gpos.z-13);
-    else if(hole.water==="left")wp.position.set(gpos.x-15,0.008,gpos.z-3);
-    else wp.position.set(gpos.x+15,0.008,gpos.z-3);
-    scene.add(wp);
+    let wx=gpos.x,wz=gpos.z,rw=9;
+    if(hole.water==="front"){wx-=2;wz-=14;rw=11;}
+    else if(hole.water==="left"){wx-=16;wz-=3;rw=10;}
+    else{wx+=16;wz-=3;rw=10;}
+    const {shape,pts}=blobShape(0,0,rw,0.22,97);
+    const wmesh=new THREE.Mesh(new THREE.ShapeGeometry(shape),M(L(LT.water)));
+    wmesh.rotation.x=-Math.PI/2;wmesh.position.set(wx,0.02,wz);scene.add(wmesh);
+    const lp=[];pts.forEach(p=>lp.push(p.x+wx,0.09,p.y*1+wz));
+    const lg=new THREE.BufferGeometry();lg.setAttribute("position",new THREE.Float32BufferAttribute(lp,3));
+    scene.add(new THREE.LineLoop(lg,new THREE.LineBasicMaterial({color:0xf4f6fa,transparent:true,opacity:0.75})));
   }
-  // trees
-  if(!desert){
-    const tm=new THREE.MeshLambertMaterial({color:0x2c4d24}),km=new THREE.MeshLambertMaterial({color:0x5b4630});
-    for(let i=0;i<26;i++){
-      const side=i%2?1:-1, z=-len*0.5+Math.random()*len*1.05;
-      const x=side*(16+Math.random()*16)+bend*0.5;
-      if(Math.hypot(x-gpos.x,z-gpos.z)<15)continue;
-      const h=4+Math.random()*4;
-      const cone=new THREE.Mesh(new THREE.ConeGeometry(1.8+Math.random(),h,8),tm);
-      cone.position.set(x,h/2+0.8,z);scene.add(cone);
-      const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.34,1.1,6),km);
-      trunk.position.set(x,0.55,z);scene.add(trunk);
+  /* tree clusters framing the corridor */
+  const tMats=[M(L(LT.tree1)),M(L(LT.tree2))];
+  let seed=5;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  for(let i=0;i<40;i++){
+    const side=i%2?1:-1,t=rnd();
+    const p=curve.getPoint(Math.min(1,t*1.1)),d=curve.getTangent(Math.min(1,t*1.1));
+    const px=-d.z,pz=d.x;
+    const off=(fwW(t)+10+rnd()*9)*side;
+    const x=p.x+px*off,z=p.z+pz*off;
+    if(Math.hypot(x-gpos.x,z-gpos.z)<14)continue;
+    if(desert){
+      const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(0.9+rnd()*1.3,0),tMats[i%2]);
+      rock.position.set(x,0.5,z);rock.rotation.y=rnd()*3;scene.add(rock);
+    }else{
+      const s=1.6+rnd()*1.8;
+      const c1=new THREE.Mesh(new THREE.SphereGeometry(s,10,8),tMats[i%2]);
+      c1.position.set(x,s*0.95,z);c1.scale.y=0.85;scene.add(c1);
+      if(rnd()>0.4){
+        const c2=new THREE.Mesh(new THREE.SphereGeometry(s*0.7,9,7),tMats[(i+1)%2]);
+        c2.position.set(x+s*0.8,s*0.7,z+s*0.4);c2.scale.y=0.8;scene.add(c2);
+      }
     }
   }
-  // flagstick + event flag
-  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,7,8),new THREE.MeshBasicMaterial({color:0xf2f5fa}));
-  pole.position.set(gpos.x,3.5,gpos.z);scene.add(pole);
+  /* tee pad, markers, ball */
+  const tpad=new THREE.Mesh(new THREE.BoxGeometry(6,0.3,3.6),M(L(LT.fair1)));
+  tpad.position.set(tee.x,0.15,tee.z);scene.add(tpad);
+  [-2,2].forEach(dx=>{
+    const mk=new THREE.Mesh(new THREE.SphereGeometry(0.28,8,8),M(0xf4f6fa));
+    mk.position.set(tee.x+dx,0.42,tee.z);scene.add(mk);
+  });
+  const ball=new THREE.Mesh(new THREE.SphereGeometry(0.22,8,8),M(0xffffff));
+  ball.position.set(tee.x,0.5,tee.z);scene.add(ball);
+  /* flagstick: white pole + waving numbered flag */
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,8,8),M(0xf4f6fa));
+  pole.position.set(gpos.x,4,gpos.z);scene.add(pole);
+  const flagGeo=new THREE.PlaneGeometry(3.4,2,10,1);
+  const flag=new THREE.Mesh(flagGeo,new THREE.MeshBasicMaterial({map:holeFlagTex(String(hole.n||"")),side:THREE.DoubleSide}));
+  flag.position.set(gpos.x+1.72,7,gpos.z);scene.add(flag);
+  const flagBase=flagGeo.attributes.position.array.slice();
+  /* event billboard: always faces camera */
   const evName=DATA.event?DATA.event.name:"DFSRADAR";
-  const flag=new THREE.Mesh(new THREE.PlaneGeometry(3.4,1.7),
-    new THREE.MeshBasicMaterial({map:flagTex(String(hole.n||"")),side:THREE.DoubleSide}));
-  flag.position.set(gpos.x+1.75,6,gpos.z);scene.add(flag);
-  // event banner board behind green
-  const board=new THREE.Mesh(new THREE.PlaneGeometry(20,5),
-    new THREE.MeshBasicMaterial({map:bannerTex(shortName(evName),"DFSRADAR · PGA",'#ff6b1a'),side:THREE.DoubleSide}));
-  board.position.set(gpos.x,2.6,gpos.z+14);board.rotation.y=Math.PI;scene.add(board);
-  const legs=new THREE.Mesh(new THREE.BoxGeometry(20,0.4,0.4),new THREE.MeshLambertMaterial({color:0x152451}));
-  legs.position.set(gpos.x,0.2,gpos.z+14);scene.add(legs);
-  // wind ribbons
-  const GREY=[0.659,0.698,0.757], RIB=42, TAIL=14;
+  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:evSpriteTex(evName.toUpperCase(),(DATA.event?DATA.event.course:"")+"  ·  DFSRADAR"),transparent:true}));
+  spr.scale.set(34,8,1);spr.position.set(gpos.x,10.5,gpos.z+16);scene.add(spr);
+  /* wind ribbons — same grey language as the MLB park */
+  const GREY=new THREE.Color(0xa8b2c1),RIB=46,TAIL=22;
   const rmat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,side:THREE.DoubleSide,depthWrite:false});
-  const dir=new THREE.Vector3(-0.82,0,-0.4).normalize();
-  const spd=0.05+windMph*0.016;
+  const wdir=new THREE.Vector3(-0.8,0,-0.45).normalize();
+  const spd=0.06+windMph*0.02;
   const ribs=[];
-  function spawn(){return new THREE.Vector3((Math.random()-0.3)*140+30,3+Math.random()*14,(Math.random()-0.3)*150+30);}
+  const spawn=()=>new THREE.Vector3((Math.random()*0.85-0.25)*len*2.2,3+Math.random()*17,(Math.random()*0.85-0.25)*len*2.3);
   for(let i=0;i<RIB;i++){
     const geo=new THREE.BufferGeometry();
-    const pos=new Float32Array(TAIL*2*3), col=new Float32Array(TAIL*2*4);
-    geo.setAttribute("position",new THREE.BufferAttribute(pos,3));
-    geo.setAttribute("color",new THREE.BufferAttribute(col,4));
-    const idx=[];for(let s=0;s<TAIL-1;s++){const a=s*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}
+    geo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(TAIL*2*3),3));
+    geo.setAttribute("color",new THREE.BufferAttribute(new Float32Array(TAIL*2*4),4));
+    const idx=[];for(let s2=0;s2<TAIL-1;s2++){const a=s2*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}
     geo.setIndex(idx);
     const mesh=new THREE.Mesh(geo,rmat);mesh.frustumCulled=false;scene.add(mesh);
-    const p=spawn(),pts=[];for(let s=0;s<TAIL;s++)pts.push(p.clone());
-    ribs.push({mesh,pts,life:Math.random()*160,w:0.42+Math.random()*0.5,ph:Math.random()*9});
+    const p=spawn(),pts=[];for(let s2=0;s2<TAIL;s2++)pts.push(p.clone());
+    ribs.push({mesh,pts,life:Math.random()*200,w:0.7+Math.random()*0.7,ph:Math.random()*9});
   }
-  // rain
   let rain=null;
   if(rainPct>=45){
-    const N=380,rp=new Float32Array(N*6);
-    for(let i=0;i<N;i++){const x=(Math.random()-0.5)*180,y=Math.random()*40,z=(Math.random()-0.5)*180;
-      rp.set([x,y,z,x+0.5,y-2.6,z],i*6);}
+    const N=360,rp=new Float32Array(N*6);
+    for(let i=0;i<N;i++){const x=(Math.random()-0.5)*len*3,y=Math.random()*44,z=(Math.random()-0.5)*len*3;
+      rp.set([x,y,z,x+0.4,y-3,z],i*6);}
     const rg=new THREE.BufferGeometry();rg.setAttribute("position",new THREE.BufferAttribute(rp,3));
-    rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0x9db4d4,transparent:true,opacity:0.5}));
+    rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0x9db4d4,transparent:true,opacity:0.45}));
     scene.add(rain);
   }
-  // HUD
   const hudT=document.getElementById("p3d-t"),hudW=document.getElementById("p3d-w"),chip=document.getElementById("p3d-chip");
   if(hudT)hudT.textContent=(DATA.event?DATA.event.course:"")+" · signature hole · stylized view";
   if(hudW)hudW.textContent="No. "+hole.n+" · Par "+hole.par+" · "+hole.yds+" yds";
   if(chip)chip.textContent=rd?("R1 wind "+windMph+" mph · rain "+rainPct+"%"):"forecast opens closer to Thursday";
-  let ang=0.6,t0=0;
+  let t0=0;
+  
   function tick(){
-    ang+=0.0009;
-    cam.position.set(Math.sin(ang)*84,36,Math.cos(ang)*84);
-    cam.lookAt(bend*0.4,0,6);
     t0+=1;
+    const sway=Math.sin(t0*0.0014)*len*0.16;
+    cam.position.set(tee.x+sway, len*0.42, tee.z-len*0.30);
+    cam.lookAt(gpos.x,0,gpos.z*0.9);
+    /* waving flag */
+    const fp=flagGeo.attributes.position.array;
+    for(let i=0;i<fp.length;i+=3){
+      const bx=flagBase[i];
+      fp[i+2]=Math.sin(bx*1.6+t0*0.09)*0.16*((bx+1.7)/3.4);
+    }
+    flagGeo.attributes.position.needsUpdate=true;
     ribs.forEach(r=>{
       r.life+=1;
       const head=r.pts[0].clone();
-      head.addScaledVector(dir,spd);
-      head.y+=Math.sin(t0*0.02+r.ph)*0.03;
-      head.x+=Math.sin(t0*0.013+r.ph*2)*0.05;
-      if(head.x<-95||head.z<-95){const p=spawn();for(let s=0;s<TAIL;s++)r.pts[s].copy(p);r.life=0;}
-      else{for(let s=TAIL-1;s>0;s--)r.pts[s].copy(r.pts[s-1]);r.pts[0].copy(head);}
-      const pos=r.mesh.geometry.attributes.position.array, col=r.mesh.geometry.attributes.color.array;
-      for(let s=0;s<TAIL;s++){
-        const u=s/(TAIL-1);
-        const a=r.pts[s], b=r.pts[Math.min(TAIL-1,s+1)];
-        let dx=b.x-a.x,dz=b.z-a.z;const l=Math.hypot(dx,dz)||1;dx/=l;dz/=l;
+      head.addScaledVector(wdir,spd);
+      head.y+=Math.sin(t0*0.02+r.ph)*0.04;
+      head.x+=Math.sin(t0*0.011+r.ph*2)*0.07;
+      const lim=len*1.4;
+      if(head.x<-lim||head.z<-lim){const p=spawn();for(let s2=0;s2<TAIL;s2++)r.pts[s2].copy(p);r.life=0;}
+      else{for(let s2=TAIL-1;s2>0;s2--)r.pts[s2].copy(r.pts[s2-1]);r.pts[0].copy(head);}
+      const pos=r.mesh.geometry.attributes.position.array,col=r.mesh.geometry.attributes.color.array;
+      for(let s2=0;s2<TAIL;s2++){
+        const u=s2/(TAIL-1),a=r.pts[s2],b=r.pts[Math.min(TAIL-1,s2+1)];
+        let dx=b.x-a.x,dz=b.z-a.z;const l2=Math.hypot(dx,dz)||1;dx/=l2;dz/=l2;
         const half=r.w*0.5*Math.pow(1-u,0.65);
         const px=-dz*half,pz=dx*half;
-        pos.set([a.x+px,a.y,a.z+pz,a.x-px,a.y,a.z-pz],s*6);
-        const alpha=Math.min(1,r.life/40)*(0.85-0.32*u);
-        const c4=s*8;
-        col[c4]=GREY[0];col[c4+1]=GREY[1];col[c4+2]=GREY[2];col[c4+3]=alpha;
-        col[c4+4]=GREY[0];col[c4+5]=GREY[1];col[c4+6]=GREY[2];col[c4+7]=alpha;
+        pos.set([a.x+px,a.y,a.z+pz,a.x-px,a.y,a.z-pz],s2*6);
+        const alpha=Math.min(1,r.life/45)*(0.95-0.38*u);
+        const c4=s2*8;
+        col[c4]=GREY.r;col[c4+1]=GREY.g;col[c4+2]=GREY.b;col[c4+3]=alpha;
+        col[c4+4]=GREY.r;col[c4+5]=GREY.g;col[c4+6]=GREY.b;col[c4+7]=alpha;
       }
       r.mesh.geometry.attributes.position.needsUpdate=true;
       r.mesh.geometry.attributes.color.needsUpdate=true;
@@ -439,8 +495,8 @@ function pgaScene(){
     if(rain){
       const rp=rain.geometry.attributes.position.array;
       for(let i=0;i<rp.length;i+=6){
-        rp[i+1]-=0.9;rp[i+4]-=0.9;
-        if(rp[i+1]<0){const y=38;rp[i+1]=y;rp[i+4]=y-2.6;}
+        rp[i+1]-=1.0;rp[i+4]-=1.0;
+        if(rp[i+1]<0){rp[i+1]=42;rp[i+4]=39;}
       }
       rain.geometry.attributes.position.needsUpdate=true;
     }
@@ -450,7 +506,6 @@ function pgaScene(){
   G3={renderer,raf:0};
   tick();
 }
-
 renderAll();
 loadLive();
 </script>
