@@ -1,0 +1,31 @@
+name: CFB weekly slate build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "45 9 * * *"    # daily ~5:45 AM ET — forecasts sharpen as kickoff nears
+    - cron: "30 14 * * 6"   # Saturdays ~10:30 AM ET — final pre-kick refresh
+
+permissions:
+  contents: write
+
+jobs:
+  cfb-slate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build site/cfb/data.json
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python scripts/cfb/weekly_build.py
+      - name: Commit slate data
+        run: |
+          git config user.name "weatheredge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add site/cfb/data.json
+          git commit -m "CFB slate refresh" || echo "no changes"
+          git pull --rebase origin main
+          git push
