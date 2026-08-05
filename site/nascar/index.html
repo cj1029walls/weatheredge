@@ -72,6 +72,12 @@
   .event-hero .when{text-align:right}
   .event-hero .when b{font-size:16px}
   .event-hero .when span{display:block;font-size:11.5px;color:var(--muted)}
+  .scene-card{position:relative;height:340px;background:#0d1830;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
+  .scene-card canvas{width:100%;height:100%;display:block}
+  .p3d-hud{position:absolute;left:16px;top:14px;color:#eaf1fb;text-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none}
+  .p3d-hud .t{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;opacity:.85}
+  .p3d-hud .w{font-size:14px;font-weight:700;margin-top:3px}
+  .p3d-chip{position:absolute;right:14px;top:12px;background:rgba(10,18,38,.55);border:1px solid rgba(255,255,255,.18);color:#eaf1fb;font-size:11px;font-weight:700;border-radius:16px;padding:5px 12px;pointer-events:none}
   .po-pill{display:inline-block;margin-left:10px;font-size:10px;font-weight:800;letter-spacing:.8px;background:var(--gold-bg);color:var(--gold-deep);border-radius:14px;padding:3px 10px;text-transform:uppercase;vertical-align:3px}
   .sec-h{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px}
   .wx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
@@ -162,10 +168,11 @@
 
 <footer>DFSRADAR · NASCAR weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const SAMPLE = {generated:"preview",
  brief:"Iowa Corn 350 at Iowa Speedway: 88° and sunny at the green flag, wind 9 mph (gusts 16). No rain threat — this one runs on time. Track cools 13° through the window — grip picks up late, watch for handling swings.",
- race:{name:"Iowa Corn 350", track:"Iowa Speedway", city:"Newton, IA", playoff:false,
+ race:{shape:{kind:"oval",mi:0.875,bank:14}, name:"Iowa Corn 350", track:"Iowa Speedway", city:"Newton, IA", playoff:false,
   day:"Sunday, August 9", time:"3:30 PM ET", inWindow:true,
   temp:88, wind:9, gust:16, rain:10, rh:48, sky:"Sunny", tempSwing:13,
   delay:{level:"clear", pct:10},
@@ -189,6 +196,7 @@ function renderAll(){
       <div class="sub">${g.track} · ${g.city}</div></div>
       <div class="when"><b>${g.day}</b><span>Green flag ${g.time}</span></div>
     </div>`;
+    html+=`<div class="scene-card" id="n3d-wrap"><canvas id="n3d-canvas"></canvas><div class="p3d-hud"><div class="t" id="n3d-t"></div><div class="w" id="n3d-w"></div></div><div class="p3d-chip" id="n3d-chip"></div></div>`;
     if(g.inWindow){
       const [dt,ds,dc]=DL[g.delay.level]||DL.clear;
       html+=`<div class="delay-hero ${dc}"><b>DELAY OUTLOOK: ${dt}</b> — peak ${g.delay.pct}% rain in the race window. ${ds}</div>`;
@@ -220,6 +228,7 @@ function renderAll(){
       <div class="od-card"><div class="k">${o.date}${o.playoff?" · Playoffs":""}</div><div class="v">${o.name}</div><div class="s">${o.track} · ${o.city}</div></div>`).join("")}</div>`;
   }
   c.innerHTML=html;
+  setTimeout(function(){try{nascarScene()}catch(e){}},0);
   if(DATA.brief){
     const safe=DATA.brief.replace(/[<>&]/g,ch=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[ch]));
     document.getElementById("brief-body").innerHTML=safe.replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
@@ -238,6 +247,215 @@ async function loadLive(){
     renderAll();
   }catch(e){}
 }
+/* ---- 3D track ---- */
+let T3=null;
+function trkBannerTex(big,small){
+  const c=document.createElement("canvas");c.width=1024;c.height=256;
+  const x=c.getContext("2d");
+  x.fillStyle="rgba(21,36,81,0)";x.fillRect(0,0,1024,256);
+  x.fillStyle="#152451";x.font="800 96px -apple-system,Segoe UI,Arial";x.textAlign="center";x.textBaseline="middle";
+  x.fillText(big.slice(0,22).toUpperCase(),512,96);
+  x.fillStyle="#ff6b1a";x.font="800 52px -apple-system,Segoe UI,Arial";
+  x.fillText(small,512,196);
+  const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;
+}
+function checkerTex(){
+  const c=document.createElement("canvas");c.width=64;c.height=16;
+  const x=c.getContext("2d");
+  for(let i=0;i<8;i++)for(let j=0;j<2;j++){x.fillStyle=(i+j)%2?"#111":"#fff";x.fillRect(i*8,j*8,8,8);}
+  const t=new THREE.CanvasTexture(c);return t;
+}
+function trackCenter(kind){
+  const N=280,pts=[];
+  let L=1.0,R=0.55,bumpF=0,bumpB=0,egg=1;
+  if(kind==="paperclip"){L=1.35;R=0.3;}
+  else if(kind==="bullring"){L=0.62;R=0.5;}
+  else if(kind==="egg"){L=0.95;R=0.56;egg=0.72;}
+  else if(kind==="trioval"){L=1.05;R=0.52;bumpF=0.42;}
+  else if(kind==="quadoval"){L=1.05;R=0.52;bumpF=0.26;}
+  else if(kind==="dshape"){L=0.9;R=0.52;bumpF=0.3;}
+  else if(kind==="dogleg"){L=0.95;R=0.5;bumpB=0.38;}
+  else if(kind==="flat"){L=1.15;R=0.46;}
+  const straight=2*L, arc=Math.PI*R, total=2*straight+2*arc;
+  for(let i=0;i<N;i++){
+    const s=(i/N)*total;let x,y;
+    if(s<straight){x=L-s;y=-R;}
+    else if(s<straight+arc){const a=-Math.PI/2-(s-straight)/R;x=-L+Math.cos(a)*R;y=Math.sin(a)*R;}
+    else if(s<2*straight+arc){x=-L+(s-straight-arc);y=R;}
+    else{const a=Math.PI/2-(s-2*straight-arc)/R;x=L+Math.cos(a)*R;y=Math.sin(a)*R;}
+    // egg: squeeze one end
+    if(egg<1&&x>0){const f=1-(1-egg)*Math.min(1,x/(L+R));y*=f;}
+    // front-stretch bump(s)
+    if(bumpF&&y<-R*0.6&&Math.abs(x)<L){
+      if(kind==="quadoval"){
+        const g=Math.exp(-Math.pow((Math.abs(x)-L*0.45)/(L*0.28),2));
+        y-=bumpF*R*g;
+      } else {
+        y-=bumpF*R*Math.pow(Math.cos(Math.min(1,Math.abs(x)/L)*Math.PI/2),1.4);
+      }
+    }
+    if(bumpB&&y>R*0.6&&Math.abs(x)<L){
+      const g=Math.exp(-Math.pow((x+L*0.25)/(L*0.4),2));
+      y+=bumpB*R*g;
+    }
+    pts.push(new THREE.Vector2(x,y));
+  }
+  return pts;
+}
+function nascarScene(){
+  const wrap=document.getElementById("n3d-wrap");
+  if(!wrap||typeof THREE==="undefined")return;
+  if(T3){cancelAnimationFrame(T3.raf);T3.renderer.dispose();T3=null;}
+  const canvas=document.getElementById("n3d-canvas");
+  const W=wrap.clientWidth||1000,H=wrap.clientHeight||340;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setSize(W,H,false);renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  const scene=new THREE.Scene();
+  const g=DATA.race||{};
+  const shape=g.shape||{kind:"oval",mi:1.0,bank:15};
+  const rainPct=g.delay?g.delay.pct:(g.rain||0);
+  const night=/([89]|1[01]):\d+ PM/.test(g.time||"")||/7:[3-5]\d PM/.test(g.time||"");
+  const wet=rainPct>=45, watch=rainPct>=20&&rainPct<45;
+  const sky=night?0x0e1526:wet?0x707c8e:watch?0x9db0c4:0xbcd6ee;
+  scene.background=new THREE.Color(sky);
+  scene.fog=new THREE.Fog(sky,140,340);
+  const cam=new THREE.PerspectiveCamera(35,W/H,0.1,700);
+  scene.add(new THREE.HemisphereLight(night?0x37477a:0xdfeaff,0x3a4a35,night?0.55:wet?0.7:0.95));
+  const sun=new THREE.DirectionalLight(night?0xbcd0ff:0xfff2d8,night?0.5:wet?0.45:0.85);
+  sun.position.set(-50,70,-30);scene.add(sun);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(460,460),
+    new THREE.MeshLambertMaterial({color:night?0x1d3320:0x2f5a29}));
+  ground.rotation.x=-Math.PI/2;ground.position.y=-0.08;scene.add(ground);
+  // track ribbon
+  const SC=46*Math.pow(Math.max(0.5,Math.min(2.7,shape.mi)),0.45);
+  const c2=trackCenter(shape.kind).map(p=>new THREE.Vector2(p.x*SC,p.y*SC));
+  const N=c2.length, TW=8;
+  const bankMax=Math.tan(Math.min(33,shape.bank)*Math.PI/180)*TW*0.9;
+  // curvature -> banking weight
+  const kw=[];let kmax=0.0001;
+  for(let i=0;i<N;i++){
+    const a=c2[(i-1+N)%N],b=c2[i],c=c2[(i+1)%N];
+    const v1=new THREE.Vector2().subVectors(b,a).normalize(),v2=new THREE.Vector2().subVectors(c,b).normalize();
+    const k=Math.abs(v1.x*v2.y-v1.y*v2.x);kw.push(k);if(k>kmax)kmax=k;
+  }
+  const smooth=kw.map((_,i)=>{let s=0;for(let o=-7;o<=7;o++)s+=kw[(i+o+N)%N];return s/15;});
+  const smax=Math.max(...smooth);
+  const tpos=new Float32Array(N*2*3),tidx=[];
+  const inner=[],outer=[],bankH=[];
+  for(let i=0;i<N;i++){
+    const p=c2[i],q=c2[(i+1)%N];
+    let dx=q.x-p.x,dy=q.y-p.y;const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
+    const nx=-dy,ny=dx; // outward for CW? ensure outward: center is origin, pick normal pointing away
+    const outSign=(p.x*nx+p.y*ny)>0?1:-1;
+    const ox=nx*outSign,oy=ny*outSign;
+    const bh=bankMax*Math.min(1,smooth[i]/smax*1.4);
+    bankH.push(bh);
+    const ip=[p.x-ox*TW/2,0.02,p.y-oy*TW/2], op=[p.x+ox*TW/2,0.02+bh,p.y+oy*TW/2];
+    inner.push(ip);outer.push(op);
+    tpos.set([ip[0],ip[1],ip[2],op[0],op[1],op[2]],i*6);
+    const k=i*2,k2=((i+1)%N)*2;
+    tidx.push(k,k+1,k2,k+1,k2+1,k2);
+  }
+  const tgeo=new THREE.BufferGeometry();
+  tgeo.setAttribute("position",new THREE.BufferAttribute(tpos,3));
+  tgeo.setIndex(tidx);tgeo.computeVertexNormals();
+  const tmat=wet?new THREE.MeshPhongMaterial({color:0x2e3238,specular:0x9fb4cc,shininess:70})
+               :new THREE.MeshLambertMaterial({color:night?0x3a3f47:0x4a4f57});
+  scene.add(new THREE.Mesh(tgeo,tmat));
+  // white edge lines
+  [inner,outer].forEach(edge=>{
+    const lp=new Float32Array(edge.length*3);
+    edge.forEach((e,i)=>lp.set([e[0],e[1]+0.03,e[2]],i*3));
+    const lg=new THREE.BufferGeometry();lg.setAttribute("position",new THREE.BufferAttribute(lp,3));
+    const line=new THREE.LineLoop(lg,new THREE.LineBasicMaterial({color:0xe8edf5}));
+    scene.add(line);
+  });
+  // apron (inner grey strip)
+  const apos=new Float32Array(N*2*3),aidx=[];
+  for(let i=0;i<N;i++){
+    const ip=inner[i];
+    const p=c2[i];const cx=p.x*0.92,cy=p.y*0.92;
+    apos.set([cx,0.012,cy,ip[0],0.015,ip[2]],i*6);
+    const k=i*2,k2=((i+1)%N)*2;aidx.push(k,k+1,k2,k+1,k2+1,k2);
+  }
+  const ageo=new THREE.BufferGeometry();ageo.setAttribute("position",new THREE.BufferAttribute(apos,3));
+  ageo.setIndex(aidx);ageo.computeVertexNormals();
+  scene.add(new THREE.Mesh(ageo,new THREE.MeshLambertMaterial({color:night?0x555b64:0x6d737c})));
+  // start/finish checker across front stretch (i=0 is x=L,y=-R heading -x)
+  const sfI=Math.floor(N*0.12);
+  const sp=c2[sfI],sq=c2[(sfI+1)%N];
+  let sdx=sq.x-sp.x,sdy=sq.y-sp.y;const sl=Math.hypot(sdx,sdy)||1;sdx/=sl;sdy/=sl;
+  const sf=new THREE.Mesh(new THREE.PlaneGeometry(TW,1.4),
+    new THREE.MeshBasicMaterial({map:checkerTex()}));
+  sf.rotation.x=-Math.PI/2;
+  sf.rotation.z=Math.atan2(sdy,sdx);
+  sf.position.set(sp.x,0.06,sp.y);scene.add(sf);
+  // infield event banner painted on grass
+  const ev=g.name||"DFSRADAR";
+  const ban=new THREE.Mesh(new THREE.PlaneGeometry(SC*1.15,SC*0.29),
+    new THREE.MeshBasicMaterial({map:trkBannerTex(ev,(g.track||"DFSRADAR")+" · DFSRADAR"),transparent:true}));
+  ban.rotation.x=-Math.PI/2;ban.position.set(0,0.04,0);scene.add(ban);
+  // cars
+  const carCols=[0xff6b1a,0x2f62e8,0x6ee7a0];
+  const cars=carCols.map((cc,ci)=>{
+    const body=new THREE.Mesh(new THREE.BoxGeometry(2.1,0.5,1),new THREE.MeshLambertMaterial({color:cc}));
+    const top=new THREE.Mesh(new THREE.BoxGeometry(1,0.4,0.8),new THREE.MeshLambertMaterial({color:0x20242c}));
+    top.position.set(-0.1,0.42,0);
+    const grp=new THREE.Group();grp.add(body);grp.add(top);scene.add(grp);
+    return {grp,t:ci*0.31,lane:0.28+ci*0.24,sp:(0.0016-ci*0.00022)*(1.15-Math.min(1,shape.mi/2.7)*0.3)};
+  });
+  function trackPoint(t,lane){
+    const f=((t%1)+1)%1,i=Math.floor(f*N),fr=f*N-i;
+    const ip=inner[i],op=outer[i],ip2=inner[(i+1)%N],op2=outer[(i+1)%N];
+    const ax=ip[0]+(op[0]-ip[0])*lane, ay=ip[1]+(op[1]-ip[1])*lane, az=ip[2]+(op[2]-ip[2])*lane;
+    const bx=ip2[0]+(op2[0]-ip2[0])*lane, by=ip2[1]+(op2[1]-ip2[1])*lane, bz=ip2[2]+(op2[2]-ip2[2])*lane;
+    return [ax+(bx-ax)*fr,ay+(by-ay)*fr,az+(bz-az)*fr];
+  }
+  // rain
+  let rain=null;
+  if(wet||watch){
+    const RN=watch?160:420,rp=new Float32Array(RN*6);
+    for(let i=0;i<RN;i++){const x=(Math.random()-0.5)*220,y=Math.random()*45,z=(Math.random()-0.5)*220;
+      rp.set([x,y,z,x+0.5,y-2.8,z],i*6);}
+    const rg=new THREE.BufferGeometry();rg.setAttribute("position",new THREE.BufferAttribute(rp,3));
+    rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0x9db4d4,transparent:true,opacity:wet?0.55:0.3}));
+    scene.add(rain);
+  }
+  // HUD
+  const hudT=document.getElementById("n3d-t"),hudW=document.getElementById("n3d-w"),chip=document.getElementById("n3d-chip");
+  if(hudT)hudT.textContent=(g.track||"")+" · stylized live view";
+  if(hudW)hudW.textContent=shape.mi+" mi · "+shape.bank+"° banking"+(g.inWindow?(" · "+(g.temp!=null?g.temp+"°":"")+" · wind "+(g.wind!=null?g.wind+" mph":"")):"");
+  if(chip){
+    const M={clear:"RUNS ON TIME",watch:"RAIN NEARBY",likely:"DELAY LIKELY",severe:"PPD RISK"};
+    chip.textContent=g.inWindow&&g.delay?("RAIN "+rainPct+"% · "+(M[g.delay.level]||"")):"forecast opens near race day";
+  }
+  let ang=0.5;
+  function tick(){
+    ang+=0.0008;
+    const rad=SC*2.05;
+    cam.position.set(Math.sin(ang)*rad,SC*1.05,Math.cos(ang)*rad);
+    cam.lookAt(0,0,0);
+    cars.forEach(c=>{
+      c.t+=c.sp;
+      const p=trackPoint(c.t,c.lane),p2=trackPoint(c.t+0.004,c.lane);
+      c.grp.position.set(p[0],p[1]+0.3,p[2]);
+      c.grp.lookAt(p2[0],p2[1]+0.3,p2[2]);
+    });
+    if(rain){
+      const rp=rain.geometry.attributes.position.array;
+      for(let i=0;i<rp.length;i+=6){
+        rp[i+1]-=1.0;rp[i+4]-=1.0;
+        if(rp[i+1]<0){rp[i+1]=42;rp[i+4]=39.2;}
+      }
+      rain.geometry.attributes.position.needsUpdate=true;
+    }
+    renderer.render(scene,cam);
+    T3.raf=requestAnimationFrame(tick);
+  }
+  T3={renderer,raf:0};
+  tick();
+}
+
 renderAll();
 loadLive();
 </script>
