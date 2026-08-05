@@ -332,7 +332,7 @@ function nascarScene(){
   const M=c=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide});
   scene.background=L(LT.bg);
   scene.fog=new THREE.Fog(L(LT.bg),wet?220:420,wet?560:950);
-  const cam=new THREE.PerspectiveCamera(34,W/H,0.1,900);
+  const cam=new THREE.PerspectiveCamera(34,W/H,2,700);
   const SC=48*Math.pow(Math.max(0.5,Math.min(2.7,shape.mi)),0.42);
   const ground=new THREE.Mesh(new THREE.CircleGeometry(SC*3.4,56),M(L(LT.field)));
   ground.rotation.x=-Math.PI/2;ground.position.y=-0.2;scene.add(ground);
@@ -354,10 +354,10 @@ function nascarScene(){
     let nx=-dy,ny=dx;
     if(p.x*nx+p.y*ny<0){nx=-nx;ny=-ny;}
     const bh=bankMax*Math.min(1,smooth[i]/smax*1.5);
-    inner.push([p.x-nx*TW/2,0.02,p.y-ny*TW/2]);
-    outer.push([p.x+nx*TW/2,0.02+bh,p.y+ny*TW/2]);
-    mid1.push([p.x-nx*TW*0.1,0.03+bh*0.4,p.y-ny*TW*0.1]);
-    mid2.push([p.x+nx*TW*0.28,0.03+bh*0.78,p.y+ny*TW*0.28]);
+    inner.push([p.x-nx*TW/2,0.12,p.y-ny*TW/2]);
+    outer.push([p.x+nx*TW/2,0.12+bh,p.y+ny*TW/2]);
+    mid1.push([p.x-nx*TW*0.1,0.32+bh*0.4,p.y-ny*TW*0.1]);
+    mid2.push([p.x+nx*TW*0.28,0.32+bh*0.78,p.y+ny*TW*0.28]);
   }
   function ribbon(edgeA,edgeB,mat,lift){
     const pos=[],idx=[];
@@ -378,7 +378,7 @@ function nascarScene(){
   const infMesh=new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(inf)),new THREE.MeshBasicMaterial({color:L(LT.infield),side:THREE.DoubleSide}));
   infMesh.rotation.x=-Math.PI/2;infMesh.scale.z=-1;infMesh.position.y=0.005;scene.add(infMesh);
   /* apron between infield and track */
-  const ap=[];c2.forEach((p,i)=>ap.push([p.x*0.9,0.008,p.y*0.9]));
+  const ap=[];c2.forEach((p,i)=>ap.push([p.x*0.9,0.06,p.y*0.9]));
   ribbon(ap,inner,new THREE.MeshBasicMaterial({color:L(LT.apron),side:THREE.DoubleSide}));
   /* white outer wall — the radar signature */
   const wallT=[],wallB=[];
@@ -388,7 +388,7 @@ function nascarScene(){
   }
   ribbon(wallB,wallT,new THREE.MeshBasicMaterial({color:0xe9edf4,side:THREE.DoubleSide}));
   /* white line at inner edge */
-  const ilp=[];inner.forEach(e=>ilp.push(e[0],e[1]+0.05,e[2]));
+  const ilp=[];inner.forEach(e=>ilp.push(e[0],e[1]+0.22,e[2]));
   const ilg=new THREE.BufferGeometry();ilg.setAttribute("position",new THREE.Float32BufferAttribute(ilp,3));
   scene.add(new THREE.LineLoop(ilg,new THREE.LineBasicMaterial({color:0xf4f6fa,transparent:true,opacity:0.85})));
   /* start/finish: checkered band conformed to the banked surface */
@@ -398,7 +398,7 @@ function nascarScene(){
   const cpos=[],cidx=[],cuv=[];
   for(let k=0;k<=4;k++){
     const i=(sfBest+k)%N;
-    cpos.push(inner[i][0],inner[i][1]+0.09,inner[i][2],outer[i][0],outer[i][1]+0.09,outer[i][2]);
+    cpos.push(inner[i][0],inner[i][1]+0.30,inner[i][2],outer[i][0],outer[i][1]+0.30,outer[i][2]);
     cuv.push(0,k/4,1,k/4);
     if(k<4){const a=k*2;cidx.push(a,a+1,a+2,a+1,a+3,a+2);}
   }
@@ -416,7 +416,7 @@ function nascarScene(){
   fbox.position.set(fpx,SC*0.105,fpz);scene.add(fbox);
   /* pit road: light strip inside front stretch */
   const pit=new THREE.Mesh(new THREE.PlaneGeometry(SC*1.3,SC*0.06),M(L(LT.apron)));
-  pit.rotation.x=-Math.PI/2;pit.position.set(0,0.012,-SC*0.36);scene.add(pit);
+  pit.rotation.x=-Math.PI/2;pit.position.set(0,0.14,-SC*0.36);scene.add(pit);
   /* night: light poles */
   if(night){
     for(let i=0;i<6;i++){
@@ -462,18 +462,20 @@ function nascarScene(){
           bz=inner[i2][2]+(outer[i2][2]-inner[i2][2])*lane;
     return {p:new THREE.Vector3(ax+(bx-ax)*fr,ay+(by-ay)*fr,az+(bz-az)*fr),i};
   }
-  const mUp=new THREE.Vector3(),mLat=new THREE.Vector3(),mFwd=new THREE.Vector3(),rot=new THREE.Matrix4();
+  const mUp=new THREE.Vector3(),mLat=new THREE.Vector3(),mFwd=new THREE.Vector3(),rot=new THREE.Matrix4(),qT=new THREE.Quaternion();
   function orient(car,t,lane){
-    const a=lanePt(t,lane),b=lanePt(t+0.006,lane);
-    mFwd.subVectors(b.p,a.p).normalize();
+    const a=lanePt(t,lane),b=lanePt(t+0.014,lane),c0=lanePt(t-0.014,lane);
+    mFwd.subVectors(b.p,c0.p).normalize();
     const i=a.i;
     mLat.set(outer[i][0]-inner[i][0],outer[i][1]-inner[i][1],outer[i][2]-inner[i][2]).normalize();
     mUp.crossVectors(mLat,mFwd).normalize();
     if(mUp.y<0)mUp.negate();
     mLat.crossVectors(mFwd,mUp).normalize();
     rot.makeBasis(mLat,mUp,mFwd);
-    car.grp.quaternion.setFromRotationMatrix(rot);
-    car.grp.position.copy(a.p);
+    qT.setFromRotationMatrix(rot);
+    if(car.init)car.grp.quaternion.slerp(qT,0.14);
+    else{car.grp.quaternion.copy(qT);car.init=true;}
+    car.grp.position.lerp(a.p,car.posInit?0.6:1);car.posInit=true;
   }
   /* rain */
   let rain=null;
