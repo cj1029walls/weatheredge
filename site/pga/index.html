@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFSRADAR — PGA Weather Edges for DFS</title>
+<meta name="description" content="DFSRADAR PGA: tournament weather for golf DFS — round-by-round wind and rain at this week's course, with AM vs PM tee-time wave splits that decide who plays the easier golf course.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
+<style>
+  :root{
+    --navy:#152451; --navy2:#24409c; --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
+    --green:#178a3f; --green-deep:#10682e; --green-bg:#e6f5eb;
+    --red:#d33131; --red-deep:#a92525; --red-bg:#fdecec;
+    --blue:#5b6b83; --blue-deep:#47566d; --blue-bg:#edf0f5;
+    --gold:#2f62e8; --gold-deep:#2450b8; --gold-bg:#e8eefc;
+    --amber-bg:#fdf5e3;
+    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#fff; --line:#e4e8ef;
+    --line-strong:#c3cde0; --body2:#3e4a5e;
+    --note-bg:#fdf5e3; --note-border:#f0dfb2; --note-text:#8a6207;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
+    --shadow-hover:0 2px 4px rgba(21,36,81,.08),0 10px 28px rgba(21,36,81,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
+  .announce{background:linear-gradient(90deg,#0e1a3d,#2450b8 55%,#0e1a3d);color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;padding:8px 14px}
+  .announce b{color:#fff}
+  .announce .soon{display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ffd94a}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 22px}
+  .header-inner{max-width:1100px;margin:0 auto}
+  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
+  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
+  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
+  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
+  .brand .tagline b{color:#e8c877;font-weight:600}
+  .sport-tabs{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+  .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
+  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+  .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  main{max-width:1100px;margin:0 auto;padding:22px 24px 70px}
+  .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
+  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
+  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
+  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;animation:bpulse 2.2s ease-in-out infinite}
+  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
+  .brief-body b{color:#fff}
+  .tip{position:relative;cursor:help}
+  .info-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray-bg);color:var(--muted);font-size:10px;font-weight:800;vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong)}
+  .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;font-size:11.5px;font-weight:500;line-height:1.55;text-transform:none;letter-spacing:.1px;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;transition:opacity .15s;z-index:90;text-align:left;white-space:normal}
+  .tip::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90}
+  .tip:hover::after,.tip:hover::before{opacity:1}
+  .event-hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .event-hero .name{font-size:22px;font-weight:800}
+  .event-hero .sub{font-size:13px;color:var(--muted);margin-top:3px}
+  .event-hero .when{text-align:right}
+  .event-hero .when b{font-size:16px}
+  .event-hero .when span{display:block;font-size:11.5px;color:var(--muted)}
+  .team-pill{display:inline-block;margin-left:10px;font-size:10px;font-weight:800;letter-spacing:.8px;background:var(--gold-bg);color:var(--gold-deep);border-radius:14px;padding:3px 10px;text-transform:uppercase;vertical-align:3px}
+  .sec-h{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px}
+  .rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .r-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 14px}
+  .r-card .r-name{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+  .r-card .r-date{font-size:15px;font-weight:800;margin-top:2px}
+  .r-main{display:flex;gap:16px;margin-top:10px;align-items:baseline}
+  .r-main .t{font-size:26px;font-weight:800}
+  .r-main .w{font-size:13px;color:var(--body2)}
+  .r-main .w b{font-size:15px}
+  .r-sky{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .waves{margin-top:11px;border-top:1px dashed var(--line-strong);padding-top:10px}
+  .wave-row{display:flex;justify-content:space-between;font-size:12px;color:var(--body2);padding:2.5px 0}
+  .wave-row .wl{font-weight:800;letter-spacing:.6px;font-size:10.5px;color:var(--muted);text-transform:uppercase;width:34px}
+  .wave-edge{margin-top:9px;font-size:11.5px;font-weight:700;background:var(--gold-bg);color:var(--gold-deep);border-radius:9px;padding:7px 10px;line-height:1.5}
+  .r-out{margin-top:9px;font-size:11px;font-weight:700;letter-spacing:.4px;border-radius:8px;padding:5px 9px;display:inline-block}
+  .dl-clear{background:var(--green-bg);color:var(--green-deep)}
+  .dl-watch{background:var(--amber-bg);color:#8a6207}
+  .dl-likely{background:#fdeee0;color:#b45309}
+  .dl-severe{background:var(--red-bg);color:var(--red-deep)}
+  .out-window{color:var(--muted);font-size:12.5px;margin-top:12px}
+  .ondeck{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .od-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+  .od-card .k{font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .od-card .v{font-size:15px;font-weight:800;margin-top:3px}
+  .od-card .s{font-size:12px;color:var(--muted);margin-top:2px}
+  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-top:20px}
+  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
+  .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
+  .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
+  footer{max-width:1100px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--faint);text-align:center}
+</style>
+</head>
+<body>
+<div class="announce">📡 DFSRADAR covers <b>MLB · NFL · CFB · PGA · NASCAR</b> — more outdoor sports <span class="soon">coming soon</span></div>
+<header>
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
+          <defs><linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
+            <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/><stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
+          </linearGradient></defs>
+          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
+          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
+          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
+          <g><path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
+          <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
+          <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
+          <circle cx="29.5" cy="13.5" r="2.3" fill="#ffd94a"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
+          <circle cx="13" cy="28.5" r="1.9" fill="#6ee7a0"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
+        </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">PGA</span></h1>
+        <div class="tagline">Golf weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
+        <div class="sport-tabs">
+          <a href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a class="on" href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — the live tournament loads automatically when the daily build has run.</span></div>
+
+  <div class="brief-card" id="brief-card" style="display:none">
+    <div class="brief-head"><span class="pulse"></span>This week's read — live from the radar<span class="tip" data-tip="Auto-generated on every build from the tournament forecast — wind days, wave edges, and rain risk straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
+    <div class="brief-body" id="brief-body"></div>
+  </div>
+
+  <div id="content"></div>
+
+  <div class="m-sec" style="margin-top:26px">
+    <h5>How it works</h5>
+    <p style="font-size:14px;line-height:1.7;color:var(--body2)">Every week, half the field tees off in the morning and half in the afternoon (Thursday waves flip on Friday). When wind or rain is lopsided between waves, the two halves of the field are playing <b>different golf courses</b> — and that's the sharpest weather edge in golf DFS. We pull the hourly forecast at this week's course and split every round into its AM and PM windows: average wind, peak gusts, and rain risk for each wave, flagged whenever the gap is big enough to matter. Rebuilt every morning as the forecast sharpens.</p>
+  </div>
+</main>
+
+<footer>DFSRADAR · PGA weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
+
+<script>
+const SAMPLE = {generated:"preview",
+ brief:"Thursday is the wind day — 18 mph average, gusts to 29. Thursday: PM wave faces 7 mph more wind — edge to the morning wave. No serious rain threats this week.",
+ event:{name:"FedEx St. Jude Championship", course:"TPC Southwind", city:"Memphis, TN", team:false, dates:"Aug 13–16", r1:"2026-08-13", end:"2026-08-16"},
+ rounds:[
+  {name:"Round 1 · Thu", date:"Thu Aug 13", inWindow:true, temp:91, wind:18, gust:29, rain:15, sky:"Sunny", delay:"clear",
+   am:{wind:11, gust:18, temp:86, rain:5}, pm:{wind:18, gust:29, temp:94, rain:15},
+   waveEdge:{calmer:"AM", diff:7, txt:"PM wave faces 7 mph more wind — edge to the morning wave"}},
+  {name:"Round 2 · Fri", date:"Fri Aug 14", inWindow:true, temp:92, wind:12, gust:20, rain:20, sky:"Partly cloudy", delay:"watch",
+   am:{wind:10, gust:16, temp:87, rain:8}, pm:{wind:13, gust:20, temp:95, rain:20}},
+  {name:"Round 3 · Sat", date:"Sat Aug 15", inWindow:true, temp:89, wind:9, gust:15, rain:35, sky:"Partly cloudy", delay:"watch",
+   am:{wind:8, gust:13, temp:85, rain:20}, pm:{wind:10, gust:15, temp:92, rain:35}},
+  {name:"Round 4 · Sun", date:"Sun Aug 16", inWindow:true, temp:87, wind:7, gust:12, rain:55, sky:"Rain risk", delay:"likely",
+   am:{wind:6, gust:10, temp:83, rain:30}, pm:{wind:8, gust:12, temp:89, rain:55}}
+ ],
+ onDeck:[{name:"BMW Championship", course:"Bellerive Country Club", city:"Town and Country, MO", dates:"Aug 20–23"},
+         {name:"TOUR Championship", course:"East Lake Golf Club", city:"Atlanta, GA", dates:"Aug 27–30"},
+         {name:"Biltmore Championship", course:"The Cliffs at Walnut Cove", city:"Asheville, NC", dates:"Sep 17–20"}]};
+
+let DATA = SAMPLE;
+const DL={clear:["No delay concern","dl-clear"],watch:["Worth monitoring","dl-watch"],likely:["Delays likely","dl-likely"],severe:["Washout risk","dl-severe"]};
+function roundCard(r){
+  if(!r.inWindow) return `<div class="r-card"><div class="r-name">${r.name}</div><div class="r-date">${r.date}</div><div class="out-window">Forecast opens closer to the round.</div></div>`;
+  const waves = (r.am&&r.pm)?`<div class="waves">
+      <div class="wave-row"><span class="wl">AM</span><span>Wind <b>${r.am.wind}</b> mph · gusts ${r.am.gust}</span><span>Rain ${r.am.rain}%</span></div>
+      <div class="wave-row"><span class="wl">PM</span><span>Wind <b>${r.pm.wind}</b> mph · gusts ${r.pm.gust}</span><span>Rain ${r.pm.rain}%</span></div>
+      ${r.waveEdge?`<div class="wave-edge">⚑ ${r.waveEdge.txt}</div>`:""}
+    </div>`:"";
+  const [dtxt,dcls]=DL[r.delay]||DL.clear;
+  return `<div class="r-card">
+    <div class="r-name">${r.name}</div><div class="r-date">${r.date}</div>
+    <div class="r-main"><div class="t">${r.temp}°</div><div class="w">Wind <b>${r.wind}</b> mph<br>gusts to ${r.gust}</div></div>
+    <div class="r-sky">${r.sky} · Rain ${r.rain}%</div>
+    ${waves}
+    <div class="r-out ${dcls}">${dtxt}</div>
+  </div>`;
+}
+function renderAll(){
+  const c=document.getElementById("content");
+  let html="";
+  if(DATA.event){
+    const e=DATA.event;
+    html+=`<div class="event-hero">
+      <div><div class="name">${e.name}${e.team?'<span class="team-pill">Team event</span>':""}</div>
+      <div class="sub">${e.course} · ${e.city}</div></div>
+      <div class="when"><b>${e.dates}</b><span>Rounds Thu–Sun</span></div>
+    </div>`;
+    const inw=DATA.rounds.filter(r=>r.inWindow);
+    if(DATA.rounds.length){
+      html+=`<div class="sec-h">Round-by-round · wave splits<span class="tip" data-tip="AM ≈ 7 AM–noon local, PM ≈ noon–6 PM — the two tee-time waves. The flag marks rounds where the gap between waves is big enough to change how you build lineups."><span class="info-i">i</span></span></div>`;
+      html+=`<div class="rounds">${DATA.rounds.map(roundCard).join("")}</div>`;
+      if(!inw.length) html+=`<div class="empty-season" style="margin-top:14px"><b>Forecast window opens soon</b>Round forecasts appear once tournament days are inside the 16-day horizon — then sharpen daily.</div>`;
+    }
+  } else {
+    html+=`<div class="empty-season"><b>Between events</b>The next tournament loads here automatically.</div>`;
+  }
+  if(DATA.onDeck && DATA.onDeck.length){
+    html+=`<div class="sec-h">On deck</div><div class="ondeck">${DATA.onDeck.map(o=>`
+      <div class="od-card"><div class="k">${o.dates}</div><div class="v">${o.name}</div><div class="s">${o.course} · ${o.city}</div></div>`).join("")}</div>`;
+  }
+  c.innerHTML=html;
+  if(DATA.brief){
+    const safe=DATA.brief.replace(/[<>&]/g,ch=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[ch]));
+    document.getElementById("brief-body").innerHTML=safe.replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
+    document.getElementById("brief-card").style.display="";
+  } else {
+    document.getElementById("brief-card").style.display="none";
+  }
+}
+async function loadLive(){
+  try{
+    const r=await fetch("data.json?_="+Date.now());
+    if(!r.ok) return;
+    DATA=await r.json();
+    document.getElementById("proto-note").innerHTML=
+      `🟢 <span><b>Live</b> — real schedule & course forecasts, wave splits from the hourly numbers. Updated ${DATA.generated}.</span>`;
+    renderAll();
+  }catch(e){}
+}
+renderAll();
+loadLive();
+</script>
+</body>
+</html>
