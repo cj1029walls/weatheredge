@@ -90,6 +90,18 @@
   .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
   .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  .kx-btn{display:inline-flex;align-items:center;margin-left:auto;background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-btn:hover{filter:brightness(1.1);color:#fff}
+  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #ff6b1a;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
+  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ff9d54}
+  .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
+  .kx-card .kx-t b{color:#fff}
+  .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
+  .kx-card .kx-go{background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-card .kx-go:hover{filter:brightness(1.1)}
+  .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
+  .kx-hook a{color:#e85d0f;font-weight:800;text-decoration:none}
+  .kx-hook a:hover{text-decoration:underline}
   .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
   .date-chip b{color:#fff}
   /* tabs */
@@ -382,7 +394,7 @@
         </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">MLB</span></h1>
         <div class="tagline">MLB weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
         <div class="sport-tabs">
-          <a class="on" href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
+          <a class="on" href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="kx-btn" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=header&utm_campaign=mlb" target="_blank" rel="noopener">⚡ The Optimizer</a>
         </div>
       </div>
       <div class="date-chip">Slate for <b id="date-label">Tuesday, July 28</b> · <span id="game-count"></span> games</div>
@@ -402,6 +414,13 @@
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>Today's read — live from the radar<span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
     <div class="brief-body" id="brief-body"></div>
+  </div>
+
+  <div class="kx-card">
+    <div><div class="kx-k">⚡ Found your edge?</div>
+    <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
+    <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
+    <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=mlb" target="_blank" rel="noopener">Build lineups →</a>
   </div>
 
   <!-- ======== SLATE VIEW ======== -->
@@ -1433,6 +1452,7 @@ function openModal(g){
         <h5>What actually happened — ${g.sample} historically similar games ${g.dome?"(indoor)":""}<span class="tip" data-tip="Real final scores from games at this park in weather like today's. Over/under is computed against today's total, so it updates when the line moves. A 'wet' tag marks games with measurable rain."><span class="info-i">i</span></span></h5>
         ${histTable(g)}
       </div>
+      <div class="kx-hook">⚡ Feed this edge into your lineups — <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=modal&utm_campaign=mlb" target="_blank" rel="noopener">try The Optimizer</a> · part of The DFS Kitchen</div>
     </div>`;
   overlay.classList.add("open");
   document.body.style.overflow="hidden";
