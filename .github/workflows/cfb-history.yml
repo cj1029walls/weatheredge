@@ -1,0 +1,30 @@
+name: Build CFB history
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 20 2 *"   # each Feb 20 — fold the finished season in
+
+permissions:
+  contents: write
+
+jobs:
+  cfb-history:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build CFB venues_history.json (CFBD + Open-Meteo archive)
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python scripts/cfb/build_history.py
+      - name: Commit dataset
+        run: |
+          git config user.name "weatheredge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/cfb/venues_history.json
+          git commit -m "Rebuild CFB history" || echo "no changes"
+          git pull --rebase origin main
+          git push
