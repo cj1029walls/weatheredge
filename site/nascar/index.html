@@ -179,7 +179,7 @@ function renderAll(){
         <div class="wx-tile"><div class="k">Temp swing</div><div class="v">${g.tempSwing}°</div><div class="s">green flag → finish · grip comes up as it cools<span class="tip" data-tip="Track temperature falls through the race window. Cooler track = more grip. A big swing means handling changes lap by lap — an edge for drivers who adjust."><span class="info-i">i</span></span></div></div>
       </div>`;
       if(g.hourly&&g.hourly.length){
-        html+=`<div class="sec-h">Race window · hour by hour</div>
+        html+=`<div class="sec-h">Race window · hour by hour (track time)</div>
         <div class="hourly">${g.hourly.map(h=>`
           <div class="hr-cell ${h.fp?"hr-fp":""}">
             <div class="hr-lab">${h.lab}${h.fp?" · green":""}</div>
