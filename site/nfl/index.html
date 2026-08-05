@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFSRADAR — NFL Weather Edges for DFS</title>
+<meta name="description" content="DFSRADAR NFL: stadium weather for DFS players — wind, cold, and rain impact on scoring, plus real over/under hit rates against actual closing lines in similar conditions.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
+<style>
+  :root{
+    --navy:#152451; --navy2:#24409c; --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
+    --green:#178a3f; --green-deep:#10682e; --green-bg:#e6f5eb;
+    --red:#d33131; --red-deep:#a92525; --red-bg:#fdecec;
+    --blue:#5b6b83; --blue-deep:#47566d; --blue-bg:#edf0f5;
+    --gold:#2f62e8; --gold-deep:#2450b8; --gold-bg:#e8eefc;
+    --amber-bg:#fdf5e3;
+    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#fff; --line:#e4e8ef;
+    --line-strong:#c3cde0; --body2:#3e4a5e;
+    --note-bg:#fdf5e3; --note-border:#f0dfb2; --note-text:#8a6207;
+    --ou1:#4a79f2; --ou2:#2450b8; --radius:14px;
+    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
+    --shadow-hover:0 2px 4px rgba(21,36,81,.08),0 10px 28px rgba(21,36,81,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
+  .announce{background:linear-gradient(90deg,#0e1a3d,#2450b8 55%,#0e1a3d);color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;padding:8px 14px}
+  .announce b{color:#fff}
+  .announce .soon{display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ffd94a}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 0}
+  .header-inner{max-width:1240px;margin:0 auto}
+  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
+  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
+  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
+  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
+  .brand .tagline b{color:#e8c877;font-weight:600}
+  .sport-tabs{display:flex;gap:6px;margin-top:14px}
+  .sport-tabs a,.sport-tabs span{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
+  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+  .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  .sport-tabs .off{opacity:.55;cursor:default}
+  .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
+  .date-chip b{color:#fff}
+  nav{display:flex;gap:4px;margin-top:18px}
+  nav button{appearance:none;border:0;background:transparent;color:#95a1b5;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px 10px 0 0;cursor:pointer;letter-spacing:.2px}
+  nav button:hover{color:#fff}
+  nav button.active{background:var(--surface);color:var(--ink)}
+  main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
+  .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
+  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
+  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
+  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;animation:bpulse 2.2s ease-in-out infinite}
+  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
+  .brief-body b{color:#fff}
+  .tip{position:relative;cursor:help}
+  .info-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray-bg);color:var(--muted);font-size:10px;font-weight:800;vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong)}
+  .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;font-size:11.5px;font-weight:500;line-height:1.55;text-transform:none;letter-spacing:.1px;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;transition:opacity .15s;z-index:90;text-align:left;white-space:normal}
+  .tip::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90}
+  .tip:hover::after,.tip:hover::before{opacity:1}
+  .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
+  .sum-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
+  .sum-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
+  .sum-card .k{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .sum-card .v{font-size:17px;font-weight:800;margin-top:4px}
+  .sum-card .s{font-size:12px;color:var(--muted);margin-top:2px}
+  .pos{color:var(--green)} .neg{color:var(--red)} .neu{color:var(--muted)}
+  .controls{display:flex;align-items:center;justify-content:space-between;margin:6px 0 14px;gap:12px;flex-wrap:wrap}
+  .controls h2{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+  .board{display:flex;flex-direction:column;gap:10px}
+  .b-row{display:grid;grid-template-columns:96px 1.35fr 1.25fr .9fr 1.15fr 120px;gap:14px;align-items:center;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;cursor:pointer;border:1px solid transparent;transition:.15s}
+  .b-row:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
+  .b-time{font-size:14px;font-weight:800;line-height:1.15}
+  .b-time span{display:block;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.6px}
+  .b-teams{font-size:17px;font-weight:800}
+  .b-teams .at{font-weight:300;color:var(--faint)}
+  .b-stad{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .b-wx .t{font-size:15px;font-weight:800}
+  .b-wx .w{font-size:11.5px;color:var(--muted);line-height:1.45}
+  .pill{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:16px;letter-spacing:.3px}
+  .pill.pos{background:var(--green-bg);color:var(--green-deep)}
+  .pill.neg{background:var(--red-bg);color:var(--red-deep)}
+  .pill.neu{background:var(--gray-bg);color:var(--muted)}
+  .b-ou{display:flex;align-items:center;gap:10px}
+  .b-ou .txt b{display:block;font-size:13.5px}
+  .b-ou .txt span{font-size:11px;color:var(--muted)}
+  .edge-badge{font-size:10px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+  .edge-wind{background:#47566d;color:#e2e8f2}
+  .edge-cold{background:#2450b8;color:#dde7fb}
+  .edge-rain{background:#b45309;color:#fdeee0}
+  .edge-neutral{background:var(--gray-bg);color:var(--muted)}
+  .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin-top:13px}
+  .hr-cell{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center}
+  .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .hr-lab{font-size:9.5px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
+  .hr-t{font-size:18px;font-weight:800;margin-top:2px}
+  .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px;white-space:nowrap}
+  .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
+  .hr-rain.warn{color:var(--red);font-weight:800}
+  .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
+  .dl-clear{background:var(--green-bg);color:var(--green-deep)}
+  .dl-watch{background:var(--amber-bg);color:#8a6207}
+  .dl-likely{background:#fdeee0;color:#b45309}
+  .dl-severe{background:var(--red-bg);color:var(--red-deep)}
+  .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
+  .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)} .fx-high b{color:#d97708} .fx-extreme b{color:var(--red)}
+  .overlay{position:fixed;inset:0;background:rgba(13,25,41,.55);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:34px 16px;z-index:50;overflow-y:auto}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:18px;max-width:860px;width:100%;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+  .m-head{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:20px 26px;display:flex;justify-content:space-between;align-items:center}
+  .m-head .teams{font-size:22px;font-weight:800}
+  .m-head .meta{font-size:12.5px;color:#93a1b8;margin-top:3px}
+  .m-close{appearance:none;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:15px}
+  .m-body{padding:20px 26px 28px}
+  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
+  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
+  .m-cond{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .wx-item .big{font-size:27px;font-weight:800}
+  .wx-item .big sup{font-size:12px;font-weight:700;color:var(--muted)}
+  .wx-item .lab{font-size:11px;color:var(--muted)}
+  .m-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+  .m-tile{border-radius:12px;padding:14px 16px}
+  .m-tile.pos{background:var(--green-bg)} .m-tile.pos .t-val{color:var(--green-deep)}
+  .m-tile.neg{background:var(--red-bg)} .m-tile.neg .t-val{color:var(--red-deep)}
+  .m-tile.neu{background:var(--gray-bg)} .m-tile.neu .t-val{color:var(--muted)}
+  .m-tile .t-lab{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+  .m-tile .t-val{font-size:26px;font-weight:800;margin:2px 0}
+  .m-tile .t-sub{font-size:11.5px;color:var(--body2)}
+  .hit-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .hit-box{flex:1;min-width:120px;border-radius:11px;padding:11px 14px;text-align:center}
+  .hit-box .n{font-size:22px;font-weight:800}
+  .hit-box .l{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
+  .hit-box.over{background:var(--gold-bg)} .hit-box.over .n,.hit-box.over .l{color:var(--gold-deep)}
+  .hit-box.under{background:var(--blue-bg)} .hit-box.under .n,.hit-box.under .l{color:var(--blue-deep)}
+  .hit-box.push{background:var(--gray-bg)} .hit-box.push .n,.hit-box.push .l{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1.5px solid var(--line)}
+  tbody td{padding:8px 10px;border-bottom:1px solid var(--line)}
+  .res-chip{display:inline-block;padding:2.5px 9px;border-radius:8px;font-weight:800;font-size:10.5px;letter-spacing:.4px}
+  .res-chip.over{background:var(--gold-bg);color:var(--gold-deep)}
+  .res-chip.under{background:var(--blue-bg);color:var(--blue-deep)}
+  .res-chip.push{background:var(--gray-bg);color:var(--muted)}
+  .hist-note{font-size:11.5px;color:var(--muted);margin-top:10px}
+  .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
+  .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
+  footer{max-width:1240px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--faint);text-align:center}
+  @media(max-width:900px){.b-row{grid-template-columns:80px 1fr 1fr;row-gap:10px}.b-ou,.b-badge{grid-column:span 2}}
+</style>
+</head>
+<body>
+<div class="announce">📡 NFL weather is here — <b>CFB</b> · <b>PGA</b> · <b>NASCAR</b> and more outdoor sports <span class="soon">coming soon</span></div>
+<header>
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
+          <defs><linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
+            <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/><stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
+          </linearGradient></defs>
+          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
+          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
+          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
+          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
+          <g><path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
+          <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
+          <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
+          <circle cx="29.5" cy="13.5" r="2.3" fill="#ffd94a"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
+          <circle cx="13" cy="28.5" r="1.9" fill="#6ee7a0"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
+        </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">NFL</span></h1>
+        <div class="tagline">NFL weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
+        <div class="sport-tabs">
+          <a href="/">MLB</a><a class="on" href="/nfl/">NFL</a><span class="off">CFB · soon</span>
+        </div>
+      </div>
+      <div class="date-chip">This week's slate · <b id="game-count">0</b> games</div>
+    </div>
+    <nav><button class="active" data-view="slate">This Week</button><button data-view="method">How It Works</button></nav>
+  </div>
+</header>
+
+<main>
+  <div class="proto-note" id="proto-note">⚠️ <span><b>Preseason mode</b> — the slate fills in automatically when games enter the 8-day forecast window.</span></div>
+
+  <div class="brief-card" id="brief-card" style="display:none">
+    <div class="brief-head"><span class="pulse"></span>This week's read — live from the radar<span class="tip" data-tip="Auto-generated from this week's data on every build — cold, wind, and rain risks straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
+    <div class="brief-body" id="brief-body"></div>
+  </div>
+
+  <section class="view active" id="view-slate">
+    <div class="summary-strip" id="summary-strip"></div>
+    <div class="controls"><h2>Weather impact vs each stadium<span class="tip" data-tip="PTS shows how total scoring in historically similar weather at that stadium compares to the stadium's own average. O/U hit rates are measured against each past game's REAL closing total — the actual lines that existed."><span class="info-i">i</span></span></h2></div>
+    <div class="board" id="board"></div>
+    <div class="empty-season" id="empty-state" style="display:none"><b>Kickoff is almost here</b>Games appear once they're inside the 8-day forecast window. The history engine is already loaded: 2015–2025, every stadium, real closing lines.</div>
+  </section>
+
+  <section class="view" id="view-method" style="display:none">
+    <div class="m-sec" style="max-width:860px;margin:0 auto">
+      <h5>Real games. Real weather. Real closing lines.</h5>
+      <p style="font-size:14px;line-height:1.7;color:var(--body2)">For every NFL game inside the forecast window, we take the kickoff forecast at that stadium — temperature, wind speed and direction relative to the field axis, and rain chances — and find every game played at <b>that same stadium in similar conditions</b> since 2015. Then we report what actually happened: total points, and how often those games went over or under <b>their own real closing totals</b>. Wind is classified against the field's long axis — crosswinds punish kicking and deep passing more than wind straight down the field. Domes and closed roofs are weather-neutral and flagged as such. Rebuilt automatically every morning as forecasts sharpen toward kickoff.</p>
+    </div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<footer>DFSRADAR · NFL weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
+
+<script>
+const SAMPLE = {generated:"preview", brief:"Coldest kickoff: 24° for PIT @ BUF. Wind watch: 21 mph crosswind for GB @ CHI at Soldier Field. No serious rain threats on the slate. 3 games under a roof — weather-neutral.",
+games:[
+ {id:"pit-buf", away:"PIT", home:"BUF", stadium:"Highmark Stadium", day:"Sun Sep 13", time:"1:00 PM ET", sortTime:"1",
+  temp:24, dew:15, wind:16, ax:75, windClass:"cross", windLabel:"crosswind", sky:"Overcast", skyIcon:"☁️", dome:false,
+  rain:20, rh:58, pres:1016, sample:23, pts:-11, ptsGm:38.9, ptsStad:43.8,
+  ou:{over:26, under:70, push:4, n:23}, total:41.5, lineSource:"book", note:"±10° temp, ±6 mph, cross wind",
+  windFx:{rating:"HIGH", pct10:-9},
+  delay:{level:"watch", pct:28},
+  hourly:[{lab:"12 PM",c:"☁️",t:26,w:14,ax:70,rain:12,rh:55},{lab:"1 PM",fp:true,c:"☁️",t:24,w:16,ax:75,rain:20,rh:58},{lab:"2 PM",c:"☁️",t:24,w:17,ax:78,rain:24,rh:60},{lab:"3 PM",c:"🌧️",t:23,w:15,ax:74,rain:28,rh:64},{lab:"4 PM",c:"☁️",t:22,w:13,ax:70,rain:22,rh:66}],
+  matches:[{d:"20241215",t:22,w:17,ax:80,pts:30,line:40.5,res:"under"},{d:"20231217",t:28,w:14,ax:72,pts:52,line:43.5,res:"over"},{d:"20221204",t:25,w:19,ax:68,pts:40,line:43.5,res:"under"}]},
+ {id:"gb-chi", away:"GB", home:"CHI", stadium:"Soldier Field", day:"Sun Sep 13", time:"4:25 PM ET", sortTime:"2",
+  temp:41, dew:30, wind:21, ax:85, windClass:"cross", windLabel:"crosswind", sky:"Partly cloudy", skyIcon:"⛅", dome:false,
+  rain:8, rh:48, pres:1019, sample:18, pts:-8, ptsGm:40.1, ptsStad:43.6,
+  ou:{over:33, under:61, push:6, n:18}, total:44.5, lineSource:"book", note:"±10° temp, ±6 mph, cross wind",
+  windFx:{rating:"EXTREME", pct10:-13}, delay:{level:"clear", pct:8},
+  hourly:[{lab:"3 PM",c:"⛅",t:43,w:19,ax:82,rain:4,rh:45},{lab:"4 PM",fp:true,c:"⛅",t:41,w:21,ax:85,rain:8,rh:48},{lab:"5 PM",c:"⛅",t:40,w:20,ax:84,rain:8,rh:50},{lab:"6 PM",c:"🌙",t:38,w:18,ax:80,rain:6,rh:54},{lab:"7 PM",c:"🌙",t:37,w:16,ax:76,rain:4,rh:56}],
+  matches:[{d:"20241124",t:38,w:22,ax:88,pts:33,line:41.5,res:"under"},{d:"20221113",t:44,w:19,ax:81,pts:55,line:46.5,res:"over"}]},
+ {id:"dal-det", away:"DAL", home:"DET", stadium:"Ford Field", day:"Sun Sep 13", time:"8:20 PM ET", sortTime:"3",
+  temp:70, dew:50, wind:0, ax:0, windClass:"along", windLabel:"ROOF CLOSED", sky:"Indoor", skyIcon:"🏟️", dome:true,
+  rain:null, rh:null, pres:null, sample:74, pts:0, ptsGm:47.2, ptsStad:47.2,
+  ou:{over:54, under:43, push:3, n:70}, total:51.5, lineSource:"book", note:"indoor games (roof closed)",
+  windFx:null, delay:null, hourly:null, matches:[{d:"20241230",t:70,w:0,ax:0,pts:49,line:50.5,res:"under"}]}
+]};
+
+let DATA = SAMPLE, LIVE = false;
+const pct = v => (v>0?"+":"")+v+"%";
+const cls = v => v>0?"pos":(v<0?"neg":"neu");
+function axLabel(g){
+  if(g.dome) return "roof closed";
+  return `${g.wind} mph ${g.windClass==="cross"?"crosswind":g.windClass==="along"?"down the axis":"quartering"}`;
+}
+function edgeBadge(g){
+  if(g.dome) return `<span class="edge-badge edge-neutral">Roof closed</span>`;
+  if(g.delay && (g.delay.level==="likely"||g.delay.level==="severe")) return `<span class="edge-badge edge-rain">${g.delay.level==="severe"?"PPD risk":"Delay likely"}</span>`;
+  if(g.wind>=15) return `<span class="edge-badge edge-wind">Wind game</span>`;
+  if(g.temp<=25) return `<span class="edge-badge edge-cold">Deep freeze</span>`;
+  return "";
+}
+function gauge(g, size=48){
+  const r=17, c=2*Math.PI*r;
+  const o=g.ou.over/100*c, p=g.ou.push/100*c, u=g.ou.under/100*c;
+  const center = g.total!=null ? g.total.toFixed(1) : "—";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46">
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#2f62e8" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#c7d0dd" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#8b99ad" stroke-width="6" stroke-dasharray="${u} ${c}" stroke-dashoffset="${-(o+p)}" transform="rotate(-90 23 23)"/>
+    <text x="23" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#1a2333">${center}</text>
+  </svg>`;
+}
+function leanTxt(g){
+  if(!g.ou.n) return `<b class="neu">NO LINE DATA</b>`;
+  return g.ou.over>g.ou.under+3 ? `<b style="color:var(--gold-deep)">OVER ${g.ou.over}%</b>`
+    : g.ou.under>g.ou.over+3 ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
+    : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
+}
+function rowHTML(g){
+  const imp = g.dome ? `<span class="pill neu">PTS —</span>` : `<span class="pill ${cls(g.pts)}">PTS ${pct(g.pts)}</span>`;
+  const wx = g.dome ? `<div class="w">roof closed<br>weather sealed out</div>`
+    : `<div class="w">${axLabel(g)}<br>${(g.rain!=null&&g.rain>=15)?`Rain ${g.rain}% · `:""}dew ${g.dew}°</div>`;
+  return `<div class="b-row" data-game="${g.id}">
+    <div class="b-time">${g.day}<span>${g.time.replace(" ET","")} ET</span></div>
+    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-stad">${g.stadium}</div></div>
+    <div class="b-wx"><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div>
+    <div>${imp}</div>
+    <div class="b-ou">${gauge(g)}<div class="txt">${leanTxt(g)}<span>vs real closing lines · ${g.ou.n||g.sample} gms</span></div></div>
+    <div class="b-badge">${edgeBadge(g)}</div>
+  </div>`;
+}
+function renderSummary(){
+  const live = DATA.games.filter(g=>!g.dome);
+  const el = document.getElementById("summary-strip");
+  if(!live.length){ el.innerHTML=""; return; }
+  const windy=[...live].sort((a,b)=>b.wind-a.wind)[0];
+  const cold=[...live].sort((a,b)=>a.temp-b.temp)[0];
+  const under=[...live].sort((a,b)=>b.ou.under-a.ou.under)[0];
+  const over=[...live].sort((a,b)=>b.ou.over-a.ou.over)[0];
+  el.innerHTML = [
+    {k:"Biggest wind game", v:`${windy.away} @ ${windy.home} <span class="neg">${windy.wind} mph</span>`, s:windy.windLabel+" at "+windy.stadium.split(" ·")[0], id:windy.id},
+    {k:"Coldest kickoff", v:`${cold.away} @ ${cold.home} <span class="neg">${cold.temp}°</span>`, s:cold.sky.toLowerCase(), id:cold.id},
+    {k:"Strongest under history", v:`${under.away} @ ${under.home} <span class="neg">${under.ou.under}%</span>`, s:"vs real closing lines in similar weather", id:under.id},
+    {k:"Strongest over history", v:`${over.away} @ ${over.home} <span class="pos">${over.ou.over}%</span>`, s:"vs real closing lines in similar weather", id:over.id},
+  ].map(c=>`<div class="sum-card" data-game="${c.id}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s}</div></div>`).join("");
+}
+function hourlyStrip(g){
+  if(g.dome || !g.hourly || !g.hourly.length) return "";
+  return `<div class="hourly">${g.hourly.map(h=>`
+    <div class="hr-cell ${h.fp?"hr-fp":""}">
+      <div class="hr-lab">${h.lab||""}${h.fp?" · kickoff":""}</div>
+      <div class="hr-t">${h.c?h.c+" ":""}${h.t}°</div>
+      <div class="hr-w">${h.w} mph · ${h.ax>=60?"cross":h.ax<=30?"axis":"angled"}</div>
+      <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
+    </div>`).join("")}</div>`;
+}
+function delayChip(g){
+  if(g.dome || !g.delay) return "";
+  const M={clear:["No delay concern","dl-clear"],watch:["Worth monitoring","dl-watch"],likely:["Delay likely","dl-likely"],severe:["Postponement risk","dl-severe"]};
+  const [txt,c]=M[g.delay.level]||M.clear;
+  return `<div class="delay-chip ${c}">DELAY OUTLOOK: <b>${txt}</b> — peak ${g.delay.pct}% rain in the game window</div>`;
+}
+function windFxChip(g){
+  if(g.dome || !g.windFx) return "";
+  const f=g.windFx;
+  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS STADIUM: <b>${f.rating}</b> — 10 mph of wind moves scoring ~${Math.abs(f.pct10)}% here historically<span class="tip" data-tip="Measured from every outdoor game at this stadium since 2015: the relationship between wind speed and total points. Exposed stadiums like Chicago and Buffalo rate high; sheltered ones rate low."><span class="info-i">i</span></span></div>`;
+}
+function openModal(g){
+  const modal=document.getElementById("modal");
+  const body = g.matches.map(m=>{
+    const ds=`${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
+    return `<tr><td>${ds}</td><td>${m.t}°</td><td>${m.w} mph ${m.ax>=60?"cross":m.ax<=30?"axis":"angled"}</td><td>${m.line!=null?m.line:"—"}</td><td><b>${m.pts}</b></td><td>${m.res?`<span class="res-chip ${m.res}">${m.res.toUpperCase()}</span>`:"—"}</td></tr>`;
+  }).join("");
+  modal.innerHTML=`
+    <div class="m-head"><div><div class="teams">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
+      <div class="meta">${g.day} · ${g.time} · ${g.stadium}</div></div>
+      <button class="m-close">✕</button></div>
+    <div class="m-body">
+      <div class="m-sec"><h5>Kickoff forecast</h5>
+        <div class="m-cond">
+          <div class="wx-item"><div class="big">${g.temp}<sup>°F</sup></div><div class="lab">${g.dome?"indoor":"temp"}</div></div>
+          <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">${g.dome?"wind":g.windLabel}</div></div>
+          ${(!g.dome&&g.rain!=null)?`<div class="wx-item"><div class="big">${g.rain}<sup>%</sup></div><div class="lab">rain chance</div></div>`:""}
+          ${(!g.dome&&g.rh!=null)?`<div class="wx-item"><div class="big">${g.rh}<sup>%</sup></div><div class="lab">humidity</div></div>`:""}
+          <div style="margin-left:auto;text-align:right"><div style="font-weight:700;color:var(--gold)">${g.skyIcon} ${g.sky}</div>
+          <div style="font-size:12px;color:var(--muted)">${g.sample} similar games</div></div>
+        </div>
+        ${hourlyStrip(g)}${delayChip(g)}${windFxChip(g)}
+      </div>
+      <div class="m-sec"><h5>Scoring in this weather at ${g.stadium.split(" ·")[0]}</h5>
+        <div class="m-tiles">
+          <div class="m-tile ${g.dome?"neu":cls(g.pts)}"><div class="t-lab">Total points</div><div class="t-val">${g.dome?"—":pct(g.pts)}</div>
+            <div class="t-sub">${g.ptsGm} pts/gm in these conditions · ${g.ptsStad} stadium avg</div></div>
+        </div>
+      </div>
+      <div class="m-sec"><h5>What actually happened — vs real closing lines<span class="tip" data-tip="Every matched game's final score against the closing total that was actually on the board that day. No estimates — these are the real lines."><span class="info-i">i</span></span></h5>
+        <div class="hit-summary">
+          <div class="hit-box over"><div class="n">${g.ou.over}%</div><div class="l">went over</div></div>
+          <div class="hit-box under"><div class="n">${g.ou.under}%</div><div class="l">went under</div></div>
+          <div class="hit-box push"><div class="n">${g.ou.push}%</div><div class="l">pushed</div></div>
+        </div>
+        <table><thead><tr><th>Date</th><th>Temp</th><th>Wind</th><th>Closing</th><th>Final</th><th>Result</th></tr></thead>
+        <tbody>${body}</tbody></table>
+        <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (live book median).`:"No live total posted yet."}</div>
+      </div>
+    </div>`;
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow="hidden";
+  modal.querySelector(".m-close").addEventListener("click", closeModal);
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
+document.getElementById("overlay").addEventListener("click", e=>{ if(e.target.id==="overlay") closeModal(); });
+document.addEventListener("click", e=>{
+  const el=e.target.closest("[data-game]");
+  if(!el) return;
+  const g=DATA.games.find(x=>x.id===el.dataset.game);
+  if(g) openModal(g);
+});
+document.querySelectorAll("nav button").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    document.getElementById("view-slate").style.display = b.dataset.view==="slate"?"":"none";
+    document.getElementById("view-method").style.display = b.dataset.view==="method"?"":"none";
+  });
+});
+function renderAll(){
+  document.getElementById("game-count").textContent = DATA.games.length;
+  document.getElementById("board").innerHTML = DATA.games.map(rowHTML).join("");
+  document.getElementById("empty-state").style.display = DATA.games.length? "none":"";
+  renderSummary();
+  if(DATA.brief){
+    const safe=DATA.brief.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+    document.getElementById("brief-body").innerHTML = safe
+      .replace(/\b([A-Z]{2,3} @ [A-Z]{2,3})\b/g,"<b>$1</b>").replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
+    document.getElementById("brief-card").style.display="";
+  }
+}
+async function loadLive(){
+  try{
+    const r=await fetch("data.json?_="+Date.now());
+    if(!r.ok) return;
+    const d=await r.json();
+    DATA=d; LIVE=true;
+    document.getElementById("proto-note").innerHTML =
+      `🟢 <span><b>Live</b> — real schedule, kickoff forecasts & stadium history (2015–2025, real closing lines). Updated ${d.generated}.</span>`;
+    renderAll();
+  }catch(e){}
+}
+renderAll();
+loadLive();
+</script>
+</body>
+</html>
