@@ -39,6 +39,18 @@
   .sport-tabs a,.sport-tabs span{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
   .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  .kx-btn{display:inline-flex;align-items:center;margin-left:auto;background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-btn:hover{filter:brightness(1.1);color:#fff}
+  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #ff6b1a;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
+  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ff9d54}
+  .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
+  .kx-card .kx-t b{color:#fff}
+  .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
+  .kx-card .kx-go{background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-card .kx-go:hover{filter:brightness(1.1)}
+  .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
+  .kx-hook a{color:#e85d0f;font-weight:800;text-decoration:none}
+  .kx-hook a:hover{text-decoration:underline}
   .sport-tabs .off{opacity:.55;cursor:default}
   .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
   .date-chip b{color:#fff}
@@ -173,7 +185,7 @@
         </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">NFL</span></h1>
         <div class="tagline">NFL weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
         <div class="sport-tabs">
-          <a href="/">MLB</a><a class="on" href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
+          <a href="/">MLB</a><a class="on" href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="kx-btn" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=header&utm_campaign=nfl" target="_blank" rel="noopener">⚡ The Optimizer</a>
         </div>
       </div>
       <div class="date-chip">This week's slate · <b id="game-count">0</b> games</div>
@@ -188,6 +200,13 @@
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>This week's read — live from the radar<span class="tip" data-tip="Auto-generated from this week's data on every build — cold, wind, and rain risks straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
     <div class="brief-body" id="brief-body"></div>
+  </div>
+
+  <div class="kx-card">
+    <div><div class="kx-k">⚡ Found your edge?</div>
+    <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
+    <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
+    <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=nfl" target="_blank" rel="noopener">Build lineups →</a>
   </div>
 
   <section class="view active" id="view-slate">
@@ -353,6 +372,7 @@ function openModal(g){
         <tbody>${body}</tbody></table>
         <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (live book median).`:"No live total posted yet."}</div>
       </div>
+      <div class="kx-hook">⚡ Feed this edge into your lineups — <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=modal&utm_campaign=nfl" target="_blank" rel="noopener">try The Optimizer</a> · part of The DFS Kitchen</div>
     </div>`;
   document.getElementById("overlay").classList.add("open");
   document.body.style.overflow="hidden";
