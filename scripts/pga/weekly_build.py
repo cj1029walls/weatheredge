@@ -77,7 +77,8 @@ def main():
     if current:
         r1 = datetime.strptime(current["r1"], "%Y-%m-%d").date()
         end = datetime.strptime(current["end"], "%Y-%m-%d").date()
-        payload["event"] = dict(name=current["name"], course=current["course"],
+        payload["event"] = dict(hole=current.get("hole"),
+                                name=current["name"], course=current["course"],
                                 city=current["city"], team=current["team"],
                                 dates=f"{r1.strftime('%b %-d')}–{end.strftime('%-d')}",
                                 r1=current["r1"], end=current["end"])
