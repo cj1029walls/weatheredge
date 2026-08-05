@@ -65,7 +65,8 @@ def main():
     current = next((e for e in EVENTS
                     if datetime.strptime(e["end"], "%Y-%m-%d").date() >= today), None)
     upcoming = [e for e in EVENTS
-                if datetime.strptime(e["r1"], "%Y-%m-%d").date() > today][:3]
+                if datetime.strptime(e["r1"], "%Y-%m-%d").date() > today
+                and e is not current][:3]
 
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    event=None, rounds=[], waves=[], brief="",
