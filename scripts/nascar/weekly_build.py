@@ -70,7 +70,8 @@ def main():
     if nxt:
         rdate = datetime.strptime(nxt["date"], "%Y-%m-%d").date()
         et_h, et_m = int(nxt["et"].split(":")[0]), int(nxt["et"].split(":")[1])
-        race = dict(name=nxt["name"], track=nxt["track"], city=nxt["city"],
+        race = dict(shape=nxt.get("shape"),
+                    name=nxt["name"], track=nxt["track"], city=nxt["city"],
                     playoff=bool(nxt.get("playoff")),
                     day=rdate.strftime("%A, %B %-d"),
                     time=f"{et_h % 12 or 12}:{et_m:02d} PM ET",
