@@ -247,55 +247,57 @@ async function loadLive(){
     renderAll();
   }catch(e){}
 }
-/* ---- 3D track ---- */
+/* ---- 3D track (weather-tinted monochrome, radar style) ---- */
 let T3=null;
-function trkBannerTex(big,small){
-  const c=document.createElement("canvas");c.width=1024;c.height=256;
+function trkSpriteTex(big,small){
+  const c=document.createElement("canvas");c.width=640;c.height=150;
   const x=c.getContext("2d");
-  x.fillStyle="rgba(21,36,81,0)";x.fillRect(0,0,1024,256);
-  x.fillStyle="#152451";x.font="800 96px -apple-system,Segoe UI,Arial";x.textAlign="center";x.textBaseline="middle";
-  x.fillText(big.slice(0,22).toUpperCase(),512,96);
-  x.fillStyle="#ff6b1a";x.font="800 52px -apple-system,Segoe UI,Arial";
-  x.fillText(small,512,196);
+  const r=26;x.fillStyle="rgba(13,24,48,0.92)";
+  x.beginPath();x.moveTo(r,0);x.lineTo(640-r,0);x.arcTo(640,0,640,r,r);x.lineTo(640,150-r);x.arcTo(640,150,640-r,150,r);
+  x.lineTo(r,150);x.arcTo(0,150,0,150-r,r);x.lineTo(0,r);x.arcTo(0,0,r,0,r);x.fill();
+  x.fillStyle="#ff6b1a";x.fillRect(0,0,9,150);
+  x.fillStyle="#f4f6fa";x.font="800 52px -apple-system,Segoe UI,Arial";x.textBaseline="middle";
+  x.fillText(big.slice(0,22),32,56);
+  x.fillStyle="#8fa8d8";x.font="700 30px -apple-system,Segoe UI,Arial";
+  x.fillText(small,32,112);
   const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;
 }
-function checkerTex(){
-  const c=document.createElement("canvas");c.width=64;c.height=16;
+function checker2Tex(){
+  const c=document.createElement("canvas");c.width=96;c.height=24;
   const x=c.getContext("2d");
-  for(let i=0;i<8;i++)for(let j=0;j<2;j++){x.fillStyle=(i+j)%2?"#111":"#fff";x.fillRect(i*8,j*8,8,8);}
-  const t=new THREE.CanvasTexture(c);return t;
+  for(let i=0;i<12;i++)for(let j=0;j<3;j++){x.fillStyle=(i+j)%2?"#141821":"#f4f6fa";x.fillRect(i*8,j*8,8,8);}
+  return new THREE.CanvasTexture(c);
 }
 function trackCenter(kind){
-  const N=280,pts=[];
-  let L=1.0,R=0.55,bumpF=0,bumpB=0,egg=1;
-  if(kind==="paperclip"){L=1.35;R=0.3;}
-  else if(kind==="bullring"){L=0.62;R=0.5;}
-  else if(kind==="egg"){L=0.95;R=0.56;egg=0.72;}
-  else if(kind==="trioval"){L=1.05;R=0.52;bumpF=0.42;}
-  else if(kind==="quadoval"){L=1.05;R=0.52;bumpF=0.26;}
-  else if(kind==="dshape"){L=0.9;R=0.52;bumpF=0.3;}
-  else if(kind==="dogleg"){L=0.95;R=0.5;bumpB=0.38;}
-  else if(kind==="flat"){L=1.15;R=0.46;}
-  const straight=2*L, arc=Math.PI*R, total=2*straight+2*arc;
+  const N=300,pts=[];
+  let Lh=1.0,R=0.55,bumpF=0,bumpB=0,egg=1;
+  if(kind==="paperclip"){Lh=1.35;R=0.3;}
+  else if(kind==="bullring"){Lh=0.62;R=0.5;}
+  else if(kind==="egg"){Lh=0.95;R=0.56;egg=0.72;}
+  else if(kind==="trioval"){Lh=1.05;R=0.52;bumpF=0.42;}
+  else if(kind==="quadoval"){Lh=1.05;R=0.52;bumpF=0.26;}
+  else if(kind==="dshape"){Lh=0.9;R=0.52;bumpF=0.3;}
+  else if(kind==="dogleg"){Lh=0.95;R=0.5;bumpB=0.38;}
+  else if(kind==="flat"){Lh=1.15;R=0.46;}
+  const straight=2*Lh, arc=Math.PI*R, total=2*straight+2*arc;
   for(let i=0;i<N;i++){
+    /* counter-clockwise: front stretch (y=-R) runs -x -> +x */
     const s=(i/N)*total;let x,y;
-    if(s<straight){x=L-s;y=-R;}
-    else if(s<straight+arc){const a=-Math.PI/2-(s-straight)/R;x=-L+Math.cos(a)*R;y=Math.sin(a)*R;}
-    else if(s<2*straight+arc){x=-L+(s-straight-arc);y=R;}
-    else{const a=Math.PI/2-(s-2*straight-arc)/R;x=L+Math.cos(a)*R;y=Math.sin(a)*R;}
-    // egg: squeeze one end
-    if(egg<1&&x>0){const f=1-(1-egg)*Math.min(1,x/(L+R));y*=f;}
-    // front-stretch bump(s)
-    if(bumpF&&y<-R*0.6&&Math.abs(x)<L){
+    if(s<straight){x=-Lh+s;y=-R;}
+    else if(s<straight+arc){const a=-Math.PI/2+(s-straight)/R;x=Lh+Math.cos(a)*R;y=Math.sin(a)*R;}
+    else if(s<2*straight+arc){x=Lh-(s-straight-arc);y=R;}
+    else{const a=Math.PI/2+(s-2*straight-arc)/R;x=-Lh+Math.cos(a)*R;y=Math.sin(a)*R;}
+    if(egg<1&&x>0){const f=1-(1-egg)*Math.min(1,x/(Lh+R));y*=f;}
+    if(bumpF&&y<-R*0.55&&Math.abs(x)<Lh){
       if(kind==="quadoval"){
-        const g=Math.exp(-Math.pow((Math.abs(x)-L*0.45)/(L*0.28),2));
+        const g=Math.exp(-Math.pow((Math.abs(x)-Lh*0.45)/(Lh*0.28),2));
         y-=bumpF*R*g;
-      } else {
-        y-=bumpF*R*Math.pow(Math.cos(Math.min(1,Math.abs(x)/L)*Math.PI/2),1.4);
+      }else{
+        y-=bumpF*R*Math.pow(Math.cos(Math.min(1,Math.abs(x)/Lh)*Math.PI/2),1.4);
       }
     }
-    if(bumpB&&y>R*0.6&&Math.abs(x)<L){
-      const g=Math.exp(-Math.pow((x+L*0.25)/(L*0.4),2));
+    if(bumpB&&y>R*0.55&&Math.abs(x)<Lh){
+      const g=Math.exp(-Math.pow((x+Lh*0.25)/(Lh*0.4),2));
       y+=bumpB*R*g;
     }
     pts.push(new THREE.Vector2(x,y));
@@ -314,138 +316,194 @@ function nascarScene(){
   const g=DATA.race||{};
   const shape=g.shape||{kind:"oval",mi:1.0,bank:15};
   const rainPct=g.delay?g.delay.pct:(g.rain||0);
-  const night=/([89]|1[01]):\d+ PM/.test(g.time||"")||/7:[3-5]\d PM/.test(g.time||"");
-  const wet=rainPct>=45, watch=rainPct>=20&&rainPct<45;
-  const sky=night?0x0e1526:wet?0x707c8e:watch?0x9db0c4:0xbcd6ee;
-  scene.background=new THREE.Color(sky);
-  scene.fog=new THREE.Fog(sky,140,340);
-  const cam=new THREE.PerspectiveCamera(35,W/H,0.1,700);
-  scene.add(new THREE.HemisphereLight(night?0x37477a:0xdfeaff,0x3a4a35,night?0.55:wet?0.7:0.95));
-  const sun=new THREE.DirectionalLight(night?0xbcd0ff:0xfff2d8,night?0.5:wet?0.45:0.85);
-  sun.position.set(-50,70,-30);scene.add(sun);
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(460,460),
-    new THREE.MeshLambertMaterial({color:night?0x1d3320:0x2f5a29}));
-  ground.rotation.x=-Math.PI/2;ground.position.y=-0.08;scene.add(ground);
-  // track ribbon
-  const SC=46*Math.pow(Math.max(0.5,Math.min(2.7,shape.mi)),0.45);
+  const hrM=(g.time||"").match(/(\d+):(\d+) PM/);
+  const night=hrM?(+hrM[1]>=7&&+hrM[1]<12):false;
+  const wet=rainPct>=45, temp=g.temp!=null?g.temp:80;
+  /* one weather-tinted hue */
+  let hue,sat;
+  if(wet){hue=0.58;sat=0.12;}
+  else if(temp>=90){hue=0.985;sat=0.30;}
+  else if(temp<=60){hue=0.575;sat=0.35;}
+  else{hue=0.62;sat=0.40;}
+  const LT=night?{bg:0.045,field:0.115,infield:0.145,track:0.20,groove:0.155,apron:0.17}
+              :wet?{bg:0.09,field:0.155,infield:0.185,track:0.235,groove:0.185,apron:0.205}
+                  :{bg:0.105,field:0.165,infield:0.195,track:0.325,groove:0.255,apron:0.26};
+  const L=l=>new THREE.Color().setHSL(hue,sat,Math.max(0.035,l));
+  const M=c=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide});
+  scene.background=L(LT.bg);
+  scene.fog=new THREE.Fog(L(LT.bg),wet?220:420,wet?560:950);
+  const cam=new THREE.PerspectiveCamera(34,W/H,0.1,900);
+  const SC=48*Math.pow(Math.max(0.5,Math.min(2.7,shape.mi)),0.42);
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(SC*3.4,56),M(L(LT.field)));
+  ground.rotation.x=-Math.PI/2;ground.position.y=-0.2;scene.add(ground);
   const c2=trackCenter(shape.kind).map(p=>new THREE.Vector2(p.x*SC,p.y*SC));
-  const N=c2.length, TW=8;
-  const bankMax=Math.tan(Math.min(33,shape.bank)*Math.PI/180)*TW*0.9;
-  // curvature -> banking weight
-  const kw=[];let kmax=0.0001;
+  const N=c2.length,TW=SC*0.17;
+  const bankMax=Math.tan(Math.min(33,shape.bank)*Math.PI/180)*TW*0.95;
+  const kw=[];
   for(let i=0;i<N;i++){
     const a=c2[(i-1+N)%N],b=c2[i],c=c2[(i+1)%N];
     const v1=new THREE.Vector2().subVectors(b,a).normalize(),v2=new THREE.Vector2().subVectors(c,b).normalize();
-    const k=Math.abs(v1.x*v2.y-v1.y*v2.x);kw.push(k);if(k>kmax)kmax=k;
+    kw.push(Math.abs(v1.x*v2.y-v1.y*v2.x));
   }
-  const smooth=kw.map((_,i)=>{let s=0;for(let o=-7;o<=7;o++)s+=kw[(i+o+N)%N];return s/15;});
-  const smax=Math.max(...smooth);
-  const tpos=new Float32Array(N*2*3),tidx=[];
-  const inner=[],outer=[],bankH=[];
+  const smooth=kw.map((_,i)=>{let s=0;for(let o=-9;o<=9;o++)s+=kw[(i+o+N)%N];return s/19;});
+  const smax=Math.max.apply(null,smooth);
+  const inner=[],outer=[],mid1=[],mid2=[];
   for(let i=0;i<N;i++){
     const p=c2[i],q=c2[(i+1)%N];
-    let dx=q.x-p.x,dy=q.y-p.y;const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
-    const nx=-dy,ny=dx; // outward for CW? ensure outward: center is origin, pick normal pointing away
-    const outSign=(p.x*nx+p.y*ny)>0?1:-1;
-    const ox=nx*outSign,oy=ny*outSign;
-    const bh=bankMax*Math.min(1,smooth[i]/smax*1.4);
-    bankH.push(bh);
-    const ip=[p.x-ox*TW/2,0.02,p.y-oy*TW/2], op=[p.x+ox*TW/2,0.02+bh,p.y+oy*TW/2];
-    inner.push(ip);outer.push(op);
-    tpos.set([ip[0],ip[1],ip[2],op[0],op[1],op[2]],i*6);
-    const k=i*2,k2=((i+1)%N)*2;
-    tidx.push(k,k+1,k2,k+1,k2+1,k2);
+    let dx=q.x-p.x,dy=q.y-p.y;const l2=Math.hypot(dx,dy)||1;dx/=l2;dy/=l2;
+    let nx=-dy,ny=dx;
+    if(p.x*nx+p.y*ny<0){nx=-nx;ny=-ny;}
+    const bh=bankMax*Math.min(1,smooth[i]/smax*1.5);
+    inner.push([p.x-nx*TW/2,0.02,p.y-ny*TW/2]);
+    outer.push([p.x+nx*TW/2,0.02+bh,p.y+ny*TW/2]);
+    mid1.push([p.x-nx*TW*0.1,0.03+bh*0.4,p.y-ny*TW*0.1]);
+    mid2.push([p.x+nx*TW*0.28,0.03+bh*0.78,p.y+ny*TW*0.28]);
   }
-  const tgeo=new THREE.BufferGeometry();
-  tgeo.setAttribute("position",new THREE.BufferAttribute(tpos,3));
-  tgeo.setIndex(tidx);tgeo.computeVertexNormals();
-  const tmat=wet?new THREE.MeshPhongMaterial({color:0x2e3238,specular:0x9fb4cc,shininess:70})
-               :new THREE.MeshLambertMaterial({color:night?0x3a3f47:0x4a4f57});
-  scene.add(new THREE.Mesh(tgeo,tmat));
-  // white edge lines
-  [inner,outer].forEach(edge=>{
-    const lp=new Float32Array(edge.length*3);
-    edge.forEach((e,i)=>lp.set([e[0],e[1]+0.03,e[2]],i*3));
-    const lg=new THREE.BufferGeometry();lg.setAttribute("position",new THREE.BufferAttribute(lp,3));
-    const line=new THREE.LineLoop(lg,new THREE.LineBasicMaterial({color:0xe8edf5}));
-    scene.add(line);
-  });
-  // apron (inner grey strip)
-  const apos=new Float32Array(N*2*3),aidx=[];
+  function ribbon(edgeA,edgeB,mat,lift){
+    const pos=[],idx=[];
+    for(let i=0;i<N;i++){
+      pos.push(edgeA[i][0],edgeA[i][1]+(lift||0),edgeA[i][2],edgeB[i][0],edgeB[i][1]+(lift||0),edgeB[i][2]);
+      const k=i*2,k2=((i+1)%N)*2;
+      idx.push(k,k+1,k2,k+1,k2+1,k2);
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
+    geo.setIndex(idx);
+    const m=new THREE.Mesh(geo,mat);scene.add(m);return m;
+  }
+  ribbon(inner,outer,new THREE.MeshBasicMaterial({color:L(LT.track),side:THREE.DoubleSide}));
+  ribbon(mid1,mid2,new THREE.MeshBasicMaterial({color:L(LT.groove),side:THREE.DoubleSide}),0.015);   /* rubbered-in groove */
+  /* infield */
+  const inf=[];c2.forEach(p=>inf.push(new THREE.Vector2(p.x*0.9,p.y*0.9)));
+  const infMesh=new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(inf)),new THREE.MeshBasicMaterial({color:L(LT.infield),side:THREE.DoubleSide}));
+  infMesh.rotation.x=-Math.PI/2;infMesh.scale.z=-1;infMesh.position.y=0.005;scene.add(infMesh);
+  /* apron between infield and track */
+  const ap=[];c2.forEach((p,i)=>ap.push([p.x*0.9,0.008,p.y*0.9]));
+  ribbon(ap,inner,new THREE.MeshBasicMaterial({color:L(LT.apron),side:THREE.DoubleSide}));
+  /* white outer wall — the radar signature */
+  const wallT=[],wallB=[];
   for(let i=0;i<N;i++){
-    const ip=inner[i];
-    const p=c2[i];const cx=p.x*0.92,cy=p.y*0.92;
-    apos.set([cx,0.012,cy,ip[0],0.015,ip[2]],i*6);
-    const k=i*2,k2=((i+1)%N)*2;aidx.push(k,k+1,k2,k+1,k2+1,k2);
+    wallB.push([outer[i][0],outer[i][1],outer[i][2]]);
+    wallT.push([outer[i][0],outer[i][1]+SC*0.02,outer[i][2]]);
   }
-  const ageo=new THREE.BufferGeometry();ageo.setAttribute("position",new THREE.BufferAttribute(apos,3));
-  ageo.setIndex(aidx);ageo.computeVertexNormals();
-  scene.add(new THREE.Mesh(ageo,new THREE.MeshLambertMaterial({color:night?0x555b64:0x6d737c})));
-  // start/finish checker across front stretch (i=0 is x=L,y=-R heading -x)
-  const sfI=Math.floor(N*0.12);
-  const sp=c2[sfI],sq=c2[(sfI+1)%N];
-  let sdx=sq.x-sp.x,sdy=sq.y-sp.y;const sl=Math.hypot(sdx,sdy)||1;sdx/=sl;sdy/=sl;
-  const sf=new THREE.Mesh(new THREE.PlaneGeometry(TW,1.4),
-    new THREE.MeshBasicMaterial({map:checkerTex()}));
-  sf.rotation.x=-Math.PI/2;
-  sf.rotation.z=Math.atan2(sdy,sdx);
-  sf.position.set(sp.x,0.06,sp.y);scene.add(sf);
-  // infield event banner painted on grass
-  const ev=g.name||"DFSRADAR";
-  const ban=new THREE.Mesh(new THREE.PlaneGeometry(SC*1.15,SC*0.29),
-    new THREE.MeshBasicMaterial({map:trkBannerTex(ev,(g.track||"DFSRADAR")+" · DFSRADAR"),transparent:true}));
-  ban.rotation.x=-Math.PI/2;ban.position.set(0,0.04,0);scene.add(ban);
-  // cars
-  const carCols=[0xff6b1a,0x2f62e8,0x6ee7a0];
-  const cars=carCols.map((cc,ci)=>{
-    const body=new THREE.Mesh(new THREE.BoxGeometry(2.1,0.5,1),new THREE.MeshLambertMaterial({color:cc}));
-    const top=new THREE.Mesh(new THREE.BoxGeometry(1,0.4,0.8),new THREE.MeshLambertMaterial({color:0x20242c}));
-    top.position.set(-0.1,0.42,0);
-    const grp=new THREE.Group();grp.add(body);grp.add(top);scene.add(grp);
-    return {grp,t:ci*0.31,lane:0.28+ci*0.24,sp:(0.0016-ci*0.00022)*(1.15-Math.min(1,shape.mi/2.7)*0.3)};
-  });
-  function trackPoint(t,lane){
-    const f=((t%1)+1)%1,i=Math.floor(f*N),fr=f*N-i;
-    const ip=inner[i],op=outer[i],ip2=inner[(i+1)%N],op2=outer[(i+1)%N];
-    const ax=ip[0]+(op[0]-ip[0])*lane, ay=ip[1]+(op[1]-ip[1])*lane, az=ip[2]+(op[2]-ip[2])*lane;
-    const bx=ip2[0]+(op2[0]-ip2[0])*lane, by=ip2[1]+(op2[1]-ip2[1])*lane, bz=ip2[2]+(op2[2]-ip2[2])*lane;
-    return [ax+(bx-ax)*fr,ay+(by-ay)*fr,az+(bz-az)*fr];
+  ribbon(wallB,wallT,new THREE.MeshBasicMaterial({color:0xe9edf4,side:THREE.DoubleSide}));
+  /* white line at inner edge */
+  const ilp=[];inner.forEach(e=>ilp.push(e[0],e[1]+0.05,e[2]));
+  const ilg=new THREE.BufferGeometry();ilg.setAttribute("position",new THREE.Float32BufferAttribute(ilp,3));
+  scene.add(new THREE.LineLoop(ilg,new THREE.LineBasicMaterial({color:0xf4f6fa,transparent:true,opacity:0.85})));
+  /* start/finish: checkered band conformed to the banked surface */
+  /* find index nearest x=0 on front stretch (min y) */
+  let sfBest=0,sfScore=1e9;
+  for(let i=0;i<N;i++){const sc=Math.abs(c2[i].x)+ (c2[i].y>0?1e6:0);if(sc<sfScore){sfScore=sc;sfBest=i;}}
+  const cpos=[],cidx=[],cuv=[];
+  for(let k=0;k<=4;k++){
+    const i=(sfBest+k)%N;
+    cpos.push(inner[i][0],inner[i][1]+0.09,inner[i][2],outer[i][0],outer[i][1]+0.09,outer[i][2]);
+    cuv.push(0,k/4,1,k/4);
+    if(k<4){const a=k*2;cidx.push(a,a+1,a+2,a+1,a+3,a+2);}
   }
-  // rain
+  const cgeo=new THREE.BufferGeometry();
+  cgeo.setAttribute("position",new THREE.Float32BufferAttribute(cpos,3));
+  cgeo.setAttribute("uv",new THREE.Float32BufferAttribute(cuv,2));
+  cgeo.setIndex(cidx);
+  scene.add(new THREE.Mesh(cgeo,new THREE.MeshBasicMaterial({map:checker2Tex(),side:THREE.DoubleSide})));
+  /* flag stand */
+  const sfOut=outer[sfBest];
+  const fpx=sfOut[0], fpz=sfOut[2]-SC*0.055;
+  const fpole=new THREE.Mesh(new THREE.CylinderGeometry(SC*0.005,SC*0.005,SC*0.10,6),M(0xf4f6fa));
+  fpole.position.set(fpx,SC*0.05,fpz);scene.add(fpole);
+  const fbox=new THREE.Mesh(new THREE.BoxGeometry(SC*0.045,SC*0.03,SC*0.005),new THREE.MeshBasicMaterial({map:checker2Tex()}));
+  fbox.position.set(fpx,SC*0.105,fpz);scene.add(fbox);
+  /* pit road: light strip inside front stretch */
+  const pit=new THREE.Mesh(new THREE.PlaneGeometry(SC*1.3,SC*0.06),M(L(LT.apron)));
+  pit.rotation.x=-Math.PI/2;pit.position.set(0,0.012,-SC*0.36);scene.add(pit);
+  /* night: light poles */
+  if(night){
+    for(let i=0;i<6;i++){
+      const idx=Math.floor(i*N/6);
+      const px=outer[idx][0]*1.12,pz=outer[idx][2]*1.12;
+      const lp=new THREE.Mesh(new THREE.CylinderGeometry(SC*0.005,SC*0.005,SC*0.24,5),M(0x5a6a8c));
+      lp.position.set(px,SC*0.12,pz);scene.add(lp);
+      const gl=new THREE.Mesh(new THREE.SphereGeometry(SC*0.018,8,8),M(0xf4f6fa));
+      gl.position.set(px,SC*0.245,pz);scene.add(gl);
+    }
+  }
+  /* event billboard sprite */
+  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:trkSpriteTex((g.name||"DFSRADAR").toUpperCase(),(g.track||"")+"  ·  DFSRADAR"),transparent:true}));
+  spr.scale.set(SC*0.95,SC*0.223,1);spr.position.set(0,SC*0.3,0);scene.add(spr);
+  /* cars: CCW, banked, smooth */
+  const carCols=[0xff6b1a,0xf4f6fa,0xffd94a];
+  const CS=SC*0.05;
+  function makeCar(col){
+    const grp=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.BoxGeometry(CS*1.1,CS*0.42,CS*2.4),M(col));
+    body.position.y=CS*0.36;grp.add(body);
+    const cab=new THREE.Mesh(new THREE.BoxGeometry(CS*0.86,CS*0.36,CS*1.05),M(0x141821));
+    cab.position.set(0,CS*0.72,-CS*0.1);grp.add(cab);
+    const sp2=new THREE.Mesh(new THREE.BoxGeometry(CS*1.08,CS*0.3,CS*0.08),M(col));
+    sp2.position.set(0,CS*0.7,-CS*1.15);grp.add(sp2);
+    [[-1,1],[1,1],[-1,-1],[1,-1]].forEach(w=>{
+      const wh=new THREE.Mesh(new THREE.CylinderGeometry(CS*0.22,CS*0.22,CS*0.16,10),M(0x141821));
+      wh.rotation.z=Math.PI/2;
+      wh.position.set(w[0]*CS*0.62,CS*0.22,w[1]*CS*0.78);grp.add(wh);
+    });
+    scene.add(grp);return grp;
+  }
+  const cars=carCols.map((cc,ci)=>({grp:makeCar(cc),t:ci*0.29+0.05,lane:0.3+ci*0.22,
+    sp:(0.0019-ci*0.00025)*Math.pow(1.6/Math.max(0.6,shape.mi),0.35)}));
+  function lanePt(t,lane){
+    const f=((t%1)+1)%1,fi=f*N,i=Math.floor(fi)%N,fr=fi-Math.floor(fi);
+    const i2=(i+1)%N;
+    const ax=inner[i][0]+(outer[i][0]-inner[i][0])*lane,
+          ay=inner[i][1]+(outer[i][1]-inner[i][1])*lane,
+          az=inner[i][2]+(outer[i][2]-inner[i][2])*lane;
+    const bx=inner[i2][0]+(outer[i2][0]-inner[i2][0])*lane,
+          by=inner[i2][1]+(outer[i2][1]-inner[i2][1])*lane,
+          bz=inner[i2][2]+(outer[i2][2]-inner[i2][2])*lane;
+    return {p:new THREE.Vector3(ax+(bx-ax)*fr,ay+(by-ay)*fr,az+(bz-az)*fr),i};
+  }
+  const mUp=new THREE.Vector3(),mLat=new THREE.Vector3(),mFwd=new THREE.Vector3(),rot=new THREE.Matrix4();
+  function orient(car,t,lane){
+    const a=lanePt(t,lane),b=lanePt(t+0.006,lane);
+    mFwd.subVectors(b.p,a.p).normalize();
+    const i=a.i;
+    mLat.set(outer[i][0]-inner[i][0],outer[i][1]-inner[i][1],outer[i][2]-inner[i][2]).normalize();
+    mUp.crossVectors(mLat,mFwd).normalize();
+    if(mUp.y<0)mUp.negate();
+    mLat.crossVectors(mFwd,mUp).normalize();
+    rot.makeBasis(mLat,mUp,mFwd);
+    car.grp.quaternion.setFromRotationMatrix(rot);
+    car.grp.position.copy(a.p);
+  }
+  /* rain */
   let rain=null;
-  if(wet||watch){
-    const RN=watch?160:420,rp=new Float32Array(RN*6);
-    for(let i=0;i<RN;i++){const x=(Math.random()-0.5)*220,y=Math.random()*45,z=(Math.random()-0.5)*220;
-      rp.set([x,y,z,x+0.5,y-2.8,z],i*6);}
+  if(rainPct>=20){
+    const RN=rainPct>=45?420:150,rp=new Float32Array(RN*6);
+    for(let i=0;i<RN;i++){const x=(Math.random()-0.5)*SC*4.5,y=Math.random()*SC,z=(Math.random()-0.5)*SC*4.5;
+      rp.set([x,y,z,x+0.4,y-SC*0.06,z],i*6);}
     const rg=new THREE.BufferGeometry();rg.setAttribute("position",new THREE.BufferAttribute(rp,3));
-    rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0x9db4d4,transparent:true,opacity:wet?0.55:0.3}));
+    rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0x9db4d4,transparent:true,opacity:rainPct>=45?0.5:0.28}));
     scene.add(rain);
   }
-  // HUD
   const hudT=document.getElementById("n3d-t"),hudW=document.getElementById("n3d-w"),chip=document.getElementById("n3d-chip");
   if(hudT)hudT.textContent=(g.track||"")+" · stylized live view";
   if(hudW)hudW.textContent=shape.mi+" mi · "+shape.bank+"° banking"+(g.inWindow?(" · "+(g.temp!=null?g.temp+"°":"")+" · wind "+(g.wind!=null?g.wind+" mph":"")):"");
   if(chip){
-    const M={clear:"RUNS ON TIME",watch:"RAIN NEARBY",likely:"DELAY LIKELY",severe:"PPD RISK"};
-    chip.textContent=g.inWindow&&g.delay?("RAIN "+rainPct+"% · "+(M[g.delay.level]||"")):"forecast opens near race day";
+    const Mm={clear:"RUNS ON TIME",watch:"RAIN NEARBY",likely:"DELAY LIKELY",severe:"PPD RISK"};
+    chip.textContent=g.inWindow&&g.delay?("RAIN "+rainPct+"% · "+(Mm[g.delay.level]||"")):"forecast opens near race day";
   }
-  let ang=0.5;
+  let t0=0;
   function tick(){
-    ang+=0.0008;
-    const rad=SC*2.05;
-    cam.position.set(Math.sin(ang)*rad,SC*1.05,Math.cos(ang)*rad);
-    cam.lookAt(0,0,0);
-    cars.forEach(c=>{
-      c.t+=c.sp;
-      const p=trackPoint(c.t,c.lane),p2=trackPoint(c.t+0.004,c.lane);
-      c.grp.position.set(p[0],p[1]+0.3,p[2]);
-      c.grp.lookAt(p2[0],p2[1]+0.3,p2[2]);
-    });
+    t0+=1;
+    const ang=Math.PI+Math.sin(t0*0.0014)*0.55;
+    cam.position.set(Math.sin(ang)*SC*2.1,SC*0.95,Math.cos(ang)*SC*2.1);
+    cam.lookAt(0,0,-SC*0.1);
+    cars.forEach(c=>{c.t+=c.sp;orient(c,c.t,c.lane);});
     if(rain){
       const rp=rain.geometry.attributes.position.array;
       for(let i=0;i<rp.length;i+=6){
-        rp[i+1]-=1.0;rp[i+4]-=1.0;
-        if(rp[i+1]<0){rp[i+1]=42;rp[i+4]=39.2;}
+        rp[i+1]-=SC*0.022;rp[i+4]-=SC*0.022;
+        if(rp[i+1]<0){rp[i+1]=SC;rp[i+4]=SC*0.94;}
       }
       rain.geometry.attributes.position.needsUpdate=true;
     }
@@ -455,7 +513,6 @@ function nascarScene(){
   T3={renderer,raf:0};
   tick();
 }
-
 renderAll();
 loadLive();
 </script>
