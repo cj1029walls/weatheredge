@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 10 * * *"   # ~6:00 AM ET — morning slate build
+    - cron: "30 14 * * *"  # ~10:30 AM ET — first card with posted prop lines
     - cron: "30 16 * * *"  # ~12:30 PM ET — refresh before day games
     - cron: "0 21 * * *"   # ~5:00 PM ET — refresh before night games
 
@@ -30,6 +31,10 @@ jobs:
         run: python scripts/daily_build.py
       - name: Grade PRO results (yesterday's card)
         run: python scripts/pro/grade.py || echo "grading skipped"
+      - name: Refresh props odds (fresh lines for this build)
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python scripts/odds/props_build.py || echo "odds refresh skipped — using last committed feed"
       - name: Build PRO HR-prop targets (site/pro/data.json)
         run: python scripts/pro/build.py
       - name: Persist prediction archive & accuracy grades
