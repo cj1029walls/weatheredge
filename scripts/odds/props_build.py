@@ -78,7 +78,7 @@ def main():
     if not key:
         sys.exit("ODDS_API_KEY not set")
     cap = int(os.environ.get("GAMES_CAP", "16"))
-    markets = os.environ.get("MARKETS", "batter_home_runs,pitcher_strikeouts")
+    markets = os.environ.get("MARKETS", "batter_home_runs,batter_home_runs_alternate,pitcher_strikeouts")
 
     # today's radar slate, for edge-ranking (best-effort)
     edge = {}
@@ -118,7 +118,7 @@ def main():
         except Exception as e:
             print(f"  {ev['away']}@{ev['home']}: props unavailable ({e})")
             continue
-        hr_prices, ks_lines = {}, {}
+        hr_prices, ks_lines, alt_prices = {}, {}, {}
         for bk in data.get("bookmakers", []):
             for mk in bk.get("markets", []):
                 for oc in mk.get("outcomes", []):
@@ -128,6 +128,9 @@ def main():
                     if mk["key"] == "batter_home_runs" and oc.get("name") == "Over" \
                             and (oc.get("point") in (0.5, None)):
                         hr_prices.setdefault(player, []).append(oc["price"])
+                    elif mk["key"] == "batter_home_runs_alternate" and oc.get("name") == "Over" \
+                            and oc.get("point") == 1.5:
+                        alt_prices.setdefault(player, []).append(oc["price"])
                     elif mk["key"] == "pitcher_strikeouts":
                         d = ks_lines.setdefault(player, {"points": [], "over": [], "under": []})
                         if oc.get("point") is not None:
@@ -136,9 +139,15 @@ def main():
                             d["over"].append(oc["price"])
                         elif oc.get("name") == "Under":
                             d["under"].append(oc["price"])
-        hr = [dict(player=p, price=round(statistics.median(v)), books=len(v),
-                   implied=implied_pct(statistics.median(v)))
-              for p, v in hr_prices.items()]
+        hr = []
+        for p, v in hr_prices.items():
+            row = dict(player=p, price=round(statistics.median(v)), books=len(v),
+                       implied=implied_pct(statistics.median(v)))
+            av = alt_prices.get(p)
+            if av:
+                row["alt"] = dict(price=round(statistics.median(av)), books=len(av),
+                                  implied=implied_pct(statistics.median(av)))
+            hr.append(row)
         hr.sort(key=lambda x: -(x["implied"] or 0))
         ks = []
         for p, d in ks_lines.items():
