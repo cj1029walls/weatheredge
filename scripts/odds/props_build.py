@@ -80,10 +80,12 @@ def main():
     cap = int(os.environ.get("GAMES_CAP", "16"))
     markets = os.environ.get("MARKETS", "batter_home_runs,batter_home_runs_alternate,pitcher_strikeouts")
 
-    # today's radar slate, for edge-ranking (best-effort)
+    # today's radar slate, for edge-ranking (best-effort) — prefer the local
+    # file when running inside the daily workflow (it was built moments ago)
     edge = {}
     try:
-        radar = get_json(RADAR)
+        local = os.path.join(ROOT, "site", "data.json")
+        radar = json.load(open(local)) if os.path.exists(local) else get_json(RADAR)
         for g in radar.get("games", []):
             edge[f"{g['away']}@{g['home']}"] = abs(g.get("hr", 0) or 0)
     except Exception as e:
