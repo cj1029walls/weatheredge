@@ -38,7 +38,7 @@ K_BAT = 200
 LG_UMP_HR = 2.40      # league HR per game
 K_UMP = 150
 LG_HR9 = 1.05         # league HR per 9 IP
-K_SP_IP = 80
+K_SP_IP = 200
 PA_PER_GAME = 4.0
 
 def clamp(v, lo, hi):
@@ -93,7 +93,7 @@ def main():
     targets, games_out = [], []
     for g in slate.get("games", []):
         away, home = g["away"], g["home"]
-        wx = 1.0 if g.get("dome") else clamp(1 + (g.get("hr", 0) or 0) / 100, 0.70, 1.40)
+        wx = 1.0 if g.get("dome") else clamp(1 + (g.get("hr", 0) or 0) / 100 * 0.75, 0.78, 1.30)
         um, um_n = ump_mult(g.get("ump"), umps_all)
         p_away = (g.get("pitchers") or {}).get("away")   # away SP faces HOME batters
         p_home = (g.get("pitchers") or {}).get("home")   # home SP faces AWAY batters
@@ -111,13 +111,17 @@ def main():
                 adj, ab, hr = batter_rate(pl.get("g", []))
                 if adj is None:
                     continue
-                rate = adj * wx * um * spm
-                prob = 1 - (1 - min(rate, 0.20)) ** PA_PER_GAME
+                env = (wx * um * spm) ** 0.75   # damp stacked env factors (calibration)
+                rate = adj * env
+                prob = 1 - (1 - min(rate, 0.18)) ** PA_PER_GAME
                 prob_pct = round(prob * 100, 1)
-                if prob_pct > 40:      # spec sanity cap
-                    prob_pct = 40.0
+                if prob_pct > 38:      # sanity cap
+                    prob_pct = 38.0
                 o = odds_by_player.get(norm_name(pl["name"]))
                 fair = round(o["implied"] * 0.93, 1) if o and o.get("implied") else None
+                if o and o.get("implied") is not None:
+                    # market anchor: blend 25% of the books' implied prob into ours
+                    prob_pct = round(0.75 * prob_pct + 0.25 * o["implied"], 1)
                 edge = round(prob_pct - fair, 1) if fair is not None else None
                 targets.append(dict(
                     player=pl["name"], team=team, opp=opp,
@@ -131,6 +135,41 @@ def main():
                     implied=o["implied"] if o else None,
                     books=o["books"] if o else 0,
                     fair=fair, edge=edge, value=False))
+
+    # ---- K props: projected strikeouts for each probable starter ----
+    ks_odds = {}
+    for pg in props.get("games", []):
+        for o in pg.get("ks", []):
+            ks_odds.setdefault(norm_name(o["player"]), o)
+    kprops = []
+    for g in slate.get("games", []):
+        wxk = (g.get("ks", 0) or 0)
+        for side, team, opp in (("away", g["away"], g["home"]), ("home", g["home"], g["away"])):
+            p = (g.get("pitchers") or {}).get(side)
+            if not p or not p.get("all"):
+                continue
+            a = p["all"]
+            ip, n, k9 = a.get("ip", 0), a.get("n", 0), a.get("k9")
+            if not ip or not n or k9 is None:
+                continue
+            k9s = (k9 * ip + 8.5 * 60) / (ip + 60)              # shrink K/9 toward league
+            ip_ps = (ip / n * n + 5.3 * 4) / (n + 4)            # shrink IP/start toward 5.3
+            proj = k9s * ip_ps / 9 * (1 + wxk / 100 * 0.5)      # half-weight weather K edge
+            proj = round(clamp(proj, 2.5, 11.0), 1)
+            o = ks_odds.get(norm_name(p["name"]))
+            line = o["line"] if o else None
+            diff = round(proj - line, 1) if line is not None else None
+            lean = None
+            if diff is not None and abs(diff) >= 0.8:
+                lean = "OVER" if diff > 0 else "UNDER"
+            kprops.append(dict(pitcher=p["name"], team=team, opp=opp,
+                               game=f"{g['away']} @ {g['home']}",
+                               proj=proj, ipStart=round(ip_ps, 1), k9=round(k9s, 1),
+                               wxK=wxk, line=line,
+                               over=o["over"] if o else None,
+                               under=o["under"] if o else None,
+                               lean=lean, diff=diff))
+    kprops.sort(key=lambda k: (k["line"] is None, -(abs(k["diff"]) if k["diff"] is not None else 0), -k["proj"]))
 
     targets.sort(key=lambda t: -t["prob"])
     # VALUE flags: spec thresholds, max 5, ranked by edge
@@ -154,10 +193,14 @@ def main():
                      f"{len(flagged)} value flag{'s' if len(flagged)>1 else ''} tonight.")
     else:
         parts.append("No value flags tonight — the books are priced tight to our numbers.")
+    kleans = [k for k in kprops if k["lean"]]
+    if kleans:
+        kk = kleans[0]
+        parts.append(f"K props: {kk['pitcher']} projects {kk['proj']} Ks vs a {kk['line']} line — lean {kk['lean']}.")
 
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    oddsGenerated=props.get("generated"),
-                   brief=" ".join(parts), games=games_out, targets=top)
+                   brief=" ".join(parts), games=games_out, targets=top, kprops=kprops[:24])
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
