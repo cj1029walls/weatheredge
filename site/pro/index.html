@@ -108,6 +108,18 @@
   <div class="sec-h">Tonight's environments</div>
   <div class="gamestrip" id="gamestrip"></div>
 
+  <div id="record-wrap" style="display:none">
+    <div class="sec-h">Track record — every card graded</div>
+    <div class="gamestrip" id="rec-tiles" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div>
+    <div class="sec-h" style="margin-top:16px">Calibration — what our percentages actually hit</div>
+    <table>
+      <thead><tr><th>Our stated chance</th><th>Picks graded</th><th>Avg stated</th><th>Actually homered</th></tr></thead>
+      <tbody id="cal-body"></tbody>
+    </table>
+    <div class="sec-h" style="margin-top:16px">Recent nights</div>
+    <div class="gamestrip" id="rec-nights"></div>
+  </div>
+
   <div class="m-sec">
     <h5>How the number is made</h5>
     <p>Each batter's three-season HR rate is shrunk toward the league average (small samples can't fake an edge), then adjusted by tonight's weather at the park (DFSRADAR's similar-conditions history), the plate umpire's HR tendency (shrunk, capped at ±12%), and the opposing starter's HR/9 (shrunk by innings). That rate over ~4 plate appearances gives the HR chance. <b>Edge</b> compares our chance to the books' median price with ~7 points of vig stripped out. When a live price exists, 25% of the market's implied probability is blended into ours (market anchoring). A VALUE flag needs a 3-point edge, at least 3 books, and +150 or longer — at most five per night. K projections = shrunk K/9 × shrunk innings per start × the park's weather strikeout edge at half weight, leaned only when 0.8+ Ks off the line. Every night's card is archived and graded.</p>
@@ -185,8 +197,35 @@ async function loadLive(){
     renderAll();
   }catch(e){}
 }
+function renderRecord(rec){
+  if(!rec||!rec.summary||!rec.summary.nights){return;}
+  const s=rec.summary;
+  document.getElementById("record-wrap").style.display="";
+  const pct=(w,n)=>n?Math.round(w/n*100)+"%":"—";
+  document.getElementById("rec-tiles").innerHTML=[
+    {k:"Nights graded",v:s.nights,s:s.graded+" picks scored"},
+    {k:"#1 target homered",v:pct(s.top1.w,s.top1.n),s:s.top1.w+" of "+s.top1.n+" nights"},
+    {k:"VALUE flags",v:s.value.w+"–"+(s.value.n-s.value.w),s:(s.value.units>=0?"+":"")+s.value.units+" units at flagged prices"},
+    {k:"K leans",v:s.kleans.w+"–"+(s.kleans.n-s.kleans.w),s:pct(s.kleans.w,s.kleans.n)+" against the line"}
+  ].map(t=>`<div class="g-card"><div class="psub" style="text-transform:uppercase;letter-spacing:1px;font-weight:800">${t.k}</div><div class="prob" style="font-size:22px">${t.v}</div><div class="gs">${t.s}</div></div>`).join("");
+  document.getElementById("cal-body").innerHTML=(s.cal||[]).map(c=>`
+    <tr><td class="pname">${c.range}%</td><td>${c.n}</td><td>${c.exp}%</td><td><span class="prob" style="font-size:15px">${c.act}%</span></td></tr>`).join("");
+  document.getElementById("rec-nights").innerHTML=(rec.recent||[]).map(r=>{
+    const ds=r.d.slice(4,6)+"/"+r.d.slice(6,8);
+    return `<div class="g-card"><b>${ds}</b> <span style="color:var(--faint)">· ${r.hits}/${r.n} targets homered</span>
+      <div class="gs">${r.top?`#1: ${r.top.player} (${r.top.prob}%) ${r.top.hit?"✅ HR":"✖"}`:""}
+      ${r.valueHits.length?`<br>VALUE: ${r.valueHits.map(v=>v.player+(v.hit?" ✅":" ✖")).join(", ")}`:""}
+      ${r.kN?`<br>K leans ${r.kW}–${r.kN-r.kW}`:""}</div></div>`;}).join("");
+}
+async function loadRecord(){
+  try{
+    const r=await fetch("record.json?_="+Date.now());
+    if(r.ok) renderRecord(await r.json());
+  }catch(e){}
+}
 renderAll();
 loadLive();
+loadRecord();
 </script>
 </body>
 </html>
