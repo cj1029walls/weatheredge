@@ -28,11 +28,13 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/daily_build.py
+      - name: Build PRO HR-prop targets (site/pro/data.json)
+        run: python scripts/pro/build.py
       - name: Persist prediction archive & accuracy grades
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/predictions data/accuracy.json 2>/dev/null || true
+          git add data/predictions data/accuracy.json data/pro 2>/dev/null || true
           git commit -m "Archive predictions / update accuracy" || echo "no changes"
           git pull --rebase origin main || true
           git push || echo "push skipped"
