@@ -28,6 +28,8 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/daily_build.py
+      - name: Grade PRO results (yesterday's card)
+        run: python scripts/pro/grade.py || echo "grading skipped"
       - name: Build PRO HR-prop targets (site/pro/data.json)
         run: python scripts/pro/build.py
       - name: Persist prediction archive & accuracy grades
