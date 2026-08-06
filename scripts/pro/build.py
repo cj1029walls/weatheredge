@@ -32,6 +32,69 @@ PRED_DIR = os.path.join(ROOT, "data", "pro", "predictions")
 
 ET = timezone(timedelta(hours=-4))
 
+import time, urllib.request
+SCHED_LINEUPS = ("https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={d}"
+                 "&hydrate=lineups")
+BVP = ("https://statsapi.mlb.com/api/v1/people/{bid}/stats"
+       "?stats=vsPlayer&group=hitting&opposingPlayerId={pid}")
+
+def get_json(url, tries=3):
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "dfsradar-pro/1.0"})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read())
+        except Exception:
+            if i == tries - 1:
+                raise
+            time.sleep(4 * (i + 1))
+
+def fetch_lineups():
+    """(team -> {pid: batting order 1-9}) for games with posted lineups."""
+    out = {}
+    try:
+        d = datetime.now(ET).strftime("%m/%d/%Y")
+        sched = get_json(SCHED_LINEUPS.format(d=d))
+        for day in sched.get("dates", []):
+            for g in day.get("games", []):
+                lu = g.get("lineups") or {}
+                for side, key in (("home", "homePlayers"), ("away", "awayPlayers")):
+                    players = lu.get(key) or []
+                    if len(players) < 8:
+                        continue
+                    team_id = g["teams"][side]["team"].get("abbreviation") or ""
+                    slots = {str(p.get("id")): i + 1 for i, p in enumerate(players)}
+                    if team_id:
+                        out[team_id] = slots
+    except Exception as e:
+        print(f"lineups unavailable ({e}) — using flat 4.0 PA")
+    return out
+
+# team abbreviation quirks between statsapi and our park codes
+ABBR_FIX = {"AZ": "ARI", "WSN": "WSH", "SDP": "SD", "SFG": "SF", "TBR": "TB",
+            "KCR": "KC", "CHW": "CWS", "ATH": "OAK", "A": "OAK"}
+
+K_BVP = 60
+def bvp_mult(bid, pid):
+    """Batter-vs-pitcher career HR/AB, shrunk k=60, capped; None if under 10 AB."""
+    if not bid or not pid:
+        return None, None
+    try:
+        d = get_json(BVP.format(bid=bid, pid=pid))
+        for st in d.get("stats", []):
+            for sp in st.get("splits", []):
+                stat = sp.get("stat") or {}
+                ab, hr = stat.get("atBats"), stat.get("homeRuns")
+                if ab is None:
+                    continue
+                if ab < 10:
+                    return None, f"{hr or 0}/{ab}"
+                adj = ((hr or 0) + K_BVP * LG_HR_AB) / (ab + K_BVP)
+                return clamp(adj / LG_HR_AB, 0.60, 1.75), f"{hr or 0}/{ab}"
+    except Exception:
+        pass
+    return None, None
+
 # league constants + shrinkage (see spec)
 LG_HR_AB = 0.032      # league HR per AB
 K_BAT = 200
@@ -90,6 +153,10 @@ def main():
         for o in pg.get("hr", []):
             odds_by_player.setdefault(norm_name(o["player"]), o)
 
+    lineups = fetch_lineups()
+    lineups = { ABBR_FIX.get(k, k): v for k, v in lineups.items() }
+    if lineups:
+        print(f"lineups posted for {len(lineups)} teams")
     targets, games_out = [], []
     for g in slate.get("games", []):
         away, home = g["away"], g["home"]
@@ -107,13 +174,18 @@ def main():
         for team, opp, spm, sp_name in ((away, home, sp_for_away, (p_home or {}).get("name")),
                                         (home, away, sp_for_home, (p_away or {}).get("name"))):
             roster = (hitters.get(team) or {}).get("players", {})
+            lu = lineups.get(team)
             for pid, pl in roster.items():
                 adj, ab, hr = batter_rate(pl.get("g", []))
                 if adj is None:
                     continue
+                order = lu.get(str(pid)) if lu else None
+                if lu and order is None:
+                    continue                     # lineup posted, batter not in it
+                pa = 4.65 - 0.13 * (order - 1) if order else PA_PER_GAME
                 env = (wx * um * spm) ** 0.75   # damp stacked env factors (calibration)
                 rate = adj * env
-                prob = 1 - (1 - min(rate, 0.18)) ** PA_PER_GAME
+                prob = 1 - (1 - min(rate, 0.18)) ** pa
                 prob_pct = round(prob * 100, 1)
                 if prob_pct > 38:      # sanity cap
                     prob_pct = 38.0
@@ -124,9 +196,11 @@ def main():
                     prob_pct = round(0.75 * prob_pct + 0.25 * o["implied"], 1)
                 edge = round(prob_pct - fair, 1) if fair is not None else None
                 targets.append(dict(
+                    _bid=pid, _spid=( (g.get("pitchers") or {}).get("home" if team==away else "away") or {} ).get("id"),
+                    _adj=adj, _env=dict(wx=wx, um=um, spm=spm), _pa=pa,
                     player=pl["name"], team=team, opp=opp,
                     game=f"{away} @ {home}",
-                    prob=prob_pct,
+                    prob=prob_pct, order=order,
                     f=dict(bat=round(adj / LG_HR_AB, 2), wx=round(wx, 2),
                            ump=round(um, 2), sp=round(spm, 2)),
                     seasons=f"{hr} HR / {ab} AB (3 seasons)",
@@ -171,6 +245,34 @@ def main():
                                lean=lean, diff=diff))
     kprops.sort(key=lambda k: (k["line"] is None, -(abs(k["diff"]) if k["diff"] is not None else 0), -k["proj"]))
 
+    targets.sort(key=lambda t: -t["prob"])
+    # ---- BvP pass: career vs tonight's SP, top of the board only ----
+    for t in targets[:70]:
+        m, rawtxt = bvp_mult(t.pop("_bid", None), t.pop("_spid", None))
+        e = t.pop("_env"); adj = t.pop("_adj"); pa = t.pop("_pa")
+        t["f"]["bvp"] = round(m, 2) if m else None
+        t["bvpRaw"] = rawtxt
+        env = (e["wx"] * e["um"] * e["spm"] * (m or 1.0)) ** 0.75
+        rate = adj * env
+        prob = 1 - (1 - min(rate, 0.18)) ** pa
+        p = round(prob * 100, 1)
+        if p > 38: p = 38.0
+        if t.get("implied") is not None:
+            p = round(0.75 * p + 0.25 * t["implied"], 1)
+        t["prob"] = p
+        if t.get("fair") is not None:
+            t["edge"] = round(p - t["fair"], 1)
+        # 2+ HR: binomial P(X>=2) over 4 PA, matched to alt line when offered
+        n, r = 4, min(rate, 0.18)
+        p2 = 1 - (1 - r) ** n - n * r * (1 - r) ** (n - 1)
+        t["p2"] = round(p2 * 100, 1)
+        o = odds_by_player.get(norm_name(t["player"]))
+        if o and o.get("alt"):
+            t["alt"] = o["alt"]
+        time.sleep(0.25)
+    for t in targets[70:]:
+        for k in ("_bid", "_spid", "_env", "_adj", "_pa"):
+            t.pop(k, None)
     targets.sort(key=lambda t: -t["prob"])
     # VALUE flags: spec thresholds, max 5, ranked by edge
     flagged = sorted([t for t in targets
