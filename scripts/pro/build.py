@@ -211,8 +211,11 @@ def main():
     slim = [dict(player=t["player"], team=t["team"], game=t["game"], prob=t["prob"],
                  price=t["price"], implied=t["implied"], value=t["value"])
             for t in top[:20]]
+    kslim = [dict(pitcher=k["pitcher"], game=k["game"], proj=k["proj"],
+                  line=k["line"], lean=k["lean"])
+             for k in kprops if k.get("line") is not None]
     with open(os.path.join(PRED_DIR, f"{dstr}.json"), "w") as f:
-        json.dump(dict(d=dstr, targets=slim), f, separators=(",", ":"))
+        json.dump(dict(d=dstr, targets=slim, kprops=kslim), f, separators=(",", ":"))
 
     with_odds = sum(1 for t in top if t["price"] is not None)
     print(f"Wrote {OUT}: {len(top)} targets ({with_odds} with live prices, "
