@@ -21,7 +21,7 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           GAMES_CAP: "16"
-          MARKETS: "batter_home_runs,pitcher_strikeouts"
+          MARKETS: "batter_home_runs,batter_home_runs_alternate,pitcher_strikeouts"
         run: python scripts/odds/props_build.py
       - name: Commit feed
         run: |
