@@ -277,7 +277,7 @@ def pitcher_conditions(pp, hist_all, temp, wind, dome, seasons):
             wx_starts.append((g["t"], g["w"], ip, so, hr, er))
     overall = _per9([(0, 0, ip, so, hr, er) for d, c, ip, so, hr, er in starts])
     if dome:
-        return dict(name=pp.get("fullName", "TBD"), sim=None, all=overall,
+        return dict(id=pp.get("id"), name=pp.get("fullName", "TBD"), sim=None, all=overall,
                     note="roof closed — weather-neutral")
     sim_rows = [(t, w, ip, so, hr, er) for t, w, ip, so, hr, er in wx_starts
                 if abs(t - temp) <= 8 and abs(w - wind) <= 8]
@@ -287,7 +287,7 @@ def pitcher_conditions(pp, hist_all, temp, wind, dome, seasons):
                     if abs(t - temp) <= 10]
         note = "±10° temp (widened)"
     sim = _per9(sim_rows) if len(sim_rows) >= 3 else None
-    return dict(name=pp.get("fullName", "TBD"), sim=sim, all=overall, note=note)
+    return dict(id=pp.get("id"), name=pp.get("fullName", "TBD"), sim=sim, all=overall, note=note)
 
 def wet_split(hist, line):
     """Park-wide wet vs dry splits (needs history built with precip data)."""
