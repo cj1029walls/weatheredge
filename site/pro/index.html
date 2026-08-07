@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
 <title>DFSRADAR PRO — HR Prop Targets</title>
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
+<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%23ffd94a" opacity="0.6"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23ffd94a" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
 <style>
   :root{
@@ -125,6 +127,24 @@
   .intel-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
   .intel-card .stat{margin-left:auto;font-size:15px;font-weight:800;color:var(--navy2);white-space:nowrap;padding-left:8px}
   .lb-wrap{max-height:520px;overflow:auto;border-radius:var(--radius)}
+  /* paywall */
+  #paywall{display:none}
+  .pay-hero{background:linear-gradient(120deg,#0e1a3d 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:34px 30px;color:#dde5f5;text-align:center}
+  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
+  .pay-hero h2{color:#fff;font-size:24px;margin-bottom:6px}
+  .pay-hero .pay-price{font-size:38px;font-weight:800;color:#ffd94a;margin:12px 0 2px}
+  .pay-hero .pay-price span{font-size:15px;color:#95a1b5;font-weight:700}
+  .pay-feats{max-width:640px;margin:16px auto 22px;font-size:13.5px;line-height:2;text-align:left;color:#c9d4ea}
+  .pay-feats b{color:#fff}
+  .pay-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .pay-cta{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
+  .pay-cta:hover{filter:brightness(1.06)}
+  .pay-login{background:transparent;color:#dde5f5;font-size:14px;font-weight:800;border:1.5px solid rgba(255,255,255,.35);border-radius:24px;padding:13px 30px;cursor:pointer;font-family:inherit}
+  .pay-login:hover{border-color:#fff;color:#fff}
+  .pay-kitchen{margin-top:18px;font-size:12.5px;color:#95a1b5}
+  .pay-kitchen a{color:#ff8a3d;font-weight:800;text-decoration:none}
+  .member-bar{display:none;align-items:center;gap:10px;justify-content:flex-end;font-size:11.5px;color:var(--muted);margin:-8px 0 12px}
+  .member-bar a{color:var(--gold);font-weight:700;cursor:pointer;text-decoration:none}
   footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7}
   @media(max-width:760px){ .hide-m{display:none} }
 </style>
@@ -141,6 +161,29 @@
 </header>
 
 <main>
+  <div id="paywall">
+    <div class="pay-hero">
+      <div class="pay-badge">DFSRADAR PRO</div>
+      <h2>Tonight's HR prop targets — before the books adjust.</h2>
+      <div>Weather × umpire × pitcher × batter, shrunk and capped. Graded in public, every night.</div>
+      <div class="pay-price">$15<span> / month</span></div>
+      <div class="pay-feats">
+        💣 <b>Ranked HR targets</b> with our probability vs the books' live median price — VALUE flags when the edge clears 3 points<br>
+        🏟️ <b>Expected HRs per game</b> and live actual-vs-projected tracking while the slate runs<br>
+        ⚖️ <b>The umpire layer</b> — 22,000+ games: ump × park splits, hot/cold streaks, with-ump batter history<br>
+        🎯 <b>K props &amp; game totals</b> with OVER/UNDER leans vs the actual lines<br>
+        📊 <b>A public track record</b> — every card archived and graded, calibration table included
+      </div>
+      <div class="pay-btns">
+        <button class="pay-cta" data-ms-price:add="prc_pro-monthly-rdvp0vis">Subscribe — $15/mo</button>
+        <button class="pay-login" data-ms-modal="login">Member log in</button>
+      </div>
+      <div class="pay-kitchen">DFS Kitchen <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=paywall&utm_campaign=pro" target="_blank" rel="noopener">All-Access</a> members get PRO included — just log in with your Kitchen account.</div>
+    </div>
+  </div>
+
+  <div id="pro-app" style="display:none">
+  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a data-ms-modal="profile">Account</a> · <a data-ms-action="logout">Log out</a></div>
   <div class="proto-note" id="proto-note">⚠️ <span><b>Private beta</b> — sample data until tonight's build runs. This page is unlisted.</span></div>
 
   <div class="brief-card" id="brief-card" style="display:none">
@@ -237,6 +280,7 @@
       <p>When lineups post (~4 PM ET), plate appearances follow the batting slot (leadoff ≈ 4.65, nine-hole ≈ 3.6) and benched players drop off the card; before lineups, everyone gets a flat 4.0. Each batter's three-season HR rate is shrunk toward the league average (small samples can't fake an edge), then adjusted by tonight's weather at the park (DFSRADAR's similar-conditions history), the plate umpire's HR tendency (shrunk, capped at ±12%), and the opposing starter's HR/9 (shrunk by innings). That rate over ~4 plate appearances gives the HR chance. <b>Expected HRs</b> per game is the sum of those individual probabilities. <b>Edge</b> compares our chance to the books' median price with ~7 points of vig stripped out; when a live price exists, 25% of the market's implied probability is blended into ours. Career batter-vs-pitcher history joins the mix only at 10+ at-bats, shrunk hard and capped. A VALUE flag needs a 3-point edge, at least 3 books, and +150 or longer — at most five per night. <b>With-ump splits</b> (how tonight's batters and starters have fared with this exact plate umpire, 2022–2026) are context only — those samples are far too small to move a probability, and we won't pretend otherwise. <b>Game totals</b> blend season offense, the opposing starter's shrunk ERA, the park's weather runs history, and the ump's runs tendency. K projections = shrunk K/9 × shrunk innings per start × the weather strikeout edge at half weight. Live scores and HR tracking come from MLB's free public stats API and cost nothing. Every night's card is archived and graded — the calibration table is the receipts.</p>
     </div>
   </div>
+  </div><!-- /pro-app -->
 </main>
 
 <footer>
@@ -554,6 +598,45 @@ async function loadRecord(){
   }catch(e){}
 }
 if(location.hash&&["slate","targets","intel","umps","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
+/* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
+const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
+let GATED=null;
+function msReady(timeout=6000){
+  return new Promise(res=>{
+    const t0=Date.now();
+    (function poll(){
+      if(window.$memberstackDom) return res(window.$memberstackDom);
+      if(Date.now()-t0>timeout) return res(null);
+      setTimeout(poll,150);
+    })();
+  });
+}
+async function gate(){
+  let member=null, ok=false;
+  try{
+    const ms=await msReady();
+    if(ms){
+      const r=await ms.getCurrentMember();
+      member=r&&r.data;
+      ok=!!(member&&(member.planConnections||[]).some(pc=>
+        MS_PLANS.includes(pc.planId)&&["ACTIVE","TRIALING"].includes(String(pc.status||"").toUpperCase())));
+    }
+  }catch(e){}
+  GATED=ok;
+  document.getElementById("pro-app").style.display=ok?"block":"none";
+  document.getElementById("paywall").style.display=ok?"none":"block";
+  const bar=document.getElementById("member-bar");
+  if(ok&&member){bar.style.display="flex";document.getElementById("member-email").textContent=(member.auth&&member.auth.email)||"";}
+  else bar.style.display="none";
+  return ok;
+}
+(async()=>{
+  await gate();
+  const ms=window.$memberstackDom;
+  if(ms&&ms.onAuthChange) ms.onAuthChange(()=>gate());
+  if(location.hash==="#login"&&!GATED&&ms){ try{ await ms.openModal("LOGIN"); gate(); }catch(e){} }
+})();
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) gate(); });
 renderAll();
 loadLive();
 loadUmps();
