@@ -11,6 +11,15 @@ no small-sample blowups, ever (see DFSRADAR_PRO_MATH_SPEC.md).
   hr_prob = 1 - (1 - adj_rate)^PA
   adj_rate = shrunk_batter_HR_per_AB x weather x ump x opposing_SP
 
+v3 additions (game-level layer):
+  * per-game EXPECTED HRS = sum of per-batter probabilities (a real
+    expected-value total, not park-avg x multipliers)
+  * runs projections per team -> projected game total vs the market line
+  * with-ump split tables (batter / pitcher / BvP with tonight's plate ump)
+    joined from statsapi game logs x the ump game caches — DISPLAY ONLY,
+    never a multiplier
+  * auto-generated intel feed cards
+
 Outputs:
   site/pro/data.json            (deployed with the site, not committed)
   data/pro/predictions/<d>.json (committed — future accuracy grading)
@@ -20,12 +29,18 @@ No third-party dependencies.
 import functools, json, os, sys, unicodedata
 from datetime import datetime, timedelta, timezone
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from parks import MLBID_TO_CODE
+
 print = functools.partial(print, flush=True)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 SLATE = os.path.join(ROOT, "site", "data.json")
 HITTERS = os.path.join(ROOT, "data", "hitters_history.json")
 UMPS = os.path.join(ROOT, "data", "umps_history.json")
+UMPS_PRO = os.path.join(ROOT, "site", "pro", "umps.json")
+RETRO_CACHE = os.path.join(ROOT, "data", "pro", "ump_games_retro.json")
+S2026_CACHE = os.path.join(ROOT, "data", "pro", "ump_games_2026.json")
 PROPS = os.path.join(ROOT, "site", "pro", "props.json")
 OUT = os.path.join(ROOT, "site", "pro", "data.json")
 PRED_DIR = os.path.join(ROOT, "data", "pro", "predictions")
@@ -37,6 +52,14 @@ SCHED_LINEUPS = ("https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={d}"
                  "&hydrate=lineups")
 BVP = ("https://statsapi.mlb.com/api/v1/people/{bid}/stats"
        "?stats=vsPlayer&group=hitting&opposingPlayerId={pid}")
+GAMELOG = ("https://statsapi.mlb.com/api/v1/people/{pid}/stats"
+           "?stats=gameLog&group={grp}&season={season}")
+TEAM_STATS = ("https://statsapi.mlb.com/api/v1/teams/stats?sportId=1"
+              "&stats=season&group=hitting&season={y}")
+SP_SEASON = ("https://statsapi.mlb.com/api/v1/people/{pid}/stats"
+             "?stats=season&group=pitching&season={y}")
+
+SPLIT_SEASONS = [2022, 2023, 2024, 2025, 2026]
 
 def get_json(url, tries=3):
     for i in range(tries):
@@ -50,8 +73,8 @@ def get_json(url, tries=3):
             time.sleep(4 * (i + 1))
 
 def fetch_lineups():
-    """(team -> {pid: batting order 1-9}) for games with posted lineups."""
-    out = {}
+    """(team -> {pid: order 1-9}, team -> {pid: name}) for posted lineups."""
+    out, names = {}, {}
     try:
         d = datetime.now(ET).strftime("%m/%d/%Y")
         sched = get_json(SCHED_LINEUPS.format(d=d))
@@ -64,11 +87,14 @@ def fetch_lineups():
                         continue
                     team_id = g["teams"][side]["team"].get("abbreviation") or ""
                     slots = {str(p.get("id")): i + 1 for i, p in enumerate(players)}
+                    nm = {str(p.get("id")): (p.get("fullName") or p.get("lastName") or "")
+                          for p in players}
                     if team_id:
                         out[team_id] = slots
+                        names[team_id] = nm
     except Exception as e:
         print(f"lineups unavailable ({e}) — using flat 4.0 PA")
-    return out
+    return out, names
 
 # team abbreviation quirks between statsapi and our park codes
 ABBR_FIX = {"AZ": "ARI", "WSN": "WSH", "SDP": "SD", "SFG": "SF", "TBR": "TB",
@@ -103,6 +129,8 @@ K_UMP = 150
 LG_HR9 = 1.05         # league HR per 9 IP
 K_SP_IP = 200
 PA_PER_GAME = 4.0
+LG_ERA = 4.30
+LG_RPG_TEAM = 4.45    # league runs per team-game
 
 def clamp(v, lo, hi):
     return max(lo, min(hi, v))
@@ -138,6 +166,88 @@ def sp_mult(p):
     shrunk = (hr9 * ip + LG_HR9 * K_SP_IP) / (ip + K_SP_IP)
     return clamp(shrunk / LG_HR9, 0.60, 1.60), a.get("n")
 
+# ---------------------------------------------------------------- ump joins
+
+def load_ump_maps():
+    """(date_home -> ump, gamePk -> ump). Empty dicts if caches missing."""
+    by_dh, by_pk = {}, {}
+    try:
+        for d, home, _away, ump, _hr, _r in json.load(open(RETRO_CACHE))["games"]:
+            by_dh[f"{d}|{home}"] = ump
+    except Exception:
+        pass
+    try:
+        for dstr, games in json.load(open(S2026_CACHE)).items():
+            d = dstr.replace("-", "")
+            for home, _away, ump, _hr, _r, pk in games:
+                by_dh[f"{d}|{home}"] = ump
+                if pk:
+                    by_pk[pk] = ump
+    except Exception:
+        pass
+    return by_dh, by_pk
+
+def ip_to_float(s):
+    try:
+        w, _, frac = str(s).partition(".")
+        return int(w) + int(frac or 0) / 3.0
+    except (ValueError, TypeError):
+        return 0.0
+
+def game_log(pid, grp):
+    """All gameLog splits across SPLIT_SEASONS: list of normalized rows."""
+    rows = []
+    for season in SPLIT_SEASONS:
+        try:
+            d = get_json(GAMELOG.format(pid=pid, grp=grp, season=season), tries=2)
+        except Exception:
+            continue
+        for st in d.get("stats", []):
+            for sp in st.get("splits", []):
+                stat = sp.get("stat") or {}
+                team_id = (sp.get("team") or {}).get("id")
+                opp_id = (sp.get("opponent") or {}).get("id")
+                home_id = team_id if sp.get("isHome") else opp_id
+                rows.append(dict(
+                    d=(sp.get("date") or "").replace("-", ""),
+                    home=MLBID_TO_CODE.get(home_id),
+                    pk=(sp.get("game") or {}).get("gamePk"),
+                    stat=stat))
+        time.sleep(0.06)
+    return rows
+
+def match_ump(rows, ump, by_dh, by_pk):
+    out = []
+    for r in rows:
+        u = by_pk.get(r["pk"]) or (by_dh.get(f"{r['d']}|{r['home']}") if r["home"] else None)
+        if u == ump:
+            out.append(r)
+    return out
+
+def agg_bat(rows):
+    ab = sum(r["stat"].get("atBats") or 0 for r in rows)
+    hr = sum(r["stat"].get("homeRuns") or 0 for r in rows)
+    h = sum(r["stat"].get("hits") or 0 for r in rows)
+    rbi = sum(r["stat"].get("rbi") or 0 for r in rows)
+    bb = sum(r["stat"].get("baseOnBalls") or 0 for r in rows)
+    k = sum(r["stat"].get("strikeOuts") or 0 for r in rows)
+    return dict(g=len(rows), ab=ab, hr=hr, h=h, rbi=rbi, bb=bb, k=k,
+                avg=(f"{h/ab:.3f}".lstrip("0") if ab else "—"))
+
+def agg_pit(rows):
+    ip = sum(ip_to_float(r["stat"].get("inningsPitched")) for r in rows)
+    er = sum(r["stat"].get("earnedRuns") or 0 for r in rows)
+    k = sum(r["stat"].get("strikeOuts") or 0 for r in rows)
+    bb = sum(r["stat"].get("baseOnBalls") or 0 for r in rows)
+    h = sum(r["stat"].get("hits") or 0 for r in rows)
+    return dict(g=len(rows), ip=round(ip, 1),
+                era=round(9 * er / ip, 2) if ip else None,
+                k=k, bb=bb, h=h,
+                k9=round(9 * k / ip, 1) if ip else None,
+                bb9=round(9 * bb / ip, 1) if ip else None)
+
+# ---------------------------------------------------------------- main
+
 def main():
     for path, label in ((SLATE, "site/data.json"), (HITTERS, "hitters"), (UMPS, "umps")):
         if not os.path.exists(path):
@@ -145,36 +255,78 @@ def main():
     slate = json.load(open(SLATE))
     hitters = json.load(open(HITTERS))
     umps_all = json.load(open(UMPS))
+    umps_pro = json.load(open(UMPS_PRO)) if os.path.exists(UMPS_PRO) else None
     props = json.load(open(PROPS)) if os.path.exists(PROPS) else {"games": []}
+    by_dh, by_pk = load_ump_maps()
+    print(f"ump maps: {len(by_dh)} date-home keys, {len(by_pk)} gamePks")
 
-    # index props by normalized player name, keyed also by matchup
+    # index props by normalized player name
     odds_by_player = {}
     for pg in props.get("games", []):
         for o in pg.get("hr", []):
             odds_by_player.setdefault(norm_name(o["player"]), o)
 
-    lineups = fetch_lineups()
-    lineups = { ABBR_FIX.get(k, k): v for k, v in lineups.items() }
+    lineups, lu_names = fetch_lineups()
+    lineups = {ABBR_FIX.get(k, k): v for k, v in lineups.items()}
+    lu_names = {ABBR_FIX.get(k, k): v for k, v in lu_names.items()}
     if lineups:
         print(f"lineups posted for {len(lineups)} teams")
+
+    # team season offense (one call)
+    team_off = {}
+    try:
+        y = datetime.now(ET).year
+        d = get_json(TEAM_STATS.format(y=y))
+        for st in d.get("stats", []):
+            for sp in st.get("splits", []):
+                code = MLBID_TO_CODE.get((sp.get("team") or {}).get("id"))
+                stat = sp.get("stat") or {}
+                gp = stat.get("gamesPlayed") or 0
+                if code and gp:
+                    team_off[code] = dict(rg=round((stat.get("runs") or 0) / gp, 2),
+                                          ops=stat.get("ops"))
+    except Exception as e:
+        print(f"team stats unavailable ({e})")
+
+    sp_season_cache = {}
+    def sp_season(pid):
+        if not pid or pid in sp_season_cache:
+            return sp_season_cache.get(pid)
+        out = None
+        try:
+            d = get_json(SP_SEASON.format(pid=pid, y=datetime.now(ET).year), tries=2)
+            for st in d.get("stats", []):
+                for sp in st.get("splits", []):
+                    stat = sp.get("stat") or {}
+                    out = dict(era=float(stat.get("era") or 0) or None,
+                               whip=float(stat.get("whip") or 0) or None,
+                               ip=ip_to_float(stat.get("inningsPitched")))
+        except Exception:
+            pass
+        sp_season_cache[pid] = out
+        return out
+
     targets, games_out = [], []
     for g in slate.get("games", []):
         away, home = g["away"], g["home"]
         wx = 1.0 if g.get("dome") else clamp(1 + (g.get("hr", 0) or 0) / 100 * 0.75, 0.78, 1.30)
         um, um_n = ump_mult(g.get("ump"), umps_all)
+        ump_name = (g.get("ump") or {}).get("name")
         p_away = (g.get("pitchers") or {}).get("away")   # away SP faces HOME batters
         p_home = (g.get("pitchers") or {}).get("home")   # home SP faces AWAY batters
         sp_for_home, spn_h = sp_mult(p_away)
         sp_for_away, spn_a = sp_mult(p_home)
-        games_out.append(dict(
-            away=away, home=home, time=g.get("time"),
-            ump=(g.get("ump") or {}).get("name"), umpMult=round(um, 3), umpN=um_n,
-            weatherHr=g.get("hr", 0), dome=bool(g.get("dome")),
-            spAway=(p_away or {}).get("name"), spHome=(p_home or {}).get("name")))
-        for team, opp, spm, sp_name in ((away, home, sp_for_away, (p_home or {}).get("name")),
-                                        (home, away, sp_for_home, (p_away or {}).get("name"))):
+        id_away = ((g.get("pitchers") or {}).get("away") or {}).get("id")
+        id_home = ((g.get("pitchers") or {}).get("home") or {}).get("id")
+
+        exp_hr = 0.0
+        game_rows = []
+        for team, opp, spm, sp_name, spid in (
+                (away, home, sp_for_away, (p_home or {}).get("name"), id_home),
+                (home, away, sp_for_home, (p_away or {}).get("name"), id_away)):
             roster = (hitters.get(team) or {}).get("players", {})
             lu = lineups.get(team)
+            cand = []
             for pid, pl in roster.items():
                 adj, ab, hr = batter_rate(pl.get("g", []))
                 if adj is None:
@@ -182,6 +334,11 @@ def main():
                 order = lu.get(str(pid)) if lu else None
                 if lu and order is None:
                     continue                     # lineup posted, batter not in it
+                cand.append((pid, pl, adj, ab, hr, order))
+            if not lu:
+                # no lineup yet — projected nine = top 9 by 3-season AB
+                cand = sorted(cand, key=lambda c: -c[3])[:9]
+            for pid, pl, adj, ab, hr, order in cand:
                 pa = 4.65 - 0.13 * (order - 1) if order else PA_PER_GAME
                 env = (wx * um * spm) ** 0.75   # damp stacked env factors (calibration)
                 rate = adj * env
@@ -189,6 +346,7 @@ def main():
                 prob_pct = round(prob * 100, 1)
                 if prob_pct > 38:      # sanity cap
                     prob_pct = 38.0
+                exp_hr += prob_pct / 100
                 o = odds_by_player.get(norm_name(pl["name"]))
                 fair = round(o["implied"] * 0.93, 1) if o and o.get("implied") else None
                 if o and o.get("implied") is not None:
@@ -196,7 +354,7 @@ def main():
                     prob_pct = round(0.75 * prob_pct + 0.25 * o["implied"], 1)
                 edge = round(prob_pct - fair, 1) if fair is not None else None
                 targets.append(dict(
-                    _bid=pid, _spid=( (g.get("pitchers") or {}).get("home" if team==away else "away") or {} ).get("id"),
+                    _bid=pid, _spid=spid,
                     _adj=adj, _env=dict(wx=wx, um=um, spm=spm), _pa=pa,
                     player=pl["name"], team=team, opp=opp,
                     game=f"{away} @ {home}",
@@ -209,6 +367,109 @@ def main():
                     implied=o["implied"] if o else None,
                     books=o["books"] if o else 0,
                     fair=fair, edge=edge, value=False))
+
+        # ---- runs projection (partner's Combined page, our shrinkage) ----
+        runs_proj = None
+        wx_runs = clamp(1 + ((g.get("mlb") or {}).get("runs", 0) or 0) / 100 * 0.5,
+                        0.85, 1.18) if not g.get("dome") else 1.0
+        ump_r = 1.0
+        if umps_pro and ump_name and ump_name in umps_pro.get("umps", {}):
+            u = umps_pro["umps"][ump_name]
+            shr = (u["rpg"] * u["n"] + umps_pro["league"]["rpg"] * 150) / (u["n"] + 150)
+            ump_r = clamp(shr / umps_pro["league"]["rpg"], 0.95, 1.05)
+        sides = {}
+        for team, opp_spid, opp_sp_name in ((away, id_home, (p_home or {}).get("name")),
+                                            (home, id_away, (p_away or {}).get("name"))):
+            off = team_off.get(team)
+            if not off:
+                continue
+            sps = sp_season(opp_spid)
+            if sps and sps.get("era") and sps.get("ip"):
+                era_s = (sps["era"] * sps["ip"] + LG_ERA * 40) / (sps["ip"] + 40)
+            else:
+                era_s = LG_ERA
+            sp_factor = clamp(era_s / LG_ERA, 0.75, 1.30)
+            proj = off["rg"] * sp_factor * wx_runs * ump_r
+            sides[team] = dict(proj=round(proj, 1), rg=off["rg"], ops=off.get("ops"),
+                               oppSp=opp_sp_name,
+                               oppEra=sps.get("era") if sps else None,
+                               oppWhip=sps.get("whip") if sps else None)
+        if len(sides) == 2:
+            total = round(sides[away]["proj"] + sides[home]["proj"], 1)
+            line = g.get("total") if g.get("lineSource") == "book" else None
+            diff = round(total - line, 1) if line else None
+            lean = None
+            if diff is not None and abs(diff) >= 1.0:
+                lean = "OVER" if diff > 0 else "UNDER"
+            runs_proj = dict(away=sides[away], home=sides[home], total=total,
+                             line=line, diff=diff, lean=lean,
+                             wxRuns=round(wx_runs, 2), umpRuns=round(ump_r, 2))
+
+        park_avg = g.get("hrPark") or 0
+        vs_park = round((exp_hr / park_avg - 1) * 100) if park_avg else None
+        games_out.append(dict(
+            away=away, home=home, time=g.get("time"), gamePk=g.get("gamePk"),
+            ump=ump_name, umpMult=round(um, 3), umpN=um_n,
+            weatherHr=g.get("hr", 0), dome=bool(g.get("dome")),
+            spAway=(p_away or {}).get("name"), spHome=(p_home or {}).get("name"),
+            spAwayHr9=((p_away or {}).get("all") or {}).get("hr9"),
+            spHomeHr9=((p_home or {}).get("all") or {}).get("hr9"),
+            expHr=round(exp_hr, 2), parkHr=park_avg, vsPark=vs_park,
+            lineups=bool(lineups.get(away) or lineups.get(home)),
+            runs=runs_proj))
+
+    # ---- with-ump splits (display only, never a multiplier) ----
+    n_split_calls = 0
+    for gout, g in zip(games_out, slate.get("games", [])):
+        ump = gout["ump"]
+        away, home = gout["away"], gout["home"]
+        if not ump or not (by_dh or by_pk):
+            continue
+        if not (lineups.get(away) and lineups.get(home)):
+            continue                      # wait for both lineups (evening builds)
+        splits = dict(seasons=f"{SPLIT_SEASONS[0]}-{SPLIT_SEASONS[-1]}",
+                      batters={}, pitchers=[], bvp={})
+        sp_starts = {}
+        for side, spid, spname in (("away", ((g.get("pitchers") or {}).get("away") or {}).get("id"),
+                                    gout["spAway"]),
+                                   ("home", ((g.get("pitchers") or {}).get("home") or {}).get("id"),
+                                    gout["spHome"])):
+            if not spid:
+                continue
+            rows = game_log(spid, "pitching")
+            n_split_calls += len(SPLIT_SEASONS)
+            sp_starts[side] = {r["pk"] for r in rows if r["pk"]}
+            with_u = match_ump(rows, ump, by_dh, by_pk)
+            if with_u:
+                splits["pitchers"].append(dict(name=spname, side=side, **agg_pit(with_u)))
+        for team, opp_side in ((away, "home"), (home, "away")):
+            lu = lineups.get(team) or {}
+            names = lu_names.get(team) or {}
+            roster = (hitters.get(team) or {}).get("players", {})
+            brows, vrows = [], []
+            for pid in lu:
+                nm = (roster.get(pid) or {}).get("name") or names.get(pid)
+                if not nm:
+                    continue
+                rows = game_log(pid, "hitting")
+                n_split_calls += len(SPLIT_SEASONS)
+                with_u = match_ump(rows, ump, by_dh, by_pk)
+                if with_u:
+                    brows.append(dict(name=nm, order=lu[pid], **agg_bat(with_u)))
+                opp_pks = sp_starts.get(opp_side) or set()
+                three = [r for r in with_u if r["pk"] in opp_pks]
+                if three:
+                    vrows.append(dict(name=nm, **agg_bat(three)))
+            brows.sort(key=lambda b: (-b["hr"], -b["g"]))
+            vrows.sort(key=lambda b: (-b["hr"], -b["g"]))
+            if brows:
+                splits["batters"][team] = brows
+            if vrows:
+                splits["bvp"][team] = vrows
+        if splits["batters"] or splits["pitchers"]:
+            gout["splits"] = splits
+    if n_split_calls:
+        print(f"with-ump splits: {n_split_calls} gameLog calls")
 
     # ---- K props: projected strikeouts for each probable starter ----
     ks_odds = {}
@@ -283,6 +544,88 @@ def main():
         t["value"] = True
     top = targets[:40]
 
+    # ---- intel feed ----
+    intel = []
+    real = [go for go in games_out if go["expHr"]]
+    if real:
+        b = max(real, key=lambda go: go["expHr"])
+        bits = []
+        if b["ump"] and b.get("umpMult") not in (None, 1.0):
+            bits.append(f"ump {'+' if b['umpMult'] >= 1 else ''}{round((b['umpMult']-1)*100)}%")
+        bits.append(f"weather {'+' if (b['weatherHr'] or 0) >= 0 else ''}{b['weatherHr']}%")
+        intel.append(dict(icon="💣", tag="TONIGHT", game=f"{b['away']} @ {b['home']}",
+                          title=f"{b['away']} @ {b['home']} is tonight's top HR environment",
+                          text=f"{b['expHr']} expected HRs from our batter-by-batter model — "
+                               + ", ".join(bits),
+                          stat=f"{b['expHr']} exp HR"))
+    for go in games_out:
+        w = go.get("weatherHr") or 0
+        if go["dome"] or abs(w) < 15:
+            continue
+        up = w > 0
+        intel.append(dict(icon="☀️" if up else "🌬️", tag="WEATHER",
+                          game=f"{go['away']} @ {go['home']}",
+                          title=f"Weather {'helping' if up else 'hurting'} hitters in "
+                                f"{go['away']} @ {go['home']}",
+                          text=f"Similar-weather games at this park ran {w:+d}% on HRs vs the "
+                               f"park norm — {'warm temps or outward wind' if up else 'cool air or wind knocking balls down'} tonight",
+                          stat=f"{w:+d}%"))
+    if umps_pro:
+        lg = umps_pro["league"]["hrpg"]
+        for go in games_out:
+            u = umps_pro["umps"].get(go["ump"] or "")
+            if not u:
+                continue
+            pk = u["parks"].get(go["home"])
+            if pk and pk[0] >= 5:
+                v_lg = round((pk[1] / lg - 1) * 100)
+                v_car = round((pk[1] / u["hrpg"] - 1) * 100) if u["hrpg"] else 0
+                if abs(v_lg) >= 15:
+                    intel.append(dict(icon="🎯", tag="UMP × PARK",
+                                      game=f"{go['away']} @ {go['home']}",
+                                      title=f"{go['ump']} at {go['home']}: {pk[1]} HR/game in {pk[0]} games",
+                                      text=f"{v_lg:+d}% vs league avg · {v_car:+d}% vs his own career average behind the plate here",
+                                      stat=f"{pk[1]} HR/g"))
+            if u["n"] >= 30 and abs(u["last5"]["vscareer"]) >= 15:
+                hot = u["last5"]["vscareer"] > 0
+                intel.append(dict(icon="🔥" if hot else "❄️", tag="STREAK",
+                                  game=f"{go['away']} @ {go['home']}",
+                                  title=f"{go['ump']} is running {'hot' if hot else 'cold'} heading into tonight",
+                                  text=f"{u['last5']['hrpg']} HR/game over his last 5 — "
+                                       f"{u['last5']['vscareer']:+.0f}% vs his career {u['hrpg']} HR/game",
+                                  stat=f"{u['last5']['vscareer']:+.0f}%"))
+        m = umps_pro.get("meta") or {}
+        if m.get("top"):
+            intel.append(dict(icon="👀", tag="LEAGUE", game=None,
+                              title=f"{m['top'][0]} calls the most HR-friendly games of any regular ump",
+                              text=f"{m['top'][1]:+.1f}% vs league average across our {umps_pro['seasons']} dataset — check the board when he's posted",
+                              stat=f"{m['top'][1]:+.1f}%"))
+        if m.get("low"):
+            intel.append(dict(icon="🛑", tag="LEAGUE", game=None,
+                              title=f"{m['low'][0]} is the most HR-suppressive regular ump in our dataset",
+                              text=f"{m['low'][1]:+.1f}% vs league average — fade HR props when he's behind the plate",
+                              stat=f"{m['low'][1]:+.1f}%"))
+        if m.get("record"):
+            r = m["record"]
+            dd = f"{r['d'][:4]}-{r['d'][4:6]}-{r['d'][6:]}"
+            intel.append(dict(icon="🚀", tag="RECORD", game=None,
+                              title=f"Dataset record: {r['hr']} HRs in a single game",
+                              text=f"{r['matchup']} on {dd} — {r['ump']} behind the plate. Highest single-game total in {m['games']:,} tracked games",
+                              stat=f"{r['hr']} HR"))
+        intel.append(dict(icon="📊", tag="DATASET", game=None,
+                          title=f"The PRO ump layer tracks {m.get('games', 0):,} games across {umps_pro['seasons']}",
+                          text=f"{m.get('hrs', 0):,} home runs logged · {m.get('umps', 0)} umpires · league baseline {lg} HR/game",
+                          stat=f"{m.get('games', 0):,} games"))
+    tot_leans = [go for go in games_out if (go.get("runs") or {}).get("lean")]
+    for go in tot_leans[:3]:
+        r = go["runs"]
+        intel.append(dict(icon="📈" if r["lean"] == "OVER" else "📉", tag="TOTALS",
+                          game=f"{go['away']} @ {go['home']}",
+                          title=f"Our total says {r['lean']} in {go['away']} @ {go['home']}",
+                          text=f"Projected {r['total']} runs vs the {r['line']} line ({r['diff']:+.1f}) — "
+                               f"offense × opposing SP × weather × ump",
+                          stat=f"{r['diff']:+.1f}"))
+
     parts = []
     if top:
         b = top[0]
@@ -301,8 +644,10 @@ def main():
         parts.append(f"K props: {kk['pitcher']} projects {kk['proj']} Ks vs a {kk['line']} line — lean {kk['lean']}.")
 
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
+                   date=datetime.now(ET).strftime("%Y-%m-%d"),
                    oddsGenerated=props.get("generated"),
-                   brief=" ".join(parts), games=games_out, targets=top, kprops=kprops[:24])
+                   brief=" ".join(parts), games=games_out, targets=top,
+                   kprops=kprops[:24], intel=intel[:20])
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
@@ -320,8 +665,10 @@ def main():
         json.dump(dict(d=dstr, targets=slim, kprops=kslim), f, separators=(",", ":"))
 
     with_odds = sum(1 for t in top if t["price"] is not None)
+    n_splits = sum(1 for go in games_out if go.get("splits"))
     print(f"Wrote {OUT}: {len(top)} targets ({with_odds} with live prices, "
-          f"{len(flagged)} VALUE flags)")
+          f"{len(flagged)} VALUE flags), {len(games_out)} games, "
+          f"{n_splits} with-ump split panels, {len(intel)} intel cards")
 
 if __name__ == "__main__":
     main()
