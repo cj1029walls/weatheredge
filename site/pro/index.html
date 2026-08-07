@@ -39,7 +39,17 @@
   @keyframes bp{0%,100%{opacity:1}50%{opacity:.25}}
   .brief-body{font-size:14px;line-height:1.7;color:#dde5f5}
   .brief-body b{color:#fff}
+  /* tab bar */
+  .tabbar{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 20px;position:sticky;top:0;z-index:30;background:var(--surface);padding:10px 0 10px}
+  .tabbar button{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--body2);background:var(--card);border:1.5px solid var(--line-strong);border-radius:20px;padding:8px 18px;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .tabbar button:hover{border-color:var(--navy2);color:var(--navy2)}
+  .tabbar button.on{background:linear-gradient(135deg,#0e1a3d,var(--navy2));color:#fff;border-color:transparent}
+  .tabbar button .cnt{font-size:10px;background:var(--gray-bg);color:var(--muted);border-radius:9px;padding:1px 7px}
+  .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:#ffd94a}
+  .tab-pane{display:none}
+  .tab-pane.on{display:block}
   .sec-h{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px;display:flex;align-items:center;gap:8px}
+  .sec-h:first-child{margin-top:4px}
   .sec-h .live-dot{width:8px;height:8px;border-radius:50%;background:#178a3f;box-shadow:0 0 7px #35c96b;animation:bp 1.6s ease-in-out infinite}
   table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
   thead th{text-align:left;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:11px 12px;border-bottom:1.5px solid var(--line);background:var(--card)}
@@ -90,6 +100,21 @@
   .runs-strip{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
   .runs-card{flex:1;min-width:200px;background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:10px 13px;font-size:12px}
   .runs-card .big{font-size:20px;font-weight:800;color:var(--navy2)}
+  /* game panel: top-3 + ump + intel strips */
+  .top3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+  .top3-card{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:10px 13px}
+  .rank3{font-size:15px;font-weight:800;color:var(--faint)}
+  .top3-prob{margin-left:auto;text-align:right}
+  .panel-sec{margin-top:14px}
+  .ump-strip{display:flex;gap:14px;flex-wrap:wrap;background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:11px 14px;font-size:12px;align-items:center}
+  .ump-strip .u-big{font-size:18px;font-weight:800;color:var(--navy2)}
+  .ump-strip .u-cell{min-width:110px}
+  .ump-strip .u-lab{font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:800}
+  .mini-intel{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:9px 13px;font-size:12px;margin-top:8px}
+  .mini-intel .ic{font-size:18px}
+  .mini-intel b{font-size:12.5px}
+  .mini-intel p{color:var(--muted);font-size:11.5px;margin:1px 0 0}
+  .mini-intel .stat{margin-left:auto;font-weight:800;color:var(--navy2);white-space:nowrap;padding-left:8px}
   /* intel feed */
   .intel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
   .intel-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:12px 15px;display:flex;gap:11px;align-items:flex-start}
@@ -99,13 +124,7 @@
   .intel-card h4{font-size:13px;font-weight:800;margin:5px 0 3px;line-height:1.35}
   .intel-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
   .intel-card .stat{margin-left:auto;font-size:15px;font-weight:800;color:var(--navy2);white-space:nowrap;padding-left:8px}
-  /* ump leaderboard */
-  details.ump-lb{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:10px}
-  details.ump-lb summary{cursor:pointer;padding:13px 18px;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--body2);list-style:none;display:flex;align-items:center;gap:8px}
-  details.ump-lb summary::-webkit-details-marker{display:none}
-  details.ump-lb summary:after{content:"▾";margin-left:auto;color:var(--faint)}
-  details.ump-lb[open] summary:after{content:"▴"}
-  .ump-lb-body{padding:0 18px 16px;max-height:480px;overflow:auto}
+  .lb-wrap{max-height:520px;overflow:auto;border-radius:var(--radius)}
   footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7}
   @media(max-width:760px){ .hide-m{display:none} }
 </style>
@@ -129,74 +148,94 @@
     <div class="brief-body" id="brief-body"></div>
   </div>
 
-  <div class="sec-h">Tonight's slate — expected HRs <span id="live-ind" style="display:none"><span class="live-dot"></span><span style="color:var(--green-deep)">live · updates every 60s</span></span></div>
-  <table>
-    <thead><tr>
-      <th>Matchup</th><th class="hide-m">Ump</th><th class="hide-m">Starters</th>
-      <th>Weather</th><th>Expected HRs</th><th class="hide-m">vs park norm</th><th>Actual</th>
-    </tr></thead>
-    <tbody id="slate-body"></tbody>
-  </table>
-  <div class="psub" style="margin-top:6px">Expected HRs = the sum of every lineup batter's individual HR probability — a true expected value, not a park average × multipliers. Click a game for with-ump splits &amp; the runs projection.</div>
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="slate" class="on">🏟️ Slate</button>
+    <button data-tab="targets">🎯 Targets <span class="cnt" id="cnt-targets"></span></button>
+    <button data-tab="intel">🧠 Intel <span class="cnt" id="cnt-intel"></span></button>
+    <button data-tab="umps">⚖️ Umpires</button>
+    <button data-tab="record">📊 Record &amp; method</button>
+  </nav>
 
-  <div class="sec-h">Top HR targets</div>
-  <table>
-    <thead><tr>
-      <th>#</th><th>Batter</th><th class="hide-m">Game</th><th>HR chance</th>
-      <th class="hide-m">Factors</th><th>Best price</th><th>Edge</th><th></th>
-    </tr></thead>
-    <tbody id="tbody"></tbody>
-  </table>
+  <!-- ============ SLATE ============ -->
+  <div class="tab-pane on" id="tab-slate">
+    <div class="sec-h">Tonight's slate — expected HRs <span id="live-ind" style="display:none"><span class="live-dot"></span><span style="color:var(--green-deep)">live · auto-updates</span></span></div>
+    <table>
+      <thead><tr>
+        <th>Matchup</th><th class="hide-m">Ump</th><th class="hide-m">Starters</th>
+        <th>Weather</th><th>Expected HRs</th><th class="hide-m">vs park norm</th><th>Actual</th>
+      </tr></thead>
+      <tbody id="slate-body"></tbody>
+    </table>
+    <div class="psub" style="margin-top:6px">Expected HRs = the sum of every lineup batter's individual HR probability — a true expected value, not a park average × multipliers. Click a game for its top targets, ump card, intel &amp; with-ump splits. Live scores come from MLB's free public stats API — zero odds credits used.</div>
 
-  <div class="sec-h">K props — starters</div>
-  <table>
-    <thead><tr>
-      <th>Pitcher</th><th class="hide-m">Game</th><th>Proj Ks</th><th>Line</th><th>O / U</th><th>Lean</th>
-    </tr></thead>
-    <tbody id="ktbody"></tbody>
-  </table>
+    <div class="sec-h" id="totals-h" style="display:none">Game totals — our projection vs the line</div>
+    <table id="totals-table" style="display:none">
+      <thead><tr>
+        <th>Game</th><th class="hide-m">Away proj</th><th class="hide-m">Home proj</th>
+        <th>Our total</th><th>Line</th><th>Lean</th>
+      </tr></thead>
+      <tbody id="totals-body"></tbody>
+    </table>
+  </div>
 
-  <div class="sec-h" id="intel-h" style="display:none">Tonight's intel</div>
-  <div class="intel-grid" id="intel-grid"></div>
+  <!-- ============ TARGETS ============ -->
+  <div class="tab-pane" id="tab-targets">
+    <div class="sec-h">Top HR targets</div>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Batter</th><th class="hide-m">Game</th><th>HR chance</th>
+        <th class="hide-m">Factors</th><th>Best price</th><th>Edge</th><th></th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
 
-  <div class="sec-h" id="totals-h" style="display:none">Game totals — our projection vs the line</div>
-  <table id="totals-table" style="display:none">
-    <thead><tr>
-      <th>Game</th><th class="hide-m">Away proj</th><th class="hide-m">Home proj</th>
-      <th>Our total</th><th>Line</th><th>Lean</th>
-    </tr></thead>
-    <tbody id="totals-body"></tbody>
-  </table>
+    <div class="sec-h">K props — starters</div>
+    <table>
+      <thead><tr>
+        <th>Pitcher</th><th class="hide-m">Game</th><th>Proj Ks</th><th>Line</th><th>O / U</th><th>Lean</th>
+      </tr></thead>
+      <tbody id="ktbody"></tbody>
+    </table>
+  </div>
 
-  <div class="sec-h">Tonight's environments</div>
-  <div class="gamestrip" id="gamestrip"></div>
+  <!-- ============ INTEL ============ -->
+  <div class="tab-pane" id="tab-intel">
+    <div class="sec-h">Tonight's intel</div>
+    <div class="intel-grid" id="intel-grid"></div>
+  </div>
 
-  <details class="ump-lb" id="ump-lb">
-    <summary>⚖️ Umpire leaderboard — every plate ump, 2017–2026</summary>
-    <div class="ump-lb-body">
-      <div class="gamestrip" id="ump-tonight" style="margin-bottom:12px"></div>
+  <!-- ============ UMPIRES ============ -->
+  <div class="tab-pane" id="tab-umps">
+    <div class="sec-h">Tonight's plate umps</div>
+    <div class="gamestrip" id="ump-tonight"></div>
+    <div class="sec-h">Full leaderboard — every plate ump, 2017–2026</div>
+    <div class="lb-wrap">
       <table class="mini"><thead><tr>
         <th>#</th><th>Umpire</th><th>Games</th><th>HR/G</th><th>vs league</th><th>Last 5</th><th class="hide-m">Runs vs lg</th>
       </tr></thead><tbody id="ump-lb-body"></tbody></table>
-      <div class="split-note" id="ump-lb-note"></div>
     </div>
-  </details>
-
-  <div id="record-wrap" style="display:none">
-    <div class="sec-h">Track record — every card graded</div>
-    <div class="gamestrip" id="rec-tiles" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div>
-    <div class="sec-h" style="margin-top:16px">Calibration — what our percentages actually hit</div>
-    <table>
-      <thead><tr><th>Our stated chance</th><th>Picks graded</th><th>Avg stated</th><th>Actually homered</th></tr></thead>
-      <tbody id="cal-body"></tbody>
-    </table>
-    <div class="sec-h" style="margin-top:16px">Recent nights</div>
-    <div class="gamestrip" id="rec-nights"></div>
+    <div class="split-note" id="ump-lb-note"></div>
   </div>
 
-  <div class="m-sec">
-    <h5>How the number is made</h5>
-    <p>When lineups post (~4 PM ET), plate appearances follow the batting slot (leadoff ≈ 4.65, nine-hole ≈ 3.6) and benched players drop off the card; before lineups, everyone gets a flat 4.0. Each batter's three-season HR rate is shrunk toward the league average (small samples can't fake an edge), then adjusted by tonight's weather at the park (DFSRADAR's similar-conditions history), the plate umpire's HR tendency (shrunk, capped at ±12%), and the opposing starter's HR/9 (shrunk by innings). That rate over ~4 plate appearances gives the HR chance. <b>Expected HRs</b> per game is the sum of those individual probabilities. <b>Edge</b> compares our chance to the books' median price with ~7 points of vig stripped out; when a live price exists, 25% of the market's implied probability is blended into ours. Career batter-vs-pitcher history joins the mix only at 10+ at-bats, shrunk hard and capped. A VALUE flag needs a 3-point edge, at least 3 books, and +150 or longer — at most five per night. <b>With-ump splits</b> (how tonight's batters and starters have fared with this exact plate umpire, 2022–2026) are context only — those samples are far too small to move a probability, and we won't pretend otherwise. <b>Game totals</b> blend season offense, the opposing starter's shrunk ERA, the park's weather runs history, and the ump's runs tendency. K projections = shrunk K/9 × shrunk innings per start × the weather strikeout edge at half weight. Every night's card is archived and graded — the calibration table below is the receipts.</p>
+  <!-- ============ RECORD & METHOD ============ -->
+  <div class="tab-pane" id="tab-record">
+    <div id="record-wrap" style="display:none">
+      <div class="sec-h">Track record — every card graded</div>
+      <div class="gamestrip" id="rec-tiles" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div>
+      <div class="sec-h" style="margin-top:16px">Calibration — what our percentages actually hit</div>
+      <table>
+        <thead><tr><th>Our stated chance</th><th>Picks graded</th><th>Avg stated</th><th>Actually homered</th></tr></thead>
+        <tbody id="cal-body"></tbody>
+      </table>
+      <div class="sec-h" style="margin-top:16px">Recent nights</div>
+      <div class="gamestrip" id="rec-nights"></div>
+    </div>
+    <div id="record-empty" class="split-note">First graded night lands after the next slate completes — every card is archived and scored automatically.</div>
+
+    <div class="m-sec">
+      <h5>How the number is made</h5>
+      <p>When lineups post (~4 PM ET), plate appearances follow the batting slot (leadoff ≈ 4.65, nine-hole ≈ 3.6) and benched players drop off the card; before lineups, everyone gets a flat 4.0. Each batter's three-season HR rate is shrunk toward the league average (small samples can't fake an edge), then adjusted by tonight's weather at the park (DFSRADAR's similar-conditions history), the plate umpire's HR tendency (shrunk, capped at ±12%), and the opposing starter's HR/9 (shrunk by innings). That rate over ~4 plate appearances gives the HR chance. <b>Expected HRs</b> per game is the sum of those individual probabilities. <b>Edge</b> compares our chance to the books' median price with ~7 points of vig stripped out; when a live price exists, 25% of the market's implied probability is blended into ours. Career batter-vs-pitcher history joins the mix only at 10+ at-bats, shrunk hard and capped. A VALUE flag needs a 3-point edge, at least 3 books, and +150 or longer — at most five per night. <b>With-ump splits</b> (how tonight's batters and starters have fared with this exact plate umpire, 2022–2026) are context only — those samples are far too small to move a probability, and we won't pretend otherwise. <b>Game totals</b> blend season offense, the opposing starter's shrunk ERA, the park's weather runs history, and the ump's runs tendency. K projections = shrunk K/9 × shrunk innings per start × the weather strikeout edge at half weight. Live scores and HR tracking come from MLB's free public stats API and cost nothing. Every night's card is archived and graded — the calibration table is the receipts.</p>
+    </div>
   </div>
 </main>
 
@@ -226,8 +265,18 @@ const SAMPLE={generated:"preview",oddsGenerated:"preview",date:null,
 let DATA=SAMPLE;
 let UMPS=null;
 const LIVE={byPk:{},hrNames:new Set(),any:false};
+const OPEN=new Set();
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
 const normN=s=>(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").replace(/jr/g,"").trim();
+/* ---- tabs ---- */
+function showTab(id){
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
+  if(history.replaceState) history.replaceState(null,"","#"+id);
+}
+document.getElementById("tabbar").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(b) showTab(b.dataset.tab);
+});
 function chip(lab,v){
   const pct=Math.round((v-1)*100);
   const c=pct>1?"up":pct<-1?"dn":"";
@@ -243,10 +292,41 @@ function miniTable(head,rows){
   return `<table class="mini"><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table>`;
 }
 function splitPanel(g){
+  const gm=`${g.away} @ ${g.home}`;
   let h="";
+  /* top 3 expected HR hitters in this game */
+  const tops=(DATA.targets||[]).filter(t=>t.game===gm).slice(0,3);
+  if(tops.length){
+    h+=`<div class="split-box"><h6>Top HR targets — this game</h6><div class="top3">`+
+      tops.map((t,i)=>`<div class="top3-card"><div class="rank3">#${i+1}</div>
+        <div><div class="pname" style="font-size:13px">${esc(t.player)}${LIVE.hrNames.has(normN(t.player))?'<span class="hr-badge">💣 HR</span>':""}</div>
+        <div class="psub">${t.team}${t.order?` · batting ${t.order}`:""} · vs ${esc(t.sp||t.opp)}</div></div>
+        <div class="top3-prob"><span class="prob">${t.prob}%</span>${t.price!=null?`<div class="imp">${t.price>0?"+":""}${t.price}</div>`:""}</div></div>`).join("")+`</div></div>`;
+  }
+  /* the ump's card, from the leaderboard dataset */
+  if(UMPS&&g.ump&&UMPS.umps[g.ump]){
+    const u=UMPS.umps[g.ump], pk=u.parks&&u.parks[g.home];
+    h+=`<div class="panel-sec split-box"><h6>Behind the plate: ${esc(g.ump)}</h6>
+      <div class="ump-strip">
+        <div class="u-cell"><div class="u-lab">Career HR/G</div><div class="u-big">${u.hrpg}</div><div class="imp">${u.n} games</div></div>
+        <div class="u-cell"><div class="u-lab">vs league</div><div class="u-big">${u.vslg>0?"+":""}${u.vslg}%</div><div class="imp">lg ${UMPS.league.hrpg}/gm</div></div>
+        <div class="u-cell"><div class="u-lab">Last 5</div><div class="u-big">${u.last5.hrpg}</div><div class="imp">${u.last5.vscareer>0?"+":""}${u.last5.vscareer}% vs career</div></div>
+        ${pk?`<div class="u-cell"><div class="u-lab">At ${g.home}</div><div class="u-big">${pk[1]}</div><div class="imp">HR/g in ${pk[0]} games</div></div>`:""}
+        <div class="u-cell"><div class="u-lab">Runs vs lg</div><div class="u-big">${u.rvslg>0?"+":""}${u.rvslg}%</div><div class="imp">for the totals model</div></div>
+      </div></div>`;
+  }
+  /* this game's intel cards */
+  const cards=(DATA.intel||[]).filter(c=>c.game===gm);
+  if(cards.length){
+    h+=`<div class="panel-sec split-box"><h6>Intel on this game</h6>`+
+      cards.map(c=>`<div class="mini-intel"><div class="ic">${c.icon}</div>
+        <div><b>${esc(c.title)}</b><p>${esc(c.text)}</p></div>
+        <div class="stat">${esc(c.stat)}</div></div>`).join("")+`</div>`;
+  }
+  /* with-ump splits */
   const s=g.splits;
   if(s){
-    h+=`<div class="split-box"><h6>With ${esc(g.ump)} behind the plate · ${s.seasons} · history only, never in the math</h6></div>`;
+    h+=`<div class="panel-sec split-box"><h6>With ${esc(g.ump)} behind the plate · ${s.seasons} · history only, never in the math</h6></div>`;
     const teams=Object.keys(s.batters||{});
     if(teams.length){
       h+=`<div class="split-grid">`+teams.map(tm=>{
@@ -270,6 +350,7 @@ function splitPanel(g){
   }else{
     h+=`<div class="split-note">${g.ump?"With-ump splits build once both lineups post (~4–5 PM ET).":"Plate ump not announced yet — splits appear on the evening build."}</div>`;
   }
+  /* runs projection */
   const r=g.runs;
   if(r){
     h+=`<div class="runs-strip">
@@ -294,7 +375,7 @@ function renderSlate(){
     }
     const diffTxt=(lv&&lv.state==="Final"&&g.expHr)?`<div class="exp-sub">${lv.hr>=g.expHr?"over":"under"} projection</div>`:"";
     return `<tr class="slate-row" onclick="toggleGame(${i})">
-      <td><div class="pname">${g.away} @ ${g.home}</div><div class="psub">${esc(g.time||"")}${g.dome?" · roof closed":""}${g.lineups?"":" · lineups pending"}</div></td>
+      <td><div class="pname">${g.away} @ ${g.home}</div><div class="psub">${esc(g.time||"")}${g.dome?" · roof closed":""}${g.lineups?"":" · lineups pending"} · <span style="color:var(--gold);font-weight:700">details ▾</span></div></td>
       <td class="hide-m">${g.ump?`${esc(g.ump)}<div class="psub">${g.umpMult&&g.umpMult!==1?`HR ${g.umpMult>1?"+":""}${Math.round((g.umpMult-1)*100)}% vs lg`:"neutral"}${g.umpN?` · ${g.umpN} g`:""}</div>`:'<span class="imp">TBA</span>'}</td>
       <td class="hide-m"><div class="psub" style="font-size:12px"><b>${esc(g.spAway||"TBD")}</b>${g.spAwayHr9!=null?` <span class="imp">${g.spAwayHr9} HR/9</span>`:""}<br><b>${esc(g.spHome||"TBD")}</b>${g.spHomeHr9!=null?` <span class="imp">${g.spHomeHr9} HR/9</span>`:""}</div></td>
       <td>${g.dome?'<span class="chip">roof</span>':`<span class="chip ${g.weatherHr>1?"up":g.weatherHr<-1?"dn":""}">${g.weatherHr>0?"+":""}${g.weatherHr}%</span>`}</td>
@@ -302,22 +383,24 @@ function renderSlate(){
       <td class="hide-m">${leanChip(g.vsPark)}</td>
       <td>${liveCell}</td>
     </tr>
-    <tr id="exp-${i}" style="display:none"><td colspan="7" class="expand-td">${splitPanel(g)}</td></tr>`;
+    <tr id="exp-${i}" style="display:${OPEN.has(i)?"":"none"}"><td colspan="7" class="expand-td">${splitPanel(g)}</td></tr>`;
   }).join("");
 }
 function toggleGame(i){
+  if(OPEN.has(i)) OPEN.delete(i); else OPEN.add(i);
   const r=document.getElementById("exp-"+i);
-  if(r) r.style.display=r.style.display==="none"?"":"none";
+  if(r) r.style.display=OPEN.has(i)?"":"none";
 }
 function renderIntel(){
   const grid=document.getElementById("intel-grid");
   const cards=DATA.intel||[];
-  document.getElementById("intel-h").style.display=cards.length?"":"none";
-  grid.innerHTML=cards.map(c=>`
+  document.getElementById("cnt-intel").textContent=cards.length||"";
+  grid.innerHTML=cards.length?cards.map(c=>`
     <div class="intel-card"><div class="ic">${c.icon}</div>
       <div style="flex:1"><span class="tag ${c.game?"":"g"}">${esc(c.tag)}${c.game?" · "+esc(c.game):""}</span>
         <h4>${esc(c.title)}</h4><p>${esc(c.text)}</p></div>
-      <div class="stat">${esc(c.stat)}</div></div>`).join("");
+      <div class="stat">${esc(c.stat)}</div></div>`).join("")
+    :'<div class="split-note">Intel cards generate with tonight\'s build.</div>';
 }
 function renderTotals(){
   const rows=(DATA.games||[]).filter(g=>g.runs);
@@ -333,7 +416,8 @@ function renderTotals(){
     </tr>`;}).join("");
 }
 function renderAll(){
-  renderSlate(); renderIntel(); renderTotals();
+  renderSlate(); renderIntel(); renderTotals(); renderUmpsTab();
+  document.getElementById("cnt-targets").textContent=(DATA.targets||[]).length||"";
   const tb=document.getElementById("tbody");
   tb.innerHTML=DATA.targets.map((t,i)=>`
     <tr>
@@ -356,18 +440,13 @@ function renderAll(){
       <td>${k.over!=null?`<span class="imp">O ${k.over>0?"+":""}${k.over} / U ${k.under>0?"+":""}${k.under}</span>`:"—"}</td>
       <td>${k.lean?`<span class="value-badge">${k.lean} ${k.diff>0?"+":""}${k.diff}</span>`:(k.diff!=null?`<span class="imp">${k.diff>0?"+":""}${k.diff}</span>`:"—")}</td>
     </tr>`).join("");
-  document.getElementById("gamestrip").innerHTML=DATA.games.map(g=>`
-    <div class="g-card"><b>${g.away} @ ${g.home}</b> <span style="color:var(--faint)">· ${g.time||""}</span>
-      <div class="gs">Weather HR ${g.weatherHr>0?"+":""}${g.weatherHr}%${g.dome?" (roof closed)":""}<br>
-      Ump: ${g.ump||"TBA"}${g.umpMult?` (${g.umpMult>1?"+":""}${Math.round((g.umpMult-1)*100)}%)`:""}<br>
-      SP: ${g.spAway||"TBD"} v ${g.spHome||"TBD"}</div></div>`).join("");
   if(DATA.brief){
     const safe=DATA.brief.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
     document.getElementById("brief-body").innerHTML=safe.replace(/(\d+\.?\d*%|[+\-]\d+(\.\d+)? ?(pts)?)/g,"<b>$1</b>");
     document.getElementById("brief-card").style.display="";
   }
 }
-/* ---- live HR tracker: one schedule call, every 60s while games run ---- */
+/* ---- live HR tracker: MLB's free public stats API (no key, no odds credits) ---- */
 let liveTimer=null;
 async function pollLive(){
   const d=DATA.date; if(!d) return;
@@ -375,7 +454,7 @@ async function pollLive(){
     const r=await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${d}&hydrate=scoringplays,linescore`);
     if(!r.ok) return;
     const j=await r.json();
-    let anyLive=false,anyStarted=false;
+    let anyLive=false;
     for(const day of (j.dates||[])) for(const g of (day.games||[])){
       const st=(g.status||{}).abstractGameState||"Preview";
       let hr=0;
@@ -397,9 +476,7 @@ async function pollLive(){
         hScore:(g.teams.home.score!=null?g.teams.home.score:(ls.teams&&ls.teams.home?ls.teams.home.runs:0))||0,
         inning:inning};
       if(st==="Live") anyLive=true;
-      if(st!=="Preview") anyStarted=true;
     }
-    LIVE.any=anyStarted;
     document.getElementById("live-ind").style.display=anyLive?"":"none";
     renderAll();
     if(!anyLive&&liveTimer&&Object.values(LIVE.byPk).every(v=>v.state==="Final")){
@@ -418,39 +495,42 @@ async function loadLive(){
     if(DATA.date){ pollLive(); if(!liveTimer) liveTimer=setInterval(pollLive,60000); }
   }catch(e){}
 }
-/* ---- umpire leaderboard (lazy) ---- */
+/* ---- umpire dataset (loaded eagerly: powers game panels + Umpires tab) ---- */
+function renderUmpsTab(){
+  if(!UMPS) return;
+  const tonight=(DATA.games||[]).filter(g=>g.ump&&UMPS.umps[g.ump]);
+  document.getElementById("ump-tonight").innerHTML=tonight.map(g=>{
+    const u=UMPS.umps[g.ump];
+    const pk=u.parks&&u.parks[g.home];
+    return `<div class="g-card"><b>${esc(g.ump)}</b> <span style="color:var(--faint)">· ${g.away} @ ${g.home}</span>
+      <div class="gs">${u.hrpg} HR/g career (${u.vslg>0?"+":""}${u.vslg}% vs lg · ${u.n} g)<br>
+      Last 5: ${u.last5.hrpg} HR/g (${u.last5.vscareer>0?"+":""}${u.last5.vscareer}% vs career)
+      ${pk?`<br>At ${g.home}: ${pk[1]} HR/g in ${pk[0]} g`:""}</div></div>`;
+  }).join("")||'<div class="split-note">No announced umps in the dataset yet tonight — crews post close to game time.</div>';
+  const rows=Object.entries(UMPS.umps).filter(([_,u])=>u.n>=30)
+    .sort((a,b)=>b[1].vslg-a[1].vslg);
+  document.getElementById("ump-lb-body").innerHTML=rows.map(([nm,u],i)=>`
+    <tr><td class="rank">${i+1}</td><td class="pname" style="font-size:12.5px">${esc(nm)}</td>
+    <td>${u.n}</td><td>${u.hrpg}</td>
+    <td><span class="${u.vslg>=3?"edge-pos":u.vslg<=-3?"edge-neg":""}" style="font-weight:800">${u.vslg>0?"+":""}${u.vslg}%</span></td>
+    <td class="imp">${u.last5.hrpg} (${u.last5.vscareer>0?"+":""}${u.last5.vscareer}%)</td>
+    <td class="hide-m imp">${u.rvslg>0?"+":""}${u.rvslg}%</td></tr>`).join("");
+  document.getElementById("ump-lb-note").textContent=
+    `${UMPS.meta.games.toLocaleString()} games · ${UMPS.meta.hrs.toLocaleString()} HRs · league ${UMPS.league.hrpg} HR/game · ${UMPS.seasons} · min 30 games to rank`;
+}
 async function loadUmps(){
-  if(UMPS) return;
   try{
     const r=await fetch("umps.json?_="+Date.now());
     if(!r.ok){document.getElementById("ump-lb-note").textContent="Umpire dataset builds on the next nightly run.";return;}
     UMPS=await r.json();
-    const tonight=(DATA.games||[]).filter(g=>g.ump&&UMPS.umps[g.ump]);
-    document.getElementById("ump-tonight").innerHTML=tonight.map(g=>{
-      const u=UMPS.umps[g.ump];
-      const pk=u.parks&&u.parks[g.home];
-      return `<div class="g-card"><b>${esc(g.ump)}</b> <span style="color:var(--faint)">· ${g.away} @ ${g.home}</span>
-        <div class="gs">${u.hrpg} HR/g career (${u.vslg>0?"+":""}${u.vslg}% vs lg · ${u.n} g)<br>
-        Last 5: ${u.last5.hrpg} HR/g (${u.last5.vscareer>0?"+":""}${u.last5.vscareer}% vs career)
-        ${pk?`<br>At ${g.home}: ${pk[1]} HR/g in ${pk[0]} g`:""}</div></div>`;
-    }).join("")||'<div class="split-note">No announced umps in the dataset yet tonight.</div>';
-    const rows=Object.entries(UMPS.umps).filter(([_,u])=>u.n>=30)
-      .sort((a,b)=>b[1].vslg-a[1].vslg);
-    document.getElementById("ump-lb-body").innerHTML=rows.map(([nm,u],i)=>`
-      <tr><td class="rank">${i+1}</td><td class="pname" style="font-size:12.5px">${esc(nm)}</td>
-      <td>${u.n}</td><td>${u.hrpg}</td>
-      <td><span class="${u.vslg>=3?"edge-pos":u.vslg<=-3?"edge-neg":""}" style="font-weight:800">${u.vslg>0?"+":""}${u.vslg}%</span></td>
-      <td class="imp">${u.last5.hrpg} (${u.last5.vscareer>0?"+":""}${u.last5.vscareer}%)</td>
-      <td class="hide-m imp">${u.rvslg>0?"+":""}${u.rvslg}%</td></tr>`).join("");
-    document.getElementById("ump-lb-note").textContent=
-      `${UMPS.meta.games.toLocaleString()} games · ${UMPS.meta.hrs.toLocaleString()} HRs · league ${UMPS.league.hrpg} HR/game · ${UMPS.seasons} · min 30 games to rank`;
+    renderAll();
   }catch(e){}
 }
-document.getElementById("ump-lb").addEventListener("toggle",e=>{if(e.target.open)loadUmps();});
 function renderRecord(rec){
   if(!rec||!rec.summary||!rec.summary.nights){return;}
   const s=rec.summary;
   document.getElementById("record-wrap").style.display="";
+  document.getElementById("record-empty").style.display="none";
   const pct=(w,n)=>n?Math.round(w/n*100)+"%":"—";
   document.getElementById("rec-tiles").innerHTML=[
     {k:"Nights graded",v:s.nights,s:s.graded+" picks scored"},
@@ -473,8 +553,10 @@ async function loadRecord(){
     if(r.ok) renderRecord(await r.json());
   }catch(e){}
 }
+if(location.hash&&["slate","targets","intel","umps","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
 renderAll();
 loadLive();
+loadUmps();
 loadRecord();
 </script>
 </body>
