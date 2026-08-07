@@ -85,13 +85,15 @@ def fetch_lineups():
                     players = lu.get(key) or []
                     if len(players) < 8:
                         continue
-                    team_id = g["teams"][side]["team"].get("abbreviation") or ""
+                    # map by team id — the schedule payload no longer carries
+                    # abbreviations reliably (they came back null Aug 2026)
+                    code = MLBID_TO_CODE.get(g["teams"][side]["team"].get("id"))
                     slots = {str(p.get("id")): i + 1 for i, p in enumerate(players)}
                     nm = {str(p.get("id")): (p.get("fullName") or p.get("lastName") or "")
                           for p in players}
-                    if team_id:
-                        out[team_id] = slots
-                        names[team_id] = nm
+                    if code:
+                        out[code] = slots
+                        names[code] = nm
     except Exception as e:
         print(f"lineups unavailable ({e}) — using flat 4.0 PA")
     return out, names
