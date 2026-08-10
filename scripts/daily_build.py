@@ -306,8 +306,8 @@ def wet_split(hist, line):
     out = dict(wet=s(wet), dry=s(dry))
     if line:
         n = len(wet)
-        out["wetOver"] = round(sum(1 for x in wet if x["r"] > line) / n * 100)
-        out["wetUnder"] = round(sum(1 for x in wet if x["r"] < line) / n * 100)
+        out["wetOver"] = round(sum(1 for x in wet if era_runs(x) > line) / n * 100)
+        out["wetUnder"] = round(sum(1 for x in wet if era_runs(x) < line) / n * 100)
     return out
 
 ERA_FACTOR = {}   # season -> run-environment scale (filled in main)
