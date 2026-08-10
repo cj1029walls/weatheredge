@@ -329,7 +329,7 @@ def main():
         id_home = ((g.get("pitchers") or {}).get("home") or {}).get("id")
 
         exp_hr = 0.0
-        game_rows = []
+        game_lineup = {}
         for team, opp, spm, sp_name, spid in (
                 (away, home, sp_for_away, (p_home or {}).get("name"), id_home),
                 (home, away, sp_for_home, (p_away or {}).get("name"), id_away)):
@@ -361,7 +361,7 @@ def main():
                     # market anchor at 40% — week 1 the books' Brier edged ours
                     prob_pct = round(0.60 * prob_pct + 0.40 * o["implied"], 1)
                 edge = round(prob_pct - fair, 1) if fair is not None else None
-                targets.append(dict(
+                row = dict(
                     _bid=pid, _spid=spid,
                     _adj=adj, _env=dict(wx=wx, um=um, spm=spm), _pa=pa,
                     player=pl["name"], team=team, opp=opp,
@@ -374,7 +374,24 @@ def main():
                     price=o["price"] if o else None,
                     implied=o["implied"] if o else None,
                     books=o["books"] if o else 0,
-                    fair=fair, edge=edge, value=False))
+                    fair=fair, edge=edge, value=False)
+                targets.append(row)
+                # Lineups tab: same dict object, so BvP/alt updates flow through
+                game_lineup.setdefault(team, []).append(row)
+            # lineup members with no 3-season sample (rookies / call-ups):
+            # they still get a row — a number for everybody, honestly labeled
+            if lu:
+                seen = {str(p[0]) for p in cand}
+                for pid, slot in lu.items():
+                    if pid in seen:
+                        continue
+                    nm = ((roster.get(pid) or {}).get("name")
+                          or (lu_names.get(team) or {}).get(pid))
+                    if nm:
+                        game_lineup.setdefault(team, []).append(dict(
+                            player=nm, team=team, opp=opp, order=slot,
+                            prob=None, sp=sp_name,
+                            note="under 50 AB in our 3-season sample"))
 
         # ---- runs projection (partner's Combined page, our shrinkage) ----
         runs_proj = None
@@ -424,6 +441,9 @@ def main():
             spHomeHr9=((p_home or {}).get("all") or {}).get("hr9"),
             expHr=round(exp_hr, 2), parkHr=park_avg, vsPark=vs_park,
             lineups=bool(lineups.get(away) or lineups.get(home)),
+            luPosted=dict(away=bool(lineups.get(away)), home=bool(lineups.get(home))),
+            lineup={t: sorted(rows, key=lambda r: (r.get("order") or 99, -(r.get("prob") or 0)))
+                    for t, rows in game_lineup.items()},
             runs=runs_proj))
 
     # ---- with-ump splits (display only, never a multiplier) ----
@@ -660,6 +680,37 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
+
+    # ---- free-side teaser feed (site/teaser.json) ----
+    # Publishes ONLY the #1 target in the clear. The rest of the card ships as
+    # salted FNV-1a name hashes + rank + price, so the free page's live ticker
+    # can announce "PRO's #7 target just homered (+520)" without leaking the
+    # board (names/probs are never in the free payload).
+    def fnv(s):
+        h = 0x811c9dc5
+        for ch in s:
+            h = ((h ^ ord(ch)) * 0x01000193) & 0xffffffff
+        return format(h, "08x")
+    salt = datetime.now(ET).strftime("%Y%m%d")
+    t1 = top[0] if top else None
+    teaser = dict(
+        generated=payload["generated"], date=payload["date"],
+        top1=None if not t1 else dict(player=t1["player"], team=t1["team"],
+                                      game=t1["game"], prob=t1["prob"],
+                                      price=t1["price"], implied=t1["implied"],
+                                      value=t1["value"]),
+        counts=dict(targets=len(top), priced=sum(1 for t in top if t["price"] is not None),
+                    value=len(flagged), games=len(games_out)),
+        expTop=None if not games_out else max(
+            (dict(game=f"{go['away']} @ {go['home']}", exp=go["expHr"])
+             for go in games_out if go["expHr"]), key=lambda x: x["exp"], default=None),
+        salt=salt,
+        tlist=[dict(r=i + 1, h=fnv(salt + norm_name(t["player"])),
+                    price=t["price"], value=t["value"])
+               for i, t in enumerate(top)])
+    with open(os.path.join(ROOT, "site", "teaser.json"), "w") as f:
+        json.dump(teaser, f, separators=(",", ":"))
+    print(f"Wrote site/teaser.json (#1: {t1['player'] if t1 else '—'})")
 
     # archive tonight's card for future grading
     os.makedirs(PRED_DIR, exist_ok=True)
