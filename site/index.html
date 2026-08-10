@@ -173,6 +173,8 @@
   .pt-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
   .pt-go{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
   .pt-go:hover{filter:brightness(1.06)}
+  .pt-login{color:#c9d4ea;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:8px 16px}
+  .pt-login:hover{color:#fff;border-color:#fff}
   .pt-receipts{font-size:11.5px;color:#9fb0d4}
   .pt-receipts b{color:#6ee7a0}
 
@@ -474,6 +476,8 @@
 <main>
   <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — live slate loads automatically when the daily build has run.</span></div>
 
+  <section class="hero" id="hero"></section>
+
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>Today's read — live from the radar<span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
     <div class="brief-body" id="brief-body"></div>
@@ -488,8 +492,10 @@
     <div class="pt-locked" id="pt-locked"></div>
     <div class="pt-cta">
       <a class="pt-go" href="/pro/">Unlock the full board — $15/mo</a>
+      <a class="pt-login" href="/pro/#login">Member log in</a>
       <div class="pt-receipts" id="pt-receipts"></div>
     </div>
+    <div style="font-size:10.5px;color:#7285ab;margin-top:7px">Included free with DFS Kitchen All-Access · graded in public every night</div>
   </div>
   <div class="kx-card">
     <div><div class="kx-k">⚡ Found your edge?</div>
@@ -498,20 +504,10 @@
     <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=mlb" target="_blank" rel="noopener">Build lineups →</a>
   </div>
 
-  <div class="pro-card">
-    <div><div class="px-k">💣 DFSRADAR PRO — $15/mo</div>
-    <div class="px-t">Tonight's <b>HR prop targets</b>: our probability vs the books' live price, VALUE flags, the 22,000-game umpire layer, and live actual-vs-projected tracking.</div>
-    <div class="px-s">Graded in public every night · included free with DFS Kitchen All-Access</div></div>
-    <div class="px-btns">
-      <a class="px-go" href="/pro/">See tonight's card →</a>
-      <a class="px-login" href="/pro/#login">Member log in</a>
-    </div>
-  </div>
 
   <!-- ======== SLATE VIEW ======== -->
   <section class="view active" id="view-slate">
     <div class="summary-strip" id="summary-strip"></div>
-    <section class="hero" id="hero"></section>
     <div class="controls">
       <h2>Weather impact vs each park<span class="tip" data-tip="HR, R, and K show how home runs, runs, and strikeouts in historically similar weather at that park compare to the park's own average. Green = weather boosts it, red = weather suppresses it."><span class="info-i">i</span></span></h2>
       <div class="sort-wrap">
