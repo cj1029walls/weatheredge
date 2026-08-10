@@ -129,6 +129,27 @@
   .mini-intel b{font-size:12.5px}
   .mini-intel p{color:var(--muted);font-size:11.5px;margin:1px 0 0}
   .mini-intel .stat{margin-left:auto;font-weight:800;color:var(--navy2);white-space:nowrap;padding-left:8px}
+  /* lineups tab */
+  .lu-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .lu-pills button{font-family:inherit;font-size:11.5px;font-weight:800;letter-spacing:.4px;color:var(--body2);background:var(--card);border:1.5px solid var(--line-strong);border-radius:16px;padding:6px 13px;cursor:pointer}
+  .lu-pills button.on{background:var(--navy2);color:#fff;border-color:transparent}
+  .lu-head-strip{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .lu-head-strip .g-card{flex:1;min-width:170px}
+  .lu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:900px){.lu-grid{grid-template-columns:1fr}}
+  .lu-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .lu-card .lu-top{background:linear-gradient(120deg,#0e1a3d,var(--navy2));color:#fff;padding:12px 16px}
+  .lu-card .lu-top .tm{font-size:17px;font-weight:800;letter-spacing:.5px}
+  .lu-card .lu-top .vs{font-size:11.5px;color:#aab8d8;margin-top:2px}
+  .lu-card .lu-top .vs b{color:#ffd94a}
+  .lu-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line)}
+  .lu-row:last-child{border-bottom:0}
+  .lu-row:hover{background:#f8fafc}
+  .lu-ord{width:22px;font-size:13px;font-weight:800;color:var(--faint);text-align:center}
+  .lu-mid{flex:1;min-width:0}
+  .lu-prob{font-size:16px;font-weight:800;color:var(--navy2);width:58px;text-align:right}
+  .lu-price{width:74px;text-align:right}
+  .proj-tag{display:inline-block;background:var(--gray-bg);color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.8px;border-radius:8px;padding:1.5px 6px;margin-left:6px}
   /* intel feed */
   .intel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
   .intel-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:12px 15px;display:flex;gap:11px;align-items:flex-start}
@@ -205,6 +226,7 @@
 
   <nav class="tabbar" id="tabbar">
     <button data-tab="slate" class="on">🏟️ Slate</button>
+    <button data-tab="lineups">🧢 Lineups</button>
     <button data-tab="targets">🎯 Targets <span class="cnt" id="cnt-targets"></span></button>
     <button data-tab="intel">🧠 Intel <span class="cnt" id="cnt-intel"></span></button>
     <button data-tab="umps">⚖️ Umpires</button>
@@ -231,6 +253,15 @@
       </tr></thead>
       <tbody id="totals-body"></tbody>
     </table>
+  </div>
+
+  <!-- ============ LINEUPS ============ -->
+  <div class="tab-pane" id="tab-lineups">
+    <div class="sec-h">Full lineups — a number for everybody</div>
+    <div class="lu-pills" id="lu-pills"></div>
+    <div id="lu-head"></div>
+    <div class="lu-grid" id="lu-grid"></div>
+    <div class="psub" style="margin-top:8px">Every batter in both lineups with our HR probability, live price, and factors. Rookies under 50 AB in our 3-season sample are shown without a number — we don't fake edges. Before lineups post (~4 PM ET), you see each team's projected nine.</div>
   </div>
 
   <!-- ============ TARGETS ============ -->
@@ -447,6 +478,43 @@ function toggleGame(i){
   const r=document.getElementById("exp-"+i);
   if(r) r.style.display=OPEN.has(i)?"":"none";
 }
+/* ---- Lineups tab ---- */
+let LSEL=0;
+function renderLineups(){
+  const games=(DATA.games||[]).filter(g=>g.lineup&&Object.keys(g.lineup).length);
+  const pills=document.getElementById("lu-pills");
+  if(!games.length){pills.innerHTML='<div class="split-note">Lineup cards build with tonight\'s first slate run.</div>';document.getElementById("lu-grid").innerHTML="";document.getElementById("lu-head").innerHTML="";return;}
+  if(LSEL>=games.length) LSEL=0;
+  pills.innerHTML=games.map((g,i)=>`<button class="${i===LSEL?"on":""}" onclick="LSEL=${i};renderLineups()">${g.away} @ ${g.home}</button>`).join("");
+  const g=games[LSEL];
+  const u=UMPS&&g.ump?UMPS.umps[g.ump]:null;
+  const r=g.runs;
+  document.getElementById("lu-head").innerHTML=`<div class="lu-head-strip">
+    <div class="g-card"><div class="psub" style="font-weight:800;text-transform:uppercase;letter-spacing:.8px">Expected HRs</div><div class="prob" style="font-size:22px">${g.expHr?g.expHr.toFixed(2):"—"}</div><div class="gs">park avg ${g.parkHr||"—"} · ${g.vsPark!=null?(g.vsPark>0?"+":"")+g.vsPark+"% vs norm":""}</div></div>
+    <div class="g-card"><div class="psub" style="font-weight:800;text-transform:uppercase;letter-spacing:.8px">Weather</div><div class="prob" style="font-size:22px">${g.dome?"Roof":"HR "+(g.weatherHr>0?"+":"")+g.weatherHr+"%"}</div><div class="gs">${esc(g.time||"")}</div></div>
+    <div class="g-card"><div class="psub" style="font-weight:800;text-transform:uppercase;letter-spacing:.8px">Behind the plate</div><div class="prob" style="font-size:${g.ump?"16":"22"}px">${g.ump?esc(g.ump):"TBA"}</div><div class="gs">${u?`${u.hrpg} HR/g (${u.vslg>0?"+":""}${u.vslg}% vs lg)`:(g.umpMult&&g.umpMult!==1?`HR ${g.umpMult>1?"+":""}${Math.round((g.umpMult-1)*100)}%`:"")}</div></div>
+    <div class="g-card"><div class="psub" style="font-weight:800;text-transform:uppercase;letter-spacing:.8px">Our total</div><div class="prob" style="font-size:22px">${r?r.total:"—"}</div><div class="gs">${r&&r.line?`line ${r.line} · ${r.lean?r.lean+" "+(r.diff>0?"+":"")+r.diff:(r.diff>0?"+":"")+r.diff}`:"no book line yet"}</div></div>
+  </div>`;
+  const kByName={}; (DATA.kprops||[]).forEach(k=>kByName[normN(k.pitcher)]=k);
+  document.getElementById("lu-grid").innerHTML=[["away",g.away,g.spHome,g.spHomeHr9],["home",g.home,g.spAway,g.spAwayHr9]].map(([side,tm,oppSp,oppHr9])=>{
+    const rows=(g.lineup[tm]||[]);
+    const posted=g.luPosted?g.luPosted[side]:g.lineups;
+    const ourSp=side==="away"?g.spAway:g.spHome;
+    const k=kByName[normN(ourSp||"")];
+    return `<div class="lu-card">
+      <div class="lu-top"><div class="tm">${tm} ${posted?"":'<span class="proj-tag" style="background:rgba(255,255,255,.15);color:#ffd94a">PROJECTED</span>'}</div>
+        <div class="vs">vs <b>${esc(oppSp||"TBD")}</b>${oppHr9!=null?` · ${oppHr9} HR/9`:""}${ourSp?`<br>SP ${esc(ourSp)}${k?` — proj ${k.proj} Ks${k.line!=null?` vs ${k.line} line${k.lean?` · <b>${k.lean}</b>`:""}`:""}`:""}`:""}</div></div>
+      ${rows.map(t=>`<div class="lu-row">
+        <div class="lu-ord">${t.order||"·"}</div>
+        <div class="lu-mid"><div class="pname" style="font-size:13.5px">${esc(t.player)}${LIVE.hrNames.has(normN(t.player))?'<span class="hr-badge">💣 HR</span>':""}${t.value?' <span class="value-badge">Value</span>':""}</div>
+          <div class="psub">${t.prob!=null?`${t.seasons||""}${t.bvpRaw?` · BvP ${t.bvpRaw}`:""}`:esc(t.note||"")}</div>
+          ${t.f?`<div class="chips" style="margin-top:3px">${chip("Bat",t.f.bat)}${chip("Wthr",t.f.wx)}${chip("Ump",t.f.ump)}${chip("SP",t.f.sp)}${t.f.bvp?chip("BvP",t.f.bvp):""}</div>`:""}</div>
+        <div class="lu-prob">${t.prob!=null?t.prob+"%":"—"}</div>
+        <div class="lu-price">${t.price!=null?`<span class="price">${t.price>0?"+":""}${t.price}</span>`:'<span class="imp">—</span>'}${t.p2!=null&&t.alt?`<div class="imp">2+: ${t.p2}%</div>`:""}</div>
+      </div>`).join("")}
+    </div>`;
+  }).join("");
+}
 function renderIntel(){
   const grid=document.getElementById("intel-grid");
   const cards=DATA.intel||[];
@@ -472,7 +540,7 @@ function renderTotals(){
     </tr>`;}).join("");
 }
 function renderAll(){
-  renderSlate(); renderIntel(); renderTotals(); renderUmpsTab();
+  renderSlate(); renderLineups(); renderIntel(); renderTotals(); renderUmpsTab();
   document.getElementById("cnt-targets").textContent=(DATA.targets||[]).length||"";
   const tb=document.getElementById("tbody");
   tb.innerHTML=DATA.targets.map((t,i)=>`
@@ -609,7 +677,7 @@ async function loadRecord(){
     if(r.ok) renderRecord(await r.json());
   }catch(e){}
 }
-if(location.hash&&["slate","targets","intel","umps","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
+if(location.hash&&["slate","lineups","targets","intel","umps","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
 let GATED=null;
