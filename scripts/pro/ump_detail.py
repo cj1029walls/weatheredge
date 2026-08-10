@@ -217,6 +217,17 @@ def main():
                        to=recent[-1][0] if recent else None),
             parks=parks)
 
+    # park HR factors (all seasons, home park) + recent game log
+    park_agg = {}
+    for d, home, away, ump, hr, runs in rows:
+        p = park_agg.setdefault(home, [0, 0])
+        p[0] += 1; p[1] += hr
+    parks_out = {code: dict(n=p[0], hrpg=round(p[1] / p[0], 2),
+                            factor=round((p[1] / p[0]) / lg_hrpg, 3))
+                 for code, p in park_agg.items() if p[0] >= 100}
+    recent_log = [dict(d=r[0], m=f"{r[2]}@{r[1]}", ump=r[3], hr=r[4], r=r[5])
+                  for r in sorted(rows, key=lambda r: r[0], reverse=True)[:150]]
+
     # league context / records
     record = max(rows, key=lambda r: r[4])
     qual = {k: v for k, v in out_umps.items() if v["n"] >= 30}
@@ -233,6 +244,7 @@ def main():
                   low=[low[0], low[1]["vslg"]] if low else None,
                   record=dict(hr=record[4], d=record[0],
                               matchup=f"{record[2]}@{record[1]}", ump=record[3])),
+        parkFactors=parks_out, log=recent_log,
         umps=out_umps)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:

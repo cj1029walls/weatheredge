@@ -413,7 +413,9 @@ def main():
                 era_s = (sps["era"] * sps["ip"] + LG_ERA * 40) / (sps["ip"] + 40)
             else:
                 era_s = LG_ERA
-            sp_factor = clamp(era_s / LG_ERA, 0.75, 1.30)
+            # exponent 0.6: the starter covers ~60% of innings — a full ERA
+            # ratio double-counts what season R/G already includes
+            sp_factor = clamp((era_s / LG_ERA) ** 0.6, 0.80, 1.25)
             proj = off["rg"] * sp_factor * wx_runs * ump_r
             sides[team] = dict(proj=round(proj, 1), rg=off["rg"], ops=off.get("ops"),
                                oppSp=opp_sp_name,
@@ -551,9 +553,10 @@ def main():
         t["prob"] = p
         if t.get("fair") is not None:
             t["edge"] = round(p - t["fair"], 1)
-        # 2+ HR: binomial P(X>=2) over 4 PA, matched to alt line when offered
-        n, r = 4, min(rate, 0.18)
-        p2 = 1 - (1 - r) ** n - n * r * (1 - r) ** (n - 1)
+        # 2+ HR: binomial P(X>=2) over 4 PA, derived from the SAME calibrated
+        # probability we display (keeps 1+ and 2+ internally consistent)
+        r2 = 1 - (1 - p / 100) ** 0.25
+        p2 = 1 - (1 - r2) ** 4 - 4 * r2 * (1 - r2) ** 3
         t["p2"] = round(p2 * 100, 1)
         o = odds_by_player.get(norm_name(t["player"]))
         if o and o.get("alt"):
