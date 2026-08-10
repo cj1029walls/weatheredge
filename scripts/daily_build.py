@@ -310,6 +310,36 @@ def wet_split(hist, line):
         out["wetUnder"] = round(sum(1 for x in wet if x["r"] < line) / n * 100)
     return out
 
+ERA_FACTOR = {}   # season -> run-environment scale (filled in main)
+
+def build_era_factors(hist_all):
+    """Scale each historical season's runs to the recent run environment.
+
+    2019's juiced ball ran ~0.5 r/g hotter than recent seasons; matching raw
+    totals against today's line over-calls overs. Reference = mean of the two
+    most recent completed seasons in the dataset.
+    """
+    by_year = {}
+    for code, h in hist_all.items():
+        if code.startswith("_"):
+            continue
+        for x in h.get("games", []):
+            y = int(str(x["d"])[:4])
+            by_year.setdefault(y, []).append(x["r"])
+    if not by_year:
+        return
+    season_avg = {y: statistics.mean(v) for y, v in by_year.items() if len(v) >= 100}
+    ref_years = sorted(season_avg)[-2:]
+    ref = statistics.mean(season_avg[y] for y in ref_years)
+    for y, avg in season_avg.items():
+        ERA_FACTOR[y] = ref / avg
+    spread = {y: round(f, 3) for y, f in sorted(ERA_FACTOR.items())}
+    print(f"era factors (ref {ref:.2f} r/g): {spread}")
+
+def era_runs(x):
+    """A matched game's total runs, scaled to the current run environment."""
+    return x["r"] * ERA_FACTOR.get(int(str(x["d"])[:4]), 1.0)
+
 def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=None):
     home_id = g["teams"]["home"]["team"]["id"]
     away_id = g["teams"]["away"]["team"]["id"]
@@ -418,15 +448,23 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
     line_source = "book" if line is not None else "est"
     if line is None and rows:
         # estimate: the half-point line that best balances the matched sample
-        med = int(statistics.median(x["r"] for x in rows))
+        med = int(statistics.median(era_runs(x) for x in rows))
         candidates = [k + 0.5 for k in range(max(4, med - 3), med + 4)]
         def imbalance(L):
-            o = sum(1 for x in rows if x["r"] > L); u = sum(1 for x in rows if x["r"] < L)
+            o = sum(1 for x in rows if era_runs(x) > L); u = sum(1 for x in rows if era_runs(x) < L)
             return abs(o - u)
         line = min(candidates, key=imbalance)
-    over = sum(1 for x in rows if x["r"] > line)
-    under = sum(1 for x in rows if x["r"] < line)
+    # era-adjusted totals: each matched game scaled to the current run environment
+    over = sum(1 for x in rows if era_runs(x) > line)
+    under = sum(1 for x in rows if era_runs(x) < line)
     push = n - over - under
+    ou_median = round(statistics.median(era_runs(x) for x in rows), 1) if rows else None
+    # a LEAN is only called when the matched sample's median clears the line
+    # by a full run — percentages alone over-call (books already price weather)
+    ou_lean = None
+    if ou_median is not None and line:
+        gap = ou_median - line
+        ou_lean = "over" if gap >= 1.0 else ("under" if gap <= -1.0 else None)
 
     out.update(
         sample=n,
@@ -438,6 +476,7 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
                 under=round(under / n * 100) if n else 0,
                 push=max(0, 100 - (round(over / n * 100) + round(under / n * 100))) if n else 0),
         total=line or 0, lineSource=line_source, note=note,
+        ouMedian=ou_median, ouLean=None if dome else ou_lean,
         matches=[dict(d=x["d"], t=x["t"], w=x["w"], r=x["r"], hr=x["hr"],
                       **({"p": x["p"]} if "p" in x else {}))
                  for x in sorted(rows, key=lambda x: x["d"], reverse=True)[:15]],
@@ -474,7 +513,8 @@ def archive_predictions(date_str, games):
     edge_pk = max(live, key=lambda g: abs(g["hr"]))["gamePk"] if live else None
     slim = [dict(gamePk=g.get("gamePk"), away=g["away"], home=g["home"],
                  total=g.get("total"), lineSource=g.get("lineSource"),
-                 ou=g["ou"], hr=g["hr"], runs=g["runs"], ks=g["ks"],
+                 ou=g["ou"], ouLean=g.get("ouLean"), ouMedian=g.get("ouMedian"),
+                 hr=g["hr"], runs=g["runs"], ks=g["ks"],
                  hrPark=g.get("hrPark"), soPark=g.get("soPark"),
                  edge=(g.get("gamePk") == edge_pk),
                  dome=g.get("dome", False), sample=g.get("sample"))
@@ -511,10 +551,14 @@ def grade_day(date_str, preds):
         except Exception as e:
             print(f"    boxscore {pk}: {e}")
         ou_res = "push" if total == line else ("over" if total > line else "under")
-        lean = ("over" if p["ou"]["over"] > p["ou"]["under"] + 3
-                else "under" if p["ou"]["under"] > p["ou"]["over"] + 3 else None)
+        if "ouLean" in p:                      # v2: median-gap lean (era-adjusted)
+            lean = p["ouLean"]
+        else:                                  # legacy cards: percentage-margin lean
+            lean = ("over" if p["ou"]["over"] > p["ou"]["under"] + 3
+                    else "under" if p["ou"]["under"] > p["ou"]["over"] + 3 else None)
         lean_ok = None if (not lean or not line or ou_res == "push") else (lean == ou_res)
-        hr_call = "boost" if p["hr"] >= 8 else ("suppress" if p["hr"] <= -8 else None)
+        # v2: ±15% trigger — graded results showed 8-15% calls hit only 20%
+        hr_call = "boost" if p["hr"] >= 15 else ("suppress" if p["hr"] <= -15 else None)
         hr_ok = None
         if hr_call and hr is not None and p.get("hrPark"):
             hr_ok = (hr_call == ("boost" if hr > p["hrPark"] else "suppress"))
@@ -630,6 +674,7 @@ def main():
             sys.exit("data/parks_history.json missing — run the 'Build history' workflow first.")
     hist_all = json.load(open(hist_path))
     league = hist_all["_league"]
+    build_era_factors(hist_all)
     hitters_all = json.load(open(HITTERS)) if os.path.exists(HITTERS) else None
     umps_all = json.load(open(UMPS)) if os.path.exists(UMPS) else None
     if not umps_all:
