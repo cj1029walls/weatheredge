@@ -230,6 +230,8 @@
     <button data-tab="targets">🎯 Targets <span class="cnt" id="cnt-targets"></span></button>
     <button data-tab="intel">🧠 Intel <span class="cnt" id="cnt-intel"></span></button>
     <button data-tab="umps">⚖️ Umpires</button>
+    <button data-tab="parks">🏟️ Parks</button>
+    <button data-tab="log">📜 Game Log</button>
     <button data-tab="record">📊 Record &amp; method</button>
   </nav>
 
@@ -301,6 +303,27 @@
       </tr></thead><tbody id="ump-lb-body"></tbody></table>
     </div>
     <div class="split-note" id="ump-lb-note"></div>
+  </div>
+
+  <!-- ============ PARKS ============ -->
+  <div class="tab-pane" id="tab-parks">
+    <div class="sec-h">Ballpark HR factors — every home park, 2017–2026</div>
+    <table class="mini"><thead><tr>
+      <th>#</th><th>Park</th><th>Games</th><th>HR/G</th><th>Factor</th><th class="hide-m">Read</th>
+    </tr></thead><tbody id="parks-body"></tbody></table>
+    <div class="split-note" id="parks-note">A factor of 1.15 = 15% more HRs than an average park across the full dataset. Tonight's weather moves each park off this baseline — that delta is what the model prices.</div>
+  </div>
+
+  <!-- ============ GAME LOG ============ -->
+  <div class="tab-pane" id="tab-log">
+    <div class="sec-h">Historical game log — most recent 150</div>
+    <div class="lu-pills" style="margin-bottom:10px">
+      <select id="log-ump" class="mini" style="width:auto;padding:7px 10px;border:1.5px solid var(--line-strong);border-radius:10px;font-size:12px;font-weight:700;color:var(--body2);background:#fff"></select>
+      <select id="log-team" class="mini" style="width:auto;padding:7px 10px;border:1.5px solid var(--line-strong);border-radius:10px;font-size:12px;font-weight:700;color:var(--body2);background:#fff"></select>
+    </div>
+    <table class="mini"><thead><tr>
+      <th>Date</th><th>Matchup</th><th>Plate ump</th><th>HRs</th><th class="hide-m">Runs</th>
+    </tr></thead><tbody id="log-body"></tbody></table>
   </div>
 
   <!-- ============ RECORD & METHOD ============ -->
@@ -540,7 +563,7 @@ function renderTotals(){
     </tr>`;}).join("");
 }
 function renderAll(){
-  renderSlate(); renderLineups(); renderIntel(); renderTotals(); renderUmpsTab();
+  renderSlate(); renderLineups(); renderIntel(); renderTotals(); renderUmpsTab(); renderParksTab(); renderLogTab();
   document.getElementById("cnt-targets").textContent=(DATA.targets||[]).length||"";
   const tb=document.getElementById("tbody");
   tb.innerHTML=DATA.targets.map((t,i)=>`
@@ -642,6 +665,34 @@ function renderUmpsTab(){
   document.getElementById("ump-lb-note").textContent=
     `${UMPS.meta.games.toLocaleString()} games · ${UMPS.meta.hrs.toLocaleString()} HRs · league ${UMPS.league.hrpg} HR/game · ${UMPS.seasons} · min 30 games to rank`;
 }
+function renderParksTab(){
+  if(!UMPS||!UMPS.parkFactors) return;
+  const rows=Object.entries(UMPS.parkFactors).sort((a,b)=>b[1].factor-a[1].factor);
+  document.getElementById("parks-body").innerHTML=rows.map(([code,p],i)=>{
+    const read=p.factor>=1.1?"HR haven":p.factor>=1.03?"hitter-friendly":p.factor>=0.97?"neutral":p.factor>=0.9?"pitcher-friendly":"HR graveyard";
+    return `<tr><td class="rank">${i+1}</td><td class="pname" style="font-size:12.5px">${code}</td>
+    <td>${p.n}</td><td>${p.hrpg}</td>
+    <td><span class="${p.factor>=1.05?"edge-pos":p.factor<=0.95?"edge-neg":""}" style="font-weight:800">${p.factor.toFixed(3)}×</span></td>
+    <td class="hide-m imp">${read}</td></tr>`;}).join("");
+}
+let LOGF={ump:"",team:""};
+function renderLogTab(){
+  if(!UMPS||!UMPS.log) return;
+  const umps=[...new Set(UMPS.log.map(g=>g.ump))].sort();
+  const teams=[...new Set(UMPS.log.flatMap(g=>g.m.split("@")))].sort();
+  const su=document.getElementById("log-ump"), st=document.getElementById("log-team");
+  if(!su.options.length){
+    su.innerHTML='<option value="">All umpires</option>'+umps.map(u=>`<option>${esc(u)}</option>`).join("");
+    st.innerHTML='<option value="">All teams</option>'+teams.map(t=>`<option>${t}</option>`).join("");
+    su.onchange=()=>{LOGF.ump=su.value;renderLogTab();};
+    st.onchange=()=>{LOGF.team=st.value;renderLogTab();};
+  }
+  const rows=UMPS.log.filter(g=>(!LOGF.ump||g.ump===LOGF.ump)&&(!LOGF.team||g.m.includes(LOGF.team)));
+  document.getElementById("log-body").innerHTML=rows.map(g=>`
+    <tr><td class="imp">${g.d.slice(0,4)}-${g.d.slice(4,6)}-${g.d.slice(6)}</td>
+    <td class="pname" style="font-size:12.5px">${g.m.replace("@"," @ ")}</td>
+    <td>${esc(g.ump)}</td><td><b>${g.hr}</b></td><td class="hide-m imp">${g.r}</td></tr>`).join("");
+}
 async function loadUmps(){
   try{
     const r=await fetch("umps.json?_="+Date.now());
@@ -677,7 +728,7 @@ async function loadRecord(){
     if(r.ok) renderRecord(await r.json());
   }catch(e){}
 }
-if(location.hash&&["slate","lineups","targets","intel","umps","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
+if(location.hash&&["slate","lineups","targets","intel","umps","parks","log","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
 let GATED=null;
