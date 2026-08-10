@@ -143,6 +143,39 @@
   /* ---------- slate summary strip ---------- */
   main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
+
+  /* ---- PRO live ticker ---- */
+  .ticker-wrap{background:#0a1330;border-bottom:1px solid rgba(255,217,74,.25);overflow:hidden;white-space:nowrap;position:relative;cursor:pointer}
+  .ticker{display:inline-block;padding:7px 0;animation:tick 60s linear infinite;will-change:transform}
+  .ticker-wrap:hover .ticker{animation-play-state:paused}
+  @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .tk{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#c9d4ea;margin:0 26px}
+  .tk b{color:#fff}
+  .tk .gold{color:#ffd94a}
+  .tk .grn{color:#6ee7a0}
+  .tk .tag{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:9px;font-weight:800;letter-spacing:1px;border-radius:8px;padding:1.5px 7px}
+  .tk.live b{color:#6ee7a0}
+  /* ---- PRO teaser card ---- */
+  .pro-tease{background:linear-gradient(120deg,#0e1a3d,#24409c);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 20px;margin-bottom:18px;border-left:4px solid #ffd94a}
+  .pro-tease .pt-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ffd94a}
+  .pt-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:9px}
+  .pt-main{flex:1;min-width:230px}
+  .pt-name{font-size:20px;font-weight:800;color:#fff}
+  .pt-sub{font-size:12px;color:#9fb0d4;margin-top:2px}
+  .pt-prob{font-size:26px;font-weight:800;color:#ffd94a}
+  .pt-prob span{font-size:12px;color:#9fb0d4;font-weight:700;display:block}
+  .pt-locked{margin-top:12px}
+  .pt-lock-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.09)}
+  .pt-lock-row .rk{font-size:12px;font-weight:800;color:#5d6f96;width:22px}
+  .pt-blur{flex:1;height:13px;border-radius:7px;background:linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.12));filter:blur(4px)}
+  .pt-blur.b2{max-width:60%}
+  .pt-lock-row .pr{font-size:12px;font-weight:800;color:#5d6f96;filter:blur(3px)}
+  .pt-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .pt-go{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
+  .pt-go:hover{filter:brightness(1.06)}
+  .pt-receipts{font-size:11.5px;color:#9fb0d4}
+  .pt-receipts b{color:#6ee7a0}
+
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
   .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
@@ -389,6 +422,7 @@
 </style>
 </head>
 <body>
+<div class="ticker-wrap" id="ticker-wrap" onclick="location.href='/pro/'" style="display:none"><div class="ticker" id="ticker"></div></div>
 <div class="announce">📡 DFSRADAR covers <b>MLB · NFL · CFB · PGA · NASCAR</b> — more outdoor sports <span class="soon">coming soon</span></div>
 
 <header>
@@ -445,6 +479,18 @@
     <div class="brief-body" id="brief-body"></div>
   </div>
 
+  <div class="pro-tease" id="pro-tease" style="display:none">
+    <div class="pt-k">💣 Tonight's #1 HR target — free from DFSRADAR PRO</div>
+    <div class="pt-row">
+      <div class="pt-main"><div class="pt-name" id="pt-name"></div><div class="pt-sub" id="pt-sub"></div></div>
+      <div class="pt-prob" id="pt-prob"></div>
+    </div>
+    <div class="pt-locked" id="pt-locked"></div>
+    <div class="pt-cta">
+      <a class="pt-go" href="/pro/">Unlock the full board — $15/mo</a>
+      <div class="pt-receipts" id="pt-receipts"></div>
+    </div>
+  </div>
   <div class="kx-card">
     <div><div class="kx-k">⚡ Found your edge?</div>
     <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
@@ -1551,6 +1597,77 @@ function renderAll(){
 }
 renderAll();
 loadLive();
+
+/* ================= PRO teaser + live ticker ================= */
+const PT={teaser:null,record:null,liveEvents:[],hrCount:0,liveGames:0};
+const fnv=str=>{let h=0x811c9dc5;for(const ch of str){h=((h^ch.charCodeAt(0))*0x01000193)>>>0;}return h.toString(16).padStart(8,"0");};
+const ptNorm=s=>(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").replace(/jr/g,"").trim();
+function renderTease(){
+  const t=PT.teaser; if(!t||!t.top1) return;
+  document.getElementById("pro-tease").style.display="";
+  document.getElementById("pt-name").textContent=t.top1.player;
+  document.getElementById("pt-sub").textContent=`${t.top1.team} · ${t.top1.game}${t.top1.price!=null?` · best price ${t.top1.price>0?"+":""}${t.top1.price}`:""}`;
+  document.getElementById("pt-prob").innerHTML=`${t.top1.prob}%<span>our HR chance</span>`;
+  const n=(t.counts&&t.counts.targets||40)-1;
+  document.getElementById("pt-locked").innerHTML=[2,3,4,5].map(r=>
+    `<div class="pt-lock-row"><span class="rk">#${r}</span><div class="pt-blur${r%2?"":" b2"}"></div><span class="pr">+${300+r*40}</span><span style="font-size:11px">🔒</span></div>`).join("")
+    +`<div style="font-size:11.5px;color:#9fb0d4;margin-top:6px">${n} more ranked targets tonight · ${t.counts&&t.counts.value?`<b style="color:#ffd94a">${t.counts.value} VALUE flag${t.counts.value>1?"s":""}</b> · `:""}live odds on every one</div>`;
+  const r=PT.record&&PT.record.summary;
+  if(r&&r.nights){
+    const pct=r.top1.n?Math.round(r.top1.w/r.top1.n*100):0;
+    document.getElementById("pt-receipts").innerHTML=`Graded in public: <b>#1 target homered ${pct}%</b> of nights (${r.top1.w}/${r.top1.n}) · ${r.graded} picks scored · every card archived`;
+  }
+}
+function tickerItems(){
+  const t=PT.teaser, r=PT.record&&PT.record.summary, items=[];
+  for(const ev of PT.liveEvents.slice(-6).reverse()) items.push(`<span class="tk live"><span class="tag">PRO</span> 💣 <b>PRO's #${ev.r} target just homered</b>${ev.price!=null?` <span class="gold">(${ev.price>0?"+":""}${ev.price})</span>`:""}</span>`);
+  if(PT.liveGames) items.push(`<span class="tk">🔴 <b>${PT.liveGames} games live</b> · ${PT.hrCount} HRs on the slate so far</span>`);
+  if(t&&t.top1) items.push(`<span class="tk"><span class="tag">PRO</span> Tonight's #1 HR target: <b>${t.top1.player}</b> <span class="gold">${t.top1.prob}%</span>${t.top1.price!=null?` at <span class="gold">${t.top1.price>0?"+":""}${t.top1.price}</span>`:""}</span>`);
+  if(t&&t.counts&&t.counts.value) items.push(`<span class="tk"><span class="tag">PRO</span> <b>${t.counts.value} VALUE flag${t.counts.value>1?"s":""}</b> live on tonight's board</span>`);
+  if(t&&t.expTop) items.push(`<span class="tk">🏟️ Top HR environment: <b>${t.expTop.game}</b> — <span class="gold">${t.expTop.exp} expected HRs</span></span>`);
+  if(r&&r.nights&&r.top1.n) items.push(`<span class="tk">📊 PRO receipts: <b>#1 target homered ${r.top1.w} of ${r.top1.n} nights</b> — graded in public</span>`);
+  if(typeof DATA!=="undefined"&&DATA.games){
+    const leans=DATA.games.filter(g=>g.ouLean).length;
+    if(leans) items.push(`<span class="tk">🎯 <b>${leans} O/U lean${leans>1?"s":""}</b> called on today's free board</span>`);
+  }
+  items.push(`<span class="tk"><span class="tag">PRO</span> A number for <b>every batter in every lineup</b> → dfsradar.com/pro</span>`);
+  return items;
+}
+function renderTicker(){
+  const items=tickerItems();
+  if(!items.length) return;
+  const half=items.join('<span class="tk" style="color:#3d4d75">●</span>');
+  document.getElementById("ticker").innerHTML=half+'<span class="tk" style="color:#3d4d75">●</span>'+half;
+  document.getElementById("ticker-wrap").style.display="";
+}
+async function pollProLive(){
+  const t=PT.teaser; if(!t||!t.date||!t.tlist) return;
+  try{
+    const j=await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${t.date}&hydrate=scoringplays`).then(r=>r.json());
+    const byHash={}; t.tlist.forEach(x=>byHash[x.h]=x);
+    let hr=0,live=0; const evs=[];
+    for(const day of (j.dates||[])) for(const g of (day.games||[])){
+      if(((g.status||{}).abstractGameState)==="Live") live++;
+      for(const p of (g.scoringPlays||[])){
+        if(((p.result||{}).event||"")!=="Home Run") continue;
+        hr++;
+        const nm=(((p.matchup||{}).batter)||{}).fullName;
+        if(!nm) continue;
+        const m=byHash[fnv(t.salt+ptNorm(nm))];
+        if(m&&!evs.some(e=>e.r===m.r)) evs.push({r:m.r,price:m.price});
+      }
+    }
+    PT.hrCount=hr; PT.liveGames=live; PT.liveEvents=evs.sort((a,b)=>a.r-b.r);
+    renderTicker();
+  }catch(e){}
+}
+async function loadPro(){
+  try{const r=await fetch("/teaser.json?_="+Date.now()); if(r.ok) PT.teaser=await r.json();}catch(e){}
+  try{const r=await fetch("/pro/record.json?_="+Date.now()); if(r.ok) PT.record=await r.json();}catch(e){}
+  renderTease(); renderTicker();
+  if(PT.teaser){ pollProLive(); setInterval(pollProLive,60000); }
+}
+loadPro();
 </script>
 </body>
 </html>
