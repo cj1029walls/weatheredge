@@ -137,6 +137,13 @@ LG_RPG_TEAM = 4.45    # league runs per team-game
 def clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
+def calibrate(p):
+    """Week-1 calibration fix: stated probs above ~24% overshot reality
+    (26-30% bucket hit 12.5%). Compress the top of the range, hard cap 34."""
+    if p > 24:
+        p = 24 + (p - 24) * 0.55
+    return min(round(p, 1), 34.0)
+
 def norm_name(s):
     s = unicodedata.normalize("NFD", s or "")
     s = "".join(c for c in s if not unicodedata.combining(c))
@@ -345,15 +352,14 @@ def main():
                 env = (wx * um * spm) ** 0.75   # damp stacked env factors (calibration)
                 rate = adj * env
                 prob = 1 - (1 - min(rate, 0.18)) ** pa
-                prob_pct = round(prob * 100, 1)
-                if prob_pct > 38:      # sanity cap
-                    prob_pct = 38.0
+                prob_pct = calibrate(round(prob * 100, 1))
                 exp_hr += prob_pct / 100
                 o = odds_by_player.get(norm_name(pl["name"]))
-                fair = round(o["implied"] * 0.93, 1) if o and o.get("implied") else None
+                # de-vig at x0.87 — one-sided HR markets carry ~13pt vig, not 7
+                fair = round(o["implied"] * 0.87, 1) if o and o.get("implied") else None
                 if o and o.get("implied") is not None:
-                    # market anchor: blend 25% of the books' implied prob into ours
-                    prob_pct = round(0.75 * prob_pct + 0.25 * o["implied"], 1)
+                    # market anchor at 40% — week 1 the books' Brier edged ours
+                    prob_pct = round(0.60 * prob_pct + 0.40 * o["implied"], 1)
                 edge = round(prob_pct - fair, 1) if fair is not None else None
                 targets.append(dict(
                     _bid=pid, _spid=spid,
@@ -497,7 +503,8 @@ def main():
             line = o["line"] if o else None
             diff = round(proj - line, 1) if line is not None else None
             lean = None
-            if diff is not None and abs(diff) >= 0.8:
+            # v2: 1.5-K trigger — 0.8-1.5 gap leans went 7-10, 1.5+ went 7-3
+            if diff is not None and abs(diff) >= 1.5:
                 lean = "OVER" if diff > 0 else "UNDER"
             kprops.append(dict(pitcher=p["name"], team=team, opp=opp,
                                game=f"{g['away']} @ {g['home']}",
@@ -518,10 +525,9 @@ def main():
         env = (e["wx"] * e["um"] * e["spm"] * (m or 1.0)) ** 0.75
         rate = adj * env
         prob = 1 - (1 - min(rate, 0.18)) ** pa
-        p = round(prob * 100, 1)
-        if p > 38: p = 38.0
+        p = calibrate(round(prob * 100, 1))
         if t.get("implied") is not None:
-            p = round(0.75 * p + 0.25 * t["implied"], 1)
+            p = round(0.60 * p + 0.40 * t["implied"], 1)
         t["prob"] = p
         if t.get("fair") is not None:
             t["edge"] = round(p - t["fair"], 1)
@@ -537,9 +543,10 @@ def main():
         for k in ("_bid", "_spid", "_env", "_adj", "_pa"):
             t.pop(k, None)
     targets.sort(key=lambda t: -t["prob"])
-    # VALUE flags: spec thresholds, max 5, ranked by edge
+    # VALUE flags: v2 thresholds (edge >= 5 vs x0.87 de-vig) — week 1's 3-pt
+    # flags went 1-7; most of that "edge" was just understated vig
     flagged = sorted([t for t in targets
-                      if t["edge"] is not None and t["edge"] >= 3
+                      if t["edge"] is not None and t["edge"] >= 5
                       and t["books"] >= 3 and (t["price"] or 0) >= 150],
                      key=lambda t: -t["edge"])[:5]
     for t in flagged:
