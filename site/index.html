@@ -8,17 +8,17 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
 <meta property="og:title" content="DFSRADAR — MLB Weather Edges for DFS">
-<meta property="og:description" content="Park-specific weather impact on home runs, runs and strikeouts, from thousands of historically similar games. Free, updated all day. Not a model — real data for a real edge.">
+<meta property="og:description" content="Park-specific weather impact on home runs, runs and strikeouts, from thousands of historically similar games. Free, updated all day. Scan the slate. Find the edge.">
 <meta property="og:image" content="https://dfsradar.com/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://dfsradar.com/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="DFSRADAR — MLB Weather Edges for DFS">
-<meta name="twitter:description" content="Park-specific weather impact on home runs, runs and strikeouts, from thousands of historically similar games. Free, updated all day. Not a model — real data for a real edge.">
+<meta name="twitter:description" content="Park-specific weather impact on home runs, runs and strikeouts, from thousands of historically similar games. Free, updated all day. Scan the slate. Find the edge.">
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
 
-<meta name="description" content="DFSRADAR tracks MLB weather for DFS players: park-specific weather impact on home runs, runs, and strikeouts, plus over/under hit rates from historically similar games. Real data for a real edge.">
+<meta name="description" content="DFSRADAR tracks MLB weather for DFS players: park-specific weather impact on home runs, runs, and strikeouts, plus over/under hit rates from historically similar games. Scan the slate. Find the edge.">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
 <style>
   :root{
@@ -420,7 +420,7 @@
           </circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
         </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">MLB</span></h1>
-        <div class="tagline">MLB weather edges for DFS. Not a model, not a simulation — <b>real data for a real edge.</b></div>
+        <div class="tagline">MLB weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
         <div class="sport-tabs">
           <a class="on" href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="protab" href="/pro/">★ PRO</a>
         </div>
@@ -751,8 +751,9 @@ function gaugeSVG(g, size=48){
   </svg>`;
 }
 function leanTxt(g){
-  return g.ou.over>g.ou.under+3 ? `<b style="color:var(--gold-deep)">OVER ${g.ou.over}%</b>`
-    : g.ou.under>g.ou.over+3 ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
+  const L=g.ouLean!==undefined?g.ouLean:(g.ou.over>g.ou.under+3?"over":g.ou.under>g.ou.over+3?"under":null);
+  return L==="over" ? `<b style="color:var(--gold-deep)">OVER ${g.ou.over}%</b>`
+    : L==="under" ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
     : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
 }
 function rowHTML(g){
@@ -870,8 +871,9 @@ function renderCompare(){
     return (va<vb?-1:va>vb?1:0)*d;
   });
   document.getElementById("cmp-body").innerHTML = rows.map(g=>{
-    const lean = g.ou.over>g.ou.under+3 ? `<span class="lean-cell over">OVER ${g.ou.over}%</span>`
-      : g.ou.under>g.ou.over+3 ? `<span class="lean-cell under">UNDER ${g.ou.under}%</span>`
+    const L2=g.ouLean!==undefined?g.ouLean:(g.ou.over>g.ou.under+3?"over":g.ou.under>g.ou.over+3?"under":null);
+    const lean = L2==="over" ? `<span class="lean-cell over">OVER ${g.ou.over}%</span>`
+      : L2==="under" ? `<span class="lean-cell under">UNDER ${g.ou.under}%</span>`
       : `<span class="lean-cell none">even</span>`;
     return `<tr data-game="${g.id}">
       <td><span class="tbl-teams">${g.away} @ ${g.home}</span><br><span class="tbl-park">${g.park}</span></td>
