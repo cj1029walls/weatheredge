@@ -21,11 +21,15 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/nfl/weekly_build.py
+      - name: Build site/pro/nfl.json (PRO weekly board)
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python scripts/pro/nfl_build.py
       - name: Commit slate data
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add site/nfl/data.json
+          git add site/nfl/data.json site/pro/nfl.json data/pro/nfl_predictions
           git commit -m "NFL slate refresh" || echo "no changes"
           git pull --rebase origin main
           git push
