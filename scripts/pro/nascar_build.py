@@ -76,13 +76,16 @@ def main():
     hot_fc = fc_temp is not None and fc_temp >= HOT_FC
     delay = fr.get("delay")
 
-    # ---- track history
+    # ---- track history (active = raced in the current season on file)
+    cur_season = max((r["y"] for r in (deep.get("races") or [])), default=NG_YEAR)
     board = []
     for drv, rows in drivers.items():
         here = [r for r in rows if r[0] == key]
         recent_any = [r for r in rows if r[1] >= NG_YEAR]
         if len(here) < 2 or len(recent_any) < 10:
-            continue                      # active drivers with real track sample
+            continue                      # drivers with a real track sample
+        if not any(r[1] >= cur_season for r in rows):
+            continue                      # retired / not racing this season
         ng = [r for r in here if r[1] >= NG_YEAR]
         fins = [r[2] for r in here]
         ngf = [r[2] for r in ng]
@@ -98,6 +101,8 @@ def main():
     # ---- track-type form (Next Gen era, last 10 of this type)
     tform = []
     for drv, rows in drivers.items():
+        if not any(r[1] >= cur_season for r in rows):
+            continue
         typ = [r for r in rows
                if r[1] >= NG_YEAR and (tracks.get(r[0]) or {}).get("type") == ttype]
         if len(typ) < 6:
@@ -113,7 +118,7 @@ def main():
     heat = []
     for drv, rows in drivers.items():
         recent_any = [r for r in rows if r[1] >= NG_YEAR]
-        if len(recent_any) < 10:
+        if len(recent_any) < 10 or not any(r[1] >= cur_season for r in rows):
             continue
         hot = [r[2] for r in rows if r[4] == 1]
         cool = [r[2] for r in rows if r[4] == 0]
