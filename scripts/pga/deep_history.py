@@ -132,14 +132,14 @@ EVENT_COORDS = {
 WINDY_MPH = 12       # avg daytime wind over the event ≥ this -> WINDY edition
 
 
-def get_json(url, tries=4):
+def get_json(url, tries=4, timeout=90):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
                 "Accept": "application/json, text/plain, */*",
             })
-            with urllib.request.urlopen(req, timeout=90) as r:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.loads(r.read())
         except Exception as e:
             if i == tries - 1:
@@ -161,6 +161,7 @@ def norm_player(s):
     return re.sub(r"\s+", " ", s).strip()
 
 
+_WX_FAILS = [0]
 def event_wind(key, d0, d1, cache):
     ck = f"{key}:{d0}"
     if ck in cache:
@@ -169,10 +170,12 @@ def event_wind(key, d0, d1, cache):
     if not co:
         cache[ck] = None
         return None
+    if _WX_FAILS[0] >= 6:          # archive API unresponsive — skip for this run,
+        return None                # cache stays clean so next run backfills
     lat, lon, tz = co
     try:
         j = get_json(ARC_URL.format(lat=lat, lon=lon, d0=d0, d1=d1,
-                                    tz=tz.replace("/", "%2F")), tries=2)
+                                    tz=tz.replace("/", "%2F")), tries=1, timeout=20)
         hrs = j.get("hourly") or {}
         winds = []
         for t, w in zip(hrs.get("time") or [], hrs.get("wind_speed_10m") or []):
@@ -181,12 +184,13 @@ def event_wind(key, d0, d1, cache):
                 winds.append(w)
         out = round(sum(winds) / len(winds), 1) if winds else None
         cache[ck] = out
+        _WX_FAILS[0] = 0
         time.sleep(0.6)
         return out
     except Exception as e:
+        _WX_FAILS[0] += 1
         print(f"    wx skip {key} {d0}: {e}")
-        cache[ck] = None
-        return None
+        return None                # NOT cached — retried on the next run
 
 
 def main():
