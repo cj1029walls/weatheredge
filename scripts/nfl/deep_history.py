@@ -307,13 +307,17 @@ def build_tier2(games):
                     if nm and res in ("made", "missed", "blocked") and dist:
                         k = kickers.setdefault(nm, dict(seasons=set(), att=[]))
                         k["seasons"].add(y)
+                        k["team"] = (y, col(row, "posteam") or k.get("team", (0, ""))[1])
                         k["att"].append((dist, res == "made",
                                          g["temp"], g["wind"],
                                          g["outdoor"], g["home"]))
                 # QB passing (per game aggregation)
                 nm = col(row, "passer_player_name")
                 if nm:
-                    q = qbs.setdefault(nm, {}).setdefault(
+                    qq = qbs.setdefault(nm, {"_team": (0, "")})
+                    if col(row, "posteam") and y >= qq["_team"][0]:
+                        qq["_team"] = (y, col(row, "posteam"))
+                    q = qq.setdefault(
                         gid, dict(att=0, comp=0, yds=0.0, td=0, i=0, sk=0))
                     if col(row, "sack") == "1":
                         q["sk"] += 1
@@ -382,12 +386,16 @@ def build_tier2(games):
                 out[b] = dict(att=e["att"], made=e["made"],
                               pct=round(100 * e["made"] / e["att"]))
         if len(out) > 1:
+            out["team"] = k.get("team", (0, ""))[1]
             kick_out[nm] = out
     # QB weather splits (active recently, real passing stats)
     qb_out = {}
     for nm, by_game in qbs.items():
+        team = by_game.get("_team", (0, ""))[1]
         rows = []
         for gid, q in by_game.items():
+            if gid == "_team":
+                continue
             g = by_id.get(gid)
             if g is None or q["att"] < 12:
                 continue
@@ -417,6 +425,7 @@ def build_tier2(games):
             entry["windy"] = agg(windy)
             entry["windy"]["delta"] = round((entry["windy"]["ypg"] / base["ypg"] - 1) * 100)
         if "cold" in entry or "windy" in entry:
+            entry["team"] = team
             qb_out[nm] = entry
     return dict(seasons=seasons_ok, refsPen=refs_pen,
                 kickers=kick_out, qbs=qb_out)

@@ -26,6 +26,7 @@ from stadiums import STADIUMS, axis_angle, wind_class
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 HISTORY = os.path.join(ROOT, "data", "nfl", "stadiums_history.json")
+DEEP = os.path.join(ROOT, "data", "nfl", "deep.json")
 OUT = os.path.join(ROOT, "site", "nfl", "data.json")
 
 GAMES_URL = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
@@ -169,6 +170,84 @@ def match_games(hist_games, temp, wind, ax, dome):
     return rows, "small sample — widest window"
 
 
+TZ_HRS = {"America/New_York": -5, "America/Detroit": -5, "America/Chicago": -6,
+          "America/Denver": -7, "America/Phoenix": -7, "America/Los_Angeles": -8}
+
+def _tz(team):
+    st = STADIUMS.get(team)
+    return TZ_HRS.get(st["tz"], -5) if st else -5
+
+def build_edge(r, away, home, deep):
+    """Situational edge block for one upcoming game: ref crew, travel/rest
+    badges (with historical records vs closing lines), team weather identity,
+    QB + kicker condition splits. Display data straight from data/nfl/deep.json."""
+    if not deep:
+        return None
+    edge = dict(badges=[])
+    lg_spots = (deep.get("situations") or {}).get("league", {})
+    team_spots = (deep.get("situations") or {}).get("teams", {})
+    def spot_txt(e):
+        return f"{e['atsW']}-{e['atsL']} ATS · {e['overW']}-{e['overL']} O/U" if e else ""
+    # referee (posts game week; empty before)
+    ref = (r.get("referee") or "").strip()
+    if ref:
+        info = (deep.get("refs") or {}).get(ref)
+        edge["ref"] = dict(name=ref, **info) if info else dict(name=ref)
+    else:
+        edge["ref"] = None
+    # rest
+    try:
+        ar, hr = int(r.get("away_rest") or 7), int(r.get("home_rest") or 7)
+    except ValueError:
+        ar = hr = 7
+    edge["rest"] = dict(away=ar, home=hr)
+    if ar <= 5:
+        edge["badges"].append(dict(k="SHORT WEEK", team=away,
+                                   txt=f"{away} on {ar} days rest",
+                                   rec=spot_txt(lg_spots.get("shortWeekAway"))))
+    if hr <= 5:
+        edge["badges"].append(dict(k="SHORT WEEK", team=home,
+                                   txt=f"{home} on {hr} days rest",
+                                   rec=spot_txt(lg_spots.get("shortWeekHome"))))
+    if ar >= 13:
+        edge["badges"].append(dict(k="OFF BYE", team=away, txt=f"{away} off the bye",
+                                   rec=spot_txt(lg_spots.get("offByeAway"))))
+    if ar - hr >= 4:
+        edge["badges"].append(dict(k="REST EDGE", team=away,
+                                   txt=f"{away} +{ar-hr} days rest",
+                                   rec=spot_txt(lg_spots.get("restEdgeAway"))))
+    if hr - ar >= 4:
+        edge["badges"].append(dict(k="REST EDGE", team=home,
+                                   txt=f"{home} +{hr-ar} days rest",
+                                   rec=spot_txt(lg_spots.get("restEdgeHome"))))
+    # travel / circadian
+    a_tz, h_tz = _tz(away), _tz(home)
+    try:
+        kick_et = int((r.get("gametime") or "13:00").split(":")[0])
+    except ValueError:
+        kick_et = 13
+    if a_tz <= -7 and kick_et <= 13:
+        t_rec = (team_spots.get(away) or {}).get("westEarly")
+        edge["badges"].append(dict(k="BODY CLOCK", team=away,
+            txt=f"{away} kicking off at {kick_et + a_tz + 5}:00 body time",
+            rec=(f"{away} {spot_txt(t_rec)}" if t_rec else f"league {spot_txt(lg_spots.get('westEarly'))}")))
+    if a_tz <= -7 and kick_et >= 20:
+        edge["badges"].append(dict(k="WEST AT NIGHT", team=away,
+            txt=f"{away} in the circadian-peak window",
+            rec=f"league {spot_txt(lg_spots.get('westNight'))} — unders angle"))
+    if a_tz == -5 and h_tz - a_tz <= -2:
+        edge["badges"].append(dict(k="CROSS-COUNTRY", team=away,
+            txt=f"{away} traveling {abs(h_tz - a_tz)} zones west",
+            rec=spot_txt(lg_spots.get("eastWest"))))
+    # team weather identity + QB/kicker splits, keyed for the UI to filter
+    twx = deep.get("teamWx") or {}
+    edge["teamWx"] = {t: twx[t] for t in (away, home) if t in twx}
+    edge["qbs"] = {nm: q for nm, q in (deep.get("qbs") or {}).items()
+                   if q.get("team") in (away, home)}
+    edge["kickers"] = {nm: k for nm, k in (deep.get("kickers") or {}).items()
+                       if k.get("team") in (away, home)}
+    return edge
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--offline", action="store_true")
@@ -178,6 +257,10 @@ def main():
     if not hist_all:
         sys.exit("data/nfl/stadiums_history.json missing — run the NFL history workflow first.")
     league = hist_all["_league"]
+    deep = json.load(open(DEEP)) if os.path.exists(DEEP) else None
+    if deep:
+        print(f"deep layer: {len(deep.get('refs', {}))} refs, "
+              f"{len(deep.get('qbs', {}))} QBs, {len(deep.get('kickers', {}))} kickers")
 
     upcoming = [] if args.offline else load_upcoming()
     totals = {} if args.offline else fetch_book_totals()
@@ -273,6 +356,7 @@ def main():
             matches=[dict(d=x["d"], t=x["t"], w=x["w"], ax=x["ax"], pts=x["pts"],
                           line=x["line"], res=x["res"])
                      for x in sorted(rows, key=lambda x: x["d"], reverse=True)[:15]],
+            edge=build_edge(r, away, home, deep),
         ))
         if dome:
             games[-1]["pts"] = 0
