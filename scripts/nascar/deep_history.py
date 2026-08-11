@@ -46,12 +46,12 @@ TRACKS = [
     (r"texas",                "texas",       "INT",   33.037, -97.282, "America/Chicago"),
     (r"homestead|miami",      "homestead",   "INT",   25.452, -80.409, "America/New_York"),
     (r"kentucky",             "kentucky",    "INT",   38.712, -84.916, "America/New_York"),
-    (r"chicagoland",          "chicagoland", "INT",   41.475, -88.057, "America/Chicago"),
+    (r"chicagoland|at chicago\b", "chicagoland", "INT",   41.475, -88.057, "America/Chicago"),
     (r"darlington|southern 500", "darlington", "INT", 34.295, -79.905, "America/New_York"),
     (r"dover",                "dover",       "INT",   39.190, -75.530, "America/New_York"),
     (r"michigan",             "michigan",    "INT",   42.065, -84.241, "America/Detroit"),
     (r"pocono",               "pocono",      "INT",   41.054, -75.512, "America/New_York"),
-    (r"fontana|auto club",    "fontana",     "INT",   34.088, -117.500, "America/Los_Angeles"),
+    (r"fontana|auto club|at california", "fontana",     "INT",   34.088, -117.500, "America/Los_Angeles"),
     (r"nashville",            "nashville",   "INT",   36.046, -86.408, "America/Chicago"),
     (r"gateway|wwt|world wide technology|illinois 300", "gateway", "FLAT", 38.651, -90.137, "America/Chicago"),
     (r"phoenix",              "phoenix",     "FLAT",  33.375, -112.311, "America/Phoenix"),
@@ -75,14 +75,14 @@ TRACKS = [
 HOT_F = 88          # race-day high ≥ this at the track -> HOT (slick) race
 
 
-def get_json(url, tries=4):
+def get_json(url, tries=4, timeout=90):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers={
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
                 "Accept": "application/json, text/plain, */*",
             })
-            with urllib.request.urlopen(req, timeout=90) as r:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.loads(r.read())
         except Exception as e:
             if i == tries - 1:
@@ -104,21 +104,25 @@ def norm_driver(s):
     return re.sub(r"\s+", " ", s).replace(" Jr.", "").replace(" Sr.", "").strip()
 
 
+_WX_FAILS = [0]
 def day_high(lat, lon, tz, d, cache):
     ck = f"{round(lat,2)},{round(lon,2)}:{d}"
     if ck in cache:
         return cache[ck]
+    if _WX_FAILS[0] >= 6:          # archive API unresponsive — skip for this run
+        return None
     try:
         j = get_json(ARC_URL.format(lat=lat, lon=lon, d=d,
-                                    tz=tz.replace("/", "%2F")), tries=2)
+                                    tz=tz.replace("/", "%2F")), tries=1, timeout=20)
         v = ((j.get("daily") or {}).get("temperature_2m_max") or [None])[0]
         cache[ck] = round(v) if v is not None else None
+        _WX_FAILS[0] = 0
         time.sleep(0.5)
         return cache[ck]
     except Exception as e:
+        _WX_FAILS[0] += 1
         print(f"    wx skip {d}: {e}")
-        cache[ck] = None
-        return None
+        return None                # NOT cached — retried on the next run
 
 
 def main():
@@ -159,10 +163,10 @@ def main():
                 continue
             date = (ev.get("date") or "")[:10]
             hi = day_high(lat, lon, tz, date, cache) if date else None
-            hot = 1 if (hi is not None and hi >= HOT_F) else 0
+            hot = None if hi is None else (1 if hi >= HOT_F else 0)
             n = len(rows)
             races.append(dict(y=y, d=date, track=key, type=ttype, n=n,
-                              hi=hi, hot=bool(hot)))
+                              hi=hi, hot=hot))
             n_pts += 1
             for i, c in enumerate(rows):
                 ath = (c.get("athlete") or {}).get("displayName")
