@@ -119,6 +119,17 @@
   .edge-cold{background:#2450b8;color:#dde7fb}
   .edge-rain{background:#b45309;color:#fdeee0}
   .edge-neutral{background:var(--gray-bg);color:var(--muted)}
+  .sit-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .sit-chip{font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:3px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap;background:#eef2f8;color:#47566d;border:1px solid #dbe3ee}
+  .sit-chip.hot{background:#fdf0e4;color:#b45309;border-color:#f3ddc2}
+  .sit-chip.ref{background:#eae6f7;color:#5b4a9e;border-color:#d9d2ef}
+  .crew-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .crew-box{background:var(--gray-bg);border-radius:10px;padding:12px 14px}
+  .crew-box .cb-k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
+  .crew-box .cb-line{font-size:12.5px;color:var(--body2);margin:3px 0;line-height:1.45}
+  .crew-box .cb-line b{color:#1a2333}
+  .crew-box .cb-hi{color:#b45309;font-weight:700}
+  .sit-note{font-size:11.5px;color:var(--muted);margin-top:9px;line-height:1.5}
   .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin-top:13px}
   .hr-cell{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center}
   .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
@@ -303,13 +314,23 @@ function leanTxt(g){
     : g.ou.under>g.ou.over+3 ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
     : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
 }
+function sitChips(g){
+  const e=g.edge; if(!e) return "";
+  const chips=[];
+  (e.badges||[]).forEach(b=>{
+    const hot = /SHORT WEEK|BODY CLOCK|WEST AT NIGHT/.test(b.k);
+    chips.push(`<span class="sit-chip ${hot?"hot":""}" title="${(b.txt||"")+(b.rec?" — "+b.rec:"")}">${b.k}${b.team?" · "+b.team:""}</span>`);
+  });
+  if(e.ref && e.ref.name) chips.push(`<span class="sit-chip ref" title="${e.ref.n} games · ${e.ref.ppg} pts/gm">🦓 ${e.ref.name.split(" ").pop()}</span>`);
+  return chips.length?`<div class="sit-row">${chips.join("")}</div>`:"";
+}
 function rowHTML(g){
   const imp = g.dome ? `<span class="pill neu">PTS —</span>` : `<span class="pill ${cls(g.pts)}">PTS ${pct(g.pts)}</span>`;
   const wx = g.dome ? `<div class="w">roof closed<br>weather sealed out</div>`
     : `<div class="w">${axLabel(g)}<br>${(g.rain!=null&&g.rain>=15)?`Rain ${g.rain}% · `:""}dew ${g.dew}°</div>`;
   return `<div class="b-row" data-game="${g.id}">
     <div class="b-time">${g.day}<span>${g.time.replace(" ET","")} ET</span></div>
-    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-stad">${g.stadium}</div></div>
+    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-stad">${g.stadium}</div>${sitChips(g)}</div>
     <div class="b-wx"><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div>
     <div>${imp}</div>
     <div class="b-ou">${gauge(g)}<div class="txt">${leanTxt(g)}<span>vs real closing lines · ${g.ou.n||g.sample} gms</span></div></div>
@@ -352,6 +373,62 @@ function windFxChip(g){
   const f=g.windFx;
   return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS STADIUM: <b>${f.rating}</b> — 10 mph of wind moves scoring ~${Math.abs(f.pct10)}% here historically<span class="tip" data-tip="Measured from every outdoor game at this stadium since 2015: the relationship between wind speed and total points. Exposed stadiums like Chicago and Buffalo rate high; sheltered ones rate low."><span class="info-i">i</span></span></div>`;
 }
+function crewSec(g){
+  const e=g.edge; if(!e) return "";
+  const boxes=[];
+  // referee crew card
+  if(e.ref && e.ref.n){
+    const r=e.ref;
+    boxes.push(`<div class="crew-box"><div class="cb-k">🦓 Referee — ${r.name}</div>
+      <div class="cb-line"><b>${r.ppg}</b> pts/gm in his games (${r.vslg>0?"+":""}${r.vslg} vs league) · <b>${r.overPct}%</b> overs</div>
+      <div class="cb-line"><b>${r.penG||"—"}</b> penalties/gm${r.penYdsG?` · <b>${r.penYdsG}</b> pen yds/gm`:""}</div>
+      <div class="cb-line">Home teams: ${r.homeWinPct}% SU · ${r.homeCoverPct}% ATS · ${r.n} games since 2015</div></div>`);
+  } else if(e.ref && e.ref.name){
+    boxes.push(`<div class="crew-box"><div class="cb-k">🦓 Referee — ${e.ref.name}</div><div class="cb-line">No crew history in our 2015+ sample yet.</div></div>`);
+  }
+  // situational badges expanded
+  if((e.badges||[]).length){
+    boxes.push(`<div class="crew-box"><div class="cb-k">🧭 Situational spots</div>${e.badges.map(b=>
+      `<div class="cb-line"><b>${b.k}</b> — ${b.txt}${b.rec?`<br><span class="cb-hi">${b.rec}</span>`:""}</div>`).join("")}</div>`);
+  }
+  // team weather identity — highlight the band matching today's forecast
+  const band = g.dome?null : g.wind>=15?"windy" : g.temp<40?"cold" : g.temp<55?"chilly" : g.temp>=85?"hot" : null;
+  const twx=e.teamWx||{};
+  for(const t of [g.away, g.home]){
+    const w=twx[t]; if(!w) continue;
+    const lines=["cold","chilly","hot","windy"].filter(b=>w[b]&&w[b].n>=8).map(b=>{
+      const hit = b===band;
+      return `<div class="cb-line${hit?'" style="background:#fdf0e4;border-radius:6px;padding:3px 6px':''}">${hit?"▶ ":""}${b==="windy"?"Wind 15+":b.charAt(0).toUpperCase()+b.slice(1)}: <b>${w[b].ppg}</b> pts/gm (<span class="${w[b].delta<0?'cb-hi':''}">${w[b].delta>0?"+":""}${w[b].delta}%</span> vs their norm, ${w[b].n} gms)</div>`;
+    });
+    if(lines.length) boxes.push(`<div class="crew-box"><div class="cb-k">🌡 ${t} in weather (${w.basePpg} base pts/gm)</div>${lines.join("")}</div>`);
+  }
+  // QB condition splits — only when today is cold or windy
+  if(band==="cold"||band==="windy"||band==="chilly"){
+    const key = band==="windy"?"windy":"cold";
+    for(const [nm,q] of Object.entries(e.qbs||{})){
+      const s=q[key]; if(!s || s.g<4) continue;
+      boxes.push(`<div class="crew-box"><div class="cb-k">🎯 ${nm} (${q.team}) in ${key} games</div>
+        <div class="cb-line"><b>${s.ypg}</b> ypg (<span class="${s.delta<0?'cb-hi':''}">${s.delta>0?"+":""}${s.delta}%</span> vs his ${q.base.ypg} norm) · ${s.compPct}% comp · ${s.g} gms</div>
+        <div class="cb-line">${s.tdG} TD/gm · ${s.intG} INT/gm · ${s.skG} sacks/gm (norm ${q.base.skG})</div></div>`);
+    }
+  }
+  // kicker conditions — always show if outdoor
+  if(!g.dome){
+    for(const [nm,k] of Object.entries(e.kickers||{})){
+      if(!k.all || k.all.att<30) continue;
+      const parts=[`<b>${k.all.pct}%</b> career (${k.all.made}/${k.all.att})`];
+      if(band==="windy"&&k.windy&&k.windy.att>=6) parts.push(`<span class="cb-hi">wind 15+: ${k.windy.pct}% (${k.windy.made}/${k.windy.att})</span>`);
+      else if((band==="cold")&&k.cold&&k.cold.att>=6) parts.push(`cold: <b>${k.cold.pct}%</b> (${k.cold.made}/${k.cold.att})`);
+      if(k.long50&&k.long50.att>=8) parts.push(`50+: ${k.long50.pct}%`);
+      boxes.push(`<div class="crew-box"><div class="cb-k">🦵 ${nm} (${k.team})</div><div class="cb-line">${parts.join(" · ")}</div></div>`);
+    }
+  }
+  if(!boxes.length) return "";
+  return `<div class="m-sec"><h5>Crew & situations<span class="tip" data-tip="Referee tendencies, travel/rest spots, and player condition splits from 2015-2025 play-by-play. Crews and QBs post during game week."><span class="info-i">i</span></span></h5>
+    <div class="crew-grid">${boxes.join("")}</div>
+    <div class="sit-note">Splits are historical tendencies, not projections — small samples flagged by game counts. Referee assignments post Thu-Fri each week.</div>
+  </div>`;
+}
 function openModal(g){
   const modal=document.getElementById("modal");
   const body = g.matches.map(m=>{
@@ -390,6 +467,7 @@ function openModal(g){
         <tbody>${body}</tbody></table>
         <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (live book median).`:"No live total posted yet."}</div>
       </div>
+      ${crewSec(g)}
       <div class="kx-hook">⚡ Feed this edge into your lineups — <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=modal&utm_campaign=nfl" target="_blank" rel="noopener">try The Optimizer</a> · part of The DFS Kitchen</div>
     </div>`;
   document.getElementById("overlay").classList.add("open");
