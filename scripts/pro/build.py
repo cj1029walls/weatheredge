@@ -507,8 +507,19 @@ def main():
         for o in pg.get("ks", []):
             ks_odds.setdefault(norm_name(o["player"]), o)
     kprops = []
+    LG_UMP_SO = (umps_all.get("_league") or {}).get("so") or 17.1
+    def ump_k_mult(ump_name):
+        """Zone signal: shrunk ump strikeout environment vs league, capped ±6%.
+        A wide-zone ump is worth real Ks — his app tracks this, ours now prices it."""
+        u = umps_all.get(ump_name or "")
+        if not u or not u.get("so") or not u.get("n"):
+            return 1.0
+        shrunk = (u["so"] * u["n"] + LG_UMP_SO * 150) / (u["n"] + 150)
+        return clamp(shrunk / LG_UMP_SO, 0.94, 1.06)
     for g in slate.get("games", []):
         wxk = (g.get("ks", 0) or 0)
+        ump_nm = (g.get("ump") or {}).get("name")
+        kmult = ump_k_mult(ump_nm)
         for side, team, opp in (("away", g["away"], g["home"]), ("home", g["home"], g["away"])):
             p = (g.get("pitchers") or {}).get(side)
             if not p or not p.get("all"):
@@ -519,7 +530,7 @@ def main():
                 continue
             k9s = (k9 * ip + 8.5 * 60) / (ip + 60)              # shrink K/9 toward league
             ip_ps = (ip / n * n + 5.3 * 4) / (n + 4)            # shrink IP/start toward 5.3
-            proj = k9s * ip_ps / 9 * (1 + wxk / 100 * 0.5)      # half-weight weather K edge
+            proj = k9s * ip_ps / 9 * (1 + wxk / 100 * 0.5) * kmult
             proj = round(clamp(proj, 2.5, 11.0), 1)
             o = ks_odds.get(norm_name(p["name"]))
             line = o["line"] if o else None
@@ -531,7 +542,9 @@ def main():
             kprops.append(dict(pitcher=p["name"], team=team, opp=opp,
                                game=f"{g['away']} @ {g['home']}",
                                proj=proj, ipStart=round(ip_ps, 1), k9=round(k9s, 1),
-                               wxK=wxk, line=line,
+                               wxK=wxk, ump=ump_nm,
+                               umpK=round((kmult - 1) * 100, 1) if kmult != 1.0 else 0,
+                               line=line,
                                over=o["over"] if o else None,
                                under=o["under"] if o else None,
                                lean=lean, diff=diff))
@@ -724,8 +737,20 @@ def main():
     kslim = [dict(pitcher=k["pitcher"], game=k["game"], proj=k["proj"],
                   line=k["line"], lean=k["lean"])
              for k in kprops if k.get("line") is not None]
+    # game-level projections: graded nightly as avg error / within 1 / within 2,
+    # plus the ump-reliability check (did the ump's tendency hold tonight?)
+    gslim = []
+    for go in games_out:
+        if not go.get("gamePk") or not go.get("expHr"):
+            continue
+        uv = None
+        if umps_pro and go.get("ump") and go["ump"] in umps_pro.get("umps", {}):
+            uv = umps_pro["umps"][go["ump"]]["vslg"]
+        gslim.append(dict(pk=go["gamePk"], m=f"{go['away']}@{go['home']}",
+                          expHr=go["expHr"], ump=go.get("ump"), umpVslg=uv))
     with open(os.path.join(PRED_DIR, f"{dstr}.json"), "w") as f:
-        json.dump(dict(d=dstr, targets=slim, kprops=kslim), f, separators=(",", ":"))
+        json.dump(dict(d=dstr, targets=slim, kprops=kslim, games=gslim),
+                  f, separators=(",", ":"))
 
     with_odds = sum(1 for t in top if t["price"] is not None)
     n_splits = sum(1 for go in games_out if go.get("splits"))

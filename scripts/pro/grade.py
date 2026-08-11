@@ -48,10 +48,10 @@ def norm_name(s):
 
 
 def day_stats(dstr):
-    """name -> {hr, k} actuals for every final game on that date."""
+    """(name -> {hr, k, ab} actuals, gamePk -> total game HRs) for that date."""
     d = f"{dstr[4:6]}/{dstr[6:8]}/{dstr[:4]}"
     sched = get_json(SCHED.format(d=d))
-    stats = {}
+    stats, game_hr = {}, {}
     for day in sched.get("dates", []):
         for g in day.get("games", []):
             if g.get("status", {}).get("abstractGameState") != "Final":
@@ -61,7 +61,10 @@ def day_stats(dstr):
             except Exception as e:
                 print(f"  boxscore {g['gamePk']} unavailable ({e})")
                 continue
+            tot = 0
             for side in ("home", "away"):
+                tot += ((box["teams"][side].get("teamStats") or {})
+                        .get("batting") or {}).get("homeRuns") or 0
                 for pl in box["teams"][side]["players"].values():
                     nm = norm_name((pl.get("person") or {}).get("fullName", ""))
                     if not nm:
@@ -72,11 +75,12 @@ def day_stats(dstr):
                     e["hr"] += bat.get("homeRuns") or 0
                     e["ab"] += bat.get("atBats") or 0
                     e["k"] += pit.get("strikeOuts") or 0
+            game_hr[g["gamePk"]] = tot
             time.sleep(0.25)
-    return stats
+    return stats, game_hr
 
 
-def grade_day(pred, stats):
+def grade_day(pred, stats, game_hr):
     """Pure grading of one archived card against actual stats."""
     tg = []
     for t in pred.get("targets", []):
@@ -97,7 +101,15 @@ def grade_day(pred, stats):
             win = (k["lean"] == "OVER") == (res == "over")
         kk.append(dict(pitcher=k["pitcher"], game=k.get("game"), proj=k.get("proj"),
                        line=k["line"], lean=k.get("lean"), actual=act, res=res, win=win))
-    return dict(targets=tg, k=kk)
+    gg = []
+    for g in pred.get("games", []):
+        act = game_hr.get(g.get("pk"))
+        if act is None or not g.get("expHr"):
+            continue
+        gg.append(dict(m=g.get("m"), exp=g["expHr"], act=act,
+                       delta=round(act - g["expHr"], 2),
+                       ump=g.get("ump"), umpVslg=g.get("umpVslg")))
+    return dict(targets=tg, k=kk, games=gg)
 
 
 def summarize(days):
@@ -120,10 +132,29 @@ def summarize(days):
             top1.append(graded[0]["hit"])
     kleans = [k for d in days.values() for k in d["k"] if k.get("win") is not None]
     k_w = sum(1 for k in kleans if k["win"])
+    # game-level projection accuracy (his "Within 1 / Within 2" module, ours)
+    gg = [g for d in days.values() for g in d.get("games", [])]
+    game_proj = None
+    if gg:
+        errs = [abs(g["delta"]) for g in gg]
+        game_proj = dict(n=len(gg),
+                         avgErr=round(sum(errs) / len(errs), 2),
+                         w1=round(100 * sum(1 for e in errs if e <= 1) / len(errs)),
+                         w2=round(100 * sum(1 for e in errs if e <= 2) / len(errs)))
+    # umpire reliability: in non-neutral ump games (career |vslg| >= 5%), did
+    # the game land on the same side of league average as the ump's tendency?
+    LG_HRPG = 2.4
+    sig = [g for g in gg if g.get("umpVslg") is not None and abs(g["umpVslg"]) >= 5
+           and g["act"] != LG_HRPG]
+    ump_signal = None
+    if sig:
+        w = sum(1 for g in sig if (g["act"] > LG_HRPG) == (g["umpVslg"] > 0))
+        ump_signal = dict(n=len(sig), w=w, pct=round(100 * w / len(sig)))
     return dict(nights=len(days), graded=len(all_t), cal=cal,
                 value=dict(n=len(vals), w=v_w, units=units),
                 top1=dict(n=len(top1), w=sum(1 for h in top1 if h)),
-                kleans=dict(n=len(kleans), w=k_w))
+                kleans=dict(n=len(kleans), w=k_w),
+                gameProj=game_proj, umpSignal=ump_signal)
 
 
 def main():
@@ -140,11 +171,11 @@ def main():
         if dstr >= today or dstr in results["days"]:
             continue
         pred = json.load(open(os.path.join(PRED_DIR, f)))
-        stats = day_stats(dstr)
+        stats, game_hr = day_stats(dstr)
         if len(stats) < 50:
             print(f"  {dstr}: boxscores not ready ({len(stats)} players) — will retry")
             continue
-        results["days"][dstr] = grade_day(pred, stats)
+        results["days"][dstr] = grade_day(pred, stats, game_hr)
         g = results["days"][dstr]
         hits = sum(1 for t in g["targets"] if t["hit"])
         print(f"  {dstr}: graded {len(g['targets'])} targets ({hits} homered), "
