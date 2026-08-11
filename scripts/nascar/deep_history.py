@@ -78,7 +78,12 @@ HOT_F = 88          # race-day high ≥ this at the track -> HOT (slick) race
 def get_json(url, tries=4):
     for i in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "dfsradar-build/1.0"})
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Referer": "https://www.espn.com/",
+            })
             with urllib.request.urlopen(req, timeout=60) as r:
                 return json.loads(r.read())
         except Exception as e:
