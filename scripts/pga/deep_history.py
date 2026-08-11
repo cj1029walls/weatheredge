@@ -31,7 +31,7 @@ OUT = os.path.join(ROOT, "data", "pga", "deep.json")
 WX_CACHE = os.path.join(ROOT, "data", "pga", "wx_cache.json")
 
 SEASONS = list(range(2018, 2027))
-SB_URL = "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates={y}"
+SB_URL = "https://site.web.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates={y}"
 ARC_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
            "&start_date={d0}&end_date={d1}&hourly=wind_speed_10m,wind_gusts_10m"
            "&wind_speed_unit=mph&timezone={tz}")
@@ -133,33 +133,19 @@ WINDY_MPH = 12       # avg daytime wind over the event ≥ this -> WINDY edition
 
 
 def get_json(url, tries=4):
-    """ESPN blocks some datacenter IP ranges (403 from CI runners). Fallback
-    chain: direct -> allorigins relay -> codetabs relay. Weekly cadence and a
-    handful of calls, so relay load is trivial."""
-    import urllib.parse
-    variants = [
-        url,
-        "https://api.allorigins.win/raw?url=" + urllib.parse.quote(url, safe=""),
-        "https://api.codetabs.com/v1/proxy?quest=" + urllib.parse.quote(url, safe=""),
-    ]
-    last = None
     for i in range(tries):
-        for v in variants:
-            try:
-                req = urllib.request.Request(v, headers={
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-                    "Accept": "application/json, text/plain, */*",
-                    "Accept-Language": "en-US,en;q=0.9",
-                })
-                with urllib.request.urlopen(req, timeout=60) as r:
-                    return json.loads(r.read())
-            except Exception as e:
-                last = e
-                continue
-        if i < tries - 1:
-            print(f"    retry {i+1}/{tries}: {last}")
+        try:
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+            })
+            with urllib.request.urlopen(req, timeout=90) as r:
+                return json.loads(r.read())
+        except Exception as e:
+            if i == tries - 1:
+                raise
+            print(f"    retry {i+1}/{tries}: {e}")
             time.sleep(6 * (i + 1))
-    raise last
 
 
 def canon_key(name):
