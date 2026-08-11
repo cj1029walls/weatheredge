@@ -7,23 +7,18 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe data sources
+      - name: Probe remaining sources
         run: |
           probe () {
             echo "== $1"
-            curl -sS -o /tmp/out -w "HTTP %{http_code} · %{size_download}B\n" --max-time 40 "$2" \
-              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" \
-              -H "Accept: application/json" || echo "FAILED"
-            head -c 120 /tmp/out; echo; echo
+            curl -sS -o /tmp/out -w "HTTP %{http_code} - %{size_download}B\n" --max-time 40 "$2" -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36" -H "Accept: application/json" || echo "CURL FAILED"
+            head -c 150 /tmp/out || true
+            echo ""
+            echo "--"
           }
-          E="https://site.api.espn.com/apis/site/v2/sports/racing/nascar-premier/scoreboard?dates=2024"
-          EE=$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote('$E',safe=''))")
-          probe "espn direct (curl)" "$E"
-          probe "espn via corsproxy.io" "https://corsproxy.io/?url=$EE"
-          probe "espn via r.jina.ai" "https://r.jina.ai/$E"
-          probe "espn via allorigins" "https://api.allorigins.win/raw?url=$EE"
-          probe "espn via codetabs" "https://api.codetabs.com/v1/proxy?quest=$EE"
-          probe "espn cdn host" "https://cdn.espn.com/core/nascar/scoreboard?xhr=1&dates=2024"
-          probe "nascar cf feed race_list" "https://cf.nascar.com/cacher/2024/race_list_basic.json"
-          probe "espn golf direct" "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates=2024"
-          probe "espn site.web.api" "https://site.web.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates=2024"
+          probe "nascar cf race_list 2024" "https://cf.nascar.com/cacher/2024/race_list_basic.json"
+          probe "nascar cf race_list 2019" "https://cf.nascar.com/cacher/2019/race_list_basic.json"
+          probe "nascar cf weekend-feed" "https://cf.nascar.com/cacher/2024/1/5285/weekend-feed.json"
+          probe "espn golf via wikipedia-style host sports.core" "https://sports.core.api.espn.com/v2/sports/golf/leagues/pga/seasons/2024/types"
+          probe "site.web.api golf" "https://site.web.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates=2024"
+          probe "datagolf no-key check" "https://feeds.datagolf.com/field-updates?tour=pga&file_format=json"
