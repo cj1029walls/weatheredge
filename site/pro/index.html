@@ -45,6 +45,11 @@
   .brand .tagline b{color:#ffd94a;font-weight:700}
   .backlink{display:inline-block;margin-top:12px;font-size:12px;font-weight:700;letter-spacing:.5px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:5px 13px}
   .backlink:hover{color:#fff}
+  .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+  .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
+  .pro-nav a:hover{color:#fff}
+  .pro-nav a.on{background:#fff;color:#152451;border-color:#fff}
+  .pro-nav .soon{font-size:11px;color:#7c8aa5;font-weight:700;margin-left:2px}
   main{max-width:1160px;margin:0 auto;padding:22px 24px 50px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,#0e1a3d 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
@@ -188,7 +193,12 @@
     <div class="brand">
       <h1>DFS<span class="brand-rad">RADAR</span><span class="pro">PRO</span></h1>
       <div class="tagline">Tonight's HR prop targets — <b>our probability vs the books' price.</b> Weather × umpire × pitcher × batter, shrunk and capped. No hype numbers.</div>
-      <a class="backlink" href="/">← DFSRADAR MLB</a>
+      <div class="pro-nav">
+        <a class="on" href="/pro/">⚾ MLB</a>
+        <a href="/pro/nfl/">🏈 NFL</a>
+        <span class="soon">⛳ PGA &amp; 🏁 NASCAR coming</span>
+        <a href="/" style="margin-left:auto">← free MLB radar</a>
+      </div>
     </div>
   </div>
 </header>
@@ -232,7 +242,6 @@
     <button data-tab="umps">⚖️ Umpires</button>
     <button data-tab="parks">🏟️ Parks</button>
     <button data-tab="log">📜 Game Log</button>
-    <button data-tab="nfl">🏈 NFL <span class="cnt" id="cnt-nfl"></span></button>
     <button data-tab="record">📊 Record &amp; method</button>
   </nav>
 
@@ -325,20 +334,6 @@
     <table class="mini"><thead><tr>
       <th>Date</th><th>Matchup</th><th>Plate ump</th><th>HRs</th><th class="hide-m">Runs</th>
     </tr></thead><tbody id="log-body"></tbody></table>
-  </div>
-
-  <!-- ============ NFL ============ -->
-  <div class="tab-pane" id="tab-nfl">
-    <div class="sec-h" id="nfl-week-h">NFL weekly board</div>
-    <div class="split-note" id="nfl-note" style="margin-bottom:12px"></div>
-    <div class="sec-h">Prop &amp; angle leans</div>
-    <div class="gamestrip" id="nfl-leans" style="grid-template-columns:repeat(auto-fill,minmax(290px,1fr))"></div>
-    <div class="sec-h" style="margin-top:16px">The slate</div>
-    <div id="nfl-board"></div>
-    <div class="m-sec" style="margin-top:16px">
-      <h5>How the NFL board works</h5>
-      <p>Built from 2015–2025 play-by-play and schedule data: referee crew tendencies (pts/gm, over rate, penalty volume), travel and rest spots with their real against-the-spread and over/under records, each team's scoring identity by weather band, and QB/kicker condition splits. When kickoffs enter the 16-day forecast window, weather-dependent leans activate (QB pass-yds in 15+ mph wind, kicker accuracy in wind and cold, team totals in sub-40°). When sportsbooks post player props, each lean carries the live line and price. Every lean is archived the moment it posts and graded publicly after the games — same receipts-first rules as the MLB board. Historical records are tendencies, not guarantees; sample sizes are shown on every number.</p>
-    </div>
   </div>
 
   <!-- ============ RECORD & METHOD ============ -->
@@ -657,48 +652,6 @@ async function loadLive(){
     if(DATA.date){ pollLive(); if(!liveTimer) liveTimer=setInterval(pollLive,60000); }
   }catch(e){}
 }
-/* ---- NFL weekly board ---- */
-let NFL=null;
-const LEAN_ICON={"REF TOTAL":"🦓","SPOT":"🧭","QB WIND":"💨","QB COLD":"🥶","KICKER":"🦵","COLD":"🥶","ALTITUDE":"⛰️"};
-function nflLeanCard(l){
-  const price=l.line!=null?`<div class="stat">${l.side==="UNDER"?"U":l.side==="OVER"?"O":""} ${l.line}${l.price!=null?` <span style="font-size:11px;color:var(--muted)">${l.price>0?"+":""}${l.price}</span>`:""}</div>`:"";
-  return `<div class="intel-card"><div class="ic">${LEAN_ICON[l.k]||"📌"}</div>
-    <div style="flex:1"><span class="tag ${l.side==="WATCH"?"g":""}">${esc(l.k)} · ${esc(l.side)}</span>
-    <h4>${esc(l.who)}${l.prop?` — ${esc(l.prop)}`:""} <span style="color:var(--muted);font-weight:700">· ${esc(l.game)}</span></h4>
-    <p>${esc(l.why)}${l.books?` · line from ${l.books} books`:""}</p></div>${price}</div>`;
-}
-function renderNFL(){
-  if(!NFL) return;
-  document.getElementById("cnt-nfl").textContent=(NFL.leans||[]).length||"";
-  document.getElementById("nfl-week-h").textContent=NFL.season?`NFL — ${NFL.season} Week ${NFL.week} · ${(NFL.games||[]).length} games`:"NFL weekly board";
-  document.getElementById("nfl-note").textContent=NFL.note||"";
-  const lw=document.getElementById("nfl-leans");
-  lw.innerHTML=(NFL.leans||[]).length?(NFL.leans||[]).map(nflLeanCard).join(""):
-    `<div class="split-note">No leans yet this week — they load as forecasts, crews, and prop lines post.</div>`;
-  const rows=(NFL.games||[]).map(g=>{
-    const e=g.edge||{};
-    const chips=[...(e.badges||[]).map(b=>`<span class="chip" title="${esc((b.txt||"")+(b.rec?" — "+b.rec:""))}">${esc(b.k)}${b.team?" · "+esc(b.team):""}</span>`),
-      ...(e.ref&&e.ref.name?[`<span class="chip" title="${e.ref.n||0} games · ${e.ref.ppg||"—"} pts/gm · ${e.ref.overPct||"—"}% overs">🦓 ${esc(e.ref.name)}</span>`]:[])];
-    const wx=g.wx?(g.wx.dome?"🏟 roof":`${g.wx.temp}° · ${g.wx.wind} mph`):`<span class="imp">—</span>`;
-    return `<tr>
-      <td><div class="pname">${esc(g.away)} @ ${esc(g.home)}</div><div class="psub">${esc(g.day)} ${esc(g.time)} · ${esc(g.stadium)}</div></td>
-      <td>${g.spread!=null?esc(g.spread):'<span class="imp">—</span>'}</td>
-      <td>${g.total!=null?g.total:'<span class="imp">—</span>'}</td>
-      <td class="hide-m">${wx}</td>
-      <td><div class="chips">${chips.join("")||'<span class="imp">—</span>'}</div></td>
-    </tr>`;}).join("");
-  document.getElementById("nfl-board").innerHTML=`<table class="mini"><thead><tr>
-    <th>Game</th><th>Spread</th><th>Total</th><th class="hide-m">Forecast</th><th>Edges</th>
-    </tr></thead><tbody>${rows}</tbody></table>`;
-}
-async function loadNFL(){
-  try{
-    const r=await fetch("nfl.json?_="+Date.now());
-    if(!r.ok) return;
-    NFL=await r.json();
-    renderNFL();
-  }catch(e){}
-}
 /* ---- umpire dataset (loaded eagerly: powers game panels + Umpires tab) ---- */
 function renderUmpsTab(){
   if(!UMPS) return;
@@ -787,7 +740,7 @@ async function loadRecord(){
     if(r.ok) renderRecord(await r.json());
   }catch(e){}
 }
-if(location.hash&&["slate","lineups","targets","intel","umps","parks","log","nfl","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
+if(location.hash&&["slate","lineups","targets","intel","umps","parks","log","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
 let GATED=null;
@@ -831,7 +784,6 @@ renderAll();
 loadLive();
 loadUmps();
 loadRecord();
-loadNFL();
 </script>
 </body>
 </html>
