@@ -157,10 +157,21 @@ def batter_rate(games):
     adj = (hr + K_BAT * LG_HR_AB) / (ab + K_BAT)
     return adj, ab, hr
 
-def ump_mult(ump, umps_all):
-    if not ump or not ump.get("name") or ump["name"] not in umps_all:
+def ump_mult(ump, umps_all, umps_pro=None):
+    """Prefer the 10-season+current PRO ump dataset (2017-2026, incl. this
+    season's games) over the free-side 2019-2025 aggregate. Same shrinkage
+    and cap — more games just means the estimate earns more of its signal."""
+    name = (ump or {}).get("name")
+    if not name:
         return 1.0, None
-    u = umps_all[ump["name"]]
+    if umps_pro and name in umps_pro.get("umps", {}):
+        u = umps_pro["umps"][name]
+        lg = umps_pro["league"]["hrpg"]
+        shrunk = (u["hrpg"] * u["n"] + lg * K_UMP) / (u["n"] + K_UMP)
+        return clamp(shrunk / lg, 0.88, 1.12), u["n"]
+    if name not in umps_all:
+        return 1.0, None
+    u = umps_all[name]
     shrunk = (u["hr"] * u["n"] + LG_UMP_HR * K_UMP) / (u["n"] + K_UMP)
     return clamp(shrunk / LG_UMP_HR, 0.88, 1.12), u["n"]
 
@@ -319,7 +330,7 @@ def main():
     for g in slate.get("games", []):
         away, home = g["away"], g["home"]
         wx = 1.0 if g.get("dome") else clamp(1 + (g.get("hr", 0) or 0) / 100 * 0.75, 0.78, 1.30)
-        um, um_n = ump_mult(g.get("ump"), umps_all)
+        um, um_n = ump_mult(g.get("ump"), umps_all, umps_pro)
         ump_name = (g.get("ump") or {}).get("name")
         p_away = (g.get("pitchers") or {}).get("away")   # away SP faces HOME batters
         p_home = (g.get("pitchers") or {}).get("home")   # home SP faces AWAY batters
