@@ -39,6 +39,8 @@ jobs:
         run: python scripts/pro/ump_detail.py || echo "ump dataset skipped — using last committed caches"
       - name: Build PRO HR-prop targets (site/pro/data.json)
         run: python scripts/pro/build.py
+      - name: Fetch Advanced Model card (Model Lab beta)
+        run: python scripts/pro/adv_build.py || echo "adv model unreachable — keeping last card"
       - name: Persist prediction archive & accuracy grades
         run: |
           git config user.name "weatheredge-bot"
