@@ -835,7 +835,7 @@ function renderLabBatters(){
       <td class="hide-m">${esc(h.game||"")}<div class="psub">${esc(h.ump||"")}</div></td>
       <td><span class="prob" style="color:#b8860b">${h.combinedHrScore}</span></td>
       <td class="hide-m"><span class="imp">${h.games?`${h.hr} HR in ${h.games} gms (${h.ab} AB${h.avg!=null?` · ${String(h.avg).replace(/^0/,"")}`:""})`:"no ump history"}</span></td>
-      <td class="hide-m"><span class="imp">${h.vsPitcher?esc(h.vsPitcher):(h.pitcherMod?`${h.pitcherMod>0?"+":""}${h.pitcherMod}`:"—")}</span></td>
+      <td class="hide-m"><span class="imp">${h.vsPitcher&&h.vsPitcher.ab?`${h.vsPitcher.h}-${h.vsPitcher.ab}, ${h.vsPitcher.hr} HR`:(h.pitcherMod?`mod ${h.pitcherMod>0?"+":""}${h.pitcherMod}`:"—")}</span></td>
       </tr>`).join("")}</tbody></table>
       <div class="split-note">Ranked by the Advanced Model's own combined HR score, shown verbatim. "With tonight's ump" = that batter's history with tonight's plate umpire (his engine's signature stat — small samples, shown for what they are).</div>`;
   }
