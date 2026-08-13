@@ -140,9 +140,22 @@ def grade_adv(dstr, stats, game_hr):
         s = stats.get(norm_name(top["name"]))
         if s is not None and s.get("ab", 0) > 0:
             top_hit = s.get("hr", 0) >= 1
+    # his top-10 batters across the slate by combinedHrScore, graded like ours
+    hitters = []
+    for pk, p in (arc.get("proj") or {}).items():
+        for h in p.get("hitters") or []:
+            if h.get("combinedHrScore") is not None and h.get("name"):
+                hitters.append(h)
+    hitters.sort(key=lambda h: -(h["combinedHrScore"] or 0))
+    top10 = []
+    for h in hitters[:10]:
+        s = stats.get(norm_name(h["name"]))
+        hit = None if s is None or s.get("ab", 0) == 0 else (s.get("hr", 0) >= 1)
+        top10.append(dict(player=h["name"], score=h["combinedHrScore"], hit=hit))
     return dict(games=gg,
                 top=(dict(player=top.get("name"), score=top.get("combinedHrScore"),
-                          hit=top_hit) if top.get("name") else None))
+                          hit=top_hit) if top.get("name") else None),
+                top10=top10)
 
 
 def summarize(days):
@@ -187,7 +200,7 @@ def summarize(days):
     # projectedHr, same nights, same games (matched by gamePk), same actuals.
     lab = None
     pairs, night_w = [], dict(ours=0, adv=0, push=0)
-    adv_top = []
+    adv_top, adv_t10, our_t10 = [], [], []
     for dstr in sorted(days):
         d = days[dstr]
         adv = d.get("adv")
@@ -211,6 +224,11 @@ def summarize(days):
                 night_w["adv"] += 1
         if adv.get("top") and adv["top"].get("hit") is not None:
             adv_top.append(adv["top"]["hit"])
+        for h in adv.get("top10") or []:
+            if h.get("hit") is not None:
+                adv_t10.append(h["hit"])
+        for t in [t for t in d["targets"] if t["hit"] is not None][:10]:
+            our_t10.append(t["hit"])
     if pairs:
         n = len(pairs)
         lab = dict(
@@ -221,7 +239,9 @@ def summarize(days):
             adv=dict(avgErr=round(sum(p[1] for p in pairs) / n, 2),
                      w1=round(100 * sum(1 for p in pairs if p[1] <= 1) / n),
                      w2=round(100 * sum(1 for p in pairs if p[1] <= 2) / n)),
-            advTop=dict(n=len(adv_top), w=sum(1 for h in adv_top if h)))
+            advTop=dict(n=len(adv_top), w=sum(1 for h in adv_top if h)),
+            topTen=dict(ours=dict(n=len(our_t10), w=sum(1 for h in our_t10 if h)),
+                        adv=dict(n=len(adv_t10), w=sum(1 for h in adv_t10 if h))))
     return dict(nights=len(days), graded=len(all_t), cal=cal,
                 value=dict(n=len(vals), w=v_w, units=units),
                 top1=dict(n=len(top1), w=sum(1 for h in top1 if h)),

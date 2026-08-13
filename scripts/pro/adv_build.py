@@ -67,6 +67,36 @@ def main():
         print("unexpected slate shape — keeping last card")
         return
 
+    # ---- batter-level combined projections, one call per game (verbatim)
+    proj = {}
+    for g in slate:
+        pk = g.get("gamePk")
+        if not pk:
+            continue
+        try:
+            p = get_json(f"/api/combined-projection?gamePk={pk}", tries=1)
+            if isinstance(p, dict) and p.get("hitters"):
+                proj[str(pk)] = p
+            time.sleep(0.3)
+        except Exception as e:
+            print(f"  projection {pk} skipped ({e})")
+    n_hitters = sum(len(p.get("hitters") or []) for p in proj.values())
+    print(f"batter projections: {len(proj)} games · {n_hitters} hitters")
+
+    # best overall: every hitter across the slate, ranked by his combined score
+    best = []
+    for pk, p in proj.items():
+        game = f"{p.get('awayAbbr')} @ {p.get('homeAbbr')}"
+        for h in p.get("hitters") or []:
+            if h.get("combinedHrScore") is None:
+                continue
+            best.append(dict(h, gamePk=int(pk), game=game,
+                             team=(p.get("awayAbbr") if h.get("side") == "away"
+                                   else p.get("homeAbbr")),
+                             ump=p.get("umpName")))
+    best.sort(key=lambda h: -(h.get("combinedHrScore") or 0))
+    best = best[:20]
+
     now = datetime.now(ET)
     out = dict(
         fetched=now.strftime("%Y-%m-%d %H:%M ET"),
@@ -76,7 +106,9 @@ def main():
                      hrPerGame=overview.get("hrPerGame"),
                      lastDate=overview.get("lastDate")),
         slate=slate,          # verbatim
-        stars=stars)          # verbatim
+        stars=stars,          # verbatim
+        proj=proj,            # verbatim per-game hitters
+        best=best)            # verbatim rows, ranked by his combinedHrScore
     json.dump(out, open(OUT, "w"), separators=(",", ":"))
     print(f"wrote {OUT}: {len(slate)} games · top batter "
           f"{((stars or {}).get('topBatter') or {}).get('name')}")
@@ -108,9 +140,11 @@ def main():
             continue
         # postGame=True marks a first-ever snapshot taken AFTER results
         # started — the grader excludes those nights from the head-to-head.
+        pks = {str(g.get("gamePk")) for g in rows}
         json.dump(dict(archived=out["fetched"], generatedAt=out["generatedAt"],
                        locked=locked_now, postGame=locked_now,
                        slate=rows,
+                       proj={pk: p for pk, p in proj.items() if pk in pks},
                        stars=(stars if not locked_now else None)),
                   open(path, "w"), separators=(",", ":"))
         print(f"  archive {d}: {len(rows)} games{' (post-game — excluded from grading)' if locked_now else ''}")
