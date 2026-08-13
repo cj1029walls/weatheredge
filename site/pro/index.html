@@ -346,29 +346,33 @@
 
   <!-- ============ MODEL LAB (BETA) ============ -->
   <div class="tab-pane" id="tab-lab">
-    <div class="sec-h">Model Lab — DFSRADAR v2 vs the Advanced Model</div>
-    <div class="split-note" style="margin-bottom:14px">Beta test, run in the open: the <b>Advanced Model</b> is our partner engine, and its numbers are shown here <b>verbatim</b> from its own live system — nothing re-computed on our side. Both models project the same slate every night, both cards are archived before first pitch, and both are graded against the same actual results. After a few weeks of receipts, the better model becomes the primary card — and we'll show our work either way.</div>
+    <div class="sec-h">Model Lab — two models, one slate</div>
+    <div class="split-note" style="margin-bottom:6px">We're beta-testing our new <b>Advanced Model</b> next to the current DFSRADAR model. Both project every game each night, both cards are saved before first pitch, and both are graded against the real results. When the test ends, the better model becomes the main card.</div>
+    <div class="split-note" style="margin-bottom:14px"><span class="chip" style="background:var(--gold-bg);color:var(--gold-deep)">DFSRADAR — blue numbers</span> <span class="chip" style="background:#fdf5dc;color:#b8860b">Advanced — gold numbers</span></div>
 
-    <div class="sec-h">Head-to-head record</div>
+    <div class="sec-h">The score so far</div>
     <div class="gamestrip" id="lab-tiles" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
-    <div class="split-note" id="lab-empty">First graded night lands after tonight's slate completes — both cards are already being archived.</div>
+    <div class="split-note" id="lab-empty">First graded night lands after tonight's games finish — both cards are already being saved.</div>
 
-    <div class="sec-h" style="margin-top:18px">Tonight, side by side — expected HRs per game</div>
-    <div id="lab-board"></div>
-
-    <div class="sec-h" style="margin-top:18px">Advanced Model — tonight's stars</div>
-    <div class="gamestrip" id="lab-stars"></div>
-
-    <div class="sec-h" style="margin-top:18px">Advanced Model — best overall HR targets</div>
+    <div class="sec-h" style="margin-top:18px">Advanced Model — tonight's HR targets</div>
     <div id="lab-best"></div>
 
-    <div class="sec-h" style="margin-top:18px">Advanced Model — by game &amp; lineup</div>
+    <div class="sec-h" style="margin-top:18px">Advanced Model — batter vs pitcher flags</div>
+    <div class="gamestrip" id="lab-bvp" style="grid-template-columns:repeat(auto-fill,minmax(290px,1fr))"></div>
+
+    <div class="sec-h" style="margin-top:18px">Advanced Model — intel feed</div>
+    <div class="gamestrip" id="lab-intel" style="grid-template-columns:repeat(auto-fill,minmax(290px,1fr))"></div>
+
+    <div class="sec-h" style="margin-top:18px">Lineups by game — Advanced scores</div>
     <div class="lu-pills" id="lab-game-pills" style="margin-bottom:10px"></div>
     <div id="lab-lineups"></div>
 
+    <div class="sec-h" style="margin-top:18px">Both models, game by game</div>
+    <div id="lab-board"></div>
+
     <div class="m-sec" style="margin-top:16px">
       <h5>How the lab works</h5>
-      <p>The Advanced Model runs on its own engine (10-season umpire dataset, 22,000+ games) and refreshes every 30 minutes; we pull its output as-is on every build. DFSRADAR v2 is the model behind every other tab. The comparison is strict: same games, matched by game ID, graded on identical final boxscores. Per-game accuracy is measured as average error between projected and actual home runs, plus the share of games landing within ±1 and ±2. A night is "won" by whichever model had the lower average error. Snapshots lock the moment the first game goes final — nothing recorded after results begin counts. Small samples early; the table fills in nightly.</p>
+      <p>The Advanced Model is our new engine, built on a 10-season umpire dataset of 22,000+ games. Its numbers refresh every 30 minutes and are shown here exactly as it computes them. The current DFSRADAR model powers every other tab. The test is simple: same games, same nights, graded on the same final boxscores. For each game we measure how far each model's home-run projection landed from what actually happened, and each night goes to whichever model was closer overall. We also track how often each model's top-ranked batters actually homer. Projections lock the moment the first game ends — nothing recorded after results begin counts. Early numbers will bounce around; the picture gets real after a few weeks.</p>
     </div>
   </div>
 
@@ -777,27 +781,23 @@ async function loadRecord(){
     if(r.ok){ REC=await r.json(); renderRecord(REC); renderLab(); }
   }catch(e){}
 }
-/* ---- Model Lab (beta): Advanced Model shown verbatim, graded head-to-head ---- */
-let ADV=null, REC=null;
+/* ---- Model Lab (beta): the Advanced Model shown exactly as computed, graded head-to-head ---- */
+let ADV=null, REC=null, LAB_PK=null;
 function renderLab(){
-  // head-to-head tiles (need graded record with lab section)
   const lab=REC&&REC.summary&&REC.summary.lab;
   if(lab){
     document.getElementById("lab-empty").style.display="none";
     const nw=lab.nightW||{ours:0,adv:0,push:0};
     document.getElementById("lab-tiles").innerHTML=[
-      {k:"Nights won",v:`${nw.ours}–${nw.adv}${nw.push?"–"+nw.push:""}`,s:"DFSRADAR v2 vs Advanced · lower nightly error wins"},
-      {k:"Avg error — DFSRADAR",v:"±"+lab.ours.avgErr,s:lab.ours.w1+"% within 1 HR · "+lab.ours.w2+"% within 2"},
-      {k:"Avg error — Advanced",v:"±"+lab.adv.avgErr,s:lab.adv.w1+"% within 1 HR · "+lab.adv.w2+"% within 2"},
-      {k:"Top-star homered",v:(REC.summary.top1.n?Math.round(100*REC.summary.top1.w/REC.summary.top1.n)+"%":"—")+" / "+(lab.advTop.n?Math.round(100*lab.advTop.w/lab.advTop.n)+"%":"—"),s:"ours / advanced · "+lab.n+" games graded"},
-      ...(lab.topTen&&lab.topTen.adv.n?[{k:"Top-10 targets homered",v:(lab.topTen.ours.n?Math.round(100*lab.topTen.ours.w/lab.topTen.ours.n)+"%":"—")+" / "+Math.round(100*lab.topTen.adv.w/lab.topTen.adv.n)+"%",s:`ours ${lab.topTen.ours.w}/${lab.topTen.ours.n} · advanced ${lab.topTen.adv.w}/${lab.topTen.adv.n}`}]:[]),
+      {k:"Nights won",v:`${nw.ours}–${nw.adv}${nw.push?"–"+nw.push:""}`,s:"DFSRADAR vs Advanced — closest projections take the night"},
+      {k:"Avg miss — DFSRADAR",v:"±"+lab.ours.avgErr+" HR",s:lab.ours.w1+"% of games within 1 HR · "+lab.ours.w2+"% within 2"},
+      {k:"Avg miss — Advanced",v:"±"+lab.adv.avgErr+" HR",s:lab.adv.w1+"% of games within 1 HR · "+lab.adv.w2+"% within 2"},
+      ...(lab.topTen&&lab.topTen.adv.n?[{k:"Top-10 targets that homered",v:(lab.topTen.ours.n?Math.round(100*lab.topTen.ours.w/lab.topTen.ours.n)+"%":"—")+" / "+Math.round(100*lab.topTen.adv.w/lab.topTen.adv.n)+"%",s:`DFSRADAR ${lab.topTen.ours.w}/${lab.topTen.ours.n} · Advanced ${lab.topTen.adv.w}/${lab.topTen.adv.n}`}]:[]),
+      {k:"#1 target homered",v:(REC.summary.top1.n?Math.round(100*REC.summary.top1.w/REC.summary.top1.n)+"%":"—")+" / "+(lab.advTop.n?Math.round(100*lab.advTop.w/lab.advTop.n)+"%":"—"),s:"DFSRADAR / Advanced · "+lab.n+" games graded"},
     ].map(c=>`<div class="intel-card"><div style="flex:1"><span class="tag">${c.k}</span><h4 style="font-size:18px;margin-top:6px">${c.v}</h4><p>${c.s}</p></div></div>`).join("");
   }
-  // tonight's side-by-side
-  if(!ADV||!ADV.slate){ return; }
-  const advByPk={}; ADV.slate.forEach(g=>{ if(g.gamePk) advByPk[g.gamePk]=g; });
+  if(!ADV||!ADV.slate) return;
   const ourByPk={}; (DATA.games||[]).forEach(g=>{ if(g.gamePk) ourByPk[g.gamePk]=g; });
-  const pks=[...new Set([...Object.keys(advByPk)])];
   const rows=ADV.slate.map(a=>{
     const o=ourByPk[a.gamePk];
     const d=(o&&o.expHr!=null&&a.projectedHr!=null)?(o.expHr-a.projectedHr):null;
@@ -810,51 +810,68 @@ function renderLab(){
       <td class="hide-m"><span class="imp">${o&&o.umpMult?((o.umpMult-1)*100>0?"+":"")+Math.round((o.umpMult-1)*100)+"%":"—"} / ${a.umpBoostPct!=null?(a.umpBoostPct>0?"+":"")+a.umpBoostPct+"%":"—"}</span></td>
     </tr>`;}).join("");
   document.getElementById("lab-board").innerHTML=`<table><thead><tr>
-    <th>Game</th><th>DFSRADAR exp HR</th><th>Advanced proj HR</th><th>Δ models</th><th class="hide-m">Weather (ours/adv)</th><th class="hide-m">Ump (ours/adv)</th>
+    <th>Game</th><th>DFSRADAR</th><th>Advanced</th><th>Gap</th><th class="hide-m">Weather boost</th><th class="hide-m">Ump boost</th>
     </tr></thead><tbody>${rows}</tbody></table>
-    <div class="split-note">Advanced column served live from the partner engine (computed ${esc(ADV.generatedAt?new Date(ADV.generatedAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"—")} · refreshes every 30 min · fetched ${esc(ADV.fetched||"—")}). Δ models = DFSRADAR minus Advanced.</div>`;
-  const st=ADV.stars||{};
-  const cards=[];
-  if(st.topBatter) cards.push({e:"💣",k:"Adv top batter",t:st.topBatter.name,s:`${st.topBatter.team} · ${st.topBatter.game} · combined score ${st.topBatter.combinedHrScore}`});
-  if(st.topPitcher) cards.push({e:"🔥",k:"Adv top K pitcher",t:st.topPitcher.name,s:`${st.topPitcher.team} · ${st.topPitcher.game}`});
-  if(st.topUmpire) cards.push({e:"⚖️",k:"Adv umpire of the night",t:st.topUmpire.ump||st.topUmpire.name||"—",s:st.topUmpire.game||""});
-  const ourTop=(DATA.targets||[])[0];
-  if(ourTop) cards.push({e:"🎯",k:"DFSRADAR #1 target (for contrast)",t:ourTop.player,s:`${ourTop.team} · ${ourTop.game} · ${ourTop.prob}% HR chance`});
-  document.getElementById("lab-stars").innerHTML=cards.map(c=>`<div class="intel-card"><div class="ic">${c.e}</div><div style="flex:1"><span class="tag">${esc(c.k)}</span><h4>${esc(c.t)}</h4><p>${esc(c.s)}</p></div></div>`).join("")||'<div class="split-note">Stars post when the engine computes tonight\'s card.</div>';
+    <div class="split-note">Expected home runs per game from each model. Gap = DFSRADAR minus Advanced — a big gap means the models disagree, and grading settles who was right. Boost columns show each model's read as DFSRADAR / Advanced. Advanced numbers computed ${esc(ADV.generatedAt?new Date(ADV.generatedAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"—")}, refreshed every 30 minutes.</div>`;
 }
-let LAB_PK=null;
 function renderLabBatters(){
+  // top targets board
   const best=ADV&&ADV.best||[];
   const bb=document.getElementById("lab-best");
   if(!best.length){
-    bb.innerHTML='<div class="split-note">Batter projections post once the engine computes tonight\'s lineups (~lineup time).</div>';
+    bb.innerHTML='<div class="split-note">Batter scores post once the engine has today\'s lineups and umpires — usually by late afternoon.</div>';
   }else{
-    bb.innerHTML=`<table><thead><tr><th>#</th><th>Player</th><th class="hide-m">Game</th><th>Adv HR score</th><th class="hide-m">With tonight's ump</th><th class="hide-m">vs SP</th></tr></thead><tbody>${best.map((h,i)=>`
+    bb.innerHTML=`<table><thead><tr><th>#</th><th>Player</th><th class="hide-m">Game</th><th>HR score</th><th class="hide-m">History with tonight's ump</th><th class="hide-m">vs tonight's starter</th></tr></thead><tbody>${best.map((h,i)=>`
       <tr><td class="rank">${i+1}</td>
       <td><div class="pname">${esc(h.name)}${LIVE.hrNames.has(normN(h.name))?'<span class="hr-badge">💣 HR</span>':""}</div><div class="psub">${esc(h.team||"")}${h.projected?" · projected lineup":""}</div></td>
       <td class="hide-m">${esc(h.game||"")}<div class="psub">${esc(h.ump||"")}</div></td>
       <td><span class="prob" style="color:#b8860b">${h.combinedHrScore}</span></td>
-      <td class="hide-m"><span class="imp">${h.games?`${h.hr} HR in ${h.games} gms (${h.ab} AB${h.avg!=null?` · ${String(h.avg).replace(/^0/,"")}`:""})`:"no ump history"}</span></td>
-      <td class="hide-m"><span class="imp">${h.vsPitcher&&h.vsPitcher.ab?`${h.vsPitcher.h}-${h.vsPitcher.ab}, ${h.vsPitcher.hr} HR`:(h.pitcherMod?`mod ${h.pitcherMod>0?"+":""}${h.pitcherMod}`:"—")}</span></td>
+      <td class="hide-m"><span class="imp">${h.games?`${h.hr} HR in ${h.games} games (${h.ab} AB)`:"first time with this ump"}</span></td>
+      <td class="hide-m"><span class="imp">${h.vsPitcher&&h.vsPitcher.ab?`${h.vsPitcher.h}-for-${h.vsPitcher.ab}, ${h.vsPitcher.hr} HR`:"no history"}</span></td>
       </tr>`).join("")}</tbody></table>
-      <div class="split-note">Ranked by the Advanced Model's own combined HR score, shown verbatim. "With tonight's ump" = that batter's history with tonight's plate umpire (his engine's signature stat — small samples, shown for what they are).</div>`;
+      <div class="split-note">Ranked by the Advanced Model's HR score. "History with tonight's ump" is that batter's record in games this umpire called — small samples, so read it as color, not gospel.</div>`;
   }
+  // BvP flags: batters who have taken tonight's starter deep before
   const proj=ADV&&ADV.proj||{};
+  const flags=[];
+  for(const pk of Object.keys(proj)){
+    const p=proj[pk];
+    for(const h of (p.hitters||[])){
+      const v=h.vsPitcher;
+      if(v&&v.hr>=1){
+        const sp=h.side==="away"?p.homePitcher:p.awayPitcher;
+        flags.push({name:h.name, team:(h.side==="away"?p.awayAbbr:p.homeAbbr), sp:sp&&sp.name||"tonight's starter", game:`${p.awayAbbr} @ ${p.homeAbbr}`, v, score:h.combinedHrScore});
+      }
+    }
+  }
+  flags.sort((a,b)=>(b.v.hr-a.v.hr)||((b.score||0)-(a.score||0)));
+  document.getElementById("lab-bvp").innerHTML=flags.length?flags.slice(0,9).map(f=>`
+    <div class="intel-card"><div class="ic">⚔️</div><div style="flex:1"><span class="tag">${esc(f.game)}</span>
+    <h4>${esc(f.name)}${LIVE.hrNames.has(normN(f.name))?' <span class="hr-badge">💣 HR</span>':""} <span style="color:var(--muted);font-weight:700">vs ${esc(f.sp)}</span></h4>
+    <p>${f.v.h}-for-${f.v.ab} with ${f.v.hr} HR off him${f.score!=null?` · HR score ${f.score}`:""}</p></div></div>`).join(""):
+    '<div class="split-note">No batter on tonight\'s slate has homered off the starter he faces — flags post when lineups do.</div>';
+  // intel feed
+  const intel=ADV&&ADV.intel||[];
+  document.getElementById("lab-intel").innerHTML=intel.length?intel.slice(0,12).map(it=>`
+    <div class="intel-card"><div class="ic">${esc(it.icon||"🧠")}</div><div style="flex:1"><span class="tag">${esc(it.tag||it.category||"")}</span>
+    <h4>${esc(it.headline||"")}</h4><p>${esc(it.detail||"")}</p></div>${it.value?`<div class="stat" style="color:#b8860b">${esc(it.value)}</div>`:""}</div>`).join(""):
+    '<div class="split-note">The intel feed posts once the engine reads today\'s slate.</div>';
+  // lineups by game
   const pks=Object.keys(proj);
   const pills=document.getElementById("lab-game-pills");
   const wrap=document.getElementById("lab-lineups");
-  if(!pks.length){ pills.innerHTML=""; wrap.innerHTML='<div class="split-note">Per-game lineups load with the batter projections.</div>'; return; }
+  if(!pks.length){ pills.innerHTML=""; wrap.innerHTML='<div class="split-note">Per-game lineups load with the batter scores.</div>'; return; }
   if(!LAB_PK||!proj[LAB_PK]) LAB_PK=pks[0];
   pills.innerHTML=pks.map(pk=>{const p=proj[pk];return `<button class="${pk===LAB_PK?"on":""}" data-labpk="${pk}">${esc(p.awayAbbr)} @ ${esc(p.homeAbbr)}</button>`;}).join("");
   const p=proj[LAB_PK];
-  const side=(s,team,pitcher)=>{
-    const rows=(p.hitters||[]).filter(h=>h.side===s).sort((a,b)=>(b.combinedHrScore||0)-(a.combinedHrScore||0));
-    return `<div class="crew-box" style="background:var(--card)"><div class="cb-k">${esc(team)} — vs ${esc(pitcher&&pitcher.name||"TBD")}</div>
-      ${rows.map(h=>`<div class="cb-line" style="display:flex;gap:8px"><span style="flex:1"><b>${esc(h.name)}</b>${h.projected?' <span class="imp">proj</span>':""}${LIVE.hrNames.has(normN(h.name))?' <span class="hr-badge">💣</span>':""}</span>
-        <span class="imp">${h.games?`${h.hr}/${h.games} w/ ump`:"—"}</span>
-        <span style="font-weight:800;color:#b8860b;min-width:44px;text-align:right">${h.combinedHrScore!=null?h.combinedHrScore:"—"}</span></div>`).join("")||'<div class="cb-line imp">No hitters posted.</div>'}</div>`;
+  const side=(sd,team,pitcher)=>{
+    const rows=(p.hitters||[]).filter(h=>h.side===sd).sort((a,b)=>(b.combinedHrScore||0)-(a.combinedHrScore||0));
+    return `<div class="crew-box"><div class="cb-k">${esc(team)} — facing ${esc(pitcher&&pitcher.name||"TBD")}</div>
+      ${rows.map(h=>`<div class="cb-line" style="display:flex;gap:8px"><span style="flex:1"><b>${esc(h.name)}</b>${h.projected?' <span class="imp">projected</span>':""}${LIVE.hrNames.has(normN(h.name))?' <span class="hr-badge">💣</span>':""}</span>
+        <span class="imp">${h.games?`${h.hr} HR/${h.games} gms w. ump`:""}</span>
+        <span style="font-weight:800;color:#b8860b;min-width:44px;text-align:right">${h.combinedHrScore!=null?h.combinedHrScore:"—"}</span></div>`).join("")||'<div class="cb-line imp">No hitters posted yet.</div>'}</div>`;
   };
-  wrap.innerHTML=`<div class="split-note" style="margin:0 0 10px">${esc(p.umpName||"Ump TBD")} behind the plate · ump ${p.umpBoostPct>0?"+":""}${p.umpBoostPct??"—"}% · weather ${p.weatherHrMod>0?"+":""}${p.weatherHrMod??"—"}% · combined game mod ${p.combinedHrMod>0?"+":""}${p.combinedHrMod??"—"}%</div>
+  wrap.innerHTML=`<div class="split-note" style="margin:0 0 10px">${esc(p.umpName||"Ump TBD")} behind the plate${p.umpBoostPct!=null?` · ump ${p.umpBoostPct>0?"+":""}${p.umpBoostPct}% HR`:""}${p.weatherHrMod!=null?` · weather ${p.weatherHrMod>0?"+":""}${p.weatherHrMod}%`:""}${p.combinedHrMod!=null?` · game total ${p.combinedHrMod>0?"+":""}${p.combinedHrMod}%`:""}</div>
     <div class="crew-grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">${side("away",p.awayAbbr,p.awayPitcher)}${side("home",p.homeAbbr,p.homePitcher)}</div>`;
 }
 document.addEventListener("click",e=>{
