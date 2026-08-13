@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """DFSRADAR PRO — Advanced Model (beta) card -> site/pro/adv.json
 
-Pulls the partner model's computed output VERBATIM from its live API
+Pulls the Advanced Model's computed output VERBATIM from its live engine
 (umpire-analytics.replit.app). Nothing is recomputed or adjusted here — the
 whole point of the Model Lab is an exact side-by-side, so this script is a
 courier, not a model: fetch, stamp, archive.
@@ -62,6 +62,13 @@ def main():
         overview = get_json("/api/overview", tries=1)
     except Exception:
         pass
+    intel = []
+    try:
+        it = get_json("/api/today/intel", tries=1)
+        items = sorted((it or {}).get("items") or [], key=lambda x: x.get("priority") or 99)
+        intel = items[:14]
+    except Exception:
+        pass
 
     if not isinstance(slate, list):
         print("unexpected slate shape — keeping last card")
@@ -108,7 +115,8 @@ def main():
         slate=slate,          # verbatim
         stars=stars,          # verbatim
         proj=proj,            # verbatim per-game hitters
-        best=best)            # verbatim rows, ranked by his combinedHrScore
+        best=best,            # verbatim rows, ranked by the engine's score
+        intel=intel)          # verbatim intel feed, top items by priority
     json.dump(out, open(OUT, "w"), separators=(",", ":"))
     print(f"wrote {OUT}: {len(slate)} games · top batter "
           f"{((stars or {}).get('topBatter') or {}).get('name')}")
