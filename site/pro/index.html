@@ -243,6 +243,7 @@
     <button data-tab="umps">⚖️ Umpires</button>
     <button data-tab="parks">🏟️ Parks</button>
     <button data-tab="log">📜 Game Log</button>
+    <button data-tab="lab">🧪 Model Lab <span class="cnt">BETA</span></button>
     <button data-tab="record">📊 Record &amp; method</button>
   </nav>
 
@@ -335,6 +336,27 @@
     <table class="mini"><thead><tr>
       <th>Date</th><th>Matchup</th><th>Plate ump</th><th>HRs</th><th class="hide-m">Runs</th>
     </tr></thead><tbody id="log-body"></tbody></table>
+  </div>
+
+  <!-- ============ MODEL LAB (BETA) ============ -->
+  <div class="tab-pane" id="tab-lab">
+    <div class="sec-h">Model Lab — DFSRADAR v2 vs the Advanced Model</div>
+    <div class="split-note" style="margin-bottom:14px">Beta test, run in the open: the <b>Advanced Model</b> is our partner engine, and its numbers are shown here <b>verbatim</b> from its own live system — nothing re-computed on our side. Both models project the same slate every night, both cards are archived before first pitch, and both are graded against the same actual results. After a few weeks of receipts, the better model becomes the primary card — and we'll show our work either way.</div>
+
+    <div class="sec-h">Head-to-head record</div>
+    <div class="gamestrip" id="lab-tiles" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
+    <div class="split-note" id="lab-empty">First graded night lands after tonight's slate completes — both cards are already being archived.</div>
+
+    <div class="sec-h" style="margin-top:18px">Tonight, side by side — expected HRs per game</div>
+    <div id="lab-board"></div>
+
+    <div class="sec-h" style="margin-top:18px">Advanced Model — tonight's stars</div>
+    <div class="gamestrip" id="lab-stars"></div>
+
+    <div class="m-sec" style="margin-top:16px">
+      <h5>How the lab works</h5>
+      <p>The Advanced Model runs on its own engine (10-season umpire dataset, 22,000+ games) and refreshes every 30 minutes; we pull its output as-is on every build. DFSRADAR v2 is the model behind every other tab. The comparison is strict: same games, matched by game ID, graded on identical final boxscores. Per-game accuracy is measured as average error between projected and actual home runs, plus the share of games landing within ±1 and ±2. A night is "won" by whichever model had the lower average error. Snapshots lock the moment the first game goes final — nothing recorded after results begin counts. Small samples early; the table fills in nightly.</p>
+    </div>
   </div>
 
   <!-- ============ RECORD & METHOD ============ -->
@@ -575,6 +597,7 @@ function renderTotals(){
 }
 function renderAll(){
   renderSlate(); renderLineups(); renderIntel(); renderTotals(); renderUmpsTab(); renderParksTab(); renderLogTab();
+  try{ renderLab(); }catch(e){}
   document.getElementById("cnt-targets").textContent=(DATA.targets||[]).length||"";
   const tb=document.getElementById("tbody");
   tb.innerHTML=DATA.targets.map((t,i)=>`
@@ -738,10 +761,60 @@ function renderRecord(rec){
 async function loadRecord(){
   try{
     const r=await fetch("record.json?_="+Date.now());
-    if(r.ok) renderRecord(await r.json());
+    if(r.ok){ REC=await r.json(); renderRecord(REC); renderLab(); }
   }catch(e){}
 }
-if(location.hash&&["slate","lineups","targets","intel","umps","parks","log","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
+/* ---- Model Lab (beta): Advanced Model shown verbatim, graded head-to-head ---- */
+let ADV=null, REC=null;
+function renderLab(){
+  // head-to-head tiles (need graded record with lab section)
+  const lab=REC&&REC.summary&&REC.summary.lab;
+  if(lab){
+    document.getElementById("lab-empty").style.display="none";
+    const nw=lab.nightW||{ours:0,adv:0,push:0};
+    document.getElementById("lab-tiles").innerHTML=[
+      {k:"Nights won",v:`${nw.ours}–${nw.adv}${nw.push?"–"+nw.push:""}`,s:"DFSRADAR v2 vs Advanced · lower nightly error wins"},
+      {k:"Avg error — DFSRADAR",v:"±"+lab.ours.avgErr,s:lab.ours.w1+"% within 1 HR · "+lab.ours.w2+"% within 2"},
+      {k:"Avg error — Advanced",v:"±"+lab.adv.avgErr,s:lab.adv.w1+"% within 1 HR · "+lab.adv.w2+"% within 2"},
+      {k:"Top-star homered",v:(REC.summary.top1.n?Math.round(100*REC.summary.top1.w/REC.summary.top1.n)+"%":"—")+" / "+(lab.advTop.n?Math.round(100*lab.advTop.w/lab.advTop.n)+"%":"—"),s:"ours / advanced · "+lab.n+" games graded"},
+    ].map(c=>`<div class="intel-card"><div style="flex:1"><span class="tag">${c.k}</span><h4 style="font-size:18px;margin-top:6px">${c.v}</h4><p>${c.s}</p></div></div>`).join("");
+  }
+  // tonight's side-by-side
+  if(!ADV||!ADV.slate){ return; }
+  const advByPk={}; ADV.slate.forEach(g=>{ if(g.gamePk) advByPk[g.gamePk]=g; });
+  const ourByPk={}; (DATA.games||[]).forEach(g=>{ if(g.gamePk) ourByPk[g.gamePk]=g; });
+  const pks=[...new Set([...Object.keys(advByPk)])];
+  const rows=ADV.slate.map(a=>{
+    const o=ourByPk[a.gamePk];
+    const d=(o&&o.expHr!=null&&a.projectedHr!=null)?(o.expHr-a.projectedHr):null;
+    return `<tr>
+      <td><div class="pname">${esc(a.away)} @ ${esc(a.home)}</div><div class="psub">${esc(a.ump||"ump TBD")}${a.status&&a.status!=="Scheduled"?" · "+esc(a.status):""}</div></td>
+      <td>${o&&o.expHr!=null?`<span class="prob">${o.expHr}</span>`:'<span class="imp">—</span>'}</td>
+      <td><span class="prob" style="color:#b8860b">${a.projectedHr!=null?a.projectedHr:"—"}</span></td>
+      <td>${d!=null?`<span class="${Math.abs(d)<0.4?"imp":""}">${d>0?"+":""}${d.toFixed(2)}</span>`:'<span class="imp">—</span>'}</td>
+      <td class="hide-m"><span class="imp">${o&&o.weatherHr!=null?(o.weatherHr>0?"+":"")+o.weatherHr+"%":"—"} / ${a.weatherHrMod!=null?(a.weatherHrMod>0?"+":"")+a.weatherHrMod+"%":"—"}</span></td>
+      <td class="hide-m"><span class="imp">${o&&o.umpMult?((o.umpMult-1)*100>0?"+":"")+Math.round((o.umpMult-1)*100)+"%":"—"} / ${a.umpBoostPct!=null?(a.umpBoostPct>0?"+":"")+a.umpBoostPct+"%":"—"}</span></td>
+    </tr>`;}).join("");
+  document.getElementById("lab-board").innerHTML=`<table><thead><tr>
+    <th>Game</th><th>DFSRADAR exp HR</th><th>Advanced proj HR</th><th>Δ models</th><th class="hide-m">Weather (ours/adv)</th><th class="hide-m">Ump (ours/adv)</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+    <div class="split-note">Advanced column served live from the partner engine (computed ${esc(ADV.generatedAt?new Date(ADV.generatedAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):"—")} · refreshes every 30 min · fetched ${esc(ADV.fetched||"—")}). Δ models = DFSRADAR minus Advanced.</div>`;
+  const st=ADV.stars||{};
+  const cards=[];
+  if(st.topBatter) cards.push({e:"💣",k:"Adv top batter",t:st.topBatter.name,s:`${st.topBatter.team} · ${st.topBatter.game} · combined score ${st.topBatter.combinedHrScore}`});
+  if(st.topPitcher) cards.push({e:"🔥",k:"Adv top K pitcher",t:st.topPitcher.name,s:`${st.topPitcher.team} · ${st.topPitcher.game}`});
+  if(st.topUmpire) cards.push({e:"⚖️",k:"Adv umpire of the night",t:st.topUmpire.ump||st.topUmpire.name||"—",s:st.topUmpire.game||""});
+  const ourTop=(DATA.targets||[])[0];
+  if(ourTop) cards.push({e:"🎯",k:"DFSRADAR #1 target (for contrast)",t:ourTop.player,s:`${ourTop.team} · ${ourTop.game} · ${ourTop.prob}% HR chance`});
+  document.getElementById("lab-stars").innerHTML=cards.map(c=>`<div class="intel-card"><div class="ic">${c.e}</div><div style="flex:1"><span class="tag">${esc(c.k)}</span><h4>${esc(c.t)}</h4><p>${esc(c.s)}</p></div></div>`).join("")||'<div class="split-note">Stars post when the engine computes tonight\'s card.</div>';
+}
+async function loadAdv(){
+  try{
+    const r=await fetch("adv.json?_="+Date.now());
+    if(r.ok){ ADV=await r.json(); renderLab(); }
+  }catch(e){}
+}
+if(location.hash&&["slate","lineups","targets","intel","umps","parks","log","lab","record"].includes(location.hash.slice(1))) showTab(location.hash.slice(1));
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
 let GATED=null;
@@ -785,6 +858,7 @@ renderAll();
 loadLive();
 loadUmps();
 loadRecord();
+loadAdv();
 </script>
 </body>
 </html>
