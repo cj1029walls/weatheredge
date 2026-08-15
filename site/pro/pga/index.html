@@ -252,6 +252,46 @@ async function gate(){
   if(location.hash==="#login"&&!GATED&&ms){ try{ await ms.openModal("LOGIN"); gate(); }catch(e){} }
 })();
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) gate(); });
+/* ---- checkout wiring: the data-ms attributes don't fire for logged-out
+   visitors, so Subscribe/Login/Account/Logout are driven explicitly. ---- */
+const PRO_PRICE="prc_pro-monthly-rdvp0vis";
+async function buyPro(){
+  const ms=await msReady();
+  if(!ms){ alert("Checkout couldn't load — please refresh the page (and disable ad blockers if you use one)."); return; }
+  let member=null;
+  try{ member=(await ms.getCurrentMember()).data; }catch(e){}
+  if(!member){
+    try{ const r=await ms.openModal("SIGNUP"); member=r&&r.data; }catch(e){ return; }
+    try{ ms.hideModal(); }catch(e){}
+  }
+  if(!member) return;
+  if(await gate()) return;   // Kitchen All-Access / existing PRO — already unlocked
+  try{
+    await ms.purchasePlansWithCheckout({ priceId: PRO_PRICE,
+      successUrl: location.origin+location.pathname,
+      cancelUrl: location.origin+location.pathname });
+  }catch(e){
+    console.error("checkout", e);
+    alert("Couldn't open checkout — please try again, or log in first if you already have an account.");
+  }
+}
+document.querySelectorAll(".pay-cta").forEach(b=>b.addEventListener("click", e=>{ e.preventDefault(); buyPro(); }));
+document.querySelectorAll(".pay-login").forEach(b=>b.addEventListener("click", async e=>{
+  e.preventDefault();
+  const ms=await msReady(); if(!ms) return;
+  try{ await ms.openModal("LOGIN"); ms.hideModal(); }catch(err){}
+  gate();
+}));
+document.querySelectorAll('[data-ms-action="logout"]').forEach(a=>a.addEventListener("click", async e=>{
+  e.preventDefault();
+  const ms=await msReady(); if(ms){ try{ await ms.logout(); }catch(err){} }
+  gate();
+}));
+document.querySelectorAll('[data-ms-modal="profile"]').forEach(a=>a.addEventListener("click", async e=>{
+  e.preventDefault();
+  const ms=await msReady(); if(ms){ try{ await ms.openModal("PROFILE"); }catch(err){} }
+}));
+
 </script>
 </body>
 </html>
