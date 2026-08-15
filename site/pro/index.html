@@ -225,15 +225,15 @@
         📊 <b>A public track record</b> — every card archived and graded, calibration table included
       </div>
       <div class="pay-btns">
-        <button class="pay-cta" data-ms-price:add="prc_pro-monthly-rdvp0vis">Subscribe — $15/mo</button>
-        <button class="pay-login" data-ms-modal="login">Member log in</button>
+        <button class="pay-cta">Subscribe — $15/mo</button>
+        <button class="pay-login">Member log in</button>
       </div>
       <div class="pay-kitchen">DFS Kitchen <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=paywall&utm_campaign=pro" target="_blank" rel="noopener">All-Access</a> members get PRO included — just log in with your Kitchen account.</div>
     </div>
   </div>
 
   <div id="pro-app" style="display:none">
-  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a data-ms-modal="profile">Account</a> · <a data-ms-action="logout">Log out</a></div>
+  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
   <div class="proto-note" id="proto-note">⚠️ <span><b>Private beta</b> — sample data until tonight's build runs. This page is unlisted.</span></div>
 
   <div class="brief-card" id="brief-card" style="display:none">
@@ -954,12 +954,12 @@ document.querySelectorAll(".pay-login").forEach(b=>b.addEventListener("click", a
   try{ await ms.openModal("LOGIN"); ms.hideModal(); }catch(err){}
   gate();
 }));
-document.querySelectorAll('[data-ms-action="logout"]').forEach(a=>a.addEventListener("click", async e=>{
+document.querySelectorAll('.ms-logout').forEach(a=>a.addEventListener("click", async e=>{
   e.preventDefault();
   const ms=await msReady(); if(ms){ try{ await ms.logout(); }catch(err){} }
   gate();
 }));
-document.querySelectorAll('[data-ms-modal="profile"]').forEach(a=>a.addEventListener("click", async e=>{
+document.querySelectorAll('.ms-account').forEach(a=>a.addEventListener("click", async e=>{
   e.preventDefault();
   const ms=await msReady(); if(ms){ try{ await ms.openModal("PROFILE"); }catch(err){} }
 }));
