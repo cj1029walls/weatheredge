@@ -200,21 +200,25 @@ def main():
                        f"top-quintile edges rushed for +0.4 YPC in our 4-season backtest")
                 if windy_kick:
                     leans.append(dict(k="STACKED RUSH", side="TARGET", who=e["team"],
-                        game=f"{a} @ {h}",
+                        game=f"{a} @ {h}", cd=e["cdiff"],
                         why=why + f" · {w['wind']} mph forecast leans the script run-heavy"))
                 else:
                     leans.append(dict(k="RUSH EDGE", side="TARGET", who=e["team"],
-                                      game=f"{a} @ {h}", why=why))
+                                      game=f"{a} @ {h}", cd=e["cdiff"], why=why))
             elif e["q"] == 1:
                 leans.append(dict(k="RUSH FADE", side="FADE", who=e["team"],
-                    game=f"{a} @ {h}",
+                    game=f"{a} @ {h}", cd=e["cdiff"],
                     why=(f"{e['cdiff']} lbs/man vs league norm (their OL {e['ol']} vs "
                          f"{opp} DL {e['oppDl']}) — bottom-quintile edges averaged "
                          f"0.4 fewer YPC in the backtest")))
-    # keep the board scannable: strongest edges first, cap
-    order = {"STACKED RUSH": 0, "RUSH EDGE": 1, "RUSH FADE": 2}
-    leans.sort(key=lambda l: order.get(l["k"], 9))
-    leans = leans[:14]
+    # keep the board scannable: biggest edges first, targets and fades each capped
+    # so one side never crowds the other off the board
+    order = {"STACKED RUSH": 0, "RUSH EDGE": 1}
+    targets = sorted([l for l in leans if l["side"] == "TARGET"],
+                     key=lambda l: (order.get(l["k"], 9), -l["cd"]))[:9]
+    fades = sorted([l for l in leans if l["side"] == "FADE"],
+                   key=lambda l: l["cd"])[:5]
+    leans = targets + fades
 
     backtest = None
     if os.path.exists(BACKTEST):
