@@ -21,11 +21,16 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python scripts/cfb/weekly_build.py
+      - name: Build PRO Trench Edge board (site/pro/cfb.json)
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python scripts/pro/cfb_build.py || echo "trench board skipped — using last committed board"
       - name: Commit slate data
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add site/cfb/data.json
+          git add site/cfb/data.json 2>/dev/null || true
+          git add site/pro/cfb.json data/pro/cfb_predictions 2>/dev/null || true
           git commit -m "CFB slate refresh" || echo "no changes"
           git pull --rebase origin main
           git push
