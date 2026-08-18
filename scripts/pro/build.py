@@ -127,7 +127,7 @@ def bvp_mult(bid, pid):
 LG_HR_AB = 0.032      # league HR per AB
 K_BAT = 200
 LG_UMP_HR = 2.40      # league HR per game
-K_UMP = 150
+K_UMP = 200
 LG_HR9 = 1.05         # league HR per 9 IP
 K_SP_IP = 200
 PA_PER_GAME = 4.0
@@ -138,11 +138,14 @@ def clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 def calibrate(p):
-    """Week-1 calibration fix: stated probs above ~24% overshot reality
-    (26-30% bucket hit 12.5%). Compress the top of the range, hard cap 34."""
+    """Calibration, tuned from graded receipts. Week 1: top bucket overshot,
+    slope above 24 cut to 0.55. Week 2 (12 nights, 226 picks): 20-25 bucket
+    is dead-on (stated 22.5 -> hit 22.3, n=148) but 25+ still overshoots
+    (stated 27.4 -> hit 18.3, n=60) -> slope 0.55 -> 0.40, hard cap 34 -> 30.
+    Half-corrections on purpose: n=60 has a wide confidence interval."""
     if p > 24:
-        p = 24 + (p - 24) * 0.55
-    return min(round(p, 1), 34.0)
+        p = 24 + (p - 24) * 0.40
+    return min(round(p, 1), 30.0)
 
 def norm_name(s):
     s = unicodedata.normalize("NFD", s or "")
@@ -168,12 +171,12 @@ def ump_mult(ump, umps_all, umps_pro=None):
         u = umps_pro["umps"][name]
         lg = umps_pro["league"]["hrpg"]
         shrunk = (u["hrpg"] * u["n"] + lg * K_UMP) / (u["n"] + K_UMP)
-        return clamp(shrunk / lg, 0.88, 1.12), u["n"]
+        return clamp(shrunk / lg, 0.90, 1.10), u["n"]
     if name not in umps_all:
         return 1.0, None
     u = umps_all[name]
     shrunk = (u["hr"] * u["n"] + LG_UMP_HR * K_UMP) / (u["n"] + K_UMP)
-    return clamp(shrunk / LG_UMP_HR, 0.88, 1.12), u["n"]
+    return clamp(shrunk / LG_UMP_HR, 0.90, 1.10), u["n"]
 
 def sp_mult(p):
     """Opposing starting pitcher HR/9, shrunk by innings."""
@@ -743,7 +746,8 @@ def main():
     os.makedirs(PRED_DIR, exist_ok=True)
     dstr = datetime.now(ET).strftime("%Y%m%d")
     slim = [dict(player=t["player"], team=t["team"], game=t["game"], prob=t["prob"],
-                 price=t["price"], implied=t["implied"], value=t["value"])
+                 price=t["price"], implied=t["implied"], value=t["value"],
+                 f=t.get("f"))
             for t in top[:20]]
     kslim = [dict(pitcher=k["pitcher"], game=k["game"], proj=k["proj"],
                   line=k["line"], lean=k["lean"])
