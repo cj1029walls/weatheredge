@@ -77,6 +77,8 @@ def main():
     game_rows = []     # one row per game (net mass, spread, total, results)
     for year in SEASONS:
         print(f"== season {year}")
+        fbs = {gv(t, "school") for t in fetch(f"{CFBD}/teams/fbs?year={year}")}
+        print(f"  FBS teams: {len(fbs)}")
         # trench weights per team
         roster = fetch(f"{CFBD}/roster?year={year}")
         tw = {}
@@ -93,7 +95,7 @@ def main():
                           dl=round(statistics.mean(v["dl"]), 1),
                           nOl=len(v["ol"]), nDl=len(v["dl"]))
                   for t, v in tw.items()
-                  if len(v["ol"]) >= 8 and len(v["dl"]) >= 6}
+                  if t in fbs and len(v["ol"]) >= 8 and len(v["dl"]) >= 6}
         print(f"  teams with trench data: {len(trench)}")
 
         # results + lines
@@ -202,6 +204,34 @@ def main():
                                 [r["pos"] for r in rows if r["pos"]]))
     print("correlations:", out["corr"])
 
+    # center diff per season: OL groups run ~20 lbs heavier than DL by nature,
+    # so the raw diff is positional physiology; the EDGE is distance from the
+    # season's mean diff.
+    by_year_mean = {}
+    for y in SEASONS:
+        ys = [r["diff"] for r in rows if r["y"] == y]
+        if ys:
+            by_year_mean[y] = statistics.mean(ys)
+    for r in rows:
+        r["cdiff"] = round(r["diff"] - by_year_mean.get(r["y"], 0), 1)
+    cds = sorted(r["cdiff"] for r in rows)
+    qs = [cds[int(len(cds) * k / 5)] for k in range(1, 5)]
+    print(f"\ncentered diff quintile cuts: {qs}")
+    def cbucket(lo, hi, label):
+        sub = [r for r in rows if lo <= r["cdiff"] < hi]
+        if len(sub) < 30:
+            return None
+        b = dict(label=label, n=len(sub),
+                 ypc=round(statistics.mean(r["ypc"] for r in sub), 2),
+                 rushYds=round(statistics.mean(r["ry"] for r in sub)))
+        print(f"  {label}: n={b['n']} ypc={b['ypc']} rush={b['rushYds']}")
+        return b
+    print("centered OL-vs-opp-DL edge (quintiles) -> offense output:")
+    out["centeredBuckets"] = [b for b in [
+        cbucket(-999, qs[0], "Q1 lightest edge"), cbucket(qs[0], qs[1], "Q2"),
+        cbucket(qs[1], qs[2], "Q3"), cbucket(qs[2], qs[3], "Q4"),
+        cbucket(qs[3], 999, "Q5 heaviest edge")] if b]
+
     def bucket_off(lo, hi, label):
         sub = [r for r in rows if lo <= r["diff"] < hi]
         if len(sub) < 30:
@@ -254,6 +284,21 @@ def main():
             bucket_total(0, q1, f"light (<{q1})"),
             bucket_total(q1, q3, "middle"),
             bucket_total(q3, 9999, f"heavy (>={q3})")] if b]
+
+    # per-season stability of the positive-edge ATS signal
+    stab = []
+    for y in SEASONS:
+        sub = [g for g in game_rows if g["y"] == y and g["net"] >= 10 and g["cover"] is not None]
+        neg = [g for g in game_rows if g["y"] == y and g["net"] <= -10 and g["cover"] is not None]
+        if sub:
+            stab.append(dict(y=y, posN=len(sub),
+                posCover=round(100 * sum(1 for g in sub if g["cover"]) / len(sub), 1),
+                negN=len(neg),
+                negCover=(round(100 * sum(1 for g in neg if g["cover"]) / len(neg), 1) if neg else None)))
+    out["atsBySeason"] = stab
+    print("\nATS stability by season (net>=+10 home cover% / net<=-10):")
+    for r2 in stab:
+        print(f"  {r2['y']}: heavy-home {r2['posCover']}% (n={r2['posN']}) · light-home {r2['negCover']}% (n={r2['negN']})")
 
     # spread-vs-mass control: how much of the mass edge is already priced?
     sp_rows = [g for g in game_rows if g["spread"] is not None]
