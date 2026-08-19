@@ -11,8 +11,7 @@ straight from the radar's history-match engine.
 
 Flag rules (a game is a "board flag" when, non-dome):
   * |HR delta vs park norm| >= 20%  (history match, sample >= 15), or
-  * an O/U LEAN call (median of matched games clears the line by >= 1 run)
-    with a gap >= 1.5 runs, or
+  * an O/U LEAN call (median of matched games clears the line by >= 1 run), or
   * a suppressor: HR delta <= -15% (these are the stack-killers)
 
 Headline pick = highest-scoring flag:
@@ -20,13 +19,30 @@ Headline pick = highest-scoring flag:
           + 10 if wind label starts OUT/IN (aligned wind story)
 Suppressors compete equally — a big wind-in fade IS the flag some nights.
 
+Only main-slate games are considered (first pitch 6:35 PM ET or later —
+CJ's standing rule; override with --all).
+
 Usage:
   python3 flag_of_day.py slate.json            # full site/data.json
   python3 flag_of_day.py slate.json --slim     # slimmed field names (a,h,pk,...)
 Prints the pick + tweet draft, writes flag_pick.json next to the input.
 """
-import json, os, sys
+import json, os, re, sys
 from datetime import datetime
+
+MAIN_SLATE_MIN = 18 * 60 + 35   # 6:35 PM ET
+
+
+def start_minutes(tm):
+    m = re.match(r"(\d+):(\d+)\s*(AM|PM)", str(tm or ""))
+    if not m:
+        return None
+    hh, mm, ap = int(m.group(1)), int(m.group(2)), m.group(3)
+    if ap == "PM" and hh != 12:
+        hh += 12
+    if ap == "AM" and hh == 12:
+        hh = 0
+    return hh * 60 + mm
 
 
 def norm(g, slim):
@@ -55,7 +71,7 @@ def is_flag(g):
     if g["hr"] <= -15:
         return True
     if g["ouLean"] and g["ouMedian"] is not None and g["total"] \
-            and abs(g["ouMedian"] - g["total"]) >= 1.5:
+            and abs(g["ouMedian"] - g["total"]) >= 1.0:
         return True
     return False
 
@@ -67,6 +83,10 @@ def score(g):
         s += 15
     if str(g["windLabel"] or "").startswith(("OUT", "IN")):
         s += 10
+    if g["ouLean"]:               # the board itself calls a lean — corroboration
+        s += 8
+    if g["temp"] is not None and g["temp"] >= 85:
+        s += 5                    # heat story: hot air carries
     return s
 
 
@@ -75,6 +95,9 @@ def main():
     slim = "--slim" in sys.argv
     data = json.load(open(path))
     games = [norm(g, slim) for g in (data["games"] if isinstance(data, dict) else data)]
+    if "--all" not in sys.argv:
+        games = [g for g in games if (start_minutes(g["time"]) or 0) >= MAIN_SLATE_MIN]
+        print(f"main slate (6:35 PM ET+): {len(games)} games")
     flags = [g for g in games if is_flag(g)]
     if not flags:
         print("No board flags tonight — quiet slate, skip the post or run a "
@@ -93,14 +116,29 @@ def main():
                   else f"{pick['wind']} mph crosswind")
     park_short = pick["park"].split(" · ")[0]
     wf = pick.get("windFx") or {}
+    windy_story = (str(pick["windLabel"] or "").startswith(("OUT", "IN"))
+                   and pick["wind"] >= 8)
     lines = [f"🚨 RADAR FLAG — {d}", ""]
-    lines.append(f"{wind_story} at {park_short} tonight ({pick['wind']} mph). "
-                 f"{pick['sample']} similar-condition games there: "
-                 f"HR rate {updown}{pick['hr']}% vs park norm "
-                 f"({pick['hrGm']}/gm vs {round(pick['hrPark'],1)}).")
-    if wf.get("rating") == "EXTREME":
-        lines += ["", f"Most wind-sensitive park we track: "
-                      f"{'+' if wf['pct10']>0 else ''}{wf['pct10']}% HR per 10 mph."]
+    if windy_story:
+        lines.append(f"{wind_story} at {park_short} tonight ({pick['wind']} mph). "
+                     f"{pick['sample']} similar-condition games there: "
+                     f"HR rate {updown}{pick['hr']}% vs park norm "
+                     f"({pick['hrGm']}/gm vs {round(pick['hrPark'],1)}).")
+        if wf.get("rating") == "EXTREME":
+            lines += ["", f"Most wind-sensitive park we track: "
+                          f"{'+' if wf['pct10']>0 else ''}{wf['pct10']}% HR per 10 mph."]
+    else:
+        opener = (f"{pick['temp']}° at first pitch for {pick['away']}-{pick['home']} "
+                  f"at {park_short}." if (pick["temp"] or 0) >= 85 else
+                  f"{pick['away']}-{pick['home']} at {park_short} tonight.")
+        lines.append(f"{opener} {pick['sample']} similar-condition games there: "
+                     f"HR rate {updown}{pick['hr']}% vs park norm "
+                     f"({pick['hrGm']}/gm vs {round(pick['hrPark'],1)}).")
+        if pick["ouLean"] and pick["ouMedian"] and pick["total"]:
+            pctside = pick["ou"][pick["ouLean"]] if pick.get("ou") else None
+            lines += ["", f"The total sits {pick['total']}. Median of those "
+                          f"{pick['sample']} games: {pick['ouMedian']} runs"
+                          + (f" — {pctside}% went {pick['ouLean']}." if pctside else ".")]
     lines.append("")
     tease = f"Tonight's board: {len(flags)} flags."
     if suppressors:
