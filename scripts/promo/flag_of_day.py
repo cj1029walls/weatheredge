@@ -19,8 +19,9 @@ Headline pick = highest-scoring flag:
           + 10 if wind label starts OUT/IN (aligned wind story)
 Suppressors compete equally — a big wind-in fade IS the flag some nights.
 
-Only main-slate games are considered (first pitch 6:35 PM ET or later —
-CJ's standing rule; override with --all).
+Only main-slate games are considered. Default: first pitch 6:35 PM ET or
+later (CJ's standing rule for night slates). For day slates pass an explicit
+window, e.g. --window "12:40 PM-2:10 PM". --all disables the filter.
 
 Usage:
   python3 flag_of_day.py slate.json            # full site/data.json
@@ -95,7 +96,12 @@ def main():
     slim = "--slim" in sys.argv
     data = json.load(open(path))
     games = [norm(g, slim) for g in (data["games"] if isinstance(data, dict) else data)]
-    if "--all" not in sys.argv:
+    if "--window" in sys.argv:
+        w = sys.argv[sys.argv.index("--window") + 1]
+        lo, hi = (start_minutes(x.strip()) for x in w.split("-"))
+        games = [g for g in games if lo <= (start_minutes(g["time"]) or -1) <= hi]
+        print(f"main slate ({w} ET): {len(games)} games")
+    elif "--all" not in sys.argv:
         games = [g for g in games if (start_minutes(g["time"]) or 0) >= MAIN_SLATE_MIN]
         print(f"main slate (6:35 PM ET+): {len(games)} games")
     flags = [g for g in games if is_flag(g)]
@@ -128,19 +134,27 @@ def main():
             lines += ["", f"Most wind-sensitive park we track: "
                           f"{'+' if wf['pct10']>0 else ''}{wf['pct10']}% HR per 10 mph."]
     else:
+        dp = "today" if (start_minutes(pick["time"]) or 1200) < 17 * 60 else "tonight"
         opener = (f"{pick['temp']}° at first pitch for {pick['away']}-{pick['home']} "
                   f"at {park_short}." if (pick["temp"] or 0) >= 85 else
-                  f"{pick['away']}-{pick['home']} at {park_short} tonight.")
-        lines.append(f"{opener} {pick['sample']} similar-condition games there: "
-                     f"HR rate {updown}{pick['hr']}% vs park norm "
-                     f"({pick['hrGm']}/gm vs {round(pick['hrPark'],1)}).")
+                  f"{pick['away']}-{pick['home']} at {park_short} {dp}.")
+        if pick["ouLean"] == "under" and abs(pick["runs"]) > abs(pick["hr"]):
+            # under story: lead with the run suppression, not HR rate
+            lines.append(f"{opener} {pick['sample']} similar-condition games "
+                         f"there: runs {pick['runs']}% vs park norm.")
+        else:
+            lines.append(f"{opener} {pick['sample']} similar-condition games there: "
+                         f"HR rate {updown}{pick['hr']}% vs park norm "
+                         f"({pick['hrGm']}/gm vs {round(pick['hrPark'],1)}).")
         if pick["ouLean"] and pick["ouMedian"] and pick["total"]:
             pctside = pick["ou"][pick["ouLean"]] if pick.get("ou") else None
+            verb = "stayed" if pick["ouLean"] == "under" else "went"
             lines += ["", f"The total sits {pick['total']}. Median of those "
                           f"{pick['sample']} games: {pick['ouMedian']} runs"
-                          + (f" — {pctside}% went {pick['ouLean']}." if pctside else ".")]
+                          + (f" — {pctside}% {verb} {pick['ouLean']}." if pctside else ".")]
     lines.append("")
-    tease = f"Tonight's board: {len(flags)} flags."
+    daypart = "Today" if (start_minutes(pick["time"]) or 1200) < 17 * 60 else "Tonight"
+    tease = f"{daypart}'s board: {len(flags)} flag{'s' if len(flags) != 1 else ''}."
     if suppressors:
         tease += " One kills a popular stack."
     lines += [tease, "", "📡 dfsradar.com"]
