@@ -84,7 +84,11 @@ def score(g):
         s += 15
     if str(g["windLabel"] or "").startswith(("OUT", "IN")):
         s += 10
-    if g["ouLean"]:               # the board itself calls a lean — corroboration
+    if g["ouLean"] and g["ouMedian"] is not None and g["total"]:
+        # the board itself calls a lean — weight by how far the matched
+        # median clears the line (capped so one game can't run away)
+        s += 8 * min(abs(g["ouMedian"] - g["total"]), 2.5)
+    elif g["ouLean"]:
         s += 8
     if g["temp"] is not None and g["temp"] >= 85:
         s += 5                    # heat story: hot air carries
