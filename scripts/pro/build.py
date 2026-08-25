@@ -26,7 +26,7 @@ Outputs:
 
 No third-party dependencies.
 """
-import functools, json, os, sys, unicodedata
+import functools, json, os, statistics, sys, unicodedata
 from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -125,6 +125,21 @@ def bvp_mult(bid, pid):
 
 # league constants + shrinkage (see spec)
 LG_HR_AB = 0.032      # league HR per AB
+
+def league_drift():
+    """Trailing-14-day league HR environment vs the 2.40/game anchor, from our
+    own graded results (runs after grade.py in the workflow, so it is fresh).
+    Clamped tight: this tracks slow seasonal drift, not one hot week. Added in
+    v4 after game-projection bias flipped +0.24 -> -0.22 across two windows."""
+    try:
+        res = json.load(open(os.path.join(ROOT, "data", "pro", "results.json")))
+        acts = [g["act"] for d in sorted(res["days"])[-14:]
+                for g in res["days"][d].get("games", [])]
+        if len(acts) >= 40:
+            return clamp(statistics.mean(acts) / 2.40, 0.92, 1.08)
+    except Exception:
+        pass
+    return 1.0
 K_BAT = 200
 LG_UMP_HR = 2.40      # league HR per game
 K_UMP = 200
@@ -143,9 +158,11 @@ def calibrate(p):
     is dead-on (stated 22.5 -> hit 22.3, n=148) but 25+ still overshoots
     (stated 27.4 -> hit 18.3, n=60) -> slope 0.55 -> 0.40, hard cap 34 -> 30.
     Half-corrections on purpose: n=60 has a wide confidence interval."""
-    if p > 24:
-        p = 24 + (p - 24) * 0.40
-    return min(round(p, 1), 30.0)
+    if p > 23:
+        p = 23 + (p - 23) * 0.30
+    return min(round(p, 1), 27.0)
+    # v4 (20 nights, 374 picks): everything stated 24+ hit ~18% (n=101) while
+    # 20-24 stayed calibrated -> knee 24 -> 23, slope 0.40 -> 0.30, cap 30 -> 27
 
 def norm_name(s):
     s = unicodedata.normalize("NFD", s or "")
@@ -329,10 +346,16 @@ def main():
         sp_season_cache[pid] = out
         return out
 
+    LG_DRIFT = league_drift()
+    if LG_DRIFT != 1.0:
+        print(f"league HR drift factor (trailing 14d): {LG_DRIFT:.3f}")
     targets, games_out = [], []
     for g in slate.get("games", []):
         away, home = g["away"], g["home"]
-        wx = 1.0 if g.get("dome") else clamp(1 + (g.get("hr", 0) or 0) / 100 * 0.75, 0.78, 1.30)
+        wx = 1.0 if g.get("dome") else clamp(1 + (g.get("hr", 0) or 0) / 100 * 0.40, 0.85, 1.15)
+        # v4: weather coeff 0.75 -> 0.40, clamp +/-15% — week 3 factor grading
+        # showed the biggest per-batter weather boosts hitting 12% vs 23.7% stated
+        # (n=25): game-level weather is real, stacking it per batter double-counts
         um, um_n = ump_mult(g.get("ump"), umps_all, umps_pro)
         ump_name = (g.get("ump") or {}).get("name")
         p_away = (g.get("pitchers") or {}).get("away")   # away SP faces HOME batters
@@ -364,7 +387,7 @@ def main():
             for pid, pl, adj, ab, hr, order in cand:
                 pa = 4.65 - 0.13 * (order - 1) if order else PA_PER_GAME
                 env = (wx * um * spm) ** 0.75   # damp stacked env factors (calibration)
-                rate = adj * env
+                rate = adj * env * LG_DRIFT
                 prob = 1 - (1 - min(rate, 0.18)) ** pa
                 prob_pct = calibrate(round(prob * 100, 1))
                 exp_hr += prob_pct / 100
@@ -549,10 +572,10 @@ def main():
             o = ks_odds.get(norm_name(p["name"]))
             line = o["line"] if o else None
             diff = round(proj - line, 1) if line is not None else None
+            # v4: lean calls RETIRED 8/25 — 27/57 (47%) over 20 graded nights.
+            # Projection and line stay on the card; no call until the K model
+            # is rebuilt. The 57-call public record stands on the Record tab.
             lean = None
-            # v2: 1.5-K trigger — 0.8-1.5 gap leans went 7-10, 1.5+ went 7-3
-            if diff is not None and abs(diff) >= 1.5:
-                lean = "OVER" if diff > 0 else "UNDER"
             kprops.append(dict(pitcher=p["name"], team=team, opp=opp,
                                game=f"{g['away']} @ {g['home']}",
                                proj=proj, ipStart=round(ip_ps, 1), k9=round(k9s, 1),
@@ -571,8 +594,10 @@ def main():
         e = t.pop("_env"); adj = t.pop("_adj"); pa = t.pop("_pa")
         t["f"]["bvp"] = round(m, 2) if m else None
         t["bvpRaw"] = rawtxt
-        env = (e["wx"] * e["um"] * e["spm"] * (m or 1.0)) ** 0.75
-        rate = adj * env
+        # v4: BvP no longer moves the probability — flagged targets graded 1/15
+        # (6.7% vs 22.5% stated). Archived in f.bvp and shown as context only.
+        env = (e["wx"] * e["um"] * e["spm"]) ** 0.75
+        rate = adj * env * LG_DRIFT
         prob = 1 - (1 - min(rate, 0.18)) ** pa
         p = calibrate(round(prob * 100, 1))
         if t.get("implied") is not None:
@@ -601,7 +626,11 @@ def main():
                      key=lambda t: -t["edge"])[:5]
     for t in flagged:
         t["value"] = True
-    top = targets[:40]
+    # v4: sub-20% targets graded 4/36 (11.1%) over 20 nights — filler, cut.
+    top = [t for t in targets if t["prob"] >= 20]
+    if len(top) < 8:
+        top = targets[:8]     # cold-slate guard: never an empty card
+    top = top[:40]
 
     # ---- intel feed ----
     intel = []
