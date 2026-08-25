@@ -36,6 +36,7 @@ ET = timezone(timedelta(hours=-4))
 OL_POS = {"OL", "OT", "OG", "C", "G", "T"}
 DL_POS = {"DL", "DT", "DE", "NT", "EDGE"}
 WINDY = 15
+BRAND = {}
 
 
 def gv(d, *names):
@@ -123,7 +124,12 @@ def top_rushers(prior, current_rosters):
 
 
 def build_trench(year):
-    fbs = {gv(t, "school") for t in fetch(f"{CFBD}/teams/fbs?year={year}")}
+    teams_raw = fetch(f"{CFBD}/teams/fbs?year={year}")
+    fbs = {gv(t, "school") for t in teams_raw}
+    global BRAND
+    BRAND = {gv(t, "school"): dict(color=gv(t, "color"),
+                                   ab=gv(t, "abbreviation") or (gv(t, "school") or "")[:4].upper())
+             for t in teams_raw}
     roster = fetch(f"{CFBD}/roster?year={year}")
     tw, names = {}, {}
     for p in roster:
@@ -253,6 +259,9 @@ def main():
             time=(et_dt.strftime("%-I:%M %p ET") if et_dt else "TBD"),
             spread=ln.get("spread"), total=ln.get("total"),
             awayEdge=ae, homeEdge=he,
+            awayColor=(BRAND.get(a) or {}).get("color"),
+            homeColor=(BRAND.get(h) or {}).get("color"),
+            awayAb=(BRAND.get(a) or {}).get("ab"), homeAb=(BRAND.get(h) or {}).get("ab"),
             wx=(dict(temp=w.get("temp"), wind=w.get("wind"),
                      dome=bool(w.get("dome")), sky=w.get("sky")) if w else None))
         out_games.append(entry)
