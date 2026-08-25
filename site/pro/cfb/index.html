@@ -19,6 +19,7 @@
 <meta name="twitter:description" content="OL vs DL weight mismatches, quintile-ranked and backtested across 4 seasons — top-quintile trench edges rush for +0.4 YPC. Weather-stacked rushing-prop leans, archived and graded in public. $15/mo.">
 <meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%23ffd94a" opacity="0.6"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23ffd94a" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
@@ -79,6 +80,31 @@
   .ladder{max-width:560px}
   .ladder td,.ladder th{padding:9px 14px}
   .lbar{height:8px;border-radius:4px;background:linear-gradient(90deg,#8fd3a5,#178a3f)}
+  .tabbar{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 20px;position:sticky;top:0;z-index:30;background:var(--surface);padding:10px 0 10px}
+  .tabbar button{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--body2);background:var(--card);border:1.5px solid var(--line-strong);border-radius:20px;padding:8px 18px;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .tabbar button:hover{border-color:var(--navy2);color:var(--navy2)}
+  .tabbar button.on{background:linear-gradient(135deg,#0e1a3d,var(--navy2));color:#fff;border-color:transparent}
+  .tabbar button .cnt{font-size:10px;background:var(--gray-bg);color:var(--muted);border-radius:9px;padding:1px 7px}
+  .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:#ffd94a}
+  .tab-pane{display:none}
+  .tab-pane.on{display:block}
+  .howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:18px}
+  .howto .step{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;border-top:3px solid var(--gold)}
+  .howto .step .n{font-size:10px;font-weight:800;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase}
+  .howto .step h6{font-size:13.5px;font-weight:800;margin:6px 0 4px}
+  .howto .step p{font-size:12px;color:var(--muted);line-height:1.55;margin:0}
+  .trench3d-wrap{position:relative;height:400px;background:#10151f;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .trench3d-wrap canvas{width:100%;height:100%;display:block;cursor:grab}
+  .trench3d-wrap canvas:active{cursor:grabbing}
+  .t3d-hud{position:absolute;top:14px;left:16px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55);pointer-events:none}
+  .t3d-hud .t{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
+  .t3d-hud .w{font-size:17px;font-weight:800;margin-top:3px}
+  .t3d-hud .q{font-size:12px;font-weight:700;margin-top:2px;opacity:.85}
+  .t3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none}
+  .t3d-ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .t3d-ctrl select{font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--line-strong);border-radius:10px;padding:8px 12px}
+  .t3d-ctrl .side-btn{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.5px;background:var(--card);color:var(--body2);border:1.5px solid var(--line-strong);border-radius:18px;padding:7px 16px;cursor:pointer}
+  .t3d-ctrl .side-btn.on{background:linear-gradient(135deg,#0e1a3d,var(--navy2));color:#fff;border-color:transparent}
   /* paywall */
   #paywall{display:none}
   .pay-hero{background:linear-gradient(120deg,#0e1a3d 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:34px 30px;color:#dde5f5;text-align:center}
@@ -149,16 +175,54 @@
   <div class="sec-h" id="cfb-week-h">CFB trench board</div>
   <div class="split-note" id="cfb-note" style="margin-bottom:12px"></div>
 
-  <div class="sec-h">Rushing-prop leans</div>
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="leans" class="on">🎯 Leans <span class="cnt" id="cnt-leans"></span></button>
+    <button data-tab="slate">🏟️ Slate <span class="cnt" id="cnt-slate"></span></button>
+    <button data-tab="trench">🏋️ Trench View</button>
+    <button data-tab="record">📊 Record</button>
+    <button data-tab="method">📐 Receipts &amp; method</button>
+  </nav>
+
+  <div class="tab-pane on" id="tab-leans">
+  <div class="howto">
+    <div class="step"><div class="n">Step 1 · The idea</div><h6>Heavier lines control games</h6>
+      <p>We weigh every FBS offensive line against the exact defensive front it plays this week. Four seasons of data say the biggest weight edges rush for <b>+0.4 yards per carry</b> over the smallest.</p></div>
+    <div class="step"><div class="n">Step 2 · The flags</div><h6>Green = target, red = fade</h6>
+      <p><b>RUSH EDGE</b> — a top-20% weight edge on a team that actually runs. <b>STACKED RUSH</b> — same edge plus a windy forecast (run-heavy script). <b>RUSH FADE</b> — a bottom-20% edge: their ground game is out-gunned.</p></div>
+    <div class="step"><div class="n">Step 3 · The bet</div><h6>Rushing props, nothing else</h6>
+      <p>Each card names the back and how the team used him last season. This board is for <b>rushing props only</b> — our backtest found no side or total edge, so we don't sell one.</p></div>
+  </div>
+  <div class="sec-h">This week's rushing-prop leans</div>
   <div class="gamestrip" id="cfb-leans"></div>
+  </div>
 
-  <div class="sec-h" style="margin-top:18px">The slate — trench edge both ways</div>
+  <div class="tab-pane" id="tab-slate">
+  <div class="sec-h">The slate — every game's trench edge, both ways</div>
+  <div class="split-note" style="margin-bottom:10px">Q5 (green) = a line in the top 20% of weight edges this season · Q1 (red) = bottom 20%. The lean cards on the first tab come from these.</div>
   <div id="cfb-board"></div>
+  </div>
 
-  <div class="sec-h" style="margin-top:22px">The record — graded every week</div>
-  <div class="m-sec" id="cfb-record"><p class="split-note">First slate grades after opening weekend — every lean above is already archived.</p></div>
+  <div class="tab-pane" id="tab-trench">
+  <div class="sec-h">Trench view — the weight mismatch, to scale</div>
+  <div class="t3d-ctrl">
+    <select id="t3d-game"></select>
+    <button class="side-btn on" id="t3d-away"></button>
+    <button class="side-btn" id="t3d-home"></button>
+    <span class="split-note" style="margin:0">Each blocker is drawn to his unit's average weight — the gold arrow shows which way the trench tilts.</span>
+  </div>
+  <div class="trench3d-wrap"><canvas id="trench3d"></canvas>
+    <div class="t3d-hud"><div class="t">Line of scrimmage · this week</div><div class="w" id="t3d-title"></div><div class="q" id="t3d-sub"></div></div>
+    <div class="t3d-hint">drag to look around</div>
+  </div>
+  </div>
 
-  <div class="sec-h" style="margin-top:22px">The receipts — 4-season backtest</div>
+  <div class="tab-pane" id="tab-record">
+  <div class="sec-h">The record — graded every week</div>
+  <div class="m-sec" id="cfb-record"><p class="split-note">First slate grades after opening weekend — every lean is already archived.</p></div>
+  </div>
+
+  <div class="tab-pane" id="tab-method">
+  <div class="sec-h">The receipts — 4-season backtest</div>
   <div class="m-sec">
     <p style="margin-bottom:12px" id="bt-line">Every FBS offense-game from four seasons, bucketed by its OL-vs-opposing-DL weight edge (centered against that season's league norm):</p>
     <div id="cfb-ladder"></div>
@@ -169,6 +233,7 @@
     <h5>How the trench board works</h5>
     <p>Every FBS roster's offensive-line and defensive-line average weights are computed from current-season rosters. For each game, each offense gets a trench edge: its OL average minus the opposing DL average, centered against the league-wide norm (offensive lines naturally run heavier than defensive fronts, so raw differences mislead — the centering is what made the backtest ladder appear). Edges are quintile-ranked against the full season's matchup set. Top-quintile edges become RUSH EDGE targets; when the kickoff forecast shows 15+ mph wind outdoors — the scripts that lean run-heavy — they upgrade to STACKED RUSH. Bottom-quintile edges become RUSH FADE flags. Weather joins from the same forecast engine as the free CFB radar. A top-quintile edge only becomes a rushing-prop TARGET if the offense actually runs the ball (pass-first teams — under a 44% run rate last season — stay on the board but never get flagged: real edge, wrong market). Each lean names the team's top returning rusher from last season's production, cross-checked against the current roster. Every lean is archived the moment it posts and graded publicly against actual rushing box scores — a TARGET hits when the team beats that week's FBS median yards per carry, a FADE hits when it lands below it, so a league-wide sloppy week can't fake our record either way — same receipts-first rules as every DFSRADAR board. We validated this signal for rushing output only; our backtest found no reliable edge for sides or totals, so this board makes no such claims. Tendencies, not guarantees.</p>
   </div>
+  </div><!-- /tab-method -->
   </div><!-- /pro-app -->
 </main>
 
@@ -181,6 +246,172 @@
 
 <script>
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
+function showTab(id){
+  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+  if(id==="trench") setupTrenchControls();
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("#tabbar button"); if(b) showTab(b.dataset.tab);
+});
+/* ==================================================================
+   TRENCH VIEW — 3D line of scrimmage, blockers drawn to unit weight
+================================================================== */
+let trench3D=null, T3D_SIDE="away";
+function destroyTrench3D(){
+  if(!trench3D) return;
+  cancelAnimationFrame(trench3D.raf);
+  trench3D.scene.traverse(o=>{
+    if(o.geometry) o.geometry.dispose();
+    const m=Array.isArray(o.material)?o.material:(o.material?[o.material]:[]);
+    m.forEach(x=>{ if(x.map) x.map.dispose(); x.dispose(); });
+  });
+  trench3D.renderer.dispose(); trench3D=null;
+}
+function wtLabel(txt,sub){
+  const cv=document.createElement("canvas"); cv.width=256; cv.height=128;
+  const cx=cv.getContext("2d");
+  cx.textAlign="center";
+  cx.font="800 54px -apple-system,Segoe UI,Arial"; cx.fillStyle="#fff"; cx.fillText(txt,128,52);
+  cx.font="700 26px -apple-system,Segoe UI,Arial"; cx.fillStyle="rgba(255,255,255,.75)"; cx.fillText(sub,128,92);
+  const tex=new THREE.CanvasTexture(cv);
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(46,23),
+    new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false}));
+  return m;
+}
+function initTrench3D(){
+  const canvas=document.getElementById("trench3d");
+  if(!canvas||!CFB||typeof THREE==="undefined") return;
+  const sel=document.getElementById("t3d-game");
+  const g=(CFB.games||[]).find(x=>String(x.id)===sel.value)||(CFB.games||[])[0];
+  if(!g) return;
+  const off=T3D_SIDE==="away"?g.awayEdge:g.homeEdge;
+  const offTeam=T3D_SIDE==="away"?g.away:g.home;
+  const defTeam=T3D_SIDE==="away"?g.home:g.away;
+  const offCol=T3D_SIDE==="away"?g.awayColor:g.homeColor;
+  const defCol=T3D_SIDE==="away"?g.homeColor:g.awayColor;
+  document.getElementById("t3d-title").textContent=`${offTeam} offense vs ${defTeam} front`;
+  document.getElementById("t3d-sub").textContent=off?
+    `${off.cdiff>0?"+":""}${off.cdiff} lbs/man vs league norm · Q${off.q} — OL ${off.ol} vs DL ${off.oppDl}`:
+    "roster data pending for this matchup";
+  destroyTrench3D();
+  const W=canvas.clientWidth||900, H=canvas.clientHeight||400;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setSize(W,H,false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  const scene=new THREE.Scene();
+  const hue=0.62,sat=0.35,L=l=>new THREE.Color().setHSL(hue,sat,Math.max(0.04,l));
+  scene.background=L(0.07);
+  scene.fog=new THREE.Fog(L(0.07),600,1400);
+  const M=c=>new THREE.MeshBasicMaterial({color:c});
+  /* field patch: 10 yds each side of the LOS */
+  for(let i=0;i<8;i++){
+    const st=new THREE.Mesh(new THREE.PlaneGeometry(300,30),M(L(i%2?0.21:0.245)));
+    st.rotation.x=-Math.PI/2; st.position.set(0,0,-120+15+i*30); scene.add(st);
+  }
+  for(let z=-120;z<=120;z+=30){
+    const ln=new THREE.Mesh(new THREE.PlaneGeometry(300,z===0?2.2:1.0),M(0xf4f6fa));
+    ln.rotation.x=-Math.PI/2; ln.position.set(0,0.06,z);
+    ln.material.transparent=true; ln.material.opacity=z===0?1:0.4;
+    scene.add(ln);
+  }
+  /* hash marks */
+  for(let z=-115;z<=115;z+=10){
+    [-52,52].forEach(x=>{
+      const hm=new THREE.Mesh(new THREE.PlaneGeometry(6,0.9),M(0xf4f6fa));
+      hm.rotation.x=-Math.PI/2; hm.position.set(x,0.05,z);
+      hm.material.transparent=true; hm.material.opacity=0.35; scene.add(hm);
+    });
+  }
+  const safeCol=(c,fb)=>{ try{ return new THREE.Color(c||fb); }catch(e){ return new THREE.Color(fb); } };
+  const oc=safeCol(offCol,"#2f62e8"), dc=safeCol(defCol,"#d33131");
+  /* blockers: body height/bulk scales with unit average weight (260→340 lbs) */
+  const scale=w=>0.65+((Math.max(250,Math.min(345,w))-250)/95)*0.8;
+  function lineman(x,z,col,s,facing){
+    const grp=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(6.5*s,8.5*s,17*s,10),M(col));
+    body.position.y=8.5*s; grp.add(body);
+    const shoulders=new THREE.Mesh(new THREE.BoxGeometry(17*s,5*s,9*s),M(col));
+    shoulders.position.y=17*s; grp.add(shoulders);
+    const helmet=new THREE.Mesh(new THREE.SphereGeometry(4.6*s,12,10),M(0xf4f6fa));
+    helmet.position.y=23*s; grp.add(helmet);
+    const dark=col.clone().multiplyScalar(0.55);
+    const legs=new THREE.Mesh(new THREE.CylinderGeometry(7.5*s,6.5*s,7*s,10),M(dark));
+    legs.position.y=3*s; grp.add(legs);
+    grp.position.set(x,0,z); grp.rotation.y=facing; scene.add(grp);
+    return grp;
+  }
+  const so=off?scale(off.ol):1, sd=off?scale(off.oppDl):1;
+  /* OL: 5 men on the near side of the LOS; DL: 4 across, staggered */
+  [-56,-28,0,28,56].forEach(x=>lineman(x,14,oc,so,Math.PI));
+  [-42,-14,14,42].forEach(x=>lineman(x,-15,dc,sd,0));
+  /* unit weight labels floating above each line */
+  if(off){
+    const lo=wtLabel(`${off.ol} lbs`,`${offTeam} OL avg`); lo.position.set(-95,34,26); scene.add(lo);
+    const ld=wtLabel(`${off.oppDl} lbs`,`${defTeam} DL avg`); ld.position.set(95,34,-28); scene.add(ld);
+    trench3D_labels=[lo,ld];
+    /* gold push arrow at the LOS: points the way the weight tilts */
+    const mag=Math.min(60,8+Math.abs(off.cdiff)*1.1);
+    const dir=off.cdiff>=0?-1:1;             /* heavier OL pushes into the defense */
+    const shaft=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,mag,10),M(0xffd94a));
+    shaft.rotation.x=Math.PI/2; shaft.position.set(0,6,dir*mag/2); scene.add(shaft);
+    const tip=new THREE.Mesh(new THREE.ConeGeometry(5.5,12,12),M(0xffd94a));
+    tip.rotation.x=dir>0?Math.PI/2:-Math.PI/2; tip.position.set(0,6,dir*(mag+5)); scene.add(tip);
+  }
+  /* camera */
+  const cam=new THREE.PerspectiveCamera(38,W/H,1,2400);
+  const target=new THREE.Vector3(0,10,0);
+  let theta=0.85,el=0.42,dragging=false,lastX=0,lastY=0,idleT=0;
+  canvas.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener("pointermove",e=>{if(!dragging)return;
+    theta-=(e.clientX-lastX)*0.006;el=Math.min(1.1,Math.max(0.18,el+(e.clientY-lastY)*0.004));
+    lastX=e.clientX;lastY=e.clientY;idleT=0;});
+  canvas.addEventListener("pointerup",()=>dragging=false);
+  canvas.addEventListener("pointercancel",()=>dragging=false);
+  const clock=new THREE.Clock();
+  const inst={renderer,scene,raf:0}; trench3D=inst;
+  var trench3D_labels=trench3D_labels||[];
+  (function tick(){
+    inst.raf=requestAnimationFrame(tick);
+    const dt=Math.min(clock.getDelta(),0.05);
+    idleT+=dt;
+    if(!dragging&&idleT>2.5)theta+=dt*0.06;
+    const r=260;
+    cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r,target.y+Math.sin(el)*r,target.z+Math.cos(theta)*Math.cos(el)*r);
+    cam.lookAt(target);
+    scene.traverse(o=>{ if(o.material&&o.material.map&&o.geometry&&o.geometry.type==="PlaneGeometry"&&o.position.y>30) o.lookAt(cam.position); });
+    renderer.render(scene,cam);
+  })();
+}
+function setupTrenchControls(){
+  const sel=document.getElementById("t3d-game");
+  if(!sel||!CFB||sel.dataset.ready) return;
+  sel.dataset.ready="1";
+  sel.innerHTML=(CFB.games||[]).filter(g=>g.awayEdge&&g.homeEdge)
+    .map(g=>`<option value="${g.id}">${esc(g.away)} @ ${esc(g.home)} · ${esc(g.day)}</option>`).join("");
+  const sync=()=>{
+    const g=(CFB.games||[]).find(x=>String(x.id)===sel.value)||(CFB.games||[])[0];
+    if(!g) return;
+    document.getElementById("t3d-away").textContent=`${g.away} offense`;
+    document.getElementById("t3d-home").textContent=`${g.home} offense`;
+    initTrench3D();
+  };
+  sel.addEventListener("change",sync);
+  document.getElementById("t3d-away").addEventListener("click",()=>{
+    T3D_SIDE="away";
+    document.getElementById("t3d-away").classList.add("on");
+    document.getElementById("t3d-home").classList.remove("on");
+    initTrench3D();
+  });
+  document.getElementById("t3d-home").addEventListener("click",()=>{
+    T3D_SIDE="home";
+    document.getElementById("t3d-home").classList.add("on");
+    document.getElementById("t3d-away").classList.remove("on");
+    initTrench3D();
+  });
+  sync();
+}
+
 let CFB=null;
 const LEAN_ICON={"STACKED RUSH":"🏋️","RUSH EDGE":"🟢","RUSH FADE":"🔻"};
 function leanCard(l){
@@ -203,6 +434,8 @@ function renderCFB(){
   document.getElementById("proto-note").innerHTML=`🎓 <span><b>Live</b> — built ${esc(CFB.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
   document.getElementById("cfb-week-h").textContent=CFB.week?`CFB — ${CFB.season} Week ${CFB.week} · ${(CFB.games||[]).length} FBS games`:"CFB trench board";
   document.getElementById("cfb-note").textContent=CFB.note||"";
+  document.getElementById("cnt-leans").textContent=(CFB.leans||[]).length||"";
+  document.getElementById("cnt-slate").textContent=(CFB.games||[]).length||"";
   const lw=document.getElementById("cfb-leans");
   lw.innerHTML=(CFB.leans||[]).length?(CFB.leans||[]).map(leanCard).join(""):
     `<div class="split-note">No leans on the board yet — they post when the week's slate and rosters load.</div>`;
