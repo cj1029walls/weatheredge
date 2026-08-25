@@ -120,21 +120,29 @@ def fetch_totals(yr, season_types):
     return out
 
 
-_TEAM_LOC = None
-def team_locations(yr):
-    """{school: (lat, lon)} from /teams/fbs — for away-travel badges."""
-    global _TEAM_LOC
-    if _TEAM_LOC is None:
-        _TEAM_LOC = {}
+_TEAM_INFO = None
+def team_info(yr):
+    """{school: {lat, lon, logo, color, ab}} from /teams/fbs — travel badges
+    plus the branding (logo/color/abbreviation) the 3D stadium view uses."""
+    global _TEAM_INFO
+    if _TEAM_INFO is None:
+        _TEAM_INFO = {}
         try:
             for t in get_json(f"{CFBD}/teams/fbs?year={yr}", auth=True):
                 loc = gv(t, "location") or {}
-                la, lo = gv(loc, "latitude"), gv(loc, "longitude")
-                if la is not None and lo is not None:
-                    _TEAM_LOC[gv(t, "school")] = (la, lo)
+                logos = gv(t, "logos") or []
+                _TEAM_INFO[gv(t, "school")] = dict(
+                    lat=gv(loc, "latitude"), lon=gv(loc, "longitude"),
+                    logo=(logos[0] if logos else None),
+                    color=gv(t, "color"), ab=gv(t, "abbreviation"))
         except Exception as e:
-            print(f"team locations unavailable ({e})")
-    return _TEAM_LOC
+            print(f"team info unavailable ({e})")
+    return _TEAM_INFO
+
+
+def team_locations(yr):
+    return {k: (v["lat"], v["lon"]) for k, v in team_info(yr).items()
+            if v["lat"] is not None and v["lon"] is not None}
 
 
 def miles(a_lat, a_lon, b_lat, b_lon):
@@ -253,6 +261,7 @@ def main():
             continue
         temp = round(h["temperature_2m"][idx]); dew = round(h["dew_point_2m"][idx])
         wind = round(h["wind_speed_10m"][idx])
+        wdir = h.get("wind_direction_10m", [None] * len(h["time"]))[idx]
         cloud = h["cloud_cover"][idx]; pp = h["precipitation_probability"][idx]
         rh = h["relative_humidity_2m"][idx]; pres = h["surface_pressure"][idx]
         icon, sky = ("🏟️", "Indoor") if dome else sky_of(cloud, pp, local.hour)
@@ -304,7 +313,15 @@ def main():
             rh=None if rh is None else round(rh),
             pres=None if pres is None else round(pres),
             hourly=hourly or None, delay=delay, total=today_line,
-            badges=badges or None)
+            badges=badges or None,
+            windDir=None if (dome or wdir is None) else round(wdir),
+            kickHour=local.hour,
+            awayLogo=(team_info(yr).get(away) or {}).get("logo"),
+            homeLogo=(team_info(yr).get(home) or {}).get("logo"),
+            awayColor=(team_info(yr).get(away) or {}).get("color"),
+            homeColor=(team_info(yr).get(home) or {}).get("color"),
+            awayAb=(team_info(yr).get(away) or {}).get("ab") or away[:4].upper(),
+            homeAb=(team_info(yr).get(home) or {}).get("ab") or home[:4].upper())
 
         if hist:
             rows, note = match_games(hist["games"], temp, wind, dome)
