@@ -120,6 +120,39 @@ def fetch_totals(yr, season_types):
     return out
 
 
+_TEAM_LOC = None
+def team_locations(yr):
+    """{school: (lat, lon)} from /teams/fbs — for away-travel badges."""
+    global _TEAM_LOC
+    if _TEAM_LOC is None:
+        _TEAM_LOC = {}
+        try:
+            for t in get_json(f"{CFBD}/teams/fbs?year={yr}", auth=True):
+                loc = gv(t, "location") or {}
+                la, lo = gv(loc, "latitude"), gv(loc, "longitude")
+                if la is not None and lo is not None:
+                    _TEAM_LOC[gv(t, "school")] = (la, lo)
+        except Exception as e:
+            print(f"team locations unavailable ({e})")
+    return _TEAM_LOC
+
+
+def miles(a_lat, a_lon, b_lat, b_lon):
+    from math import radians, sin, cos, asin, sqrt
+    la1, lo1, la2, lo2 = map(radians, (a_lat, a_lon, b_lat, b_lon))
+    h = sin((la2 - la1) / 2) ** 2 + cos(la1) * cos(la2) * sin((lo2 - lo1) / 2) ** 2
+    return 3956 * 2 * asin(sqrt(h))
+
+
+def elev_feet(v):
+    """CFBD venue elevation, unit-ambiguous — normalize to feet."""
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return None
+    return v if v >= 2600 else v * 3.28084
+
+
 _VENUES = None
 def venue_meta(vid):
     global _VENUES
@@ -245,6 +278,19 @@ def main():
                                 else "likely" if worst < 70 else "severe"), pct=worst)
 
         today_line = totals.get(g["id"])
+        badges = []
+        tl = team_locations(yr).get(away)
+        if tl:
+            try:
+                d_mi = miles(tl[0], tl[1], lat, lon)
+                if d_mi >= 1200:
+                    badges.append(dict(k="LONG HAUL",
+                                       txt=f"{away} travels {round(d_mi):,} miles"))
+            except Exception:
+                pass
+        ef = elev_feet(gv(meta, "elevation"))
+        if ef and ef >= 4000:
+            badges.append(dict(k="ALTITUDE", txt=f"{round(ef):,} ft — thin air, tired legs"))
         base = dict(
             id=str(g["id"]), away=away, home=home, week=gv(g, "week"), conf=conf,
             p4=bool(hist), stadium=vname,
@@ -257,7 +303,8 @@ def main():
             rain=None if pp is None else round(pp),
             rh=None if rh is None else round(rh),
             pres=None if pres is None else round(pres),
-            hourly=hourly or None, delay=delay, total=today_line)
+            hourly=hourly or None, delay=delay, total=today_line,
+            badges=badges or None)
 
         if hist:
             rows, note = match_games(hist["games"], temp, wind, dome)
