@@ -155,6 +155,9 @@
   <div class="sec-h" style="margin-top:18px">The slate — trench edge both ways</div>
   <div id="cfb-board"></div>
 
+  <div class="sec-h" style="margin-top:22px">The record — graded every week</div>
+  <div class="m-sec" id="cfb-record"><p class="split-note">First slate grades after opening weekend — every lean above is already archived.</p></div>
+
   <div class="sec-h" style="margin-top:22px">The receipts — 4-season backtest</div>
   <div class="m-sec">
     <p style="margin-bottom:12px" id="bt-line">Every FBS offense-game from four seasons, bucketed by its OL-vs-opposing-DL weight edge (centered against that season's league norm):</p>
@@ -164,7 +167,7 @@
 
   <div class="m-sec" style="margin-top:12px">
     <h5>How the trench board works</h5>
-    <p>Every FBS roster's offensive-line and defensive-line average weights are computed from current-season rosters. For each game, each offense gets a trench edge: its OL average minus the opposing DL average, centered against the league-wide norm (offensive lines naturally run heavier than defensive fronts, so raw differences mislead — the centering is what made the backtest ladder appear). Edges are quintile-ranked against the full season's matchup set. Top-quintile edges become RUSH EDGE targets; when the kickoff forecast shows 15+ mph wind outdoors — the scripts that lean run-heavy — they upgrade to STACKED RUSH. Bottom-quintile edges become RUSH FADE flags. Weather joins from the same forecast engine as the free CFB radar. Every lean is archived the moment it posts and graded publicly against actual rushing box scores — same receipts-first rules as every DFSRADAR board. We validated this signal for rushing output only; our backtest found no reliable edge for sides or totals, so this board makes no such claims. Tendencies, not guarantees.</p>
+    <p>Every FBS roster's offensive-line and defensive-line average weights are computed from current-season rosters. For each game, each offense gets a trench edge: its OL average minus the opposing DL average, centered against the league-wide norm (offensive lines naturally run heavier than defensive fronts, so raw differences mislead — the centering is what made the backtest ladder appear). Edges are quintile-ranked against the full season's matchup set. Top-quintile edges become RUSH EDGE targets; when the kickoff forecast shows 15+ mph wind outdoors — the scripts that lean run-heavy — they upgrade to STACKED RUSH. Bottom-quintile edges become RUSH FADE flags. Weather joins from the same forecast engine as the free CFB radar. A top-quintile edge only becomes a rushing-prop TARGET if the offense actually runs the ball (pass-first teams — under a 44% run rate last season — stay on the board but never get flagged: real edge, wrong market). Each lean names the team's top returning rusher from last season's production, cross-checked against the current roster. Every lean is archived the moment it posts and graded publicly against actual rushing box scores — a TARGET hits when the team beats that week's FBS median yards per carry, a FADE hits when it lands below it, so a league-wide sloppy week can't fake our record either way — same receipts-first rules as every DFSRADAR board. We validated this signal for rushing output only; our backtest found no reliable edge for sides or totals, so this board makes no such claims. Tendencies, not guarantees.</p>
   </div>
   </div><!-- /pro-app -->
 </main>
@@ -184,7 +187,10 @@ function leanCard(l){
   return `<div class="intel-card"><div class="ic">${LEAN_ICON[l.k]||"📌"}</div>
     <div style="flex:1"><span class="tag ${l.side==="FADE"?"fade":""}">${esc(l.k)} · ${esc(l.side)}</span>
     <h4>${esc(l.who)} <span style="color:var(--muted);font-weight:700">· ${esc(l.game)}</span></h4>
-    <p>${esc(l.why)}</p></div></div>`;
+    <p>${esc(l.why)}</p>
+    ${l.rush?`<p style="margin-top:5px"><b style="color:var(--body2)">${l.side==="FADE"?"They lean on it":"They use it"}:</b> ${l.rush.att} rush att/gm · ${Math.round(l.rush.rate*100)}% run rate last season</p>`:""}
+    ${l.rb?`<p style="margin-top:3px"><b style="color:var(--body2)">${l.side==="FADE"?"The back to fade":"The back"}:</b> ${esc(l.rb.name)} — ${l.rb.yds.toLocaleString()} yds on ${l.rb.car} carries (${l.rb.ypc} YPC) last year</p>`:""}
+    </div></div>`;
 }
 function edgeCell(e){
   if(!e) return '<span class="imp">roster data pending</span>';
@@ -200,9 +206,12 @@ function renderCFB(){
   const lw=document.getElementById("cfb-leans");
   lw.innerHTML=(CFB.leans||[]).length?(CFB.leans||[]).map(leanCard).join(""):
     `<div class="split-note">No leans on the board yet — they post when the week's slate and rosters load.</div>`;
+  let lastDay=null;
   const rows=(CFB.games||[]).map(g=>{
+    const dayHdr=g.day!==lastDay?`<tr><td colspan="6" style="background:#eef1f7;font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:8px 14px">${esc(g.day)}</td></tr>`:"";
+    lastDay=g.day;
     const wx=g.wx?(g.wx.dome?"🏟 dome":`${g.wx.temp}° · ${g.wx.wind} mph${(g.wx.wind||0)>=15?" 💨":""}`):`<span class="imp">—</span>`;
-    return `<tr>
+    return `${dayHdr}<tr>
       <td><div class="pname">${esc(g.away)} @ ${esc(g.home)}</div><div class="psub">${esc(g.day)} ${esc(g.time)}</div></td>
       <td>${g.spread!=null?esc(g.spread):'<span class="imp">—</span>'}</td>
       <td class="hide-m">${g.total!=null?g.total:'<span class="imp">—</span>'}</td>
@@ -230,12 +239,30 @@ function renderCFB(){
       </tr></thead><tbody>${lrows}</tbody></table>`;
   }
 }
+function renderRecord(R){
+  if(!R||!R.summary||!R.summary.overall||!R.summary.overall.n) return;
+  const S=R.summary;
+  const chip=(lab,r)=>r&&r.n?`<div class="stat" style="padding:14px 18px"><div class="v" style="font-size:30px">${r.w}–${r.n-r.w}</div><div class="k">${lab}</div></div>`:"";
+  const weeks=(R.recent||[]).map(w=>{
+    const rows=w.leans.map(l=>`<tr><td><span class="qb ${l.hit?"q5":"q1"}">${l.hit?"HIT":"MISS"}</span></td>
+      <td><b>${esc(l.k)}</b> ${esc(l.who)}<div class="qsub">${esc(l.game)}</div></td>
+      <td>${l.act?`${l.act.yds} yds on ${l.act.att} att · <b>${l.act.ypc}</b> YPC`:"—"}</td></tr>`).join("");
+    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(w.week)}</b> · week median ${w.medYpc} YPC — a TARGET hits above it, a FADE hits below it</div>
+      <table><tbody>${rows}</tbody></table>`;
+  }).join("");
+  document.getElementById("cfb-record").innerHTML=
+    `<div class="stats" style="display:flex;gap:14px;flex-wrap:wrap">${chip("all graded leans",S.overall)}${chip("targets",S.targets)}${chip("fades",S.fades)}${chip("stacked rush",S.stacked)}</div>${weeks}`;
+}
 async function loadCFB(){
   try{
     const r=await fetch("/pro/cfb.json?_="+Date.now());
     if(!r.ok) return;
     CFB=await r.json();
     renderCFB();
+  }catch(e){}
+  try{
+    const rr=await fetch("/pro/cfb_record.json?_="+Date.now());
+    if(rr.ok) renderRecord(await rr.json());
   }catch(e){}
 }
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
