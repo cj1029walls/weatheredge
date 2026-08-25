@@ -28,6 +28,8 @@ OUT = os.path.join(ROOT, "site", "pro", "cfb.json")
 FREE = os.path.join(ROOT, "site", "cfb", "data.json")
 BACKTEST = os.path.join(ROOT, "data", "cfb", "trench_backtest.json")
 ARCH = os.path.join(ROOT, "data", "pro", "cfb_predictions")
+TEASER = os.path.join(ROOT, "site", "cfb", "teaser.json")
+PASS_FIRST = 0.44   # run rate below this = pass-first; no rushing-prop TARGET
 
 CFBD = "https://api.collegefootballdata.com"
 ET = timezone(timedelta(hours=-4))
@@ -60,12 +62,75 @@ def fetch(url, tries=4, timeout=90):
             time.sleep(wait)
 
 
+def rush_identity(prior):
+    """Last-season team rushing identity: attempts/gm and run rate.
+    From CFBD season stats; returns {team: {att, rate}} (empty on any failure)."""
+    out = {}
+    try:
+        rows = fetch(f"{CFBD}/stats/season?year={prior}", tries=2)
+        agg = {}
+        for r in rows:
+            t, name = gv(r, "team"), gv(r, "statName", "stat_name")
+            v = gv(r, "statValue", "stat_value")
+            if t is None or name is None or v is None:
+                continue
+            try:
+                agg.setdefault(t, {})[name] = float(v)
+            except (TypeError, ValueError):
+                continue
+        for t, st in agg.items():
+            ra, pa, g = st.get("rushingAttempts"), st.get("passAttempts"), st.get("games")
+            if ra and pa and g:
+                out[t] = dict(att=round(ra / g, 1), rate=round(ra / (ra + pa), 3))
+    except Exception as e:
+        print(f"rush identity unavailable ({e})")
+    print(f"rush identity: {len(out)} teams from {prior}")
+    return out
+
+
+def top_rushers(prior, current_rosters):
+    """Each team's top returning rusher: last season's leader by yards who is
+    still on this season's roster. {team: {name, car, yds, ypc}}."""
+    out = {}
+    try:
+        rows = fetch(f"{CFBD}/stats/player/season?year={prior}&category=rushing", tries=2)
+        players = {}
+        for r in rows:
+            t, nm = gv(r, "team"), gv(r, "player")
+            st = (gv(r, "statType", "stat_type") or "").upper()
+            v = gv(r, "stat")
+            if not t or not nm or v is None:
+                continue
+            try:
+                players.setdefault((t, nm), {})[st] = float(v)
+            except (TypeError, ValueError):
+                continue
+        for (t, nm), st in players.items():
+            yds, car = st.get("YDS"), st.get("CAR")
+            if not yds or not car or car < 60:
+                continue
+            cur = current_rosters.get(t)
+            if cur is not None and nm not in cur:
+                continue                      # transferred / graduated / drafted
+            best = out.get(t)
+            if not best or yds > best["yds"]:
+                out[t] = dict(name=nm, car=int(car), yds=int(yds),
+                              ypc=round(yds / car, 1))
+    except Exception as e:
+        print(f"returning rushers unavailable ({e})")
+    print(f"returning rushers: {len(out)} teams")
+    return out
+
+
 def build_trench(year):
     fbs = {gv(t, "school") for t in fetch(f"{CFBD}/teams/fbs?year={year}")}
     roster = fetch(f"{CFBD}/roster?year={year}")
-    tw = {}
+    tw, names = {}, {}
     for p in roster:
         team, w = gv(p, "team"), gv(p, "weight")
+        fn, ln = gv(p, "firstName", "first_name"), gv(p, "lastName", "last_name")
+        if team and (fn or ln):
+            names.setdefault(team, set()).add(f"{fn or ''} {ln or ''}".strip())
         pos = (gv(p, "position") or "").upper()
         if not team or not w or not (180 <= w <= 420):
             continue
@@ -79,14 +144,16 @@ def build_trench(year):
     lg_ol = round(statistics.mean(v["ol"] for v in trench.values()), 1)
     lg_dl = round(statistics.mean(v["dl"] for v in trench.values()), 1)
     print(f"trench data: {len(trench)} FBS teams · league OL {lg_ol} / DL {lg_dl}")
-    return trench, lg_ol, lg_dl
+    return trench, lg_ol, lg_dl, names
 
 
 def main():
     now = datetime.now(ET)
     season = now.year if now.month >= 7 else now.year - 1
-    trench, lg_ol, lg_dl = build_trench(season)
+    trench, lg_ol, lg_dl, roster_names = build_trench(season)
     lg_diff = lg_ol - lg_dl
+    identity = rush_identity(season - 1)
+    rbs = top_rushers(season - 1, roster_names)
 
     games = fetch(f"{CFBD}/games?year={season}&seasonType=regular")
     fbs_games = []
@@ -194,19 +261,29 @@ def main():
                 continue
             opp = h if e["team"] == a else a
             windy_kick = bool(w and not w.get("dome") and (w.get("wind") or 0) >= WINDY)
+            ident = identity.get(e["team"])
+            rb = rbs.get(e["team"])
+            if e["q"] == 5 and ident and ident["rate"] < PASS_FIRST:
+                # stacked line on a pass-first offense: real edge, wrong market.
+                # Stays on the board with its quintile; no rushing-prop TARGET.
+                print(f"  demoted (pass-first {ident['rate']:.0%}): {e['team']}")
+                continue
             if e["q"] == 5:
                 why = (f"+{e['cdiff']} lbs/man trench edge vs league norm "
                        f"(their OL {e['ol']} vs {opp} DL {e['oppDl']}) — "
                        f"top-quintile edges rushed for +0.4 YPC in our 4-season backtest")
                 if windy_kick:
                     leans.append(dict(k="STACKED RUSH", side="TARGET", who=e["team"],
+                        rush=ident, rb=rb,
                         game=f"{a} @ {h}", cd=e["cdiff"],
                         why=why + f" · {w['wind']} mph forecast leans the script run-heavy"))
                 else:
                     leans.append(dict(k="RUSH EDGE", side="TARGET", who=e["team"],
+                        rush=ident, rb=rb,
                                       game=f"{a} @ {h}", cd=e["cdiff"], why=why))
             elif e["q"] == 1:
                 leans.append(dict(k="RUSH FADE", side="FADE", who=e["team"],
+                        rush=ident, rb=rb,
                     game=f"{a} @ {h}", cd=e["cdiff"],
                     why=(f"{e['cdiff']} lbs/man vs league norm (their OL {e['ol']} vs "
                          f"{opp} DL {e['oppDl']}) — bottom-quintile edges averaged "
@@ -240,6 +317,17 @@ def main():
                note=" ".join(notes))
     json.dump(out, open(OUT, "w"), separators=(",", ":"))
     print(f"wrote {OUT}: {len(out_games)} games · {len(leans)} leans")
+
+    # public teaser for the free CFB page (counts only — the board stays gated)
+    try:
+        json.dump(dict(updated=out["updated"], week=week,
+                       targets=sum(1 for l in leans if l["side"] == "TARGET"),
+                       fades=sum(1 for l in leans if l["side"] == "FADE"),
+                       stacked=sum(1 for l in leans if l["k"] == "STACKED RUSH")),
+                  open(TEASER, "w"), separators=(",", ":"))
+        print("wrote free-page teaser")
+    except Exception as e:
+        print(f"teaser skipped ({e})")
 
     os.makedirs(ARCH, exist_ok=True)
     json.dump(dict(built=out["updated"], season=season, week=week, leans=leans,
