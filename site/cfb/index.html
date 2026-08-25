@@ -232,6 +232,13 @@
     <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=cfb" target="_blank" rel="noopener">Build lineups →</a>
   </div>
 
+  <div class="kx-card" id="pro-tease" style="display:none;border-left-color:#e8b73a">
+    <div><div class="kx-k" style="color:#b8860b">🔒 THIS WEEK'S TRENCH BOARD — PRO</div>
+    <div class="kx-t" id="pro-tease-txt"></div>
+    <div class="kx-s">OL-vs-DL weight edges, backtested on 4 seasons — every lean graded in public.</div></div>
+    <a class="kx-go" style="background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451" href="/pro/cfb/">Unlock the board →</a>
+  </div>
+
   <section class="view active" id="view-slate">
     <div class="summary-strip" id="summary-strip"></div>
     <div class="controls">
@@ -286,6 +293,21 @@ games:[
 ]};
 
 let DATA = SAMPLE, LIVE = false, FILTER = "P4";
+(async()=>{
+  try{
+    const r=await fetch("/cfb/teaser.json?_="+Date.now());
+    if(!r.ok) return;
+    const t=await r.json();
+    if(!t||!(t.targets+t.fades)) return;
+    const bits=[];
+    if(t.stacked) bits.push(`<b>${t.stacked} STACKED RUSH</b> (trench edge × wind)`);
+    bits.push(`<b>${t.targets} rushing-prop targets</b>`);
+    if(t.fades) bits.push(`<b>${t.fades} fades</b>`);
+    document.getElementById("pro-tease-txt").innerHTML=
+      `Week ${t.week}: ${bits.join(" · ")} — with the backs to play and the fronts to avoid.`;
+    document.getElementById("pro-tease").style.display="";
+  }catch(e){}
+})();
 const pct = v => (v>0?"+":"")+v+"%";
 const cls = v => v>0?"pos":(v<0?"neg":"neu");
 function edgeBadge(g){
@@ -293,6 +315,8 @@ function edgeBadge(g){
   if(g.delay && (g.delay.level==="likely"||g.delay.level==="severe")) return `<span class="edge-badge edge-rain">${g.delay.level==="severe"?"PPD risk":"Delay likely"}</span>`;
   if(g.wind>=15) return `<span class="edge-badge edge-wind">Wind game</span>`;
   if(g.temp<=25) return `<span class="edge-badge edge-cold">Deep freeze</span>`;
+  const bb=(g.badges||[])[0];
+  if(bb) return `<span class="edge-badge edge-neutral" title="${bb.txt}">${bb.k==="LONG HAUL"?"✈️ Long haul":"⛰️ Altitude"}</span>`;
   return "";
 }
 function gauge(g, size=48){
@@ -321,7 +345,7 @@ function rowHTML(g){
   const sub = g.p4 ? `vs real closing totals · ${g.ou.n||g.sample} gms` : `no venue history yet`;
   return `<div class="b-row" data-game="${g.id}">
     <div class="b-time">${g.day}<span>${g.time.replace(" ET","")} ET</span></div>
-    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}<span class="conf-tag">${g.conf}</span></div><div class="b-stad">${g.stadium}</div></div>
+    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}<span class="conf-tag">${g.conf}</span></div><div class="b-stad">${g.stadium}${(g.badges||[]).map(x=>` · ${x.k==="LONG HAUL"?"✈️":"⛰️"} ${x.txt}`).join("")}</div></div>
     <div class="b-wx"><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div>
     <div>${imp}</div>
     <div class="b-ou">${gauge(g)}<div class="txt">${leanTxt(g)}<span>${sub}</span></div></div>
