@@ -51,7 +51,8 @@ OUT = os.path.join(ROOT, "site", "pro", "nfl.json")
 ARCHIVE_DIR = os.path.join(ROOT, "data", "pro", "nfl_predictions")
 
 PROP_MARKETS = os.environ.get("ODDS_NFL_PROP_MARKETS",
-                              "player_pass_yds,player_kicking_points")
+                              "player_pass_yds,player_rush_yds,player_receptions,"
+                              "player_kicking_points,player_anytime_td")
 EVENTS_URL = ("https://api.the-odds-api.com/v4/sports/americanfootball_nfl/events"
               "?apiKey={key}")
 EVENT_ODDS_URL = ("https://api.the-odds-api.com/v4/sports/americanfootball_nfl/"
@@ -171,7 +172,29 @@ def build_leans(g, edge, wx):
                     who=f"{nm} ({k['team']})", prop="kicking pts",
                     why=f"forecast {wind} mph · {w['pct']}% in wind ({w['made']}/{w['att']}) vs {k['all']['pct']}% career"))
 
+    if wind is not None and wind >= 15:
+        # v6: run-script props — backs whose windy games show held/boosted output
+        for nm, p in (edge.get("rbs") or {}).items():
+            sw = p.get("windy")
+            if sw and sw.get("g", 0) >= 4 and sw.get("delta", -99) >= 5:
+                leans.append(dict(k="RB WIND", side="OVER", game=f"{away}@{home}",
+                    who=f"{nm} ({p['team']})", prop="rush yds",
+                    why=f"forecast {wind} mph — run-script spot · {sw['ypg']} rush ypg in wind ({sw['delta']:+d}% vs {p['base']['ypg']} norm, {sw['attG']} att/gm, {sw['g']} gms)"))
+        for nm, p in (edge.get("wrs") or {}).items():
+            sw = p.get("windy")
+            if sw and sw.get("g", 0) >= 4 and sw.get("delta", 0) <= -10:
+                leans.append(dict(k="WR WIND", side="UNDER", game=f"{away}@{home}",
+                    who=f"{nm} ({p['team']})", prop="receptions",
+                    why=f"forecast {wind} mph · {sw['recG']} rec/gm in wind ({sw['delta']}% vs {p['base']['recG']} norm, {sw['g']} gms)"))
+
     if temp is not None and temp < 40:
+        # v6: cold-game workhorses
+        for nm, p in (edge.get("rbs") or {}).items():
+            sc = p.get("cold")
+            if sc and sc.get("g", 0) >= 4 and sc.get("delta", -99) >= 5:
+                leans.append(dict(k="RB COLD", side="OVER", game=f"{away}@{home}",
+                    who=f"{nm} ({p['team']})", prop="rush yds",
+                    why=f"forecast {temp}° — cold-script spot · {sc['ypg']} rush ypg in sub-40 games ({sc['delta']:+d}% vs {p['base']['ypg']} norm, {sc['g']} gms)"))
         for t in (away, home):
             w = (edge.get("teamWx") or {}).get(t)
             c = (w or {}).get("cold")
@@ -231,7 +254,9 @@ def fetch_props(week_rows):
         for bk in data.get("bookmakers", []):
             for mk in bk.get("markets", []):
                 for oc in mk.get("outcomes", []):
-                    if oc.get("point") is None:
+                    if oc.get("point") is None and mk.get("key") != "player_anytime_td":
+                        continue
+                    if mk.get("key") == "player_anytime_td" and oc.get("name") != "Yes":
                         continue
                     kk = (f"{a}@{h}", mk.get("key"), norm_name(oc.get("description") or ""))
                     out.setdefault(kk, []).append(
@@ -241,7 +266,8 @@ def fetch_props(week_rows):
 
 
 def attach_prices(leans, props):
-    MKT = {"pass yds": "player_pass_yds", "kicking pts": "player_kicking_points"}
+    MKT = {"pass yds": "player_pass_yds", "kicking pts": "player_kicking_points",
+           "rush yds": "player_rush_yds", "receptions": "player_receptions"}
     for ln in leans:
         m = MKT.get(ln.get("prop"))
         if not m or not ln.get("who"):
@@ -258,6 +284,16 @@ def attach_prices(leans, props):
         if prices:
             ln["price"] = int(statistics.median(prices))
         ln["books"] = len(pick)
+    # anytime-TD price shown as market context on RB run-script leans — the
+    # books' number, never ours; we model the script, not TD probability
+    for ln in leans:
+        if ln.get("k") in ("RB WIND", "RB COLD") and ln.get("who"):
+            nm = norm_name(ln["who"].split("(")[0])
+            rows = props.get((ln["game"], "player_anytime_td", nm))
+            if rows:
+                prices = [r["price"] for r in rows if r.get("price") is not None]
+                if prices:
+                    ln["atd"] = int(statistics.median(prices))
     return leans
 
 

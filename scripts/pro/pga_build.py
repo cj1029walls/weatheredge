@@ -221,6 +221,11 @@ def main():
         windWeek=wind_week, fcWinds=fc_winds, waves=waves,
         fieldN=len(field), course=course, wind=dict(proof=wind_proof, fade=wind_fade),
         form=form, leans=leans, note=" ".join(notes))
+    try:
+        from market import attach_outright_prices
+        attach_outright_prices(out.get("leans", []), "golf")
+    except Exception as e:
+        print(f"outright join skipped ({e})")
     json.dump(out, open(OUT, "w"))
     print(f"wrote {OUT}: {len(course)} course rows · {len(leans)} leans")
 

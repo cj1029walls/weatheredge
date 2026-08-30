@@ -32,6 +32,11 @@ TEASER = os.path.join(ROOT, "site", "cfb", "teaser.json")
 PASS_FIRST = 0.44   # run rate below this = pass-first; no rushing-prop TARGET
 
 CFBD = "https://api.collegefootballdata.com"
+ODDS_EVENTS = ("https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/"
+               "events?apiKey={key}")
+ODDS_EVENT = ("https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/"
+              "events/{eid}/odds?apiKey={key}&regions=us&markets=player_rush_yds"
+              "&oddsFormat=american")
 ET = timezone(timedelta(hours=-4))
 OL_POS = {"OL", "OT", "OG", "C", "G", "T"}
 DL_POS = {"DL", "DT", "DE", "NT", "EDGE"}
@@ -151,6 +156,71 @@ def build_trench(year):
     lg_dl = round(statistics.mean(v["dl"] for v in trench.values()), 1)
     print(f"trench data: {len(trench)} FBS teams · league OL {lg_ol} / DL {lg_dl}")
     return trench, lg_ol, lg_dl, names
+
+
+def attach_rush_props(leans):
+    key = os.environ.get("ODDS_API_KEY")
+    named = [l for l in leans if l.get("rb")]
+    if not key or not named:
+        print("rush props: skipped (no key or no named backs)")
+        return
+    import unicodedata as _ud, re as _re
+    def last(nm):
+        nm = _ud.normalize("NFKD", nm or "").encode("ascii", "ignore").decode()
+        parts = _re.split(r"[. ]+", _re.sub(r"[^A-Za-z. ]", "", nm).strip())
+        return parts[-1].lower() if parts else ""
+    def odds_get(url):
+        req = urllib.request.Request(url, headers={"User-Agent": "dfsradar-build/1.0"})
+        with urllib.request.urlopen(req, timeout=45) as r:
+            return json.loads(r.read())
+    try:
+        events = odds_get(ODDS_EVENTS.format(key=key))
+    except Exception as e:
+        print(f"rush props: events unavailable ({e})")
+        return
+    # match Odds API team names ("Oklahoma Sooners") to CFBD schools ("Oklahoma")
+    def match_event(game):
+        away, home = [x.strip() for x in game.split("@")]
+        for ev in events:
+            ea, eh = ev.get("away_team") or "", ev.get("home_team") or ""
+            if eh.startswith(home) and ea.startswith(away):
+                return ev
+        return None
+    used, priced = 0, 0
+    for l in named:
+        if used >= 10:
+            break
+        ev = match_event(l["game"])
+        if not ev:
+            continue
+        try:
+            data = odds_get(ODDS_EVENT.format(eid=ev["id"], key=key))
+            used += 1
+        except Exception as e:
+            print(f"rush props: {l['game']} skipped ({e})")
+            continue
+        want = last(l["rb"]["name"])
+        pts, prices = [], []
+        side = "Over" if l["side"] == "TARGET" else "Under"
+        for bk in data.get("bookmakers", []):
+            for mk in bk.get("markets", []):
+                if mk.get("key") != "player_rush_yds":
+                    continue
+                for oc in mk.get("outcomes", []):
+                    if oc.get("point") is None or last(oc.get("description") or "") != want:
+                        continue
+                    if oc.get("name") != side:
+                        continue
+                    pts.append(oc["point"])
+                    if oc.get("price") is not None:
+                        prices.append(oc["price"])
+        if pts:
+            l["line"] = statistics.median(pts)
+            if prices:
+                l["price"] = int(statistics.median(prices))
+            l["books"] = len(pts)
+            priced += 1
+    print(f"rush props: priced {priced}/{len(named)} named backs from {used} event calls")
 
 
 def main():
@@ -305,6 +375,11 @@ def main():
     fades = sorted([l for l in leans if l["side"] == "FADE"],
                    key=lambda l: l["cd"])[:5]
     leans = targets + fades
+
+    # v6: join live rushing-prop lines onto leans that name a back. Coverage
+    # is book- and game-dependent (bigger games only) — a missing line is
+    # normal and shown honestly; guarded so odds failures never break a build.
+    attach_rush_props(leans)
 
     backtest = None
     if os.path.exists(BACKTEST):

@@ -176,6 +176,11 @@ def main():
         board=board, tform=tform,
         heat=dict(up=heat_up, dn=heat_dn),
         leans=leans, note=" ".join(notes))
+    try:
+        from market import attach_outright_prices
+        attach_outright_prices(out.get("leans", []), "nascar")
+    except Exception as e:
+        print(f"outright join skipped ({e})")
     json.dump(out, open(OUT, "w"))
     print(f"wrote {OUT}: {len(board)} board rows · {len(leans)} leans")
 
