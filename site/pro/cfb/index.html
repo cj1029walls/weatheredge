@@ -135,6 +135,7 @@
       <h1>DFS<span class="brand-rad">RADAR</span><span class="pro">PRO</span></h1>
       <div class="tagline">The CFB trench board — <b>who wins the line of scrimmage, by the pound.</b> Every lean archived and graded in public.</div>
       <div class="pro-nav">
+        <a href="/pro/props/">🎯 Props</a>
         <a href="/pro/">⚾ MLB</a>
         <a href="/pro/nfl/">🏈 NFL</a>
         <a class="on" href="/pro/cfb/">🎓 CFB</a>
@@ -415,13 +416,15 @@ function setupTrenchControls(){
 let CFB=null;
 const LEAN_ICON={"STACKED RUSH":"🏋️","RUSH EDGE":"🟢","RUSH FADE":"🔻"};
 function leanCard(l){
+  const price=l.line!=null?`<div style="margin-left:auto;font-size:18px;font-weight:800;color:var(--navy2);white-space:nowrap;padding-left:8px">${l.side==="FADE"?"U":"O"} ${l.line}${l.price!=null?` <span style="font-size:11px;color:var(--muted)">${l.price>0?"+":""}${l.price}</span>`:""}<div style="font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--faint);text-align:right">RUSH YDS${l.books?` · ${l.books} BOOKS`:""}</div></div>`:"";
   return `<div class="intel-card"><div class="ic">${LEAN_ICON[l.k]||"📌"}</div>
     <div style="flex:1"><span class="tag ${l.side==="FADE"?"fade":""}">${esc(l.k)} · ${esc(l.side)}</span>
     <h4>${esc(l.who)} <span style="color:var(--muted);font-weight:700">· ${esc(l.game)}</span></h4>
     <p>${esc(l.why)}</p>
     ${l.rush?`<p style="margin-top:5px"><b style="color:var(--body2)">${l.side==="FADE"?"They lean on it":"They use it"}:</b> ${l.rush.att} rush att/gm · ${Math.round(l.rush.rate*100)}% run rate last season</p>`:""}
     ${l.rb?`<p style="margin-top:3px"><b style="color:var(--body2)">${l.side==="FADE"?"The back to fade":"The back"}:</b> ${esc(l.rb.name)} — ${l.rb.yds.toLocaleString()} yds on ${l.rb.car} carries (${l.rb.ypc} YPC) last year</p>`:""}
-    </div></div>`;
+    ${l.rb&&l.line==null?`<p style="margin-top:3px;color:var(--faint);font-size:10.5px">No rushing-prop line posted yet for this game — books price the bigger slates first.</p>`:""}
+    </div>${price}</div>`;
 }
 function edgeCell(e){
   if(!e) return '<span class="imp">roster data pending</span>';
