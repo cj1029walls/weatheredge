@@ -559,7 +559,7 @@
   <section class="view" id="view-method">
     <div class="method">
       <h3>Real games. Real weather. Real results.</h3>
-      <p>For every game on today's slate, we take the forecast at first pitch — temperature, wind speed and direction relative to the park's orientation, dew point, sky cover, and rain chances — and find every game played at <b>that same ballpark in similar conditions</b> since 2019.</p>
+      <p>For every game on today's slate, we take the forecast at first pitch — temperature, wind speed and direction relative to the park's orientation, dew point, sky cover, and rain chances — and find every game played at <b>that same ballpark in similar conditions</b> since 2015 (or the park's first season) — matched on temperature, wind speed and direction, and humidity via dew point.</p>
       <p>Then we simply report what actually happened in those games: how many home runs flew, how many runs scored, how many hitters struck out — and how often the game went over or under the closing total. No projections, no simulations, no black box. Just history, matched to today.</p>
       <h4>Reading the sample badge</h4>
       <div class="pill-row">
@@ -860,7 +860,7 @@ function renderHero(){
       <div class="hero-tag">⚡ Edge of the day<span class="tip" data-tip="The open-air game where today's weather pushes home-run expectation furthest from that park's own average — the biggest weather signal on the slate, in either direction. Not a pick."><span class="info-i">i</span></span></div>
       <div class="hero-teams">${g.away} <span class="at">@</span> ${g.home}</div>
       <div class="hero-meta">${g.time} · ${g.park}</div>
-      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>rain <b>${g.rain}%</b></span>`:""}<span class="sample tip" data-tip="Matched games at this park since 2019 with weather like today's (±6° temp, ±6 mph wind, same wind direction — the window widens if fewer than 12 match). Strong = 40+, Fair = 15–39, Limited = under 15."><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}<span class="info-i">i</span></span></div>
+      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${g.windLabel.toLowerCase()}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>rain <b>${g.rain}%</b></span>`:""}<span class="sample tip" data-tip="Matched games at this park since 2015 with weather like today's (±6° temp, ±6 mph wind, similar dew point, same wind direction — the window widens, dew band first, if fewer than 12 match). Strong = 40+, Fair = 15–39, Limited = under 15."><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}<span class="info-i">i</span></span></div>
       <div class="hero-imp">
         <div class="hi-row"><span class="l">Home runs</span>${heroBar(g.hr)}<span class="hi-val ${cls(g.hr)}">${pct(g.hr)}</span></div>
         <div class="hi-row"><span class="l">Runs</span>${heroBar(g.runs)}<span class="hi-val ${cls(g.runs)}">${pct(g.runs)}</span></div>
@@ -1086,14 +1086,14 @@ function intelSec(g){
 function umpBlock(g){
   if(!g.ump) return "";
   const u = g.ump;
-  const tipTxt = "Tonight's home-plate umpire and what has actually happened in his games since 2019 — strikeouts, runs, and homers per game vs the league average. Zone size is real: some umps run K's several percent above or below the norm.";
+  const tipTxt = "Tonight's home-plate umpire and what has actually happened in his games since 2015 — strikeouts, runs, and homers per game vs the league average. Zone size is real: some umps run K's several percent above or below the norm.";
   const body = (u.n==null)
     ? `<div class="p-all">Newer umpire — no 30+ game history in our data yet.</div>`
     : `<div class="p-nums">
         <span class="${cls(u.dSo)}"><b>${pct(u.dSo)}</b> K's</span>
         <span class="${cls(u.dR)}"><b>${pct(u.dR)}</b> runs</span>
         <span class="${cls(u.dHr)}"><b>${pct(u.dHr)}</b> HR</span>
-        <span class="p-n">${u.n} games behind the plate since 2019 · ${u.so} K/gm, ${u.r} runs/gm in his games vs league avg</span>
+        <span class="p-n">${u.n} games behind the plate since 2015 · ${u.so} K/gm, ${u.r} runs/gm in his games vs league avg</span>
       </div>`;
   return `<div class="sub-h">Behind the plate<span class="tip" data-tip="${tipTxt}"><span class="info-i">i</span></span></div>
     <div class="p-card"><div class="p-side">HP UMP</div><div><div class="p-name">${u.name}</div>${body}</div></div>`;
@@ -1103,7 +1103,18 @@ function umpBlock(g){
 function windFxChip(g){
   if(g.dome || !g.windFx) return "";
   const f = g.windFx;
-  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS PARK: <b>${f.rating}</b> — 10 mph blowing out ${f.pct10>=0?"adds":"cuts"} ~${Math.abs(f.pct10)}% HR here historically<span class="tip" data-tip="How much wind actually matters at this stadium, measured from every game here since 2019: the relationship between outward wind (toward center field) and home runs. Open, exposed parks rate HIGH or EXTREME; wind-shielded stadiums rate LOW."><span class="info-i">i</span></span></div>`;
+  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS PARK: <b>${f.rating}</b> — 10 mph blowing out ${f.pct10>=0?"adds":"cuts"} ~${Math.abs(f.pct10)}% HR here historically<span class="tip" data-tip="How much wind actually matters at this stadium, measured from every game here since 2015: the relationship between outward wind (toward center field) and home runs. Open, exposed parks rate HIGH or EXTREME; wind-shielded stadiums rate LOW."><span class="info-i">i</span></span></div>`;
+}
+function tempFxChip(g){
+  const f=g.tempFx;
+  if(!f||g.dome) return "";
+  return `<div class="windfx fx-${f.rating.toLowerCase()}">HEAT FACTOR AT THIS PARK: <b>${f.rating}</b> — 10°F warmer ${f.pct10>=0?"adds":"cuts"} ~${Math.abs(f.pct10)}% HR here historically<span class="tip" data-tip="Warm air is less dense, so the same batted ball carries farther — but how much that matters varies by stadium. Measured from every game here since 2015: the relationship between game-time temperature and home runs at this park."><span class="info-i">i</span></span></div>`;
+}
+function dewChip(g){
+  if(g.dome||g.dew==null) return "";
+  if(g.dew>=68) return `<div class="windfx fx-medium">HUMID AIR TONIGHT: dew point ${g.dew}° — humid air is <b>less</b> dense than dry air, a slight extra-carry tailwind for hitters<span class="tip" data-tip="Counterintuitive but real: water vapor is lighter than the nitrogen and oxygen it displaces, so muggy air offers slightly less drag on a batted ball. A secondary factor — temperature and wind matter more — and it's part of how we match tonight to similar past games."><span class="info-i">i</span></span></div>`;
+  if(g.dew<=42) return `<div class="windfx fx-low">DRY AIR TONIGHT: dew point ${g.dew}° — dry air is denser, a touch more drag on fly balls<span class="tip" data-tip="Dry air packs more of the heavier nitrogen and oxygen molecules, adding drag. A secondary factor — temperature and wind matter more — and it's part of how we match tonight to similar past games."><span class="info-i">i</span></span></div>`;
+  return "";
 }
 
 /* ---------- rain history section (modal) ---------- */
@@ -1122,7 +1133,7 @@ function rainSec(g){
     <div class="rain-cmp">Wet games at this park average <b>${rh.wet.r.toFixed(1)} runs</b> and <b>${rh.wet.hr.toFixed(1)} HR</b>,
     vs <b>${rh.dry.r.toFixed(1)} runs</b> / <b>${rh.dry.hr.toFixed(1)} HR</b> when dry —
     against today's total of <b>${g.total?g.total.toFixed(1):"—"}</b>.
-    A wet game = measurable rain during the game window since 2019.</div>
+    A wet game = measurable rain during the game window since 2015.</div>
   </div>`;
 }
 
@@ -1526,12 +1537,12 @@ function openModal(g){
         </div>
         ${hourlyStrip(g)}
         ${delayChip(g)}
-        ${windFxChip(g)}
+        ${windFxChip(g)}${tempFxChip(g)}${dewChip(g)}
       </div>
       <div class="m-sec">
         <h5>Weather impact vs ${g.park.split("·")[0].trim()}<span class="tip" data-tip="How the matched similar-weather sample compares to this park's own all-conditions average. Every park plays differently, so this is the sharpest signal."><span class="info-i">i</span></span></h5>
         <div class="m-tiles">${mTiles}</div>
-        <div class="league-row">On a league-wide scale (all parks, all games): HR <b class="${cls(g.mlb.hr)}">${pct(g.mlb.hr)}</b> · Runs <b class="${cls(g.mlb.runs)}">${pct(g.mlb.runs)}</b> · K's <b class="${cls(g.mlb.ks)}">${pct(g.mlb.ks)}</b> vs MLB average<span class="tip" data-tip="The same matched games measured against the league-wide average since 2019 — park and weather combined, so you can compare games across the whole slate on one scale."><span class="info-i">i</span></span></div>
+        <div class="league-row">On a league-wide scale (all parks, all games): HR <b class="${cls(g.mlb.hr)}">${pct(g.mlb.hr)}</b> · Runs <b class="${cls(g.mlb.runs)}">${pct(g.mlb.runs)}</b> · K's <b class="${cls(g.mlb.ks)}">${pct(g.mlb.ks)}</b> vs MLB average<span class="tip" data-tip="The same matched games measured against the league-wide average since 2015 — park and weather combined, so you can compare games across the whole slate on one scale."><span class="info-i">i</span></span></div>
       </div>
       ${intelSec(g)}
       ${rainSec(g)}
