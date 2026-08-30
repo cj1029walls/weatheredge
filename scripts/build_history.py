@@ -25,7 +25,9 @@ from parks import PARKS, RETRO_TO_CODE, wind_rel_angle
 
 print = functools.partial(print, flush=True)   # live logs on CI
 
-SEASONS = list(range(2019, date.today().year))   # completed seasons only
+SEASONS = list(range(2015, date.today().year))   # completed seasons only
+# v5: 2019 -> 2015. Per-park qualification still governed by parks.py 'since'
+# (ATL 2017, TEX 2020, ATH 2025), so no park inherits another stadium's games.
 OUT = os.path.join(os.path.dirname(__file__), "..", "data", "parks_history.json")
 UMPS_OUT = os.path.join(os.path.dirname(__file__), "..", "data", "umps_history.json")
 
@@ -105,7 +107,7 @@ def season_games(year):
         if year < meta["since"] or year in meta["exclude"]:
             continue
         kept.append((code, d, dn, runs, hr, so))
-    # Sanity: league HR totals per full season have been ~4400-7000 since 2019.
+    # Sanity: league HR totals per full season have been ~4200-7000 since 2015.
     if year != 2020 and not (3500 < total_hr < 8000):
         raise SystemExit(f"SANITY FAIL {year}: parsed league HR total {total_hr} — "
                          "Retrosheet field layout may have changed; aborting.")

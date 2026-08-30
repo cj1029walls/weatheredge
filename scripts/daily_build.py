@@ -128,19 +128,29 @@ def roof_closed(meta, temp, precip_prob):
         return temp >= 95 or temp <= 48 or (precip_prob or 0) >= 45
     return False
 
-def match_games(hist, temp, wind, rel, dome):
-    """Adaptive similar-conditions matching. Returns (rows, note)."""
+def match_games(hist, temp, wind, rel, dome, dew=None):
+    """Adaptive similar-conditions matching. Returns (rows, note).
+
+    v5: dew point joins the match on the tightest rungs — humid air is LESS
+    dense than dry air (H2O displaces heavier N2/O2), a real if secondary
+    carry factor. The dew band is the first constraint relaxed when samples
+    thin, so it sharpens matches without starving them."""
     games = hist["games"]
     if dome:
         return games, "all games at this park (roof closed → weather-neutral)"
     sect = wind_sector(rel)
-    for dt, dw, use_sector in ((6, 6, True), (8, 8, True), (10, 10, True), (12, 99, False)):
+    for dt, dw, ddew, use_sector in ((6, 6, 8, True), (8, 8, 12, True),
+                                     (10, 10, 99, True), (12, 99, 99, False)):
         rows = [g for g in games
                 if abs(g["t"] - temp) <= dt
                 and abs(g["w"] - wind) <= dw
+                and (dew is None or ddew > 90 or g.get("dew") is None
+                     or abs(g["dew"] - dew) <= ddew)
                 and (not use_sector or wind_sector(g["rel"]) == sect)]
         if len(rows) >= 12:
-            note = f"±{dt}° temp, ±{dw} mph, wind {sect}" if use_sector else f"±{dt}° temp (widened)"
+            note = (f"±{dt}° temp, ±{dw} mph, wind {sect}"
+                    + (f", ±{ddew}° dew" if dew is not None and ddew <= 90 else "")
+                    if use_sector else f"±{dt}° temp (widened)")
             return rows, note
     return rows, "small sample — widest window"
 
@@ -188,6 +198,28 @@ def wind_receptivity(hist):
     pct10 = round(slope * 10 / my * 100)
     a = abs(pct10)
     rating = "LOW" if a < 5 else "MEDIUM" if a < 12 else "HIGH" if a < 25 else "EXTREME"
+    return dict(rating=rating, pct10=pct10)
+
+def heat_receptivity(hist):
+    """Regress HR on game-time temperature across the park's history.
+    Returns (rating, pct10) — pct10 = HR change per 10°F of warmth. The
+    physics: warm air is less dense, so the same batted ball carries farther;
+    how much that matters varies by park (altitude, dimensions, exposure)."""
+    import math
+    games = [g for g in hist["games"] if g.get("t") is not None]
+    if len(games) < 200:
+        return None
+    xs = [g["t"] for g in games]
+    ys = [g["hr"] for g in games]
+    n = len(xs)
+    mx, my = sum(xs) / n, sum(ys) / n
+    sxx = sum((x - mx) ** 2 for x in xs)
+    if not sxx or not my:
+        return None
+    slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sxx
+    pct10 = round(slope * 10 / my * 100)
+    a = abs(pct10)
+    rating = "LOW" if a < 4 else "MEDIUM" if a < 8 else "HIGH" if a < 14 else "EXTREME"
     return dict(rating=rating, pct10=pct10)
 
 # ---- conditions MVP: each team's hottest bat in this weather ----
@@ -437,7 +469,7 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
                    total=0, matches=[], note="history not built yet")
         return out
 
-    rows, note = match_games(hist, temp, wind, rel, dome)
+    rows, note = match_games(hist, temp, wind, rel, dome, dew)
     n = len(rows)
     m_hr = statistics.mean(x["hr"] for x in rows) if rows else 0
     m_r = statistics.mean(x["r"] for x in rows) if rows else 0
@@ -505,6 +537,7 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
     # plate umpire + park wind receptivity
     out["ump"] = ump_card(g, umps_all)
     out["windFx"] = None if (dome or not hist) else wind_receptivity(hist)
+    out["tempFx"] = None if (dome or not hist) else heat_receptivity(hist)
     return out
 
 def archive_predictions(date_str, games):
