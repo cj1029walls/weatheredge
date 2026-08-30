@@ -266,6 +266,8 @@ def build_tier2(games):
     pen_by_game = {}
     kickers = {}
     qbs = {}
+    rbs = {}    # v6: rusher per-game rushing lines  -> weather splits
+    wrs = {}    # v6: receiver per-game reception lines -> weather splits
     seasons_ok = []
     for y in SEASONS:
         try:
@@ -337,6 +339,34 @@ def build_tier2(games):
                             q["td"] += 1
                         if it:
                             q["i"] += 1
+                # RB rushing (per game aggregation)
+                nm = col(row, "rusher_player_name")
+                if nm and col(row, "play_type") == "run":
+                    rr = rbs.setdefault(nm, {"_team": (0, "")})
+                    if col(row, "posteam") and y >= rr["_team"][0]:
+                        rr["_team"] = (y, col(row, "posteam"))
+                    q = rr.setdefault(gid, dict(att=0, yds=0.0, td=0))
+                    q["att"] += 1
+                    try:
+                        q["yds"] += float(col(row, "rushing_yards") or 0)
+                    except ValueError:
+                        pass
+                    if col(row, "rush_touchdown") == "1":
+                        q["td"] += 1
+                # receiver targets / receptions (per game aggregation)
+                nm = col(row, "receiver_player_name")
+                if nm:
+                    ww = wrs.setdefault(nm, {"_team": (0, "")})
+                    if col(row, "posteam") and y >= ww["_team"][0]:
+                        ww["_team"] = (y, col(row, "posteam"))
+                    q = ww.setdefault(gid, dict(tgt=0, rec=0, yds=0.0))
+                    q["tgt"] += 1
+                    if col(row, "complete_pass") == "1":
+                        q["rec"] += 1
+                        try:
+                            q["yds"] += float(col(row, "receiving_yards") or 0)
+                        except ValueError:
+                            pass
             seasons_ok.append(y)
             print(f"  pbp {y}: {n_plays} plays")
         except Exception as e:
@@ -427,8 +457,74 @@ def build_tier2(games):
         if "cold" in entry or "windy" in entry:
             entry["team"] = team
             qb_out[nm] = entry
+    # v6: RB rushing weather splits (real-workload games only)
+    rb_out = {}
+    for nm, by_game in rbs.items():
+        team = by_game.get("_team", (0, ""))[1]
+        rows = []
+        for gid, q in by_game.items():
+            if gid == "_team":
+                continue
+            g = by_id.get(gid)
+            if g is None or q["att"] < 8:
+                continue
+            rows.append((g, q))
+        if len(rows) < 12 or not any(g["season"] >= SEASONS[-2] for g, _ in rows):
+            continue
+        def ragg(rs):
+            n = len(rs)
+            att = sum(q["att"] for _, q in rs)
+            return dict(g=n, ypg=round(sum(q["yds"] for _, q in rs) / n, 1),
+                        attG=round(att / n, 1),
+                        ypc=round(sum(q["yds"] for _, q in rs) / att, 2) if att else None,
+                        tdG=round(sum(q["td"] for _, q in rs) / n, 2))
+        base = ragg(rows)
+        cold = [(g, q) for g, q in rows if g["outdoor"] and g["temp"] is not None and g["temp"] < COLD]
+        windy = [(g, q) for g, q in rows if g["outdoor"] and (g["wind"] or 0) >= WINDY]
+        entry = dict(base=base)
+        if len(cold) >= 3:
+            entry["cold"] = ragg(cold)
+            entry["cold"]["delta"] = round((entry["cold"]["ypg"] / base["ypg"] - 1) * 100)
+        if len(windy) >= 3:
+            entry["windy"] = ragg(windy)
+            entry["windy"]["delta"] = round((entry["windy"]["ypg"] / base["ypg"] - 1) * 100)
+        if "cold" in entry or "windy" in entry:
+            entry["team"] = team
+            rb_out[nm] = entry
+    # v6: receiver reception weather splits (real-involvement games only)
+    wr_out = {}
+    for nm, by_game in wrs.items():
+        team = by_game.get("_team", (0, ""))[1]
+        rows = []
+        for gid, q in by_game.items():
+            if gid == "_team":
+                continue
+            g = by_id.get(gid)
+            if g is None or q["tgt"] < 4:
+                continue
+            rows.append((g, q))
+        if len(rows) < 12 or not any(g["season"] >= SEASONS[-2] for g, _ in rows):
+            continue
+        def wagg(rs):
+            n = len(rs)
+            return dict(g=n, recG=round(sum(q["rec"] for _, q in rs) / n, 1),
+                        tgtG=round(sum(q["tgt"] for _, q in rs) / n, 1),
+                        ypg=round(sum(q["yds"] for _, q in rs) / n, 1))
+        base = wagg(rows)
+        cold = [(g, q) for g, q in rows if g["outdoor"] and g["temp"] is not None and g["temp"] < COLD]
+        windy = [(g, q) for g, q in rows if g["outdoor"] and (g["wind"] or 0) >= WINDY]
+        entry = dict(base=base)
+        if len(cold) >= 3:
+            entry["cold"] = wagg(cold)
+            entry["cold"]["delta"] = round((entry["cold"]["recG"] / base["recG"] - 1) * 100) if base["recG"] else 0
+        if len(windy) >= 3:
+            entry["windy"] = wagg(windy)
+            entry["windy"]["delta"] = round((entry["windy"]["recG"] / base["recG"] - 1) * 100) if base["recG"] else 0
+        if "cold" in entry or "windy" in entry:
+            entry["team"] = team
+            wr_out[nm] = entry
     return dict(seasons=seasons_ok, refsPen=refs_pen,
-                kickers=kick_out, qbs=qb_out)
+                kickers=kick_out, qbs=qb_out, rbs=rb_out, wrs=wr_out)
 
 
 def main():
@@ -442,8 +538,11 @@ def main():
                                         penYdsG=extra["penYdsG"])
         t1["kickers"] = t2["kickers"]
         t1["qbs"] = t2["qbs"]
+        t1["rbs"] = t2.get("rbs", {})
+        t1["wrs"] = t2.get("wrs", {})
         t1["pbpSeasons"] = t2["seasons"]
         print(f"tier2: {len(t2['kickers'])} kickers, {len(t2['qbs'])} QBs, "
+              f"{len(t2.get('rbs', {}))} RBs, {len(t2.get('wrs', {}))} receivers, "
               f"{len(t2['refsPen'])} refs with penalty data")
     else:
         print("tier2 skipped (pbp unreachable) — tier1 only")

@@ -246,6 +246,10 @@ def build_edge(r, away, home, deep):
                    if q.get("team") in (away, home)}
     edge["kickers"] = {nm: k for nm, k in (deep.get("kickers") or {}).items()
                        if k.get("team") in (away, home)}
+    edge["rbs"] = {nm: p for nm, p in (deep.get("rbs") or {}).items()
+                   if p.get("team") in (away, home)}
+    edge["wrs"] = {nm: p for nm, p in (deep.get("wrs") or {}).items()
+                   if p.get("team") in (away, home)}
     return edge
 
 def main():
