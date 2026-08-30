@@ -114,6 +114,7 @@
       <h1>DFS<span class="brand-rad">RADAR</span><span class="pro">PRO</span></h1>
       <div class="tagline">The PGA weekly board — <b>course history, wind pedigree, and the draw, on one card.</b> Every lean archived and graded in public.</div>
       <div class="pro-nav">
+        <a href="/pro/props/">🎯 Props</a>
         <a href="/pro/">⚾ MLB</a>
         <a href="/pro/nfl/">🏈 NFL</a>
         <a href="/pro/cfb/">🎓 CFB</a>
@@ -187,7 +188,7 @@ const ICON={"COURSE HORSE":"🐎","WIND WEEK":"💨"};
 function leanCard(l){
   return `<div class="intel-card"><div class="ic">${ICON[l.k]||"📌"}</div>
     <div style="flex:1"><span class="tag ${l.side==="FADE"?"g":""}">${esc(l.k)} · ${esc(l.side)}</span>
-    <h4>${esc(l.who)}</h4><p>${esc(l.why)}</p></div></div>`;
+    <h4>${esc(l.who)}</h4><p>${esc(l.why)}</p>${l.market?`<p style="margin-top:4px"><span style="font-size:10px;font-weight:800;background:var(--gold-bg);color:var(--gold-deep);border-radius:10px;padding:2px 8px">MARKET ${l.market.price>0?"+":""}${l.market.price} · implied ${l.market.implied}%</span> <span style="font-size:10.5px;color:var(--faint)">books' outright price — our ranking vs their number</span></p>`:""}</div></div>`;
 }
 function lastStr(rows){return (rows||[]).map(r=>`${r.y}: ${r.pos}/${r.n}`).join(" · ");}
 function render(){
