@@ -21,6 +21,8 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/nfl/weekly_build.py
+      - name: Grade PRO leans (completed weeks)
+        run: python scripts/pro/nfl_grade.py || echo "grading skipped"
       - name: Build site/pro/nfl.json (PRO weekly board)
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
@@ -29,7 +31,8 @@ jobs:
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add site/nfl/data.json site/pro/nfl.json data/pro/nfl_predictions
+          git add site/nfl/data.json site/pro/nfl.json data/pro/nfl_predictions 2>/dev/null || true
+          git add site/pro/nfl_record.json data/pro/nfl_results.json 2>/dev/null || true
           git commit -m "NFL slate refresh" || echo "no changes"
           git pull --rebase origin main
           git push

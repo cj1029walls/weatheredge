@@ -21,6 +21,8 @@ jobs:
       - name: Refresh deep history (results + archive weather)
         run: python scripts/nascar/deep_history.py || echo "deep history refresh failed — keeping last dataset"
       - name: Build PRO board (site/pro/nascar.json)
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pro/nascar_build.py
       - name: Commit data
         run: |

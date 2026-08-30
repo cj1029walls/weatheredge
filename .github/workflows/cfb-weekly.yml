@@ -28,6 +28,7 @@ jobs:
       - name: Build PRO Trench Edge board (site/pro/cfb.json)
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pro/cfb_build.py || echo "trench board skipped — using last committed board"
       - name: Commit slate data
         run: |
