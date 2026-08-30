@@ -260,7 +260,7 @@ def fetch_props(week_rows):
                         continue
                     kk = (f"{a}@{h}", mk.get("key"), norm_name(oc.get("description") or ""))
                     out.setdefault(kk, []).append(
-                        dict(side=oc.get("name"), point=oc["point"], price=oc.get("price")))
+                        dict(side=oc.get("name"), point=oc.get("point"), price=oc.get("price")))
     print(f"props: priced {len(out)} (game, market, player) combos from {used} events")
     return out
 
