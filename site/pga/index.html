@@ -19,27 +19,29 @@
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
 
 <meta name="description" content="Golf weather for this week's PGA Tour event: round-by-round forecasts and AM vs PM tee-time wave splits — when half the field plays a different golf course, we quantify it.">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%2322d3ee" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23a5f3fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 <style>
   :root{
-    --navy:#152451; --navy2:#24409c; --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
-    --green:#178a3f; --green-deep:#10682e; --green-bg:#e6f5eb;
-    --red:#d33131; --red-deep:#a92525; --red-bg:#fdecec;
-    --blue:#5b6b83; --blue-deep:#47566d; --blue-bg:#edf0f5;
-    --gold:#2f62e8; --gold-deep:#2450b8; --gold-bg:#e8eefc;
-    --amber-bg:#fdf5e3;
-    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#fff; --line:#e4e8ef;
-    --line-strong:#c3cde0; --body2:#3e4a5e;
-    --note-bg:#fdf5e3; --note-border:#f0dfb2; --note-text:#8a6207;
+    --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
+    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15);
+    --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
+    --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
+    --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
+    --amber-bg:rgba(251,191,36,.15);
+    --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
+    --line-strong:#57627A; --body2:#C7CEDC;
+    --note-bg:rgba(251,191,36,.12); --note-border:rgba(251,191,36,.32); --note-text:#fbbf24;
     --radius:14px;
-    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
-    --shadow-hover:0 2px 4px rgba(21,36,81,.08),0 10px 28px rgba(21,36,81,.13);
+    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
+    --shadow-hover:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
-  .announce{background:linear-gradient(90deg,#0e1a3d,#2450b8 55%,#0e1a3d);color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;padding:8px 14px}
+  body{font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
+  .announce{background:linear-gradient(90deg,#252A35,#2450b8 55%,#252A35);color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;padding:8px 14px}
   .announce b{color:#fff}
-  .announce .soon{display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ffd94a}
+  .announce .soon{display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#F08A3C}
   header{position:relative;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 22px}
   .header-inner{max-width:1100px;margin:0 auto}
   .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -48,13 +50,13 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#e8c877;font-weight:600}
+  .brand .tagline b{color:#FFA05A;font-weight:600}
   .sport-tabs{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
   .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .protab{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451 !important;border-color:transparent;font-weight:800}
+  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a !important;border-color:transparent;font-weight:800}
   .sport-tabs .protab:hover{filter:brightness(1.06)}
-  .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  .sport-tabs .on{background:var(--card);color:var(--navy);border-color:#fff}
   .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
   @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
@@ -72,8 +74,8 @@
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
-  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;animation:bpulse 2.2s ease-in-out infinite}
+  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:bpulse 2.2s ease-in-out infinite}
   @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
   .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
   .brief-body b{color:#fff}
@@ -111,8 +113,8 @@
   .wave-edge{margin-top:9px;font-size:11.5px;font-weight:700;background:var(--gold-bg);color:var(--gold-deep);border-radius:9px;padding:7px 10px;line-height:1.5}
   .r-out{margin-top:9px;font-size:11px;font-weight:700;letter-spacing:.4px;border-radius:8px;padding:5px 9px;display:inline-block}
   .dl-clear{background:var(--green-bg);color:var(--green-deep)}
-  .dl-watch{background:var(--amber-bg);color:#8a6207}
-  .dl-likely{background:#fdeee0;color:#b45309}
+  .dl-watch{background:var(--amber-bg);color:#fbbf24}
+  .dl-likely{background:#3a2f24;color:#f59e0b}
   .dl-severe{background:var(--red-bg);color:var(--red-deep)}
   .out-window{color:var(--muted);font-size:12.5px;margin-top:12px}
   .ondeck{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
@@ -125,6 +127,21 @@
   .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
   .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
   footer{max-width:1100px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--faint);text-align:center}
+
+  /* ===== DFS Kitchen family — cyan-forward chrome (appended) ===== */
+  .brand h1 .brand-rad{color:#22d3ee}
+  .sport-tabs .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
+  nav button.active{box-shadow:inset 0 -2px 0 #22d3ee}
+  .controls h2,.method h4,.sub-h,.hist-table th{color:#67e8f9}
+  .sum-card{border-top:2px solid rgba(34,211,238,.55)}
+  .sum-card:hover,.b-row:hover,.wxc:hover,.p-card:hover{border-color:rgba(34,211,238,.5)}
+  .hero-tag{color:#67e8f9;background:rgba(34,211,238,.14)}
+  .brief-card::after{border-color:rgba(34,211,238,.30)!important;box-shadow:0 0 0 38px rgba(34,211,238,.06),0 0 0 80px rgba(34,211,238,.04)!important}
+  .brief-head{color:#67e8f9}
+  a{color:#67e8f9}
+  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
+  :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
+  .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
 </style>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
@@ -146,8 +163,8 @@
           <g><path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
           <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
           <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
-          <circle cx="29.5" cy="13.5" r="2.3" fill="#ffd94a"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#6ee7a0"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
+          <circle cx="13" cy="28.5" r="1.9" fill="#4ade80"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
         </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">PGA</span></h1>
         <div class="tagline">Golf weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
@@ -286,7 +303,7 @@ function holeFlagTex(txt){
   const c=document.createElement("canvas");c.width=200;c.height=120;
   const x=c.getContext("2d");
   x.fillStyle="#f4f6fa";x.fillRect(0,0,200,120);
-  x.fillStyle="#152451";x.font="800 74px -apple-system,Segoe UI,Arial";
+  x.fillStyle="#08222a";x.font="800 74px -apple-system,Segoe UI,Arial";
   x.textBaseline="middle";x.textAlign="center";x.fillText(txt,100,64);
   return new THREE.CanvasTexture(c);
 }
