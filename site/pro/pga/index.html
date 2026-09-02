@@ -167,6 +167,9 @@
   <div class="sec-h" style="margin-top:18px">Recent form — last 5 starts</div>
   <div id="form-board"></div>
 
+  <div class="sec-h" style="margin-top:18px">The record — every lean graded against the final leaderboard</div>
+  <div class="m-sec" id="pga-record"><p class="split-note">A COURSE HORSE is scored on one bar: <b>a top-20 finish</b>. Grades post the day after each event ends — every lean above is already archived.</p></div>
+
   <div class="m-sec" style="margin-top:18px">
     <h5>How the PGA board works</h5>
     <p>Player results for every PGA Tour event since 2018, with every finish expressed as a field percentile (winning a 156-man open ≠ 20th of 30 at East Lake). <b>Course history</b> ranks players by their shrunk average percentile at this exact event — small samples get pulled toward the field median so a one-start fluke can't top the board. <b>Wind pedigree</b> rebuilds past event-week weather from the archive, tags each edition windy or calm (12+ mph average daytime wind), and measures who holds up when it blows — those leans activate only when this week's forecast is windy. <b>Wave splits</b> from the free radar carry forward so the draw edge sits on the same card. Every lean is archived the moment it posts and graded against the final leaderboard. Historical records are tendencies, not guarantees; sample sizes are shown on every number.</p>
@@ -213,14 +216,29 @@ function render(){
     <tr><td>${i+1}</td><td><div class="pname">${esc(f.player)}</div></td><td><b>${f.score}</b></td>
     <td class="hide-m"><span class="imp">${(f.last||[]).map(r=>`${r.pos}/${r.n}`).join(" · ")}</span></td></tr>`).join("")}</tbody></table>`;
 }
+function renderPGARecord(R){
+  if(!R||!R.summary||!R.summary.overall||!R.summary.overall.n) return;
+  const S=R.summary;
+  const chip=(lab,r)=>r&&r.n?`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${r.w}–${r.n-r.w}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`:"";
+  const stat=(lab,v)=>v==null?"":`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${v}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`;
+  const events=(R.recent||[]).map(e=>{
+    const rows=e.leans.map(l=>`<tr><td><span class="chip ${l.hit?"hot":""}">${l.hit?"HIT":"MISS"}</span></td>
+      <td><b>${esc(l.who)}</b><div class="imp">${esc(l.k)}</div></td>
+      <td>finished <b>${l.pos}</b>${l.field?` of ${l.field}`:""}</td></tr>`).join("");
+    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(e.event)}</b>${e.date?` · ${esc(e.date)}`:""}</div><table><tbody>${rows}</tbody></table>`;
+  }).join("");
+  document.getElementById("pga-record").innerHTML=
+    `<div>${chip("all graded leans",S.overall)}${chip("course horses",S.courseHorse)}${stat("avg finish",S.avgFinish)}${stat("wins",S.wins)}${stat("top 5s",S.top5)}</div>
+     <p class="split-note">Bar: <b>${esc(S.bar)}</b>. A player who never teed off is left ungraded rather than counted as a loss.</p>${events}`;
+}
 async function load(){
   try{const r=await fetch("/pro/pga.json?_="+Date.now()); if(!r.ok) return; D=await r.json(); render();}catch(e){}
+  try{const rr=await fetch("/pro/pga_record.json?_="+Date.now()); if(rr.ok) renderPGARecord(await rr.json());}catch(e){}
 }
-load();
 
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null;
+let GATED=null, LOADED=false;
 function msReady(timeout=6000){
   return new Promise(res=>{
     const t0=Date.now();
@@ -243,6 +261,9 @@ async function gate(){
     }
   }catch(e){}
   GATED=ok;
+  /* PRO data is fetched only once the gate says this visitor is a member —
+     never before it resolves, and never for a logged-out visitor. */
+  if(ok&&!LOADED){ LOADED=true; load(); }
   document.getElementById("pro-app").style.display=ok?"block":"none";
   document.getElementById("paywall").style.display=ok?"none":"block";
   const bar=document.getElementById("member-bar");
