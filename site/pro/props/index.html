@@ -400,10 +400,9 @@ async function loadHub(){
   feed.innerHTML=html||`<div class="split-note">Boards are rebuilding — check back in a few minutes.</div>`;
   document.getElementById("proto-note").innerHTML=`🎯 <span><b>Live</b> — ${total} targets across every in-season board · one PRO subscription covers all of it.</span>`;
 }
-loadHub();
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null;
+let GATED=null, LOADED=false;
 function msReady(timeout=6000){
   return new Promise(res=>{
     const t0=Date.now();
@@ -426,6 +425,9 @@ async function gate(){
     }
   }catch(e){}
   GATED=ok;
+  /* PRO data is fetched only once the gate says this visitor is a member —
+     never before it resolves, and never for a logged-out visitor. */
+  if(ok&&!LOADED){ LOADED=true; loadHub(); }
   document.getElementById("pro-app").style.display=ok?"block":"none";
   document.getElementById("paywall").style.display=ok?"none":"block";
   const bar=document.getElementById("member-bar");
