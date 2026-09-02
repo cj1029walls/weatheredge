@@ -20,6 +20,8 @@ jobs:
         run: python scripts/pga/weekly_build.py
       - name: Refresh deep history (results + archive weather)
         run: python scripts/pga/deep_history.py || echo "deep history refresh failed — keeping last dataset"
+      - name: Grade PRO leans (completed events)
+        run: python scripts/pro/pga_grade.py || echo "grading skipped"
       - name: Build PRO board (site/pro/pga.json)
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
@@ -28,7 +30,8 @@ jobs:
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add site/pga/data.json site/pro/pga.json data/pga data/pro/pga_predictions
+          git add site/pga/data.json site/pro/pga.json site/pro/pga_record.json \
+                  data/pga data/pro/pga_predictions data/pro/pga_results.json
           git commit -m "PGA refresh" || echo "no changes"
           git pull --rebase origin main
           git push

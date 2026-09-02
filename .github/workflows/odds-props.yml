@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 15 * * *"    # ~11 AM ET — morning lines
-    - cron: "0 21 * * *"    # ~5 PM ET — pre-slate refresh
+    - cron: "40 20 * * *"   # ~4:40 PM ET — lands before daily.yml's 21:00 run
+                            # (they collided on 21:00 and raced for the same ref)
 
 permissions:
   contents: write

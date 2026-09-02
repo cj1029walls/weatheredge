@@ -43,10 +43,23 @@ jobs:
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/predictions data/accuracy.json data/pro 2>/dev/null || true
-          git commit -m "Archive predictions / update accuracy" || echo "no changes"
-          git pull --rebase origin main || true
-          git push || echo "push skipped"
+          # site/pro/props.json is TRACKED and rewritten by the odds step above.
+          # Leaving it unstaged made every `git pull --rebase` abort on a dirty
+          # worktree, so the push was never rebased — and both failures were
+          # masked, silently discarding the day's archive and grades.
+          git add data/predictions data/accuracy.json data/pro site/pro/props.json
+          git commit -m "Archive predictions / update accuracy" \
+            || { echo "no changes to commit"; exit 0; }
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push; then
+              echo "archive pushed on attempt $i"
+              exit 0
+            fi
+            echo "push attempt $i failed (remote moved) — retrying"
+            sleep $((i * 6))
+          done
+          echo "::error::archive push failed after 5 attempts — predictions and accuracy grades were NOT saved"
+          exit 1
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
