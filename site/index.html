@@ -20,41 +20,47 @@
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
 
 <meta name="description" content="Free MLB weather edges for DFS and home run props: tonight's forecast at every park, how scoring changes in these exact conditions, umpire HR tendencies, and real over/under history. Scan the slate. Find the edge.">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%23152451"/><circle cx="22" cy="22" r="16" fill="none" stroke="%238fa8d8" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%235d75ab" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%235d75ab" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%237ea2ff" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23cfe0ff" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23ffd94a"/><circle cx="22" cy="22" r="1.8" fill="%23e7eeff"/></svg>'>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%2322d3ee" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23a5f3fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 <style>
   :root{
-    /* "Blueprint" — locked palette: cobalt-indigo + royal blue accent,
-       green/red impact language, slate under, amber bolt */
-    --navy:#152451; --navy2:#24409c; --navy3:#3a5bc4;
-    --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
-    --green:#178a3f; --green-deep:#10682e; --green-bg:#e6f5eb; --green-bg2:#d5efdd;
-    --red:#d33131; --red-deep:#a92525; --red-bg:#fdecec; --red-bg2:#f9dbdb;
-    /* under / neutral-cool = slate */
-    --blue:#5b6b83; --blue-deep:#47566d; --blue-bg:#edf0f5;
-    --purple:#5b6b83; --purple-bg:#edf0f5;
-    /* over / brand accent = royal blue */
-    --gold:#2f62e8; --gold-deep:#2450b8; --gold-bg:#e8eefc;
-    --info:#2f62e8;
-    --amber:#e0a11d; --amber-bg:#fdf5e3;
-    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#ffffff; --line:#e4e8ef;
-    --line-strong:#c3cde0; --hover:#f0f4fb; --body2:#3e4a5e;
-    --note-bg:#fdf5e3; --note-border:#f0dfb2; --note-text:#8a6207;
-    --ou1:#4a79f2; --ou2:#2450b8;
-    --bolt1:#f5b52e; --bolt2:#d98a12;
-    --meterp1:#5fbf8a; --meterp2:#178a3f; --metern1:#d33131; --metern2:#eda3a3;
+    /* DFS Kitchen family theme — DFSRADAR wears cyan (its family color);
+       orange is reserved for family currency (PRO / All-Access).
+       green = HR-boost / positive, red = suppress / negative, amber = small sample.
+       Token NAMES are kept from the old light palette so every var() reference
+       flips at once; only the values change to the dark family surfaces. */
+    --navy:#2E3440; --navy2:#3A4356; --navy3:#454E61;
+    --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
+    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15); --green-bg2:rgba(34,197,94,.24);
+    --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15); --red-bg2:rgba(248,113,113,.24);
+    /* under / neutral-cool = slate-blue (kept distinct from red impact language) */
+    --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
+    --purple:#9bb6d6; --purple-bg:rgba(155,182,214,.14);
+    /* over / product accent = radar cyan */
+    --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
+    --info:#22d3ee;
+    --amber:#fbbf24; --amber-bg:rgba(251,191,36,.15);
+    --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
+    --line-strong:#57627A; --hover:#3C4455; --body2:#C7CEDC;
+    --note-bg:rgba(251,191,36,.12); --note-border:rgba(251,191,36,.32); --note-text:#fbbf24;
+    --ou1:#22d3ee; --ou2:#0ea5c4;
+    --bolt1:#fbbf24; --bolt2:#d97706;
+    --meterp1:#4ade80; --meterp2:#22c55e; --metern1:#f87171; --metern2:#b91c1c;
+    --on-accent:#08222a;
     --radius:14px;
-    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
-    --shadow-hover:0 2px 4px rgba(21,36,81,.08),0 10px 28px rgba(21,36,81,.13);
+    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
+    --shadow-hover:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--surface); color:var(--ink); line-height:1.45;
   }
   /* ---------- announce strip ---------- */
   .announce{
-    background:linear-gradient(90deg,#0e1a3d,#2450b8 55%,#0e1a3d);
+    background:linear-gradient(90deg,#252A35,#2450b8 55%,#252A35);
     color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;
     padding:8px 14px;
   }
@@ -62,7 +68,7 @@
   .announce .soon{
     display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);
     border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;
-    font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ffd94a;
+    font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#F08A3C;
   }
   /* ---------- info tooltips ---------- */
   .tip{position:relative;cursor:help}
@@ -100,24 +106,24 @@
   .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#e8c877;font-weight:600}
+  .brand .tagline b{color:#FFA05A;font-weight:600}
   .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
   .sport-tabs{display:flex;gap:6px;margin-top:14px}
   .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .on{background:#fff;color:var(--navy);border-color:#fff}
+  .sport-tabs .on{background:var(--gold-bg);color:var(--gold-deep);border-color:rgba(34,211,238,.45)}
   .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
   @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
-  .sport-tabs .protab{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451 !important;border-color:transparent;font-weight:800}
-  .sport-tabs .protab:hover{filter:brightness(1.06);color:#152451}
-  .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,#0e1a3d,var(--navy2));border-left:4px solid #ffd94a;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .pro-card .px-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ffd94a}
+  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a !important;border-color:transparent;font-weight:800}
+  .sport-tabs .protab:hover{filter:brightness(1.06);color:#08222a}
+  .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,#252A35,var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
+  .pro-card .px-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
   .pro-card .px-t{font-size:14px;color:#dde5f5;margin-top:3px}
   .pro-card .px-t b{color:#fff}
   .pro-card .px-s{font-size:11px;color:#8b98b8;margin-top:2px}
   .pro-card .px-btns{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-  .pro-card .px-go{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,217,74,.3)}
+  .pro-card .px-go{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,217,74,.3)}
   .pro-card .px-go:hover{filter:brightness(1.06)}
   .pro-card .px-login{color:#aeb9cf;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:22px;padding:8px 16px}
   .pro-card .px-login:hover{color:#fff;border-color:rgba(255,255,255,.5)}
@@ -146,24 +152,24 @@
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
 
   /* ---- PRO live ticker ---- */
-  .ticker-wrap{background:#0a1330;border-bottom:1px solid rgba(255,217,74,.25);overflow:hidden;white-space:nowrap;position:relative;cursor:pointer}
+  .ticker-wrap{background:#252A35;border-bottom:1px solid rgba(255,217,74,.25);overflow:hidden;white-space:nowrap;position:relative;cursor:pointer}
   .ticker{display:inline-block;padding:7px 0;animation:tick 60s linear infinite;will-change:transform}
   .ticker-wrap:hover .ticker{animation-play-state:paused}
   @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
   .tk{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#c9d4ea;margin:0 26px}
   .tk b{color:#fff}
-  .tk .gold{color:#ffd94a}
-  .tk .grn{color:#6ee7a0}
-  .tk .tag{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:9px;font-weight:800;letter-spacing:1px;border-radius:8px;padding:1.5px 7px}
-  .tk.live b{color:#6ee7a0}
+  .tk .gold{color:#F08A3C}
+  .tk .grn{color:#4ade80}
+  .tk .tag{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:9px;font-weight:800;letter-spacing:1px;border-radius:8px;padding:1.5px 7px}
+  .tk.live b{color:#4ade80}
   /* ---- PRO teaser card ---- */
-  .pro-tease{background:linear-gradient(120deg,#0e1a3d,#24409c);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 20px;margin-bottom:18px;border-left:4px solid #ffd94a}
-  .pro-tease .pt-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ffd94a}
+  .pro-tease{background:linear-gradient(120deg,#252A35,#3A4356);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 20px;margin-bottom:18px;border-left:4px solid #F08A3C}
+  .pro-tease .pt-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
   .pt-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:9px}
   .pt-main{flex:1;min-width:230px}
   .pt-name{font-size:20px;font-weight:800;color:#fff}
   .pt-sub{font-size:12px;color:#9fb0d4;margin-top:2px}
-  .pt-prob{font-size:26px;font-weight:800;color:#ffd94a}
+  .pt-prob{font-size:26px;font-weight:800;color:#F08A3C}
   .pt-prob span{font-size:12px;color:#9fb0d4;font-weight:700;display:block}
   .pt-locked{margin-top:12px}
   .pt-lock-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.09)}
@@ -172,17 +178,17 @@
   .pt-blur.b2{max-width:60%}
   .pt-lock-row .pr{font-size:12px;font-weight:800;color:#5d6f96;filter:blur(3px)}
   .pt-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .pt-go{background:linear-gradient(135deg,#ffd94a,#e8b73a);color:#152451;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
+  .pt-go{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
   .pt-go:hover{filter:brightness(1.06)}
   .pt-login{color:#c9d4ea;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:8px 16px}
   .pt-login:hover{color:#fff;border-color:#fff}
   .pt-receipts{font-size:11.5px;color:#9fb0d4}
-  .pt-receipts b{color:#6ee7a0}
+  .pt-receipts b{color:#4ade80}
 
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
-  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffd94a;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#6ee7a0;box-shadow:0 0 8px #6ee7a0;animation:bpulse 2.2s ease-in-out infinite}
+  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:bpulse 2.2s ease-in-out infinite}
   @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
   .brief-head .tip .info-i{background:rgba(255,255,255,.13);color:#c8d5f2;border-color:rgba(255,255,255,.3)}
   .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
@@ -226,7 +232,7 @@
   .hero-lean{display:flex;align-items:center;gap:12px}
   .hero-lean .txt b{display:block;font-size:16px}
   .hero-lean .txt span{font-size:12px;color:var(--muted)}
-  .hero-cta{margin-left:auto;appearance:none;border:0;background:linear-gradient(135deg,var(--ou1),var(--ou2));color:#fff;font-size:13px;font-weight:700;padding:10px 18px;border-radius:10px;cursor:pointer;letter-spacing:.3px}
+  .hero-cta{margin-left:auto;appearance:none;border:0;background:linear-gradient(135deg,var(--ou1),var(--ou2));color:var(--on-accent);font-size:13px;font-weight:800;padding:10px 18px;border-radius:10px;cursor:pointer;letter-spacing:.3px}
   .hero-cta:hover{filter:brightness(1.08)}
   /* ---------- slate board rows ---------- */
   .board{display:flex;flex-direction:column;gap:10px}
@@ -288,15 +294,15 @@
   .hr-ic{font-size:12px}
   /* delay outlook chip */
   .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
-  .dl-clear{background:var(--green-bg);color:var(--green-deep);border-color:#c4e5cf}
-  .dl-watch{background:var(--amber-bg);color:#8a6207;border-color:#eedfae}
-  .dl-likely{background:#fdeee0;color:#b45309;border-color:#f3d9b8}
-  .dl-severe{background:var(--red-bg);color:var(--red-deep);border-color:#f2c5c5}
+  .dl-clear{background:var(--green-bg);color:var(--green-deep);border-color:#3a5545}
+  .dl-watch{background:var(--amber-bg);color:#fbbf24;border-color:#4d452e}
+  .dl-likely{background:#3a2f24;color:#f59e0b;border-color:#4d3b24}
+  .dl-severe{background:var(--red-bg);color:var(--red-deep);border-color:#4d3232}
   /* wind factor chip */
   .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
   .windfx b{letter-spacing:1px}
   .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)}
-  .fx-high b{color:#d97708} .fx-extreme b{color:var(--red)}
+  .fx-high b{color:#fb923c} .fx-extreme b{color:var(--red)}
   @media(max-width:960px){
     .hero{grid-template-columns:1fr}
     .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
@@ -317,7 +323,7 @@
   .wxc-dome{font-size:12.5px;color:var(--muted);margin-top:8px}
   .wxc-foot{display:flex;flex-wrap:wrap;gap:4px;font-size:12px;color:var(--body2);margin-top:10px}
   .wxc-foot b{letter-spacing:.5px}
-  .wfx-low{color:var(--blue)} .wfx-medium{color:var(--gold-deep)} .wfx-high{color:#d97708} .wfx-extreme{color:var(--red)}
+  .wfx-low{color:var(--blue)} .wfx-medium{color:var(--gold-deep)} .wfx-high{color:#fb923c} .wfx-extreme{color:var(--red)}
   .wxc-link{margin-left:auto;color:var(--gold-deep);font-weight:700}
   /* ---------- compare table ---------- */
   .table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
@@ -386,7 +392,7 @@
   .meter .fill.pos{background:linear-gradient(90deg,var(--meterp1),var(--meterp2))}
   .meter .fill.neg{background:linear-gradient(90deg,var(--metern1),var(--metern2))}
   .p3d-dims{position:absolute;left:16px;bottom:10px;color:rgba(255,255,255,.65);font-size:11px;letter-spacing:.5px;pointer-events:none}
-  .meter .mid{position:absolute;top:-4px;bottom:-4px;left:50%;width:2px;background:#c2ccd8;border-radius:2px}
+  .meter .mid{position:absolute;top:-4px;bottom:-4px;left:50%;width:2px;background:#556074;border-radius:2px}
   .meter-val{font-size:14px;font-weight:800;text-align:right}
   .meter-val.pos{color:var(--green)} .meter-val.neg{color:var(--red)} .meter-val.neu{color:var(--muted)}
   /* history table */
@@ -422,6 +428,11 @@
     .m-tiles{grid-template-columns:1fr}
     .brand h1{font-size:22px}
   }
+  /* Kitchen family display face */
+  .brand h1,.hero-teams,.b-teams,.m-head .teams,.pt-name,.pt-prob,
+  .m-tile .t-val,.wx-item .big,.hit-box .n,.method h3,.hero-tag{
+    font-family:Sora,Ubuntu,-apple-system,sans-serif;
+  }
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"DFSRADAR","url":"https://dfsradar.com/","description":"Weather, umpire and matchup edges for daily fantasy sports across MLB, NFL, PGA and NASCAR."}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"DFSRADAR","url":"https://dfsradar.com/","logo":"https://dfsradar.com/og-card.png","sameAs":[]}</script>
@@ -451,10 +462,10 @@
             <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
             <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/>
           </g>
-          <circle cx="29.5" cy="13.5" r="2.3" fill="#ffd94a">
+          <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C">
             <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#6ee7a0">
+          <circle cx="13" cy="28.5" r="1.9" fill="#4ade80">
             <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/>
           </circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
@@ -715,7 +726,7 @@ const PARKS = {
 const TEAMS = ["ARI","ATL","BAL","BOS","CHC","CIN","CLE","COL","CWS","DET","HOU","KC","LAA","LAD","MIA","MIL","MIN","NYM","NYY","OAK","PHI","PIT","SD","SEA","SF","STL","TB","TEX","TOR","WSH"];
 
 /* ---------- wind arrow colors ---------- */
-const WIND_COLORS = {out:"#178a3f", in:"#5b6b83"};
+const WIND_COLORS = {out:"#22c55e", in:"#9bb6d6"};
 
 /* ---------- helpers ---------- */
 function mulberry32(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -729,12 +740,12 @@ function parkSVG(g, size){
   const s = size, c = s/2;
   if(g.dome){
     return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
-      <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#eef1f5" stroke="#dde3ea"/>
+      <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#3C4455" stroke="#4a5468"/>
       <g transform="translate(${c},${c*1.12}) scale(${s/86})">
-        <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#e0e6ed" stroke="#c8d1dc" stroke-width="2"/>
-        <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#f6f8fa" stroke="#c8d1dc" stroke-width="1.6"/>
+        <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#454E61" stroke="#556074" stroke-width="2"/>
+        <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#3C4455" stroke="#556074" stroke-width="1.6"/>
       </g>
-      <text x="${c}" y="${s*0.22}" text-anchor="middle" font-size="${s*0.14}" font-weight="800" fill="#9aa6b5">🏟️</text>
+      <text x="${c}" y="${s*0.22}" text-anchor="middle" font-size="${s*0.14}" font-weight="800" fill="#8E97AD">🏟️</text>
     </svg>`;
   }
   const ang = (g.windAngle-90)*Math.PI/180; // 0 => up
@@ -747,11 +758,11 @@ function parkSVG(g, size){
   return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
     <defs><marker id="${mid}" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
       <path d="M0,0 L7,3.5 L0,7 Z" fill="${arrColor}"/></marker></defs>
-    <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#eaf6ee" stroke="#d3e8da"/>
+    <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#2b3a33" stroke="#3d5545"/>
     <g transform="translate(${c},${c*1.12}) scale(${s/86})">
-      <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#dcefe2" stroke="#b7d9c3" stroke-width="2"/>
-      <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#fdfefd" stroke="#b7d9c3" stroke-width="1.6"/>
-      <circle cx="0" cy="0" r="2.6" fill="#b7d9c3"/>
+      <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#2f4438" stroke="#4a6b55" stroke-width="2"/>
+      <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#eff1f7" stroke="#4a6b55" stroke-width="1.6"/>
+      <circle cx="0" cy="0" r="2.6" fill="#4a6b55"/>
     </g>
     <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${arrColor}" stroke-width="${Math.max(2,s*0.045)}" stroke-linecap="round" marker-end="url(#${mid})"/>
   </svg>`;
@@ -790,10 +801,10 @@ function gaugeSVG(g, size=48){
   const o=g.ou.over/100*c, p=g.ou.push/100*c, u=g.ou.under/100*c;
   return `<svg width="${size}" height="${size}" viewBox="0 0 46 46">
     <circle cx="23" cy="23" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#2f62e8" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#c7d0dd" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#8b99ad" stroke-width="6" stroke-dasharray="${u} ${c}" stroke-dashoffset="${-(o+p)}" transform="rotate(-90 23 23)"/>
-    <text x="23" y="27" text-anchor="middle" font-size="12" font-weight="800" fill="#1a2333">${g.total.toFixed(1)}</text>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#22d3ee" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#454E61" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
+    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#93b4d8" stroke-width="6" stroke-dasharray="${u} ${c}" stroke-dashoffset="${-(o+p)}" transform="rotate(-90 23 23)"/>
+    <text x="23" y="27" text-anchor="middle" font-size="12" font-weight="800" fill="#EFF1F7">${g.total.toFixed(1)}</text>
   </svg>`;
 }
 function leanTxt(g){
@@ -1183,7 +1194,15 @@ function initPark3D(g, canvas, slot="modal"){
   if(slot==="hero"){ disposeP3D(hero3D); hero3D = null; } else destroyPark3D();
   const park = PARKS[g.home] || {dims:[335,375,400,375,335], walls:[8,8,8,8,8]};
   const W = canvas.clientWidth || 780, H = canvas.clientHeight || 330;
-  const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  } catch(e) {
+    /* WebGL context unavailable (blocked, unsupported, or GPU exhausted) —
+       fall back to the flat park diagram instead of leaving the page dead. */
+    canvas.parentElement.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%">${parkSVG(g,140)}</div>`;
+    return;
+  }
   renderer.setSize(W, H, false);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
   const scene = new THREE.Scene();
@@ -1622,7 +1641,7 @@ function renderTease(){
   const n=(t.counts&&t.counts.targets||40)-1;
   document.getElementById("pt-locked").innerHTML=[2,3,4,5].map(r=>
     `<div class="pt-lock-row"><span class="rk">#${r}</span><div class="pt-blur${r%2?"":" b2"}"></div><span class="pr">+${300+r*40}</span><span style="font-size:11px">🔒</span></div>`).join("")
-    +`<div style="font-size:11.5px;color:#9fb0d4;margin-top:6px">${n} more ranked targets tonight · ${t.counts&&t.counts.value?`<b style="color:#ffd94a">${t.counts.value} VALUE flag${t.counts.value>1?"s":""}</b> · `:""}live odds on every one</div>`;
+    +`<div style="font-size:11.5px;color:#9fb0d4;margin-top:6px">${n} more ranked targets tonight · ${t.counts&&t.counts.value?`<b style="color:#F08A3C">${t.counts.value} VALUE flag${t.counts.value>1?"s":""}</b> · `:""}live odds on every one</div>`;
   const r=PT.record&&PT.record.summary;
   if(r&&r.nights){
     const pct=r.top1.n?Math.round(r.top1.w/r.top1.n*100):0;
