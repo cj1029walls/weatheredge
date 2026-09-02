@@ -167,6 +167,9 @@
   <div class="sec-h" style="margin-top:18px">Heat edge <span id="heat-flag"></span></div>
   <div id="heat-board"></div>
 
+  <div class="sec-h" style="margin-top:18px">The record — every lean graded against the finishing order</div>
+  <div class="m-sec" id="nascar-record"><p class="split-note">A TRACK TARGET is scored on <b>a top-10 finish</b>; a DOMINATOR is the stronger claim, so it carries the stronger bar — <b>a top-5</b>. Grades post the day after each race — every lean above is already archived.</p></div>
+
   <div class="m-sec" style="margin-top:18px">
     <h5>How the NASCAR board works</h5>
     <p>Cup Series finishing orders for every points race since 2018, mapped to tracks and track types. <b>Track history</b> ranks drivers by average finish at this exact track, with the Next Gen era (2022+) split out — the car changed in 2022 and old-car track records mislead. <b>Track-type form</b> covers the last 10 races on this track's type (superspeedway / intermediate / short / flat / road) in the current car. <b>Heat edge</b> rebuilds race-day temperatures from the weather archive: 88°+ race-day highs mean a hot, slick track, and some drivers consistently gain or lose spots in those conditions — those leans activate when the forecast runs hot. Rain/delay outlook carries over from the free radar. Every lean is archived the moment it posts and graded against the finishing order. Historical records are tendencies, not guarantees; sample sizes are shown on every number.</p>
@@ -212,14 +215,29 @@ function render(){
     <div class="crew-box"><div class="cb-k">🧊 Fades in the heat</div>${(h.dn||[]).slice(0,6).map(x=>`<div class="cb-line"><b>${esc(x.driver)}</b> — ${x.hotAvg} avg hot vs ${x.coolAvg} cool (${x.delta} spots, ${x.hotN} hot races)</div>`).join("")||'<div class="cb-line">Builds as races get weather-tagged.</div>'}</div>
   </div>`;
 }
+function renderNascarRecord(R){
+  if(!R||!R.summary||!R.summary.overall||!R.summary.overall.n) return;
+  const S=R.summary;
+  const chip=(lab,r)=>r&&r.n?`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${r.w}–${r.n-r.w}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`:"";
+  const stat=(lab,v)=>v==null?"":`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${v}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`;
+  const races=(R.recent||[]).map(e=>{
+    const rows=e.leans.map(l=>`<tr><td><span class="chip ${l.hit?"hot":""}">${l.hit?"HIT":"MISS"}</span></td>
+      <td><b>${esc(l.who)}</b><div class="imp">${esc(l.k)} · bar top-${l.bar}</div></td>
+      <td>finished <b>${l.pos}</b>${l.field?` of ${l.field}`:""}</td></tr>`).join("");
+    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(e.race)}</b>${e.date?` · ${esc(e.date)}`:""}</div><table><tbody>${rows}</tbody></table>`;
+  }).join("");
+  document.getElementById("nascar-record").innerHTML=
+    `<div>${chip("all graded leans",S.overall)}${chip("track targets",S.trackTarget)}${chip("dominators",S.dominator)}${stat("avg finish",S.avgFinish)}${stat("wins",S.wins)}</div>
+     <p class="split-note">Bar: <b>${esc(S.bar)}</b>. A driver who doesn't take the green is left ungraded rather than counted as a loss.</p>${races}`;
+}
 async function load(){
   try{const r=await fetch("/pro/nascar.json?_="+Date.now()); if(!r.ok) return; D=await r.json(); render();}catch(e){}
+  try{const rr=await fetch("/pro/nascar_record.json?_="+Date.now()); if(rr.ok) renderNascarRecord(await rr.json());}catch(e){}
 }
-load();
 
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null;
+let GATED=null, LOADED=false;
 function msReady(timeout=6000){
   return new Promise(res=>{
     const t0=Date.now();
@@ -242,6 +260,9 @@ async function gate(){
     }
   }catch(e){}
   GATED=ok;
+  /* PRO data is fetched only once the gate says this visitor is a member —
+     never before it resolves, and never for a logged-out visitor. */
+  if(ok&&!LOADED){ LOADED=true; load(); }
   document.getElementById("pro-app").style.display=ok?"block":"none";
   document.getElementById("paywall").style.display=ok?"none":"block";
   const bar=document.getElementById("member-bar");
