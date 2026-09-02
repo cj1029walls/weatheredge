@@ -40,6 +40,7 @@ ODDS_EVENT = ("https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/"
 ET = timezone(timedelta(hours=-4))
 OL_POS = {"OL", "OT", "OG", "C", "G", "T"}
 DL_POS = {"DL", "DT", "DE", "NT", "EDGE"}
+RB_POS = {"RB", "FB", "HB", "TB"}       # a rush-prop lean must name an actual back
 WINDY = 15
 BRAND = {}
 
@@ -94,10 +95,15 @@ def rush_identity(prior):
     return out
 
 
-def top_rushers(prior, current_rosters):
-    """Each team's top returning rusher: last season's leader by yards who is
-    still on this season's roster. {team: {name, car, yds, ypc}}."""
-    out = {}
+def top_rushers(prior, current_rosters, current_backs):
+    """Each team's top returning RUNNING BACK: last season's leader by rushing
+    yards who is still on this season's roster AND is listed at RB/FB.
+    {team: {name, car, yds, ypc}}.
+
+    The position filter is not optional. Without it the leader on a run-heavy
+    roster is often the quarterback, and the card then names a QB as the back
+    to play — with a live rushing-yards line attached to him."""
+    out, skipped_qb = {}, 0
     try:
         rows = fetch(f"{CFBD}/stats/player/season?year={prior}&category=rushing", tries=2)
         players = {}
@@ -118,13 +124,17 @@ def top_rushers(prior, current_rosters):
             cur = current_rosters.get(t)
             if cur is not None and nm not in cur:
                 continue                      # transferred / graduated / drafted
+            if nm not in (current_backs.get(t) or set()):
+                skipped_qb += 1               # QB/WR rushing leader, or no position data
+                continue
             best = out.get(t)
             if not best or yds > best["yds"]:
                 out[t] = dict(name=nm, car=int(car), yds=int(yds),
                               ypc=round(yds / car, 1))
     except Exception as e:
         print(f"returning rushers unavailable ({e})")
-    print(f"returning rushers: {len(out)} teams")
+    print(f"returning rushers: {len(out)} teams "
+          f"({skipped_qb} non-RB rushing leaders excluded)")
     return out
 
 
@@ -136,13 +146,16 @@ def build_trench(year):
                                    ab=gv(t, "abbreviation") or (gv(t, "school") or "")[:4].upper())
              for t in teams_raw}
     roster = fetch(f"{CFBD}/roster?year={year}")
-    tw, names = {}, {}
+    tw, names, backs = {}, {}, {}
     for p in roster:
         team, w = gv(p, "team"), gv(p, "weight")
         fn, ln = gv(p, "firstName", "first_name"), gv(p, "lastName", "last_name")
-        if team and (fn or ln):
-            names.setdefault(team, set()).add(f"{fn or ''} {ln or ''}".strip())
         pos = (gv(p, "position") or "").upper()
+        if team and (fn or ln):
+            full = f"{fn or ''} {ln or ''}".strip()
+            names.setdefault(team, set()).add(full)
+            if pos in RB_POS:
+                backs.setdefault(team, set()).add(full)
         if not team or not w or not (180 <= w <= 420):
             continue
         grp = "ol" if pos in OL_POS else "dl" if pos in DL_POS else None
@@ -155,7 +168,8 @@ def build_trench(year):
     lg_ol = round(statistics.mean(v["ol"] for v in trench.values()), 1)
     lg_dl = round(statistics.mean(v["dl"] for v in trench.values()), 1)
     print(f"trench data: {len(trench)} FBS teams · league OL {lg_ol} / DL {lg_dl}")
-    return trench, lg_ol, lg_dl, names
+    print(f"roster backs: {sum(len(v) for v in backs.values())} RB/FB across {len(backs)} teams")
+    return trench, lg_ol, lg_dl, names, backs
 
 
 def attach_rush_props(leans):
@@ -226,10 +240,10 @@ def attach_rush_props(leans):
 def main():
     now = datetime.now(ET)
     season = now.year if now.month >= 7 else now.year - 1
-    trench, lg_ol, lg_dl, roster_names = build_trench(season)
+    trench, lg_ol, lg_dl, roster_names, roster_backs = build_trench(season)
     lg_diff = lg_ol - lg_dl
     identity = rush_identity(season - 1)
-    rbs = top_rushers(season - 1, roster_names)
+    rbs = top_rushers(season - 1, roster_names, roster_backs)
 
     games = fetch(f"{CFBD}/games?year={season}&seasonType=regular")
     fbs_games = []

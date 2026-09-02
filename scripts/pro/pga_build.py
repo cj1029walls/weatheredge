@@ -24,6 +24,7 @@ No third-party dependencies.
 """
 import functools, json, os, re, sys, time, unicodedata, urllib.request
 from datetime import datetime, timedelta, timezone
+from archive import save_locked
 
 print = functools.partial(print, flush=True)
 
@@ -229,11 +230,14 @@ def main():
     json.dump(out, open(OUT, "w"))
     print(f"wrote {OUT}: {len(course)} course rows · {len(leans)} leans")
 
-    os.makedirs(ARCH, exist_ok=True)
-    json.dump(dict(built=out["updated"], event=ev["name"], key=key, year=year,
-                   leans=leans),
-              open(os.path.join(ARCH, f"{year}-{key}.json"), "w"))
-    print("archived predictions")
+    # Once the tournament has started, the first archived card is final —
+    # a later refresh must not reshuffle picks the grader will score.
+    started = bool(ev.get("r1") and
+                   str(ev["r1"])[:10] <= datetime.now(ET).strftime("%Y-%m-%d"))
+    save_locked(os.path.join(ARCH, f"{year}-{key}.json"),
+                dict(built=out["updated"], event=ev["name"], key=key, year=year,
+                     leans=leans),
+                started, label="PGA archive")
 
 
 if __name__ == "__main__":

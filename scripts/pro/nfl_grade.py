@@ -51,9 +51,33 @@ def norm_name(s):
     return parts[-1].lower() if parts else ""
 
 
+def row_team(r):
+    for col in ("recent_team", "team", "team_abbr", "posteam"):
+        v = (r.get(col) or "").strip().upper()
+        if v:
+            return v
+    return ""
+
+
+def pkey(team, last):
+    return f"{(team or '').upper()}|{last}"
+
+
 def week_stats(season, week):
-    """(player last name -> {passYds, rushYds, rec, kickPts}) for one week."""
-    out = {}
+    """((team|last name) -> {passYds, rushYds, rec, kickPts}) for one week.
+
+    Keyed by TEAM AND surname, never surname alone: a league has several
+    Smiths, and pooling them grades a receiver's 3 catches against every
+    Smith's combined total. `_last` carries a surname->keys index so a lean
+    whose team abbreviation doesn't match the feed can still resolve, but
+    only when the surname is unique that week."""
+    out, by_last = {}, {}
+
+    def bucket(team, last):
+        k = pkey(team, last)
+        by_last.setdefault(last, set()).add(k)
+        return out.setdefault(k, {})
+
     try:
         for r in read_csv_gz(fetch(STATS_URL.format(season=season))):
             if str(r.get("week")) != str(week):
@@ -61,7 +85,7 @@ def week_stats(season, week):
             nm = norm_name(r.get("player_display_name") or r.get("player_name"))
             if not nm:
                 continue
-            e = out.setdefault(nm, {})
+            e = bucket(row_team(r), nm)
             for k, col in (("passYds", "passing_yards"), ("rushYds", "rushing_yards"),
                            ("rec", "receptions")):
                 try:
@@ -81,12 +105,35 @@ def week_stats(season, week):
             try:
                 fgm = float(r.get("fg_made") or 0)
                 pat = float(r.get("pat_made") or 0)
-                out.setdefault(nm, {})["kickPts"] = fgm * 3 + pat
+                e = bucket(row_team(r), nm)
+                e["kickPts"] = e.get("kickPts", 0) + fgm * 3 + pat
             except (TypeError, ValueError):
                 pass
     except Exception as e:
         print(f"  kicking stats unavailable ({e}) — kicker leans stay ungraded")
+    out["_last"] = {k: sorted(v) for k, v in by_last.items()}
     return out
+
+
+def player_stat(stats, who, stat_key):
+    """Actual stat for the player a lean names, or None if we can't be certain.
+
+    `who` is archived as "Name (TEAM)". We resolve on (team, surname); if that
+    misses we accept a surname match only when it is unique in the week."""
+    if not stats or not who:
+        return None
+    m = re.search(r"\(([A-Za-z]{2,4})\)\s*$", who.strip())
+    team = m.group(1).upper() if m else ""
+    last = norm_name(who.split("(")[0])
+    if not last:
+        return None
+    hit = stats.get(pkey(team, last))
+    if hit is None:
+        cands = (stats.get("_last") or {}).get(last) or []
+        if len(cands) != 1:
+            return None                     # ambiguous surname — leave ungraded
+        hit = stats.get(cands[0])
+    return (hit or {}).get(stat_key)
 
 
 def week_scores(season, week):
@@ -133,20 +180,24 @@ def grade_week(pred, stats, scores):
         stat_key = PLAYER_PROPS.get(ln.get("prop") or "")
         fin = scores.get(ln["game"])
         if stat_key and ln.get("line") is not None:
-            nm = norm_name((ln.get("who") or "").split("(")[0])
-            act = (stats or {}).get(nm, {}).get(stat_key)
+            act = player_stat(stats, ln.get("who"), stat_key)
             if act is not None and ln["side"] in ("OVER", "UNDER"):
                 entry["act"] = round(act, 1)
-                entry["hit"] = (act > ln["line"]) if ln["side"] == "OVER" \
-                    else (act < ln["line"])
+                # an exact landing is a push, not a loss on both sides
+                entry["hit"] = None if act == ln["line"] else \
+                    (act > ln["line"]) if ln["side"] == "OVER" else (act < ln["line"])
+                if entry["hit"] is None:
+                    entry["push"] = True
         elif ln["k"] in ("REF TOTAL", "SPOT") and ln["side"] in ("OVER", "UNDER") and fin:
             g = gmap.get(ln["game"])
             if g and g.get("total") is not None:
                 tot = fin[0] + fin[1]
                 entry["act"] = tot
                 entry["line"] = g["total"]
-                entry["hit"] = (tot > g["total"]) if ln["side"] == "OVER" \
-                    else (tot < g["total"])
+                entry["hit"] = None if tot == g["total"] else \
+                    (tot > g["total"]) if ln["side"] == "OVER" else (tot < g["total"])
+                if entry["hit"] is None:
+                    entry["push"] = True
         elif ln["k"] == "COLD" and ln.get("prop") == "team total" and fin:
             g = gmap.get(ln["game"])
             itt = implied_team_total(g, ln.get("who")) if g else None
@@ -155,9 +206,17 @@ def grade_week(pred, stats, scores):
                 pts = fin[0] if ln.get("who") == a else fin[1]
                 entry["act"] = pts
                 entry["line"] = round(itt, 1)
-                entry["hit"] = pts < itt
+                entry["hit"] = None if pts == itt else (pts < itt)
+                if entry["hit"] is None:
+                    entry["push"] = True
         graded.append(entry)
     return graded
+
+
+def week_order(key):
+    """Sort archive keys by real week number: '2026-w10' must outrank '2026-w9'."""
+    m = re.match(r"(\d+)\D+(\d+)$", key or "")
+    return (int(m.group(1)), int(m.group(2))) if m else (0, 0)
 
 
 def main():
@@ -203,7 +262,7 @@ def main():
     json.dump(results, open(RESULTS, "w"), separators=(",", ":"))
 
     recent = []
-    for key in sorted(results["weeks"], reverse=True)[:4]:
+    for key in sorted(results["weeks"], key=week_order, reverse=True)[:4]:
         recent.append(dict(week=key,
                            leans=[x for x in results["weeks"][key]["leans"]
                                   if x["hit"] is not None]))

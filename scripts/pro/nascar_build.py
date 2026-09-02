@@ -18,6 +18,7 @@ No third-party dependencies.
 """
 import functools, json, os, re, sys
 from datetime import datetime, timedelta, timezone
+from archive import save_locked
 
 print = functools.partial(print, flush=True)
 
@@ -184,11 +185,13 @@ def main():
     json.dump(out, open(OUT, "w"))
     print(f"wrote {OUT}: {len(board)} board rows · {len(leans)} leans")
 
-    os.makedirs(ARCH, exist_ok=True)
-    json.dump(dict(built=out["updated"], race=nxt["name"], key=key,
-                   date=nxt["date"], leans=leans),
-              open(os.path.join(ARCH, f"{nxt['date']}-{key}.json"), "w"))
-    print("archived predictions")
+    # Once the green flag is out, the first archived card is final.
+    started = bool(nxt.get("date") and
+                   str(nxt["date"])[:10] <= datetime.now(ET).strftime("%Y-%m-%d"))
+    save_locked(os.path.join(ARCH, f"{nxt['date']}-{key}.json"),
+                dict(built=out["updated"], race=nxt["name"], key=key,
+                     date=nxt["date"], leans=leans),
+                started, label="NASCAR archive")
 
 
 if __name__ == "__main__":

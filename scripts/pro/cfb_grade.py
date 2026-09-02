@@ -17,7 +17,7 @@ Outputs:
 
 Runs in the CFB weekly workflow before the board build. No third-party deps.
 """
-import functools, json, os, statistics, time, urllib.request
+import functools, json, os, re, statistics, time, urllib.request
 
 print = functools.partial(print, flush=True)
 
@@ -88,6 +88,12 @@ def grade_week(pred, rush):
     return dict(medYpc=round(med, 2), nBox=len(rush), leans=graded)
 
 
+def week_order(key):
+    """Sort archive keys by real week number: '2026-w10' must outrank '2026-w9'."""
+    m = re.match(r"(\d+)\D+(\d+)$", key or "")
+    return (int(m.group(1)), int(m.group(2))) if m else (0, 0)
+
+
 def main():
     if not os.path.isdir(ARCH):
         print("no archived boards yet — nothing to grade")
@@ -134,7 +140,7 @@ def main():
 
     # slim public record: summary + the last 4 graded weeks in full
     recent = []
-    for key in sorted(results["weeks"], reverse=True)[:4]:
+    for key in sorted(results["weeks"], key=week_order, reverse=True)[:4]:
         wk = results["weeks"][key]
         recent.append(dict(week=key, medYpc=wk["medYpc"],
                            leans=[x for x in wk["leans"] if x["hit"] is not None]))

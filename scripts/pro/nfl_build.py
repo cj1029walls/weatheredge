@@ -35,6 +35,7 @@ so the grader (built when Week 1 results exist) can score every lean publicly.
 No third-party dependencies.
 """
 import functools, json, os, re, statistics, sys, unicodedata
+from archive import save_merged
 import urllib.request
 from datetime import datetime, timedelta
 
@@ -362,11 +363,15 @@ def main():
     # archive for public grading
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
     arc = os.path.join(ARCHIVE_DIR, f"{season}-w{week}.json")
-    json.dump(dict(built=out["updated"], season=season, week=week,
-                   leans=all_leans,
-                   games=[dict(away=g["away"], home=g["home"], date=g["date"],
-                               spread=g["spread"], total=g["total"]) for g in games]),
-              open(arc, "w"))
+    # The weekly slate shrinks as games are played (load_week keeps only
+    # unplayed rows), so a straight rewrite would delete Sunday's leans on
+    # Monday and leave the grader a Monday-night-only week. Merge instead.
+    save_merged(arc, dict(built=out["updated"], season=season, week=week,
+                          leans=all_leans,
+                          games=[dict(away=g["away"], home=g["home"], date=g["date"],
+                                      spread=g["spread"], total=g["total"])
+                                 for g in games]),
+                key_fields=("game", "k", "who", "prop"), label="NFL archive")
     print(f"archived predictions -> {arc}")
 
 

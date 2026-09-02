@@ -28,6 +28,7 @@ No third-party dependencies.
 """
 import functools, json, os, statistics, sys, unicodedata
 from datetime import datetime, timedelta, timezone
+from archive import save_locked
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from parks import MLBID_TO_CODE
@@ -792,9 +793,16 @@ def main():
             uv = umps_pro["umps"][go["ump"]]["vslg"]
         gslim.append(dict(pk=go["gamePk"], m=f"{go['away']}@{go['home']}",
                           expHr=go["expHr"], ump=go.get("ump"), umpVslg=uv))
-    with open(os.path.join(PRED_DIR, f"{dstr}.json"), "w") as f:
-        json.dump(dict(d=dstr, targets=slim, kprops=kslim, games=gslim),
-                  f, separators=(",", ":"))
+    # Freeze the card once the slate is under way. Refreshes before first
+    # pitch are fine (nothing has happened yet); a 5 PM ET rebuild must not
+    # reshuffle targets after the afternoon games are already final.
+    now_et = datetime.now(ET)
+    now_hm = now_et.hour * 100 + now_et.minute
+    started = any((g.get("sortTime") or 9999) <= now_hm
+                  for g in slate.get("games", []))
+    save_locked(os.path.join(PRED_DIR, f"{dstr}.json"),
+                dict(d=dstr, targets=slim, kprops=kslim, games=gslim),
+                started, label="MLB archive")
 
     with_odds = sum(1 for t in top if t["price"] is not None)
     n_splits = sum(1 for go in games_out if go.get("splits"))
