@@ -503,7 +503,7 @@ async function loadCFB(){
 }
 /* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
 const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null;
+let GATED=null, LOADED=false;
 function msReady(timeout=6000){
   return new Promise(res=>{
     const t0=Date.now();
@@ -526,6 +526,9 @@ async function gate(){
     }
   }catch(e){}
   GATED=ok;
+  /* PRO data is fetched only once the gate says this visitor is a member —
+     never before it resolves, and never for a logged-out visitor. */
+  if(ok&&!LOADED){ LOADED=true; loadCFB(); }
   document.getElementById("pro-app").style.display=ok?"block":"none";
   document.getElementById("paywall").style.display=ok?"none":"block";
   const bar=document.getElementById("member-bar");
@@ -580,7 +583,6 @@ document.querySelectorAll('.ms-account').forEach(a=>a.addEventListener("click", 
   const ms=await msReady(); if(ms){ try{ await ms.openModal("PROFILE"); }catch(err){} }
 }));
 
-loadCFB();
 </script>
 </body>
 </html>
