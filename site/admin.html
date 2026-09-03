@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DFSRADAR — Accuracy Dashboard</title>
 <meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 <style>
   :root{
-    --navy:#152451; --navy2:#24409c; --ink:#1a2333; --muted:#75809a; --faint:#a4adc2;
-    --green:#178a3f; --green-bg:#e6f5eb; --red:#d33131; --red-bg:#fdecec;
-    --blue:#2f62e8; --blue-deep:#2450b8; --blue-bg:#e8eefc;
-    --gray-bg:#edf0f5; --surface:#f3f5f9; --card:#fff; --line:#e4e8ef;
-    --shadow:0 1px 2px rgba(21,36,81,.06),0 4px 14px rgba(21,36,81,.07);
+    --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
+    --green:#22c55e; --green-bg:rgba(34,197,94,.15); --red:#f87171; --red-bg:rgba(248,113,113,.15);
+    --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
+    --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
+    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink)}
+  body{font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink)}
   header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 24px}
   .hd{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
   .hd h1{font-size:20px;font-weight:800}
@@ -51,6 +53,21 @@
   .chip.e{background:var(--blue-bg);color:var(--blue-deep)}
   .empty{padding:44px;text-align:center;color:var(--muted)}
   .empty b{display:block;font-size:16px;color:var(--ink);margin-bottom:6px}
+
+  /* ===== DFS Kitchen family — cyan-forward chrome (appended) ===== */
+  .brand h1 .brand-rad{color:#22d3ee}
+  .sport-tabs .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
+  nav button.active{box-shadow:inset 0 -2px 0 #22d3ee}
+  .controls h2,.method h4,.sub-h,.hist-table th{color:#67e8f9}
+  .sum-card{border-top:2px solid rgba(34,211,238,.55)}
+  .sum-card:hover,.b-row:hover,.wxc:hover,.p-card:hover{border-color:rgba(34,211,238,.5)}
+  .hero-tag{color:#67e8f9;background:rgba(34,211,238,.14)}
+  .brief-card::after{border-color:rgba(34,211,238,.30)!important;box-shadow:0 0 0 38px rgba(34,211,238,.06),0 0 0 80px rgba(34,211,238,.04)!important}
+  .brief-head{color:#67e8f9}
+  a{color:#67e8f9}
+  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
+  :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
+  .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
 </style>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
