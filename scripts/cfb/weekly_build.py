@@ -43,7 +43,7 @@ METRICS = (
     ("pa",  "PASSING YDS", 0),
     ("ru",  "RUSHING YDS", 0),
     ("cp",  "COMPLETION %", 1),
-    ("fg",  "FG MAKES", 1),
+    ("to",  "TURNOVERS", 1),
     ("fl",  "FUMBLES", 1),
 )
 MIN_METRIC_N = 12          # below this we show the count, not a percentage
@@ -263,22 +263,96 @@ def weather_edge(temp, wind, rain, dome):
     return dict(score=score, level=level)
 
 
+# Every metric drifts across sixteen seasons, not just scoring -- turnovers ran
+# 3.4 a game in 2010 and 2.4 in 2025. The history file ships era factors for
+# points only, so the rest are derived here from the history itself: one factor
+# per season per metric, mapping that season onto the reference season. Without
+# this, a matched sample that happens to skew old reads as a weather effect.
+_ERA_CACHE = {}
+_ERA_LEAGUE = {}      # era-adjusted league baseline per metric
+_ERA_VENUE = {}       # era-adjusted per-venue baseline, keyed by venue id
+
+
+def _season_of(d):
+    """History dates are YYYYMMDD; a January game belongs to the prior season."""
+    y, m = int(d[:4]), int(d[4:6])
+    return y - 1 if m < 2 else y
+
+
+def build_era(hist_all):
+    """{metric: {season: factor}} from every game in the history."""
+    if _ERA_CACHE:
+        return _ERA_CACHE
+    keys = [k for k, _, _ in METRICS if k != "pts"]
+    buckets = {k: {} for k in keys}
+    for vid, v in hist_all.items():
+        if vid.startswith("_"):
+            continue
+        for g in v.get("games") or []:
+            s = _season_of(g["d"])
+            for k in keys:
+                if g.get(k) is not None:
+                    buckets[k].setdefault(s, []).append(g[k])
+    ref_season = max((int(s) for s in (hist_all.get("_era") or {})), default=None)
+    for k, by_season in buckets.items():
+        means = {s: statistics.mean(v) for s, v in by_season.items() if len(v) >= 30}
+        ref = means.get(ref_season) or (statistics.mean(means.values()) if means else 0)
+        _ERA_CACHE[k] = {s: (ref / m if m else 1.0) for s, m in means.items()} if ref else {}
+
+    # A sample normalized to the reference season has to be compared against a
+    # baseline normalized the same way, or the adjustment just moves the bias
+    # from the numerator to the denominator. Rebuild both baselines in the
+    # same units as _vals() now returns.
+    pooled = {k: [] for k in keys}
+    for vid, v in hist_all.items():
+        if vid.startswith("_"):
+            continue
+        per_venue = {k: [] for k in keys}
+        for g in v.get("games") or []:
+            f_season = _season_of(g["d"])
+            for k in keys:
+                if g.get(k) is not None:
+                    adj = g[k] * _ERA_CACHE[k].get(f_season, 1.0)
+                    per_venue[k].append(adj)
+                    pooled[k].append(adj)
+        _ERA_VENUE[vid] = {k: (round(statistics.mean(x), 1) if x else None)
+                           for k, x in per_venue.items()}
+    _ERA_LEAGUE.update({k: (round(statistics.mean(x), 1) if x else None)
+                        for k, x in pooled.items()})
+    return _ERA_CACHE
+
+
 def _vals(rows, key):
     if key == "pts":
         # era-normalized points when the history carries them, raw otherwise
         return [r.get("epts", r["pts"]) for r in rows if r.get("epts", r.get("pts")) is not None]
-    return [r[key] for r in rows if r.get(key) is not None]
+    era = _ERA_CACHE.get(key) or {}
+    out = []
+    for r in rows:
+        v = r.get(key)
+        if v is None:
+            continue
+        out.append(v * era.get(_season_of(r["d"]), 1.0))
+    return out
 
 
-def metric_block(rows, hist_avg, league, dome):
-    """Each metric vs both baselines, or an honest blank when the sample is thin."""
+def metric_block(rows, hist_avg, league, dome, vid=None):
+    """Each metric vs both baselines, or an honest blank when the sample is thin.
+
+    Points baselines already ship era-adjusted (the history averages epts);
+    the rest are adjusted here so numerator and denominator share units.
+    """
     out = []
     for key, label, nd in METRICS:
         vals = _vals(rows, key)
         n = len(vals)
         cur = round(statistics.mean(vals), nd) if n else None
-        lg = league.get(key)
-        vn = (hist_avg or {}).get(key)
+        if key == "pts":
+            lg = league.get(key)
+            vn = (hist_avg or {}).get(key)
+        else:
+            lg = _ERA_LEAGUE.get(key, league.get(key))
+            vn = (_ERA_VENUE.get(str(vid)) or {}).get(key, (hist_avg or {}).get(key))
         def pct(base):
             if dome or cur is None or not base or n < MIN_METRIC_N:
                 return None
@@ -310,6 +384,7 @@ def main():
     if not hist_all:
         sys.exit("data/cfb/venues_history.json missing — run the CFB history workflow first.")
     league = hist_all["_league"]
+    build_era(hist_all)
 
     upcoming, yr = ([], season_year(datetime.now(ET))) if args.offline else load_upcoming()
     sts = sorted({g["_season_type"] for g in upcoming}) or ["regular"]
@@ -430,7 +505,7 @@ def main():
                      if avg_pts and n >= MIN_METRIC_N and not dome else
                      (0 if dome else None)),
                 ptsGm=(round(m_pts, 1) if n else None), ptsStad=avg_pts,
-                metrics=metric_block(rows, hist.get("avg"), league, dome),
+                metrics=metric_block(rows, hist.get("avg"), league, dome, vid),
                 venueN=hist["avg"].get("n", 0),
                 ou=dict(over=round(overs / len(lined) * 100) if lined else 0,
                         under=round(unders / len(lined) * 100) if lined else 0,
@@ -438,7 +513,6 @@ def main():
                         n=len(lined)),
                 note=note, windFx=None if dome else wind_receptivity(hist["games"]),
                 matches=[dict(d=x["d"], t=x["t"], w=x["w"], pts=x["pts"],
-                              fg=x.get("fg"), fga=x.get("fga"),
                               line=x["line"], res=x["res"])
                          for x in sorted(rows, key=lambda x: x["d"], reverse=True)[:12]])
         else:
