@@ -99,6 +99,38 @@
   .pos{color:var(--green)} .neg{color:var(--red)} .neu{color:var(--muted)}
   .controls{display:flex;align-items:center;justify-content:space-between;margin:6px 0 14px;gap:12px;flex-wrap:wrap}
   .controls h2{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+  /* weather-edge severity: one composite read per game */
+  .edge-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:-2px 0 12px}
+  .edge-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.3px;padding:6px 13px;border-radius:20px;border:1px solid var(--line);
+    background:var(--card);color:var(--body2)}
+  .edge-chip i{width:8px;height:8px;border-radius:50%;font-style:normal}
+  .ed-severe i{background:#f87171} .ed-elevated i{background:#fb923c}
+  .ed-watch i{background:#fbbf24} .ed-none i{background:#57627A} .ed-indoor i{background:#9bb6d6}
+  .sortwrap{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);
+    font-weight:700;letter-spacing:.5px}
+  .sortwrap select{appearance:none;background:var(--card);border:1px solid var(--line);
+    border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer}
+  .lvl{display:inline-block;width:4px;border-radius:3px;align-self:stretch}
+  .b-row.lv-severe{border-left:3px solid #f87171}
+  .b-row.lv-elevated{border-left:3px solid #fb923c}
+  .b-row.lv-watch{border-left:3px solid #fbbf24}
+  /* dual-baseline metric grid */
+  .mx-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+  .mx-toggle{margin-left:auto;display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .mx-toggle button{appearance:none;cursor:pointer;border:0;background:var(--card);color:var(--muted);
+    font-size:10.5px;font-weight:800;letter-spacing:.8px;padding:6px 12px}
+  .mx-toggle button.on{background:rgba(34,211,238,.16);color:#67e8f9}
+  .mx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .mx{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .mx .k{font-size:10px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
+  .mx .v{font-size:26px;font-weight:800;letter-spacing:-.5px;margin:3px 0 2px}
+  .mx .s{font-size:11px;color:var(--muted)}
+  .mx .s b{color:var(--body2)}
+  .mx.pos .v{color:var(--green)} .mx.neg .v{color:var(--red)} .mx.neu .v{color:var(--muted)}
+  .mx-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px}
+  .fcs-note{margin-top:10px;font-size:12px;color:var(--note-text);background:var(--note-bg);
+    border:1px solid var(--note-border);border-radius:10px;padding:8px 13px}
   .conf-chips{display:flex;gap:6px;flex-wrap:wrap}
   .conf-chips button{appearance:none;cursor:pointer;font-size:11.5px;font-weight:700;letter-spacing:.4px;padding:6px 13px;border-radius:18px;border:1px solid var(--line-strong);background:var(--card);color:var(--muted);transition:.13s}
   .conf-chips button:hover{color:var(--ink)}
@@ -267,7 +299,7 @@
   <section class="view active" id="view-slate">
     <div class="summary-strip" id="summary-strip"></div>
     <div class="controls">
-      <h2>Weather impact vs each venue<span class="tip" data-tip="PTS shows how total scoring in historically similar weather at that venue compares to the venue's own average (Power 4 venues, 2019–2025). O/U hit rates are measured against each past game's REAL closing total — the actual lines that existed."><span class="info-i">i</span></span></h2>
+      <h2>Weather impact vs each venue<span class="tip" data-tip="PTS shows how total scoring in historically similar weather at that venue compares to the venue's own average (Power 4 venues, 2010–2025, era-adjusted). O/U hit rates are measured against each past game's REAL closing total — the actual lines that existed."><span class="info-i">i</span></span></h2>
       <div class="conf-chips" id="conf-chips">
         <button data-conf="P4" class="on">Power 4</button>
         <button data-conf="SEC">SEC</button>
@@ -276,15 +308,26 @@
         <button data-conf="ACC">ACC</button>
         <button data-conf="ALL">All FBS</button>
       </div>
+      <div class="sortwrap">SORT
+        <select id="sort-sel">
+          <option value="edge">Weather edge</option>
+          <option value="time">Kickoff time</option>
+          <option value="wind">Wind</option>
+          <option value="rain">Rain %</option>
+          <option value="cold">Temperature (coldest)</option>
+          <option value="total">Closing total</option>
+        </select>
+      </div>
     </div>
+    <div class="edge-strip" id="edge-strip"></div>
     <div class="board" id="board"></div>
-    <div class="empty-season" id="empty-state" style="display:none"><b>Kickoff is almost here</b>Games appear once they're inside the 8-day forecast window. The history engine is already loaded: 2019–2025, every Power 4 venue, real closing totals.</div>
+    <div class="empty-season" id="empty-state" style="display:none"><b>Kickoff is almost here</b>Games appear once they're inside the 8-day forecast window. The history engine is already loaded: 2010–2025, every Power 4 venue, real closing totals.</div>
   </section>
 
   <section class="view" id="view-method" style="display:none">
     <div class="m-sec" style="max-width:860px;margin:0 auto">
       <h5>Real games. Real weather. Real closing totals.</h5>
-      <p style="font-size:14px;line-height:1.7;color:var(--body2)">For every FBS game inside the forecast window, we take the kickoff forecast at that stadium — temperature, wind, and rain chances — and, at <b>Power 4 home venues</b>, find every game played there in similar conditions since 2019. Then we report what actually happened: total points, and how often those games went over or under <b>their own real closing totals</b>. Domes are weather-neutral and flagged as such. Games at venues outside the Power 4 history set still show the full kickoff forecast and delay outlook. Rebuilt automatically every morning as forecasts sharpen toward kickoff.</p>
+      <p style="font-size:14px;line-height:1.7;color:var(--body2)">For every FBS game inside the forecast window, we take the kickoff forecast at that stadium — temperature, wind, and rain chances — and, at <b>Power 4 home venues</b>, find every game played there in similar conditions since 2010. Then we report what actually happened: total points, and how often those games went over or under <b>their own real closing totals</b>. Because scoring has climbed across college football since 2010, older seasons are era-adjusted onto today's scoring environment before they are averaged, so a cold 2011 game isn't mistaken for a weather effect. Domes are weather-neutral and flagged as such. Games at venues outside the Power 4 history set still show the full kickoff forecast and delay outlook. Rebuilt automatically every morning as forecasts sharpen toward kickoff.</p>
     </div>
   </section>
 </main>
@@ -295,7 +338,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const SAMPLE = {generated:"preview", brief:"Coldest kickoff: 27° for Ohio State @ Michigan. Wind watch: 19 mph for Kansas State @ Iowa State at Jack Trice Stadium. No serious rain threats on the Power 4 slate. 1 game indoors — weather-neutral.",
+const SAMPLE = {generated:"preview", league:{pts:56.0,n:6842}, counts:{severe:0,elevated:2,watch:1,none:1,indoor:1}, brief:"Coldest kickoff: 27° for Ohio State @ Michigan. Wind watch: 19 mph for Kansas State @ Iowa State at Jack Trice Stadium. No serious rain threats on the Power 4 slate. 1 game indoors — weather-neutral.",
 games:[
  {id:"s1", away:"Ohio State", home:"Michigan", conf:"Big Ten", p4:true, stadium:"Michigan Stadium", day:"Sat Nov 28", time:"12:00 PM ET", sortTime:"1",
   temp:27, dew:18, wind:14, windLabel:"14 mph wind", sky:"Overcast", skyIcon:"☁️", dome:false,
@@ -303,13 +346,17 @@ games:[
   ou:{over:31, under:65, push:4, n:26}, total:45.5, note:"±8° temp, ±6 mph wind",
   windFx:{rating:"MEDIUM", pct10:-6}, delay:{level:"clear", pct:15},
   hourly:[{lab:"11 AM",c:"☁️",t:28,w:12,rain:10,rh:58},{lab:"12 PM",fp:true,c:"☁️",t:27,w:14,rain:15,rh:60},{lab:"1 PM",c:"☁️",t:28,w:15,rain:16,rh:61},{lab:"2 PM",c:"⛅",t:29,w:13,rain:12,rh:59},{lab:"3 PM",c:"⛅",t:29,w:12,rain:8,rh:57}],
-  matches:[{d:"20231125",t:24,w:12,pts:54,line:45.5,res:"over"},{d:"20221126",t:30,w:16,pts:68,line:56.5,res:"over"},{d:"20191130",t:29,w:13,pts:83,line:55.5,res:"over"}]},
+  edge:{score:8.1,level:"elevated"}, feels:18, fcs:false, venueN:312,
+  metrics:[{k:"pts",label:"SCORING",n:26,cur:44.3,lgAvg:56.0,vnAvg:48.7,lgPct:-21,vnPct:-9},{k:"pa",label:"PASSING YDS",n:26,cur:388,lgAvg:461,vnAvg:437,lgPct:-16,vnPct:-11},{k:"ru",label:"RUSHING YDS",n:26,cur:352,lgAvg:330,vnAvg:341,lgPct:7,vnPct:3},{k:"cp",label:"COMPLETION %",n:26,cur:55.1,lgAvg:60.0,vnAvg:58.4,lgPct:-8,vnPct:-6},{k:"fg",label:"FG MAKES",n:26,cur:1.7,lgAvg:2.3,vnAvg:2.2,lgPct:-26,vnPct:-23},{k:"fl",label:"FUMBLES",n:26,cur:1.7,lgAvg:1.3,vnAvg:1.3,lgPct:31,vnPct:31}],
+  matches:[{d:"20231125",t:24,w:12,pts:54,fg:2,fga:3,line:45.5,res:"over"},{d:"20221126",t:30,w:16,pts:68,fg:1,fga:2,line:56.5,res:"over"},{d:"20191130",t:29,w:13,pts:83,fg:3,fga:4,line:55.5,res:"over"}]},
  {id:"s2", away:"Kansas State", home:"Iowa State", conf:"Big 12", p4:true, stadium:"Jack Trice Stadium", day:"Sat Nov 28", time:"3:30 PM ET", sortTime:"2",
   temp:38, dew:26, wind:19, windLabel:"19 mph wind", sky:"Partly cloudy", skyIcon:"⛅", dome:false,
   rain:6, rh:47, pres:1021, sample:14, pts:-13, ptsGm:41.0, ptsStad:47.1,
   ou:{over:29, under:64, push:7, n:14}, total:44.5, note:"±8° temp, ±6 mph wind",
   windFx:{rating:"HIGH", pct10:-10}, delay:{level:"clear", pct:6},
   hourly:[{lab:"2 PM",c:"⛅",t:40,w:17,rain:4,rh:44},{lab:"3 PM",fp:true,c:"⛅",t:38,w:19,rain:6,rh:47},{lab:"4 PM",c:"⛅",t:37,w:19,rain:6,rh:49},{lab:"5 PM",c:"🌙",t:35,w:17,rain:5,rh:53},{lab:"6 PM",c:"🌙",t:33,w:15,rain:4,rh:56}],
+  edge:{score:13.9,level:"elevated"}, feels:28, fcs:false, venueN:41,
+  metrics:[{k:"pts",label:"SCORING",n:14,cur:41.0,lgAvg:56.0,vnAvg:47.1,lgPct:-27,vnPct:-13},{k:"pa",label:"PASSING YDS",n:14,cur:352,lgAvg:461,vnAvg:430,lgPct:-24,vnPct:-18},{k:"ru",label:"RUSHING YDS",n:14,cur:349,lgAvg:330,vnAvg:335,lgPct:6,vnPct:4},{k:"cp",label:"COMPLETION %",n:14,cur:53.8,lgAvg:60.0,vnAvg:59.1,lgPct:-10,vnPct:-9},{k:"fg",label:"FG MAKES",n:14,cur:1.5,lgAvg:2.3,vnAvg:2.2,lgPct:-35,vnPct:-32},{k:"fl",label:"FUMBLES",n:14,cur:1.9,lgAvg:1.3,vnAvg:1.4,lgPct:46,vnPct:36}],
   matches:[{d:"20241130",t:35,w:21,pts:37,line:44.5,res:"under"},{d:"20221029",t:42,w:18,pts:45,line:47.5,res:"under"}]},
  {id:"s3", away:"Vanderbilt", home:"Syracuse", conf:"ACC", p4:true, stadium:"JMA Wireless Dome", day:"Sat Nov 28", time:"7:30 PM ET", sortTime:"3",
   temp:70, dew:50, wind:0, windLabel:"ROOF/DOME", sky:"Indoor", skyIcon:"🏟️", dome:true,
@@ -562,7 +609,8 @@ function initField3D(g, canvas){
   })();
 }
 
-let DATA = SAMPLE, LIVE = false, FILTER = "P4";
+const MIN_METRIC_N = 12;   // mirrors MIN_METRIC_N in scripts/cfb/weekly_build.py
+let DATA = SAMPLE, LIVE = false, FILTER = "P4", SORTBY = "edge", MX_MODE = "fbs";
 (async()=>{
   try{
     const r=await fetch("/cfb/teaser.json?_="+Date.now());
@@ -609,11 +657,11 @@ function leanTxt(g){
     : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
 }
 function rowHTML(g){
-  const imp = (g.dome||!g.p4) ? `<span class="pill neu">PTS —</span>` : `<span class="pill ${cls(g.pts)}">PTS ${pct(g.pts)}</span>`;
+  const imp = (g.dome||!g.p4||g.pts==null) ? `<span class="pill neu">PTS —</span>` : `<span class="pill ${cls(g.pts)}">PTS ${pct(g.pts)}</span>`;
   const wx = g.dome ? `<div class="w">dome<br>weather sealed out</div>`
     : `<div class="w">${g.windLabel}<br>${(g.rain!=null&&g.rain>=15)?`Rain ${g.rain}% · `:""}dew ${g.dew}°</div>`;
   const sub = g.p4 ? `vs real closing totals · ${g.ou.n||g.sample} gms` : `no venue history yet`;
-  return `<div class="b-row" data-game="${g.id}">
+  return `<div class="b-row lv-${edgeLevel(g)}" data-game="${g.id}">
     <div class="b-time">${g.day}<span>${g.time.replace(" ET","")} ET</span></div>
     <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}<span class="conf-tag">${g.conf}</span></div><div class="b-stad">${g.stadium}${(g.badges||[]).map(x=>` · ${x.k==="LONG HAUL"?"✈️":"⛰️"} ${x.txt}`).join("")}</div></div>
     <div class="b-wx"><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div>
@@ -622,15 +670,38 @@ function rowHTML(g){
     <div class="b-badge">${edgeBadge(g)}</div>
   </div>`;
 }
+const EDGE_ORDER={severe:0,elevated:1,watch:2,none:3,indoor:4};
+function edgeLevel(g){ return (g.edge&&g.edge.level) || (g.dome?"indoor":"none"); }
+function edgeScore(g){ return (g.edge&&g.edge.score) || 0; }
 function visibleGames(){
-  if(FILTER==="ALL") return DATA.games;
-  if(FILTER==="P4") return DATA.games.filter(g=>g.conf!=="Other");
-  return DATA.games.filter(g=>g.conf===FILTER);
+  let list = DATA.games;
+  if(FILTER==="P4") list = list.filter(g=>g.conf!=="Other");
+  else if(FILTER!=="ALL") list = list.filter(g=>g.conf===FILTER);
+  const by={
+    edge:(a,b)=> (EDGE_ORDER[edgeLevel(a)]-EDGE_ORDER[edgeLevel(b)]) || (edgeScore(b)-edgeScore(a)) || a.sortTime.localeCompare(b.sortTime),
+    time:(a,b)=> a.sortTime.localeCompare(b.sortTime),
+    wind:(a,b)=> (b.wind||0)-(a.wind||0),
+    rain:(a,b)=> ((b.rain||0)-(a.rain||0)),
+    cold:(a,b)=> (a.temp)-(b.temp),
+    total:(a,b)=> ((b.total==null?-1:b.total)-(a.total==null?-1:a.total)),
+  };
+  return [...list].sort(by[SORTBY]||by.edge);
+}
+function renderEdgeStrip(){
+  const el=document.getElementById("edge-strip");
+  if(!el) return;
+  const vis=visibleGames();
+  const c={severe:0,elevated:0,watch:0,none:0,indoor:0};
+  vis.forEach(g=>{ c[edgeLevel(g)]=(c[edgeLevel(g)]||0)+1; });
+  const LBL={severe:"severe",elevated:"elevated",watch:"watch",none:"no edge",indoor:"indoor"};
+  el.innerHTML=["severe","elevated","watch","none","indoor"]
+    .filter(k=>c[k])
+    .map(k=>`<span class="edge-chip ed-${k}"><i></i>${c[k]} ${LBL[k]}</span>`).join("");
 }
 function renderSummary(){
   const vis = visibleGames();
   const live = vis.filter(g=>!g.dome);
-  const hist = live.filter(g=>g.p4&&g.ou.n);
+  const hist = live.filter(g=>g.p4&&g.ou.n>=MIN_METRIC_N);
   const el = document.getElementById("summary-strip");
   if(!live.length){ el.innerHTML=""; return; }
   const windy=[...live].sort((a,b)=>b.wind-a.wind)[0];
@@ -665,13 +736,48 @@ function delayChip(g){
 function windFxChip(g){
   if(g.dome || !g.windFx) return "";
   const f=g.windFx;
-  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS VENUE: <b>${f.rating}</b> — 10 mph of wind moves scoring ~${Math.abs(f.pct10)}% here historically<span class="tip" data-tip="Measured from every game at this venue since 2019: the relationship between wind speed and total points. Exposed venues rate high; sheltered bowls rate low."><span class="info-i">i</span></span></div>`;
+  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS VENUE: <b>${f.rating}</b> — 10 mph of wind moves scoring ~${Math.abs(f.pct10)}% here historically<span class="tip" data-tip="Measured from every game at this venue since 2010: the relationship between wind speed and total points. Exposed venues rate high; sheltered bowls rate low."><span class="info-i">i</span></span></div>`;
+}
+/* Six weather-impact metrics, each against two baselines. When the matched
+   sample is too thin we show the count instead of inventing a percentage. */
+function metricGrid(g){
+  const ms=(g.metrics||[]).filter(m=>m.cur!=null);
+  if(!ms.length) return "";
+  const mode = MX_MODE;
+  const cells = ms.map(m=>{
+    const p = mode==="venue" ? m.vnPct : m.lgPct;
+    const base = mode==="venue" ? m.vnAvg : m.lgAvg;
+    const k = p==null ? "neu" : cls(p);
+    const val = p==null ? "—" : pct(p);
+    const sub = base==null ? `${m.cur}` :
+      `<b>${m.cur}</b> vs ${base} ${mode==="venue"?"venue":"FBS"} avg`;
+    return `<div class="mx ${k}"><div class="k">${m.label}</div>
+      <div class="v">${val}</div><div class="s">${sub}</div></div>`;
+  }).join("");
+  // Two different blanks, and conflating them would be a lie: either the matched
+  // sample is below MIN_METRIC_N, or that baseline simply has no data on record.
+  const n = ms[0].n;
+  const blank = ms.some(m=>(mode==="venue"?m.vnPct:m.lgPct)==null);
+  const note = !blank ? ""
+    : n < MIN_METRIC_N
+      ? `<div class="mx-note">Only ${n} past game${n===1?"":"s"} match this weather — too few for a reliable %</div>`
+      : `<div class="mx-note">No ${mode==="venue"?"venue":"FBS"} baseline on record for the blank rows</div>`;
+  return `<div class="m-sec">
+    <div class="mx-head"><h5 style="margin:0">Weather impact in similar weather</h5>
+      <div class="mx-toggle" id="mx-toggle">
+        <button data-mx="fbs" class="${mode==="fbs"?"on":""}">FBS AVG</button>
+        <button data-mx="venue" class="${mode==="venue"?"on":""}">THIS VENUE</button>
+      </div></div>
+    <div class="mx-grid">${cells}</div>${note}
+    ${g.fcs?`<div class="fcs-note">Non-conference vs an FCS opponent — weather typically moves these games less, and blowouts distort totals. Treat the read as softer.</div>`:""}
+  </div>`;
 }
 function openModal(g){
   const modal=document.getElementById("modal");
   const body = g.matches.map(m=>{
     const ds=`${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
-    return `<tr><td>${ds}</td><td>${m.t}°</td><td>${m.w} mph</td><td>${m.line!=null?m.line:"—"}</td><td><b>${m.pts}</b></td><td>${m.res?`<span class="res-chip ${m.res}">${m.res.toUpperCase()}</span>`:"—"}</td></tr>`;
+    const fg = (m.fg!=null) ? `${m.fg}${m.fga!=null?"/"+m.fga:""}` : "—";
+    return `<tr><td>${ds}</td><td>${m.t}°</td><td>${m.w} mph</td><td>${m.line!=null?m.line:"—"}</td><td><b>${m.pts}</b></td><td>${fg}</td><td>${m.res?`<span class="res-chip ${m.res}">${m.res.toUpperCase()}</span>`:"—"}</td></tr>`;
   }).join("");
   const histSecs = !g.p4 ? `
       <div class="m-sec"><h5>Venue history</h5>
@@ -679,19 +785,20 @@ function openModal(g){
       </div>` : `
       <div class="m-sec"><h5>Scoring in this weather at ${g.stadium}</h5>
         <div class="m-tiles">
-          <div class="m-tile ${g.dome?"neu":cls(g.pts)}"><div class="t-lab">Total points</div><div class="t-val">${g.dome?"—":pct(g.pts)}</div>
-            <div class="t-sub">${g.ptsGm} pts/gm in these conditions · ${g.ptsStad} venue avg</div></div>
+          <div class="m-tile ${(g.dome||g.pts==null)?"neu":cls(g.pts)}"><div class="t-lab">Total points</div><div class="t-val">${(g.dome||g.pts==null)?"—":pct(g.pts)}</div>
+            <div class="t-sub">${g.ptsGm} pts/gm in these conditions · ${g.ptsStad} venue avg${(!g.dome&&g.pts==null)?` · only ${g.sample} matching game${g.sample===1?"":"s"}, too few for a %`:""}</div></div>
         </div>
       </div>
+      ${metricGrid(g)}
       <div class="m-sec"><h5>What actually happened — vs real closing totals<span class="tip" data-tip="Every matched game's final score against the closing total that was actually on the board that day. No estimates — these are the real lines."><span class="info-i">i</span></span></h5>
         <div class="hit-summary">
           <div class="hit-box over"><div class="n">${g.ou.over}%</div><div class="l">went over</div></div>
           <div class="hit-box under"><div class="n">${g.ou.under}%</div><div class="l">went under</div></div>
           <div class="hit-box push"><div class="n">${g.ou.push}%</div><div class="l">pushed</div></div>
         </div>
-        <table><thead><tr><th>Date</th><th>Temp</th><th>Wind</th><th>Closing</th><th>Final</th><th>Result</th></tr></thead>
+        <table><thead><tr><th>Date</th><th>Temp</th><th>Wind</th><th>Closing</th><th>Final</th><th>FG</th><th>Result</th></tr></thead>
         <tbody>${body}</tbody></table>
-        <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (book median).`:"No total posted yet."}</div>
+        <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (book median).`:"No total posted yet."}${(g.ou.n&&g.ou.n<MIN_METRIC_N)?` Only ${g.ou.n} matched game${g.ou.n===1?"":"s"} had a closing total on record — read these rates as thin.`:""}</div>
       </div>`;
   modal.innerHTML=`
     <div class="m-head"><div><div class="teams">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
@@ -709,6 +816,7 @@ function openModal(g){
           <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">wind</div></div>
           ${(!g.dome&&g.rain!=null)?`<div class="wx-item"><div class="big">${g.rain}<sup>%</sup></div><div class="lab">rain chance</div></div>`:""}
           ${(!g.dome&&g.rh!=null)?`<div class="wx-item"><div class="big">${g.rh}<sup>%</sup></div><div class="lab">humidity</div></div>`:""}
+          ${(!g.dome&&g.feels!=null&&Math.abs(g.feels-g.temp)>=3)?`<div class="wx-item"><div class="big">${g.feels}<sup>°F</sup></div><div class="lab">feels like</div></div>`:""}
           <div style="margin-left:auto;text-align:right"><div style="font-weight:700;color:var(--gold)">${g.skyIcon} ${g.sky}</div>
           <div style="font-size:12px;color:var(--muted)">${g.p4?`${g.sample} similar games`:"forecast only"}</div></div>
         </div>
@@ -720,6 +828,9 @@ function openModal(g){
   document.getElementById("overlay").classList.add("open");
   document.body.style.overflow="hidden";
   modal.querySelector(".m-close").addEventListener("click", closeModal);
+  modal.querySelectorAll("#mx-toggle button").forEach(b=>{
+    b.addEventListener("click", ev=>{ ev.stopPropagation(); MX_MODE=b.dataset.mx; openModal(g); });
+  });
   const f3d=document.getElementById("field3d");
   if(f3d) initField3D(g, f3d);
 }
@@ -739,6 +850,10 @@ document.querySelectorAll("nav button").forEach(b=>{
     document.getElementById("view-method").style.display = b.dataset.view==="method"?"":"none";
   });
 });
+(function(){
+  const sel=document.getElementById("sort-sel");
+  if(sel) sel.addEventListener("change", ()=>{ SORTBY=sel.value; renderAll(); });
+})();
 document.querySelectorAll("#conf-chips button").forEach(b=>{
   b.addEventListener("click", e=>{
     e.stopPropagation();
@@ -751,6 +866,7 @@ function renderAll(){
   const vis = visibleGames();
   document.getElementById("game-count").textContent = vis.length;
   document.getElementById("board").innerHTML = vis.map(rowHTML).join("");
+  renderEdgeStrip();
   document.getElementById("empty-state").style.display = vis.length? "none":"";
   renderSummary();
   if(DATA.brief){
@@ -769,7 +885,7 @@ async function loadLive(){
     const d=await r.json();
     DATA=d; LIVE=true;
     document.getElementById("proto-note").innerHTML =
-      `🟢 <span><b>Live</b> — real schedule, kickoff forecasts & Power 4 venue history (2019–2025, real closing totals). Updated ${d.generated}.</span>`;
+      `🟢 <span><b>Live</b> — real schedule, kickoff forecasts & Power 4 venue history (2010–2025, era-adjusted, real closing totals). Updated ${d.generated}.</span>`;
     renderAll();
   }catch(e){}
 }
