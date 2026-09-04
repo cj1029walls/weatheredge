@@ -429,7 +429,7 @@ def main():
                 pts=(round((m_pts - avg_pts) / avg_pts * 100)
                      if avg_pts and n >= MIN_METRIC_N and not dome else
                      (0 if dome else None)),
-                ptsGm=round(m_pts, 1), ptsStad=avg_pts,
+                ptsGm=(round(m_pts, 1) if n else None), ptsStad=avg_pts,
                 metrics=metric_block(rows, hist.get("avg"), league, dome),
                 venueN=hist["avg"].get("n", 0),
                 ou=dict(over=round(overs / len(lined) * 100) if lined else 0,
