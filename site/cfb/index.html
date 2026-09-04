@@ -779,9 +779,15 @@ function openModal(g){
     const fg = (m.fg!=null) ? `${m.fg}${m.fga!=null?"/"+m.fga:""}` : "—";
     return `<tr><td>${ds}</td><td>${m.t}°</td><td>${m.w} mph</td><td>${m.line!=null?m.line:"—"}</td><td><b>${m.pts}</b></td><td>${fg}</td><td>${m.res?`<span class="res-chip ${m.res}">${m.res.toUpperCase()}</span>`:"—"}</td></tr>`;
   }).join("");
-  const histSecs = !g.p4 ? `
+  // A P4 venue with no matched games (a rebuilt stadium, or weather nothing
+  // in its history resembles) has nothing to average — say so rather than
+  // rendering zeros as if they were a measurement.
+  const noHist = !g.p4 || !g.sample;
+  const histSecs = noHist ? `
       <div class="m-sec"><h5>Venue history</h5>
-        <div class="hist-note" style="margin-top:0">This venue isn't in the Power 4 history set, so no similar-weather scoring history is shown — the kickoff forecast and delay outlook above are live and real.${g.total!=null?` Today's total: ${g.total.toFixed(1)}.`:""}</div>
+        <div class="hist-note" style="margin-top:0">${!g.p4
+          ? "This venue isn't in the Power 4 history set, so no similar-weather scoring history is shown"
+          : "No past game at this venue matches these conditions, so there's no similar-weather scoring history to show"} — the kickoff forecast and delay outlook above are live and real.${g.total!=null?` Today's total: ${g.total.toFixed(1)}.`:""}</div>
       </div>` : `
       <div class="m-sec"><h5>Scoring in this weather at ${g.stadium}</h5>
         <div class="m-tiles">
