@@ -32,7 +32,21 @@ FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}
           "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=UTC&forecast_days=16")
 
 P4 = {"SEC", "Big Ten", "Big 12", "ACC"}
-ET = timezone(timedelta(hours=-4))
+# Real Eastern zone — a fixed -4 offset mislabels every kickoff after DST ends.
+ET = ZoneInfo("America/New_York")
+
+# Box-score metrics carried through from the history build. Each is reported
+# against two baselines (all FBS games at P4 venues, and this venue's own
+# history) and suppressed entirely when the matched sample is too thin.
+METRICS = (
+    ("pts", "SCORING", 0),
+    ("pa",  "PASSING YDS", 0),
+    ("ru",  "RUSHING YDS", 0),
+    ("cp",  "COMPLETION %", 1),
+    ("fg",  "FG MAKES", 1),
+    ("fl",  "FUMBLES", 1),
+)
+MIN_METRIC_N = 12          # below this we show the count, not a percentage
 
 
 def gv(d, *names):
@@ -89,6 +103,9 @@ def load_upcoming(window_days=8):
             ac = (gv(g, "awayClassification", "away_division") or "").lower()
             if hc != "fbs" and ac != "fbs":
                 continue
+            # FBS-vs-FCS games behave differently (blowouts, running clocks) and
+            # weather moves them less — worth flagging rather than silently mixing in.
+            g["_fcs"] = (hc == "fcs" or ac == "fcs")
             try:
                 utc = datetime.fromisoformat(start.replace("Z", "+00:00"))
             except ValueError:
@@ -202,6 +219,76 @@ def wind_receptivity(games):
     return dict(rating=rating, pct10=pct10)
 
 
+def feels_like(temp, rh, wind):
+    """Heat index when it's warm and humid, wind chill when it's cold and windy.
+
+    Both are the standard NWS formulas; outside their valid ranges the honest
+    answer is just the air temperature.
+    """
+    if temp is None:
+        return None
+    if temp >= 80 and rh is not None:
+        t, r = float(temp), float(rh)
+        hi = (-42.379 + 2.04901523 * t + 10.14333127 * r
+              - 0.22475541 * t * r - 0.00683783 * t * t
+              - 0.05481717 * r * r + 0.00122874 * t * t * r
+              + 0.00085282 * t * r * r - 0.00000199 * t * t * r * r)
+        if r < 13 and 80 <= t <= 112:
+            hi -= ((13 - r) / 4) * ((17 - abs(t - 95)) / 17) ** 0.5
+        elif r > 85 and 80 <= t <= 87:
+            hi += ((r - 85) / 10) * ((87 - t) / 5)
+        return round(max(hi, t))
+    if temp <= 50 and wind and wind >= 3:
+        t, v = float(temp), float(wind)
+        wc = 35.74 + 0.6215 * t - 35.75 * v ** 0.16 + 0.4275 * t * v ** 0.16
+        return round(min(wc, t))
+    return round(temp)
+
+
+def weather_edge(temp, wind, rain, dome):
+    """One composite score per game, so the slate can be ranked and labelled.
+
+    Most college games have no weather edge at all; saying so plainly is more
+    useful than dressing up a 5 mph breeze.
+    """
+    if dome:
+        return dict(score=0, level="indoor")
+    w = max(0.0, (wind or 0) - 10) * 1.2
+    r = max(0.0, (rain or 0) - 25) * 0.14
+    c = max(0.0, 45 - temp) * 0.45 if temp is not None else 0.0
+    h = max(0.0, temp - 88) * 0.5 if temp is not None else 0.0
+    score = round(w + r + c + h, 1)
+    level = ("severe" if score >= 14 else "elevated" if score >= 8
+             else "watch" if score >= 3 else "none")
+    return dict(score=score, level=level)
+
+
+def _vals(rows, key):
+    if key == "pts":
+        # era-normalized points when the history carries them, raw otherwise
+        return [r.get("epts", r["pts"]) for r in rows if r.get("epts", r.get("pts")) is not None]
+    return [r[key] for r in rows if r.get(key) is not None]
+
+
+def metric_block(rows, hist_avg, league, dome):
+    """Each metric vs both baselines, or an honest blank when the sample is thin."""
+    out = []
+    for key, label, nd in METRICS:
+        vals = _vals(rows, key)
+        n = len(vals)
+        cur = round(statistics.mean(vals), nd) if n else None
+        lg = league.get(key)
+        vn = (hist_avg or {}).get(key)
+        def pct(base):
+            if dome or cur is None or not base or n < MIN_METRIC_N:
+                return None
+            return round((cur - base) / base * 100)
+        out.append(dict(k=key, label=label, n=n, cur=cur,
+                        lgAvg=lg, vnAvg=vn,
+                        lgPct=pct(lg), vnPct=pct(vn)))
+    return out
+
+
 def match_games(hist_games, temp, wind, dome):
     if dome:
         return hist_games, "indoor games (domed venue)"
@@ -312,6 +399,9 @@ def main():
             rain=None if pp is None else round(pp),
             rh=None if rh is None else round(rh),
             pres=None if pres is None else round(pres),
+            feels=None if dome else feels_like(temp, rh, wind),
+            edge=weather_edge(None if dome else temp, wind, pp, dome),
+            fcs=bool(g.get("_fcs")),
             hourly=hourly or None, delay=delay, total=today_line,
             badges=badges or None,
             windDir=None if (dome or wdir is None) else round(wdir),
@@ -326,25 +416,33 @@ def main():
         if hist:
             rows, note = match_games(hist["games"], temp, wind, dome)
             n = len(rows)
-            m_pts = statistics.mean(x["pts"] for x in rows) if rows else 0
-            avg_pts = hist["avg"]["pts"] or league["pts"]
+            pts_vals = _vals(rows, "pts")
+            m_pts = statistics.mean(pts_vals) if pts_vals else 0
+            avg_pts = hist["avg"].get("pts") or league.get("pts")
             lined = [x for x in rows if x.get("res")]
             overs = sum(1 for x in lined if x["res"] == "over")
             unders = sum(1 for x in lined if x["res"] == "under")
             base.update(
                 sample=n,
-                pts=round((m_pts - avg_pts) / avg_pts * 100) if avg_pts and n and not dome else 0,
+                # None, not 0: below MIN_METRIC_N a headline % reads as a signal
+                # when it is really just noise. The page renders None as "PTS —".
+                pts=(round((m_pts - avg_pts) / avg_pts * 100)
+                     if avg_pts and n >= MIN_METRIC_N and not dome else
+                     (0 if dome else None)),
                 ptsGm=round(m_pts, 1), ptsStad=avg_pts,
+                metrics=metric_block(rows, hist.get("avg"), league, dome),
+                venueN=hist["avg"].get("n", 0),
                 ou=dict(over=round(overs / len(lined) * 100) if lined else 0,
                         under=round(unders / len(lined) * 100) if lined else 0,
                         push=round((len(lined) - overs - unders) / len(lined) * 100) if lined else 0,
                         n=len(lined)),
                 note=note, windFx=None if dome else wind_receptivity(hist["games"]),
                 matches=[dict(d=x["d"], t=x["t"], w=x["w"], pts=x["pts"],
+                              fg=x.get("fg"), fga=x.get("fga"),
                               line=x["line"], res=x["res"])
                          for x in sorted(rows, key=lambda x: x["d"], reverse=True)[:12]])
         else:
-            base.update(sample=0, pts=0, ptsGm=0, ptsStad=0,
+            base.update(sample=0, pts=None, ptsGm=0, ptsStad=0, metrics=[], venueN=0,
                         ou=dict(over=0, under=0, push=0, n=0),
                         note="forecast only — no venue history", windFx=None, matches=[])
         games.append(base)
@@ -372,8 +470,16 @@ def main():
     if domes:
         parts.append(f"{domes} game{'s' if domes > 1 else ''} indoors — weather-neutral.")
 
+    counts = {k: 0 for k in ("severe", "elevated", "watch", "none", "indoor")}
+    for g in games:
+        counts[(g.get("edge") or {}).get("level", "none")] += 1
+    if counts["none"] and not counts["severe"] and not counts["elevated"]:
+        parts.append("Most of this slate is weather-neutral.")
+
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    league=league, seasons=hist_all.get("_seasons"),
+                   era=hist_all.get("_era") and True or False,
+                   counts=counts,
                    brief=" ".join(parts),
                    games=sorted(games, key=lambda x: x["sortTime"]))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
