@@ -13,16 +13,19 @@ whoever was visiting.
 
 Output: data/cfb/venues_history.json
   { "<venueId>": { "name", "team", "conf", "dome", "tz",
-                   "games": [ {d, t, w, wd, pts, epts, line, res,
+                   "games": [ {d, t, w, pts, epts, line, res,
                                pa, ru, cp, fg, fga, fl, to}, ... ],
                    "avg": {pts, pa, ru, cp, fg, fl, to, n} },
     "_league": {pts, pa, ru, cp, fg, fl, to, n},
     "_era": {"<season>": factor}, "_built": "...", "_seasons": [..] }
 
-Game fields: d=YYYYMMDD, t=temp°F, w=wind mph, wd=wind direction deg
-(kept raw — field bearings can be layered in later), pts=total points,
+Game fields: d=YYYYMMDD, t=temp°F, w=wind mph, pts=total points,
 epts=era-normalized total points, line=closing total (median across books),
 res=over/under/push vs that line.
+
+Wind DIRECTION is deliberately not fetched: matching is wind-speed based
+(no field bearings curated for CFB), nothing reads it, and the archive API
+meters by data volume — a third of the budget for an unused column.
 
 Box-score fields (both teams combined, None when CFBD had no box for a game):
   pa=passing yards, ru=rushing yards, cp=completion % (game-wide),
@@ -53,7 +56,7 @@ OUT = os.path.join(ROOT, "data", "cfb", "venues_history.json")
 CFBD = "https://api.collegefootballdata.com"
 ARCHIVE_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
                "&start_date={start}&end_date={end}"
-               "&hourly=temperature_2m,wind_speed_10m,wind_direction_10m"
+               "&hourly=temperature_2m,wind_speed_10m"
                "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=UTC")
 
 FIRST_SEASON = 2010
@@ -75,7 +78,7 @@ def gv(d, *names):
     return None
 
 
-def fetch(url, tries=4, timeout=60, auth=False):
+def fetch(url, tries=4, timeout=60, auth=False, backoff_429=45):
     hdrs = {"User-Agent": "dfsradar-build/1.0", "Accept": "application/json"}
     if auth:
         key = os.environ.get("CFBD_API_KEY")
@@ -93,7 +96,7 @@ def fetch(url, tries=4, timeout=60, auth=False):
             # (week 0 before it was a thing, say) — retrying just burns minutes.
             if i == tries - 1 or (code and 400 <= code < 500 and code != 429):
                 raise
-            wait = 45 if code == 429 else 8 * (i + 1)
+            wait = min(backoff_429 * (i + 1), 600) if code == 429 else 8 * (i + 1)
             print(f"    retry {i+1}/{tries} in {wait}s: {e}")
             time.sleep(wait)
 
@@ -301,6 +304,12 @@ def era_factors(games):
 
 
 def venue_weather(meta, years):
+    """Hourly archive for one venue, keyed by UTC hour.
+
+    Open-Meteo meters by data volume, not request count, and a full sixteen-
+    season build runs close enough to the ceiling that the last venues can get
+    throttled. A 429 here is a wait, not a failure, so back off in minutes.
+    """
     out = {}
     for i in range(0, len(years), 4):
         chunk = years[i:i + 4]
@@ -309,11 +318,10 @@ def venue_weather(meta, years):
             end = (date.today() - timedelta(days=3)).isoformat()
         url = ARCHIVE_URL.format(lat=meta["lat"], lon=meta["lon"],
                                  start=f"{chunk[0]}-08-01", end=end)
-        data = fetch(url)
+        data = fetch(url, tries=5, backoff_429=180)
         h = data["hourly"]
-        for t, temp, ws, wd in zip(h["time"], h["temperature_2m"],
-                                   h["wind_speed_10m"], h["wind_direction_10m"]):
-            out[t[:13]] = (temp, ws, wd)
+        for t, temp, ws in zip(h["time"], h["temperature_2m"], h["wind_speed_10m"]):
+            out[t[:13]] = (temp, ws)
         time.sleep(1.2)
     return out
 
@@ -337,13 +345,22 @@ def main():
     for g in games:
         by_venue.setdefault(g["vid"], []).append(g)
 
-    history, league_rows = {}, []
+    history, league_rows, failed_venues = {}, [], []
     for i, (vid, meta) in enumerate(sorted(venues.items(), key=lambda kv: kv[1]["team"])):
         vgames = by_venue.get(vid, [])
         years = sorted({int(g["start"][:4]) for g in vgames}) or []
         rows = []
         if years:
-            wx = venue_weather(meta, years)
+            try:
+                wx = venue_weather(meta, years)
+            except Exception as e:
+                # Losing 80 minutes of work because the last venue got
+                # throttled is not an acceptable failure mode. Record it,
+                # keep going, and let the summary below decide if the
+                # build is still worth committing.
+                print(f"  !! {meta['team']}: weather unavailable ({e}) — venue left empty")
+                failed_venues.append(meta["team"])
+                wx = {}
             tzinfo = ZoneInfo(meta["tz"])
             for g in vgames:
                 try:
@@ -355,7 +372,7 @@ def main():
                 w = wx.get(key)
                 if not w or any(v is None for v in w):
                     continue
-                temp, ws, wd = w
+                temp, ws = w
                 local = utc.astimezone(tzinfo)
                 line = lines.get(g["id"])
                 res = None
@@ -364,7 +381,7 @@ def main():
                            else "over" if g["pts"] > line else "under")
                 f = era.get(str(g["season"]), 1.0)
                 row = dict(d=local.strftime("%Y%m%d"), t=round(temp), w=round(ws),
-                           wd=round(wd), pts=g["pts"], epts=round(g["pts"] * f, 1),
+                           pts=g["pts"], epts=round(g["pts"] * f, 1),
                            line=line, res=res)
                 row.update(box.get(g["id"]) or
                            {k: None for k in ("pa", "ru", "cp", "fg", "fga", "fl", "to")})
@@ -383,6 +400,12 @@ def main():
                                  dome=meta["dome"], tz=meta["tz"], games=rows, avg=avg)
         print(f"  [{i+1}/{len(venues)}] {meta['team']}: {len(rows)} games ({meta['name']})")
 
+    if failed_venues:
+        print(f"venues without weather: {len(failed_venues)} — {', '.join(failed_venues)}")
+        if len(failed_venues) > 5:
+            raise SystemExit(f"SANITY FAIL: {len(failed_venues)} venues missing weather "
+                             f"— refusing to commit a gutted dataset; re-run when the "
+                             f"archive API allowance resets")
     lg = dict(n=len(league_rows),
               pts=round(statistics.mean(x["epts"] for x in league_rows), 1) if league_rows else 0)
     for k in METRICS:
@@ -392,6 +415,7 @@ def main():
     history["_built"] = date.today().isoformat()
     history["_seasons"] = [FIRST_SEASON, LAST_SEASON]
     history["_confSeason"] = venue_yr
+    history["_incomplete"] = failed_venues or None
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(history, f, separators=(",", ":"))
