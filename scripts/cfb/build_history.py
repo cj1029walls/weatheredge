@@ -89,7 +89,9 @@ def fetch(url, tries=4, timeout=60, auth=False):
                 return json.loads(r.read())
         except Exception as e:
             code = getattr(e, "code", None)
-            if i == tries - 1:
+            # A 4xx that isn't rate limiting means the resource doesn't exist
+            # (week 0 before it was a thing, say) — retrying just burns minutes.
+            if i == tries - 1 or (code and 400 <= code < 500 and code != 429):
                 raise
             wait = 45 if code == 429 else 8 * (i + 1)
             print(f"    retry {i+1}/{tries} in {wait}s: {e}")
