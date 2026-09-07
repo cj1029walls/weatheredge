@@ -25,7 +25,7 @@
 <style>
   :root{
     --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15);
+    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15);
     --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
     --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
     --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
@@ -54,21 +54,21 @@
   .sport-tabs{display:flex;gap:6px;margin-top:14px}
   .sport-tabs a,.sport-tabs span{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a !important;border-color:transparent;font-weight:800}
+  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206 !important;border-color:transparent;font-weight:800}
   .sport-tabs .protab:hover{filter:brightness(1.06)}
   .sport-tabs .on{background:var(--card);color:var(--navy);border-color:#fff}
-  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#F08A3C,#FFA05A);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
   @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
-  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #ff6b1a;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ff9d54}
+  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
+  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#FFA05A}
   .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
   .kx-card .kx-t b{color:#fff}
   .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
-  .kx-card .kx-go{background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-card .kx-go{background:linear-gradient(135deg,#F08A3C,#FFA05A);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-card .kx-go:hover{filter:brightness(1.1)}
   .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
-  .kx-hook a{color:#e85d0f;font-weight:800;text-decoration:none}
+  .kx-hook a{color:#CC7533;font-weight:800;text-decoration:none}
   .kx-hook a:hover{text-decoration:underline}
   .sport-tabs .off{opacity:.55;cursor:default}
   .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
@@ -82,7 +82,7 @@
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
   .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:bpulse 2.2s ease-in-out infinite}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:bpulse 2.2s ease-in-out infinite}
   @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
   .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
   .brief-body b{color:#fff}
@@ -120,18 +120,18 @@
   .edge-badge{font-size:10px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
   .edge-wind{background:#47566d;color:#e2e8f2}
   .edge-cold{background:#2450b8;color:#dde7fb}
-  .edge-rain{background:#f59e0b;color:#3a2f24}
+  .edge-rain{background:#fbbf24;color:#3a2f24}
   .edge-neutral{background:var(--gray-bg);color:var(--muted)}
   .sit-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
   .sit-chip{font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:3px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap;background:#2A303D;color:#47566d;border:1px solid #dbe3ee}
-  .sit-chip.hot{background:#3a2f24;color:#f59e0b;border-color:#f3ddc2}
+  .sit-chip.hot{background:#3a2f24;color:#fbbf24;border-color:rgba(251,191,36,.32)}
   .sit-chip.ref{background:#2b2836;color:#5b4a9e;border-color:#d9d2ef}
   .crew-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .crew-box{background:var(--gray-bg);border-radius:10px;padding:12px 14px}
   .crew-box .cb-k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
   .crew-box .cb-line{font-size:12.5px;color:var(--body2);margin:3px 0;line-height:1.45}
   .crew-box .cb-line b{color:#EFF1F7}
-  .crew-box .cb-hi{color:#f59e0b;font-weight:700}
+  .crew-box .cb-hi{color:#fbbf24;font-weight:700}
   .sit-note{font-size:11.5px;color:var(--muted);margin-top:9px;line-height:1.5}
   .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin-top:13px}
   .hr-cell{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center}
@@ -144,10 +144,10 @@
   .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
   .dl-clear{background:var(--green-bg);color:var(--green-deep)}
   .dl-watch{background:var(--amber-bg);color:#fbbf24}
-  .dl-likely{background:#3a2f24;color:#f59e0b}
+  .dl-likely{background:#3a2f24;color:#fbbf24}
   .dl-severe{background:var(--red-bg);color:var(--red-deep)}
   .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
-  .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)} .fx-high b{color:#fb923c} .fx-extreme b{color:var(--red)}
+  .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)} .fx-high b{color:#F08A3C} .fx-extreme b{color:var(--red)}
   .overlay{position:fixed;inset:0;background:rgba(13,25,41,.55);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:34px 16px;z-index:50;overflow-y:auto}
   .overlay.open{display:flex}
   .modal{background:var(--surface);border-radius:18px;max-width:860px;width:100%;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35)}
@@ -208,7 +208,6 @@
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
-<div class="announce">📡 DFSRADAR covers <b>MLB · NFL · CFB · PGA · NASCAR</b> — more outdoor sports <span class="soon">coming soon</span></div>
 <header>
   <div class="header-inner">
     <div class="brand-row">
@@ -226,7 +225,7 @@
           <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
           <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
           <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#4ade80"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="13" cy="28.5" r="1.9" fill="#22c55e"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
         </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">NFL</span></h1>
         <div class="tagline">NFL weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
@@ -242,7 +241,6 @@
 </header>
 
 <main>
-  <div class="proto-note" id="proto-note">⚠️ <span><b>Preseason mode</b> — the slate fills in automatically when games enter the 8-day forecast window.</span></div>
 
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>This week's read — live from the radar<span class="tip" data-tip="Auto-generated from this week's data on every build — cold, wind, and rain risks straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
@@ -276,6 +274,18 @@
 <footer>DFSRADAR · NFL weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
 
 <script>
+/* The announce / ticker / live-note nodes were removed from the markup; any
+   code still reaching for them gets null instead of a crash. */
+(function(){
+  const _g = document.getElementById.bind(document);
+  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
+  document.getElementById = function(id){
+    const el = _g(id);
+    if(el || !GONE[id]) return el;
+    return new Proxy({}, {get:()=>function(){}, set:()=>true});
+  };
+})();
+
 const SAMPLE = {generated:"preview", brief:"Coldest kickoff: 24° for PIT @ BUF. Wind watch: 21 mph crosswind for GB @ CHI at Soldier Field. No serious rain threats on the slate. 3 games under a roof — weather-neutral.",
 games:[
  {id:"pit-buf", away:"PIT", home:"BUF", stadium:"Highmark Stadium", day:"Sun Sep 13", time:"1:00 PM ET", sortTime:"1",
@@ -528,7 +538,8 @@ async function loadLive(){
     if(!r.ok) return;
     const d=await r.json();
     DATA=d; LIVE=true;
-    document.getElementById("proto-note").innerHTML =
+    if(0) void 0;  // live bar removed
+    void
       `🟢 <span><b>Live</b> — real schedule, kickoff forecasts & stadium history (2015–2025, real closing lines). Updated ${d.generated}.</span>`;
     renderAll();
   }catch(e){}
