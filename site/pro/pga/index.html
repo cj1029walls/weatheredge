@@ -158,6 +158,33 @@
   .m-sec h5,.method h4,.sub-h{color:#67e8f9}
   .m-head .teams{color:#EFF1F7}
   ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
+  /* ===== v3: narrow-screen header =====
+     Four things pushed every sport page sideways on a phone: .sport-tabs was a
+     non-wrapping flex row holding the header open at a 400px minimum; the
+     .controls heading is a flex item that would not shrink below its own text;
+     .b-row is a fixed six-column grid; and .tip::after is a 250px absolutely
+     positioned tooltip that hangs past the viewport on any tip near the right
+     edge. The tooltip only appears on hover, which is unreliable on touch, so
+     it is suppressed rather than re-anchored. ===== */
+  .sport-tabs{flex-wrap:wrap}
+  .brand,.brand h1{min-width:0;max-width:100%}
+  .brand h1{flex-wrap:wrap;row-gap:6px}
+  .tagline{max-width:100%}
+  .controls h2{min-width:0;overflow-wrap:anywhere}
+  @media(max-width:680px){
+    body{padding-left:14px;padding-right:14px}
+    .brand h1{font-size:21px}
+    .tip::after,.tip::before{display:none}
+    nav{flex-wrap:wrap;row-gap:4px}
+    nav button{white-space:normal}
+    .b-row{grid-template-columns:1fr!important;gap:8px;row-gap:8px}
+    .b-row>*{min-width:0}
+    .summary-strip{grid-template-columns:1fr}
+    .m-tiles,.mx-grid{grid-template-columns:1fr!important}
+    table{display:block;overflow-x:auto;white-space:nowrap}
+    .method{padding:24px 20px}
+    .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
+  }
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"PGA Course History & Wind Pedigree Board","url":"https://dfsradar.com/pro/pga/","description":"This week's PGA board: every player's course history since 2018, wind pedigree from weather-tagged past editions, wave draw and recent form \u2014 graded against the final leaderboard. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/pga/","availability":"https://schema.org/InStock"}}</script>
 </head>
@@ -169,7 +196,7 @@
       <div class="tagline">The PGA weekly board — <b>course history, wind pedigree, and the draw, on one card.</b> Every lean archived and graded in public.</div>
       <div class="pro-nav">
         <a href="/pro/props/">🎯 Props</a>
-        <a href="/pro/">⚾ MLB</a>
+        <a href="/pro/mlb/">⚾ MLB</a>
         <a href="/pro/nfl/">🏈 NFL</a>
         <a href="/pro/cfb/">🎓 CFB</a>
         <a class="on" href="/pro/pga/">⛳ PGA</a>
