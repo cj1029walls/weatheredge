@@ -32,7 +32,7 @@
        flips at once; only the values change to the dark family surfaces. */
     --navy:#2E3440; --navy2:#3A4356; --navy3:#454E61;
     --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15); --green-bg2:rgba(34,197,94,.24);
+    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15); --green-bg2:rgba(34,197,94,.24);
     --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15); --red-bg2:rgba(248,113,113,.24);
     /* under / neutral-cool = slate-blue (kept distinct from red impact language) */
     --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
@@ -45,9 +45,9 @@
     --line-strong:#57627A; --hover:#3C4455; --body2:#C7CEDC;
     --note-bg:rgba(251,191,36,.12); --note-border:rgba(251,191,36,.32); --note-text:#fbbf24;
     --ou1:#22d3ee; --ou2:#0ea5c4;
-    --bolt1:#fbbf24; --bolt2:#d97706;
-    --meterp1:#4ade80; --meterp2:#22c55e; --metern1:#f87171; --metern2:#b91c1c;
-    --on-accent:#08222a;
+    --bolt1:#fbbf24; --bolt2:#CC7533;
+    --meterp1:#22c55e; --meterp2:#22c55e; --metern1:#f87171; --metern2:#b91c1c;
+    --on-accent:#1B1206;
     --radius:14px;
     --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
     --shadow-hover:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
@@ -112,30 +112,30 @@
   .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
   .sport-tabs .on{background:var(--gold-bg);color:var(--gold-deep);border-color:rgba(34,211,238,.45)}
-  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#F08A3C,#FFA05A);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
   @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
-  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a !important;border-color:transparent;font-weight:800}
-  .sport-tabs .protab:hover{filter:brightness(1.06);color:#08222a}
+  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206 !important;border-color:transparent;font-weight:800}
+  .sport-tabs .protab:hover{filter:brightness(1.06);color:#1B1206}
   .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,#252A35,var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
   .pro-card .px-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
   .pro-card .px-t{font-size:14px;color:#dde5f5;margin-top:3px}
   .pro-card .px-t b{color:#fff}
   .pro-card .px-s{font-size:11px;color:#8b98b8;margin-top:2px}
   .pro-card .px-btns{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-  .pro-card .px-go{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,217,74,.3)}
+  .pro-card .px-go{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,217,74,.3)}
   .pro-card .px-go:hover{filter:brightness(1.06)}
   .pro-card .px-login{color:#aeb9cf;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:22px;padding:8px 16px}
   .pro-card .px-login:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #ff6b1a;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#ff9d54}
+  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
+  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#FFA05A}
   .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
   .kx-card .kx-t b{color:#fff}
   .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
-  .kx-card .kx-go{background:linear-gradient(135deg,#ff6b1a,#ff8a3d);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-card .kx-go{background:linear-gradient(135deg,#F08A3C,#FFA05A);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-card .kx-go:hover{filter:brightness(1.1)}
   .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
-  .kx-hook a{color:#e85d0f;font-weight:800;text-decoration:none}
+  .kx-hook a{color:#CC7533;font-weight:800;text-decoration:none}
   .kx-hook a:hover{text-decoration:underline}
   .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
   .date-chip b{color:#fff}
@@ -159,9 +159,9 @@
   .tk{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#c9d4ea;margin:0 26px}
   .tk b{color:#fff}
   .tk .gold{color:#F08A3C}
-  .tk .grn{color:#4ade80}
-  .tk .tag{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:9px;font-weight:800;letter-spacing:1px;border-radius:8px;padding:1.5px 7px}
-  .tk.live b{color:#4ade80}
+  .tk .grn{color:#22c55e}
+  .tk .tag{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:9px;font-weight:800;letter-spacing:1px;border-radius:8px;padding:1.5px 7px}
+  .tk.live b{color:#22c55e}
   /* ---- PRO teaser card ---- */
   .pro-tease{background:linear-gradient(120deg,#252A35,#3A4356);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 20px;margin-bottom:18px;border-left:4px solid #F08A3C}
   .pro-tease .pt-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
@@ -178,17 +178,17 @@
   .pt-blur.b2{max-width:60%}
   .pt-lock-row .pr{font-size:12px;font-weight:800;color:#5d6f96;filter:blur(3px)}
   .pt-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .pt-go{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
+  .pt-go{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
   .pt-go:hover{filter:brightness(1.06)}
   .pt-login{color:#c9d4ea;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:8px 16px}
   .pt-login:hover{color:#fff;border-color:#fff}
   .pt-receipts{font-size:11.5px;color:#9fb0d4}
-  .pt-receipts b{color:#4ade80}
+  .pt-receipts b{color:#22c55e}
 
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
   .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:bpulse 2.2s ease-in-out infinite}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:bpulse 2.2s ease-in-out infinite}
   @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
   .brief-head .tip .info-i{background:rgba(255,255,255,.13);color:#c8d5f2;border-color:rgba(255,255,255,.3)}
   .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
@@ -263,7 +263,7 @@
   .dot{width:8px;height:8px;border-radius:50%}
   .dot.strong{background:var(--green)}.dot.fair{background:var(--amber)}.dot.limited{background:var(--red)}
   .edge-badge{font-size:10.5px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase}
-  .edge-hr{background:#147a43;color:#d9f4e3}
+  .edge-hr{background:#22c55e;color:#06210F}
   .edge-under{background:#47566d;color:#e2e8f2}
   .edge-rain{background:#2450b8;color:#dde7fb}
   .edge-neutral{background:var(--gray-bg);color:var(--muted)}
@@ -296,13 +296,13 @@
   .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
   .dl-clear{background:var(--green-bg);color:var(--green-deep);border-color:#3a5545}
   .dl-watch{background:var(--amber-bg);color:#fbbf24;border-color:#4d452e}
-  .dl-likely{background:#3a2f24;color:#f59e0b;border-color:#4d3b24}
+  .dl-likely{background:#3a2f24;color:#fbbf24;border-color:#4d3b24}
   .dl-severe{background:var(--red-bg);color:var(--red-deep);border-color:#4d3232}
   /* wind factor chip */
   .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
   .windfx b{letter-spacing:1px}
   .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)}
-  .fx-high b{color:#fb923c} .fx-extreme b{color:var(--red)}
+  .fx-high b{color:#F08A3C} .fx-extreme b{color:var(--red)}
   @media(max-width:960px){
     .hero{grid-template-columns:1fr}
     .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
@@ -323,7 +323,7 @@
   .wxc-dome{font-size:12.5px;color:var(--muted);margin-top:8px}
   .wxc-foot{display:flex;flex-wrap:wrap;gap:4px;font-size:12px;color:var(--body2);margin-top:10px}
   .wxc-foot b{letter-spacing:.5px}
-  .wfx-low{color:var(--blue)} .wfx-medium{color:var(--gold-deep)} .wfx-high{color:#fb923c} .wfx-extreme{color:var(--red)}
+  .wfx-low{color:var(--blue)} .wfx-medium{color:var(--gold-deep)} .wfx-high{color:#F08A3C} .wfx-extreme{color:var(--red)}
   .wxc-link{margin-left:auto;color:var(--gold-deep);font-weight:700}
   /* ---------- compare table ---------- */
   .table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
@@ -456,8 +456,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"DFSRADAR","url":"https://dfsradar.com/","logo":"https://dfsradar.com/og-card.png","sameAs":[]}</script>
 </head>
 <body>
-<div class="ticker-wrap" id="ticker-wrap" onclick="location.href='/pro/'" style="display:none"><div class="ticker" id="ticker"></div></div>
-<div class="announce">📡 DFSRADAR covers <b>MLB · NFL · CFB · PGA · NASCAR</b> — more outdoor sports <span class="soon">coming soon</span></div>
+</div>
 
 <header>
   <div class="header-inner">
@@ -483,7 +482,7 @@
           <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C">
             <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#4ade80">
+          <circle cx="13" cy="28.5" r="1.9" fill="#22c55e">
             <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/>
           </circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
@@ -506,7 +505,6 @@
 </header>
 
 <main>
-  <div class="proto-note" id="proto-note">⚠️ <span><b>Sample data</b> — live slate loads automatically when the daily build has run.</span></div>
 
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>Today's read — live from the radar<span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
@@ -621,6 +619,18 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+/* The announce / ticker / live-note nodes were removed from the markup; any
+   code still reaching for them gets null instead of a crash. */
+(function(){
+  const _g = document.getElementById.bind(document);
+  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
+  document.getElementById = function(id){
+    const el = _g(id);
+    if(el || !GONE[id]) return el;
+    return new Proxy({}, {get:()=>function(){}, set:()=>true});
+  };
+})();
+
 /* ==================================================================
    SAMPLE DATA — representative slate for Tue, Jul 28
    windAngle: degrees clockwise from straight out to CF (0 = out to CF,
@@ -1233,16 +1243,22 @@ function initPark3D(g, canvas, slot="modal"){
      the whole scene lives in ONE hue; conditions pick it:
      hot = ember/crimson · mild = deep navy · cool = steel · fog = misty slate · dome = graphite */
   let hue, sat;
-  if(dome){ hue=0.62; sat=0.10; }
-  else if(foggy){ hue=0.58; sat=0.12; }
-  else if(g.temp>=88){ hue=0.985; sat=0.42; }
-  else if(g.temp<=72){ hue=0.575; sat=0.35; }
-  else { hue=0.62; sat=0.40; }
+  /* Anchored to the DFS Kitchen surfaces (#2E3240 is hue .625 / sat .16) so the
+     canvas sits inside its card instead of fighting it. Weather still moves the
+     hue, but toward the palette's own accents -- warm to the accent orange,
+     cold to the radar cyan -- and at a fraction of the old saturation. */
+  if(dome){ hue=0.625; sat=0.07; }
+  else if(foggy){ hue=0.58; sat=0.10; }
+  else if(g.temp>=88){ hue=0.075; sat=0.26; }
+  else if(g.temp<=72){ hue=0.525; sat=0.24; }
+  else { hue=0.625; sat=0.17; }
   /* day games get an airy, brighter scene; night games go deep and floodlit —
      the white wall and streamlines pop against the dark. Domes keep graphite. */
-  const LT = dome ? {bg:0.10, apron:0.24, grass:0.31, track:0.205, dirt:0.225, diamond:0.275, mound:0.19}
-           : night ? {bg:0.055, apron:0.175, grass:0.235, track:0.15, dirt:0.165, diamond:0.205, mound:0.135}
-                   : {bg:0.145, apron:0.29, grass:0.365, track:0.25, dirt:0.27, diamond:0.325, mound:0.235};
+  /* backgrounds lifted off near-black: at 0.055 the canvas read as a hole
+     punched in the card. These sit around the --inset surface instead. */
+  const LT = dome ? {bg:0.145, apron:0.235, grass:0.30, track:0.205, dirt:0.225, diamond:0.27, mound:0.19}
+           : night ? {bg:0.135, apron:0.215, grass:0.275, track:0.185, dirt:0.20, diamond:0.245, mound:0.17}
+                   : {bg:0.175, apron:0.285, grass:0.355, track:0.245, dirt:0.265, diamond:0.315, mound:0.23};
   const L = (l)=> new THREE.Color().setHSL(hue, sat, Math.max(0.04, l));
   const COL = {
     bg:      L(LT.bg),
