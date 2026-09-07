@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DFSRADAR — Weather, Venue &amp; Umpire Edges for DFS</title>
+<meta name="description" content="DFSRADAR reads the forecast at every venue on the slate, compares it to what actually happened there in similar weather, and grades every call in public. MLB, NFL, CFB, PGA and NASCAR.">
+<link rel="canonical" href="https://dfsradar.com/">
+<meta property="og:title" content="DFSRADAR — Weather, Venue &amp; Umpire Edges for DFS">
+<meta property="og:description" content="The forecast at every venue, measured against that venue's own history, graded in public.">
+<meta property="og:url" content="https://dfsradar.com/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<style>
+  :root{
+    --bg:#2E3240; --panel:#323A4A; --panel2:#3C4455; --inset:#252A35;
+    --line:#454E61; --line-soft:rgba(255,255,255,.07);
+    --ink:#EFF1F7; --body:#C7CEDC; --dim:#8E97AD;
+    --radar:#22d3ee; --radar-soft:#67e8f9;
+    --accent:#F08A3C; --accent-soft:#FFA05A; --on-accent:#1B1206;
+    --good:#22c55e;
+    --radius:16px;
+    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
+    --shadow-hi:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
+    --font:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --display:Sora,Ubuntu,-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:var(--font); color:var(--body);
+    font-size:17px; line-height:1.7; background:var(--bg);
+    background-image:radial-gradient(1200px 520px at 50% -180px,rgba(34,211,238,.14),transparent 70%);
+    background-repeat:no-repeat; background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--radar-soft)}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+  .measure{max-width:680px;margin-left:auto;margin-right:auto}
+
+  /* ---------- header ---------- */
+  header{position:sticky;top:0;z-index:40;background:rgba(46,50,64,.86);
+    backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line-soft)}
+  .hrow{display:flex;align-items:center;gap:18px;padding:14px 0}
+  .logo{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+  .logo span.n{font-family:var(--display);font-weight:800;font-size:21px;letter-spacing:-.4px}
+  .logo span.r{color:var(--radar)}
+  .hnav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  .hnav a{color:var(--body);text-decoration:none;font-size:14px;font-weight:500;
+    padding:8px 13px;border-radius:9px;border:1px solid transparent}
+  .hnav a:hover{background:rgba(34,211,238,.10);border-color:rgba(34,211,238,.32);color:var(--radar-soft)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:var(--font);font-weight:700;font-size:15px;text-decoration:none;
+    padding:13px 22px;border-radius:12px;border:1px solid transparent;cursor:pointer;transition:.15s}
+  .btn-pro{background:var(--accent);color:var(--on-accent)}
+  .btn-pro:hover{background:var(--accent-soft)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{border-color:rgba(34,211,238,.5);color:var(--radar-soft)}
+  .btn-sm{padding:9px 16px;font-size:14px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:78px 0 56px;text-align:center}
+  .hero h2{font-family:var(--display);font-weight:800;color:var(--ink);
+    font-size:clamp(32px,5.2vw,50px);line-height:1.08;letter-spacing:-1.5px;
+    margin:0 0 22px;text-wrap:balance}
+  .hero h2 em{font-style:normal;color:var(--radar)}
+  .hero .lead{font-size:19px;line-height:1.75;color:var(--body);margin:0 auto 34px}
+  .cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+  .chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+  .chip{display:inline-flex;align-items:center;gap:9px;background:var(--panel);
+    border:1px solid var(--line);border-radius:22px;padding:9px 17px;
+    font-size:14px;font-weight:500;color:var(--ink);text-decoration:none;transition:.15s}
+  .chip:hover{border-color:rgba(34,211,238,.5);background:var(--panel2)}
+  .chip i{width:8px;height:8px;border-radius:50%;background:var(--radar);font-style:normal}
+  .chip.soon{color:var(--dim);cursor:default}
+  .chip.soon i{background:var(--dim)}
+
+  /* ---------- sections ---------- */
+  section{padding:64px 0;border-top:1px solid var(--line-soft)}
+  .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase;
+    color:var(--radar-soft);margin:0 0 12px;text-align:center}
+  h3{font-family:var(--display);font-weight:700;color:var(--ink);
+    font-size:clamp(24px,3.4vw,32px);line-height:1.2;letter-spacing:-.7px;
+    margin:0 0 16px;text-align:center;text-wrap:balance}
+  .sub{font-size:17px;color:var(--body);text-align:center;margin:0 auto 44px}
+
+  /* four cards: a 2x2 block fills, where auto-fit left one stranded on its own row */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:28px 26px;transition:.15s}
+  .card:hover{border-color:rgba(34,211,238,.42);box-shadow:var(--shadow-hi)}
+  .card h4{font-family:var(--display);font-weight:700;color:var(--ink);font-size:17.5px;
+    margin:0 0 10px;letter-spacing:-.2px}
+  .card p{margin:0;font-size:15.5px;line-height:1.68;color:var(--body)}
+  .card .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;
+    justify-content:center;background:rgba(34,211,238,.13);border:1px solid rgba(34,211,238,.3);
+    margin-bottom:16px;font-size:18px}
+
+  /* ---------- the loop ---------- */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;counter-reset:s}
+  .step{background:var(--inset);border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;position:relative}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-13px;left:24px;
+    width:28px;height:28px;border-radius:50%;background:var(--radar);color:#08222a;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13.5px}
+  .step h4{font-family:var(--display);font-weight:700;color:var(--ink);font-size:16.5px;margin:8px 0 9px}
+  .step p{margin:0;font-size:15px;line-height:1.65;color:var(--body)}
+
+  /* ---------- pricing ---------- */
+  .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;max-width:800px;margin:0 auto}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--shadow);padding:32px 30px;display:flex;flex-direction:column}
+  .plan.best{border-color:rgba(240,138,60,.55);box-shadow:var(--shadow-hi)}
+  .plan .tag{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--radar-soft);margin-bottom:10px}
+  .plan.best .tag{color:var(--accent-soft)}
+  .plan .price{font-family:var(--display);font-weight:800;color:var(--ink);
+    font-size:40px;letter-spacing:-1.6px;line-height:1;margin-bottom:4px}
+  .plan .price small{font-size:15px;font-weight:600;color:var(--dim);letter-spacing:0}
+  .plan .who{font-size:14.5px;color:var(--dim);margin:0 0 22px}
+  .plan ul{list-style:none;margin:0 0 26px;padding:0;flex:1}
+  .plan li{position:relative;padding-left:26px;margin-bottom:11px;font-size:15px;line-height:1.6}
+  .plan li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;
+    border-radius:50%;background:var(--radar)}
+  .plan.best li::before{background:var(--accent)}
+  .plan .btn{width:100%}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line-soft);padding:44px 0 56px;text-align:center;
+    font-size:13.5px;color:var(--dim);line-height:1.8}
+  footer a{color:var(--body);text-decoration:none}
+  footer a:hover{color:var(--radar-soft)}
+  .fnav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+  .fnav a{padding:6px 12px;border-radius:8px;border:1px solid var(--line);font-size:13.5px}
+  .disc{max-width:620px;margin:18px auto 0;font-size:12.5px;color:var(--dim)}
+
+  @media (max-width:640px){
+    body{font-size:16px}
+    .hero{padding:52px 0 40px}
+    section{padding:48px 0}
+    .card,.plan{padding:24px 22px}
+    .hnav a{padding:7px 10px;font-size:13.5px}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{animation:none!important}}
+  :focus-visible{outline:2px solid var(--radar);outline-offset:2px}
+  ::selection{background:rgba(34,211,238,.32);color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hrow">
+    <a class="logo" href="/">
+      <svg viewBox="0 0 44 44" width="34" height="34" aria-hidden="true">
+        <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#22d3ee" stroke-width="1.8"/>
+        <circle cx="22" cy="22" r="13.5" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".7"/>
+        <circle cx="22" cy="22" r="7" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".5"/>
+        <line x1="22" y1="22" x2="22" y2="2.6" stroke="#EFF1F7" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="29.5" cy="13.5" r="2.4" fill="#F08A3C"/>
+        <circle cx="22" cy="22" r="1.7" fill="#EFF1F7"/>
+      </svg>
+      <span class="n">DFS<span class="r">RADAR</span></span>
+    </a>
+    <nav class="hnav">
+      <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a>
+      <a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
+      <a class="btn btn-pro btn-sm" href="#pricing" style="margin-left:8px">Get PRO</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="wrap hero">
+    <h2>The forecast is public.<br><em>What it does to a venue isn't.</em></h2>
+    <p class="lead measure">DFSRADAR reads the kickoff or first-pitch forecast at every venue on the
+      slate, then measures it against what actually happened at <em>that</em> venue in similar
+      conditions — against the real closing totals that were on the board those days.
+      Every call it makes is graded in public afterward.</p>
+    <div class="cta">
+      <a class="btn btn-pro" href="/mlb/">Open today's MLB radar →</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+    <div class="chips">
+      <a class="chip" href="/mlb/"><i></i>MLB — Weather, Park &amp; Umpire</a>
+      <a class="chip" href="/nfl/"><i></i>NFL — Wind &amp; Cold Games</a>
+      <a class="chip" href="/cfb/"><i></i>CFB — Power 4 Venue History</a>
+      <a class="chip" href="/pga/"><i></i>PGA — Tee-Time Wind</a>
+      <a class="chip" href="/nascar/"><i></i>NASCAR — Track Conditions</a>
+    </div>
+  </div>
+
+  <section id="what">
+    <div class="wrap">
+      <p class="eyebrow">What it actually does</p>
+      <h3>Not a weather app. A venue-history engine.</h3>
+      <p class="sub measure">Anyone can tell you it'll be 38° and windy. The useful question is what
+        38° and windy has historically done to scoring at <em>that specific stadium</em> — and
+        whether the number on the board already accounts for it.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="ic">🌡️</div>
+          <h4>Forecast at the venue</h4>
+          <p>Hour-by-hour temperature, wind, rain and humidity pulled for each venue's own
+            coordinates and read at the exact kickoff or first-pitch hour — in local time,
+            not a city-level average.</p>
+        </div>
+        <div class="card">
+          <div class="ic">📚</div>
+          <h4>That venue's own history</h4>
+          <p>Every past game at the same venue in similar conditions, going back years.
+            College football alone carries 6,795 Power 4 games from 2010 onward, era-adjusted
+            so an older scoring environment doesn't read as a weather effect.</p>
+        </div>
+        <div class="card">
+          <div class="ic">🎯</div>
+          <h4>Against the real closing number</h4>
+          <p>Over/under rates are measured against the closing total that was actually on the
+            board that day — not a reconstructed line. If the sample is too thin to be
+            trusted, the page says so instead of showing a percentage.</p>
+        </div>
+        <div class="card">
+          <div class="ic">🏟️</div>
+          <h4>See the conditions</h4>
+          <p>A live 3D view of each park or stadium, oriented and lit to the forecast, with
+            wind streamlines showing which way the ball is actually going to move.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h3>Four steps, rebuilt every morning</h3>
+      <p class="sub measure">The whole board regenerates on a schedule as forecasts sharpen toward
+        kickoff, so what you see in the morning is not what you saw two days ago.</p>
+      <div class="steps">
+        <div class="step">
+          <h4>Read the slate</h4>
+          <p>Pull every game inside the forecast window, with its venue, start time and the
+            current market total.</p>
+        </div>
+        <div class="step">
+          <h4>Match the conditions</h4>
+          <p>Find past games at that venue inside a stated temperature and wind window, and
+            report how many matched.</p>
+        </div>
+        <div class="step">
+          <h4>Measure the impact</h4>
+          <p>Compare scoring and the underlying box-score signals against both the league
+            baseline and the venue's own average.</p>
+        </div>
+        <div class="step">
+          <h4>Grade it in public</h4>
+          <p>Every PRO call settles from the final box score and goes into a running record —
+            losing stretches included.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <p class="eyebrow">Pricing</p>
+      <h3>The radars are free. PRO is the edge board.</h3>
+      <p class="sub measure">Every sport's weather radar stays open to everyone. PRO adds the
+        player-level boards, the trench and props models, and the graded record behind them.</p>
+      <div class="plans">
+        <div class="plan">
+          <div class="tag">DFSRADAR PRO</div>
+          <div class="price">$15<small> /mo</small></div>
+          <p class="who">For players who live on one or two sports.</p>
+          <ul>
+            <li>Every free radar, all five sports</li>
+            <li>PRO boards for MLB, NFL, CFB, PGA and NASCAR</li>
+            <li>Player props and the CFB Trench Edge board</li>
+            <li>The graded public record behind every call</li>
+            <li>Rebuilt every morning as forecasts sharpen</li>
+          </ul>
+          <a class="btn btn-ghost" href="/pro/">Go to PRO →</a>
+        </div>
+        <div class="plan best">
+          <div class="tag">DFS Kitchen All-Access</div>
+          <div class="price">$60<small> /mo</small></div>
+          <p class="who">The whole kitchen — DFSRADAR is one of four tools.</p>
+          <ul>
+            <li>Everything in DFSRADAR PRO</li>
+            <li>The Optimizer — simulation-grade lineup builder</li>
+            <li>DFSPREP — the strategy school</li>
+            <li>DFS Books — real bankroll tracking</li>
+            <li>Chef's Lineups — daily on X</li>
+          </ul>
+          <a class="btn btn-pro" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=pricing&utm_campaign=landing" target="_blank" rel="noopener">Get All-Access →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fnav">
+      <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a>
+      <a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a href="/pro/">PRO</a>
+    </div>
+    <div>DFSRADAR · part of <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=footer&utm_campaign=landing" target="_blank" rel="noopener">The DFS Kitchen</a> family</div>
+    <p class="disc">Weather-adjusted insights are informational and are not betting advice.
+      Nothing here is a guarantee of any outcome. If gambling is a problem for you, call
+      1-800-GAMBLER.</p>
+  </div>
+</footer>
+
+</body>
+</html>
