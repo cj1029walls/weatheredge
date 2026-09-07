@@ -136,8 +136,14 @@ def match_games(hist, temp, wind, rel, dome, dew=None):
     carry factor. The dew band is the first constraint relaxed when samples
     thin, so it sharpens matches without starving them."""
     games = hist["games"]
+    # Keep roof-open and roof-closed history apart. Rows built before the roof
+    # flag existed have no "rc" key; treating those as open preserves the old
+    # behaviour rather than silently emptying the pool.
+    if any("rc" in g for g in games):
+        want = 1 if dome else 0
+        games = [g for g in games if g.get("rc", 0) == want]
     if dome:
-        return games, "all games at this park (roof closed → weather-neutral)"
+        return games, "roof-closed games at this park (weather-neutral)"
     sect = wind_sector(rel)
     for dt, dw, ddew, use_sector in ((6, 6, 8, True), (8, 8, 12, True),
                                      (10, 10, 99, True), (12, 99, 99, False)):
