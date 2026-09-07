@@ -27,7 +27,7 @@
 <style>
   :root{
     --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15);
+    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15);
     --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
     --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
     --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
@@ -43,13 +43,13 @@
   .header-inner{max-width:1160px;margin:0 auto}
   .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
+  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
   .brand .tagline b{color:#F08A3C;font-weight:700}
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
   .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
   .pro-nav a:hover{color:#fff}
-  .pro-nav a.on{background:var(--card);color:#08222a;border-color:#fff}
+  .pro-nav a.on{background:var(--card);color:#1B1206;border-color:#fff}
   .pro-nav .soon{font-size:11px;color:#7c8aa5;font-weight:700;margin-left:2px}
   main{max-width:1160px;margin:0 auto;padding:22px 24px 50px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
@@ -74,7 +74,7 @@
   .imp{font-size:11px;color:var(--faint)}
   .chips{display:flex;flex-wrap:wrap;gap:5px}
   .chip{font-size:10px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:14px;background:var(--gray-bg);color:var(--body2);white-space:nowrap}
-  .chip.hot{background:#3a2f24;color:#f59e0b}
+  .chip.hot{background:#3a2f24;color:#fbbf24}
   .chip.ref{background:#2b2836;color:#5b4a9e}
   tr.d-row td{background:#2b313d;padding:14px 16px}
   .crew-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
@@ -82,7 +82,7 @@
   .crew-box .cb-k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
   .crew-box .cb-line{font-size:12.5px;color:var(--body2);margin:3px 0;line-height:1.45}
   .crew-box .cb-line b{color:#EFF1F7}
-  .crew-box .cb-hi{color:#f59e0b;font-weight:700}
+  .crew-box .cb-hi{color:#fbbf24;font-weight:700}
   .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
   .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
   .m-sec p{font-size:13px;line-height:1.75;color:var(--body2)}
@@ -94,26 +94,26 @@
   .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:#F08A3C}
   .tab-pane{display:none}
   .tab-pane.on{display:block}
-  .atd-chip{font-size:10px;font-weight:800;background:#3a2f24;color:#f59e0b;border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
+  .atd-chip{font-size:10px;font-weight:800;background:#3a2f24;color:#fbbf24;border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
   .qb2{display:inline-block;font-size:11px;font-weight:800;border-radius:12px;padding:3px 10px;white-space:nowrap}
   .hit2{background:var(--green-bg);color:var(--green-deep)}
   .miss2{background:var(--red-bg);color:var(--red-deep)}
   /* paywall */
   #paywall{display:none}
   .pay-hero{background:linear-gradient(120deg,#252A35 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:34px 30px;color:#dde5f5;text-align:center}
-  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
+  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
   .pay-hero h2{color:#fff;font-size:24px;margin-bottom:6px}
   .pay-hero .pay-price{font-size:38px;font-weight:800;color:#F08A3C;margin:12px 0 2px}
   .pay-hero .pay-price span{font-size:15px;color:#95a1b5;font-weight:700}
   .pay-feats{max-width:640px;margin:16px auto 22px;font-size:13.5px;line-height:2;text-align:left;color:#c9d4ea}
   .pay-feats b{color:#fff}
   .pay-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .pay-cta{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
+  .pay-cta{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
   .pay-cta:hover{filter:brightness(1.06)}
   .pay-login{background:transparent;color:#dde5f5;font-size:14px;font-weight:800;border:1.5px solid rgba(255,255,255,.35);border-radius:24px;padding:13px 30px;cursor:pointer;font-family:inherit}
   .pay-login:hover{border-color:#fff;color:#fff}
   .pay-kitchen{margin-top:18px;font-size:12.5px;color:#95a1b5}
-  .pay-kitchen a{color:#ff8a3d;font-weight:800;text-decoration:none}
+  .pay-kitchen a{color:#FFA05A;font-weight:800;text-decoration:none}
   .member-bar{display:none;align-items:center;gap:10px;justify-content:flex-end;font-size:11.5px;color:var(--muted);margin:-8px 0 12px}
   .member-bar a{color:var(--gold);font-weight:700;cursor:pointer;text-decoration:none}
   footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7}
@@ -182,7 +182,6 @@
 
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
-  <div class="proto-note" id="proto-note">🏈 <span><b>NFL PRO board</b> — loading this week's slate…</span></div>
 
   <div class="sec-h" id="nfl-week-h">NFL weekly board</div>
   <div class="split-note" id="nfl-note" style="margin-bottom:12px"></div>
@@ -227,6 +226,18 @@
 </footer>
 
 <script>
+/* The announce / ticker / live-note nodes were removed from the markup; any
+   code still reaching for them gets null instead of a crash. */
+(function(){
+  const _g = document.getElementById.bind(document);
+  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
+  document.getElementById = function(id){
+    const el = _g(id);
+    if(el || !GONE[id]) return el;
+    return new Proxy({}, {get:()=>function(){}, set:()=>true});
+  };
+})();
+
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
 let NFL=null;
 const OPEN=new Set();
@@ -292,7 +303,8 @@ function crewBoxes(g){
 }
 function renderNFL(){
   if(!NFL) return;
-  document.getElementById("proto-note").innerHTML=`🏈 <span><b>Live</b> — built ${esc(NFL.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
+  if(0) void 0;  // live bar removed
+    void`🏈 <span><b>Live</b> — built ${esc(NFL.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
   document.getElementById("nfl-week-h").textContent=NFL.season?`NFL — ${NFL.season} Week ${NFL.week} · ${(NFL.games||[]).length} games`:"NFL weekly board";
   document.getElementById("nfl-note").textContent=NFL.note||"";
   document.getElementById("cnt-targets").textContent=(NFL.leans||[]).length||"";
