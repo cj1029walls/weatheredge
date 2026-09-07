@@ -27,7 +27,7 @@
 <style>
   :root{
     --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15);
+    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15);
     --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
     --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
     --pro:#F08A3C; --pro-bg:rgba(240,138,60,.14);
@@ -44,7 +44,7 @@
   .header-inner{max-width:1160px;margin:0 auto}
   .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
+  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
   .brand .tagline b{color:#F08A3C;font-weight:700}
   .backlink{display:inline-block;margin-top:12px;font-size:12px;font-weight:700;letter-spacing:.5px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:5px 13px}
@@ -52,13 +52,13 @@
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
   .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
   .pro-nav a:hover{color:#fff}
-  .pro-nav a.on{background:var(--card);color:#08222a;border-color:#fff}
+  .pro-nav a.on{background:var(--card);color:#1B1206;border-color:#fff}
   .pro-nav .soon{font-size:11px;color:#7c8aa5;font-weight:700;margin-left:2px}
   main{max-width:1160px;margin:0 auto;padding:22px 24px 50px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,#252A35 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 8px #4ade80;animation:bp 2.2s ease-in-out infinite}
+  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:bp 2.2s ease-in-out infinite}
   @keyframes bp{0%,100%{opacity:1}50%{opacity:.25}}
   .brief-body{font-size:14px;line-height:1.7;color:#dde5f5}
   .brief-body b{color:#fff}
@@ -73,7 +73,7 @@
   .tab-pane.on{display:block}
   .sec-h{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px;display:flex;align-items:center;gap:8px}
   .sec-h:first-child{margin-top:4px}
-  .sec-h .live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 7px #35c96b;animation:bp 1.6s ease-in-out infinite}
+  .sec-h .live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 7px #22c55e;animation:bp 1.6s ease-in-out infinite}
   table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
   thead th{text-align:left;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:11px 12px;border-bottom:1.5px solid var(--line);background:var(--card)}
   tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -91,7 +91,7 @@
   .imp{font-size:11px;color:var(--muted)}
   .edge-pos{color:var(--green-deep);font-weight:800}
   .edge-neg{color:var(--muted)}
-  .value-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:10px;font-weight:800;letter-spacing:.8px;border-radius:14px;padding:3px 10px;text-transform:uppercase}
+  .value-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:10px;font-weight:800;letter-spacing:.8px;border-radius:14px;padding:3px 10px;text-transform:uppercase}
   .hr-badge{display:inline-block;background:var(--green-bg);color:var(--green-deep);font-size:10px;font-weight:800;letter-spacing:.6px;border-radius:12px;padding:2px 8px;margin-left:6px}
   .gamestrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
   .g-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:11px 14px;font-size:12px}
@@ -178,19 +178,19 @@
   /* paywall */
   #paywall{display:none}
   .pay-hero{background:linear-gradient(120deg,#252A35 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:34px 30px;color:#dde5f5;text-align:center}
-  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
+  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
   .pay-hero h2{color:#fff;font-size:24px;margin-bottom:6px}
   .pay-hero .pay-price{font-size:38px;font-weight:800;color:#F08A3C;margin:12px 0 2px}
   .pay-hero .pay-price span{font-size:15px;color:#95a1b5;font-weight:700}
   .pay-feats{max-width:640px;margin:16px auto 22px;font-size:13.5px;line-height:2;text-align:left;color:#c9d4ea}
   .pay-feats b{color:#fff}
   .pay-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .pay-cta{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
+  .pay-cta{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
   .pay-cta:hover{filter:brightness(1.06)}
   .pay-login{background:transparent;color:#dde5f5;font-size:14px;font-weight:800;border:1.5px solid rgba(255,255,255,.35);border-radius:24px;padding:13px 30px;cursor:pointer;font-family:inherit}
   .pay-login:hover{border-color:#fff;color:#fff}
   .pay-kitchen{margin-top:18px;font-size:12.5px;color:#95a1b5}
-  .pay-kitchen a{color:#ff8a3d;font-weight:800;text-decoration:none}
+  .pay-kitchen a{color:#FFA05A;font-weight:800;text-decoration:none}
   .member-bar{display:none;align-items:center;gap:10px;justify-content:flex-end;font-size:11.5px;color:var(--muted);margin:-8px 0 12px}
   .member-bar a{color:var(--gold);font-weight:700;cursor:pointer;text-decoration:none}
   footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7}
@@ -259,7 +259,6 @@
 
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
-  <div class="proto-note" id="proto-note">⚠️ <span><b>Private beta</b> — sample data until tonight's build runs. This page is unlisted.</span></div>
 
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>Tonight's card — live from the radar</div>
@@ -399,6 +398,18 @@
 </footer>
 
 <script>
+/* The announce / ticker / live-note nodes were removed from the markup; any
+   code still reaching for them gets null instead of a crash. */
+(function(){
+  const _g = document.getElementById.bind(document);
+  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
+  document.getElementById = function(id){
+    const el = _g(id);
+    if(el || !GONE[id]) return el;
+    return new Proxy({}, {get:()=>function(){}, set:()=>true});
+  };
+})();
+
 const SAMPLE={generated:"preview",oddsGenerated:"preview",date:null,
  brief:"Shohei Ohtani (LAD) leads the board — 27.4% HR chance, priced +320 (implied 23.8%). Best value: Kyle Schwarber +240 — our number says 24.1% vs 20.5% fair implied (+3.6 pts). 2 value flags tonight.",
  games:[{away:"LAD",home:"CHC",time:"2:20 PM ET",gamePk:null,ump:"Erich Bacchus",umpMult:0.97,umpN:200,weatherHr:51,dome:false,spAway:"Eric Lauer",spHome:"Shota Imanaga",spAwayHr9:1.21,spHomeHr9:0.98,expHr:3.4,parkHr:2.4,vsPark:42,lineups:true,runs:{away:{proj:5.1,rg:4.6,oppSp:"Shota Imanaga",oppEra:3.1},home:{proj:4.4,rg:4.3,oppSp:"Eric Lauer",oppEra:4.2},total:9.5,line:8.5,diff:1.0,lean:"OVER",wxRuns:1.09,umpRuns:0.99}},
@@ -678,7 +689,8 @@ async function loadLive(){
     const r=await fetch("data.json?_="+Date.now());
     if(!r.ok) return;
     DATA=await r.json();
-    document.getElementById("proto-note").innerHTML=
+    if(0) void 0;  // live bar removed
+    void
       `🟢 <span><b>Live</b> — built ${DATA.generated} · odds as of ${DATA.oddsGenerated||"—"} · private beta, unlisted.</span>`;
     renderAll();
     if(DATA.date){ pollLive(); if(!liveTimer) liveTimer=setInterval(pollLive,60000); }
