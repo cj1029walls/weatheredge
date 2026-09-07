@@ -28,7 +28,7 @@
 <style>
   :root{
     --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#4ade80; --green-bg:rgba(34,197,94,.15);
+    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15);
     --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
     --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
     --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
@@ -44,13 +44,13 @@
   .header-inner{max-width:1160px;margin:0 auto}
   .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
+  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
   .brand .tagline b{color:#F08A3C;font-weight:700}
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
   .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
   .pro-nav a:hover{color:#fff}
-  .pro-nav a.on{background:var(--card);color:#08222a;border-color:#fff}
+  .pro-nav a.on{background:var(--card);color:#1B1206;border-color:#fff}
   main{max-width:1160px;margin:0 auto;padding:22px 24px 50px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
   .sec-h{font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px;display:flex;align-items:center;gap:9px}
@@ -71,7 +71,7 @@
   .imp{font-size:11px;color:var(--faint)}
   .qb{display:inline-block;font-size:11px;font-weight:800;border-radius:12px;padding:3px 10px;white-space:nowrap}
   .q5{background:var(--green-bg);color:var(--green-deep)}
-  .q4{background:#17331f;color:#3f7a52}
+  .q4{background:#17331f;color:#1e7a45}
   .q3{background:var(--gray-bg);color:var(--body2)}
   .q2{background:#3a1f1f;color:#9a5555}
   .q1{background:var(--red-bg);color:var(--red-deep)}
@@ -81,7 +81,7 @@
   .m-sec p{font-size:13px;line-height:1.75;color:var(--body2)}
   .ladder{max-width:560px}
   .ladder td,.ladder th{padding:9px 14px}
-  .lbar{height:8px;border-radius:4px;background:linear-gradient(90deg,#8fd3a5,#22c55e)}
+  .lbar{height:8px;border-radius:4px;background:linear-gradient(90deg,#22c55e,#22c55e)}
   .tabbar{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 20px;position:sticky;top:0;z-index:30;background:var(--surface);padding:10px 0 10px}
   .tabbar button{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--body2);background:var(--card);border:1.5px solid var(--line-strong);border-radius:20px;padding:8px 18px;cursor:pointer;display:flex;align-items:center;gap:7px}
   .tabbar button:hover{border-color:var(--gold-deep);color:var(--gold-deep)}
@@ -110,19 +110,19 @@
   /* paywall */
   #paywall{display:none}
   .pay-hero{background:linear-gradient(120deg,#252A35 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:34px 30px;color:#dde5f5;text-align:center}
-  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
+  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
   .pay-hero h2{color:#fff;font-size:24px;margin-bottom:6px}
   .pay-hero .pay-price{font-size:38px;font-weight:800;color:#F08A3C;margin:12px 0 2px}
   .pay-hero .pay-price span{font-size:15px;color:#95a1b5;font-weight:700}
   .pay-feats{max-width:640px;margin:16px auto 22px;font-size:13.5px;line-height:2;text-align:left;color:#c9d4ea}
   .pay-feats b{color:#fff}
   .pay-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .pay-cta{background:linear-gradient(135deg,#F08A3C,#e0742a);color:#08222a;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
+  .pay-cta{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
   .pay-cta:hover{filter:brightness(1.06)}
   .pay-login{background:transparent;color:#dde5f5;font-size:14px;font-weight:800;border:1.5px solid rgba(255,255,255,.35);border-radius:24px;padding:13px 30px;cursor:pointer;font-family:inherit}
   .pay-login:hover{border-color:#fff;color:#fff}
   .pay-kitchen{margin-top:18px;font-size:12.5px;color:#95a1b5}
-  .pay-kitchen a{color:#ff8a3d;font-weight:800;text-decoration:none}
+  .pay-kitchen a{color:#FFA05A;font-weight:800;text-decoration:none}
   .member-bar{display:none;align-items:center;gap:10px;justify-content:flex-end;font-size:11.5px;color:var(--muted);margin:-8px 0 12px}
   .member-bar a{color:var(--gold);font-weight:700;cursor:pointer;text-decoration:none}
   footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7}
@@ -191,7 +191,6 @@
 
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
-  <div class="proto-note" id="proto-note">🎓 <span><b>CFB Trench Edge board</b> — loading this week's slate…</span></div>
 
   <div class="sec-h" id="cfb-week-h">CFB trench board</div>
   <div class="split-note" id="cfb-note" style="margin-bottom:12px"></div>
@@ -266,6 +265,18 @@
 </footer>
 
 <script>
+/* The announce / ticker / live-note nodes were removed from the markup; any
+   code still reaching for them gets null instead of a crash. */
+(function(){
+  const _g = document.getElementById.bind(document);
+  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
+  document.getElementById = function(id){
+    const el = _g(id);
+    if(el || !GONE[id]) return el;
+    return new Proxy({}, {get:()=>function(){}, set:()=>true});
+  };
+})();
+
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
 function showTab(id){
   document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
@@ -454,7 +465,8 @@ function edgeCell(e){
 }
 function renderCFB(){
   if(!CFB) return;
-  document.getElementById("proto-note").innerHTML=`🎓 <span><b>Live</b> — built ${esc(CFB.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
+  if(0) void 0;  // live bar removed
+    void`🎓 <span><b>Live</b> — built ${esc(CFB.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
   document.getElementById("cfb-week-h").textContent=CFB.week?`CFB — ${CFB.season} Week ${CFB.week} · ${(CFB.games||[]).length} FBS games`:"CFB trench board";
   document.getElementById("cfb-note").textContent=CFB.note||"";
   document.getElementById("cnt-leans").textContent=(CFB.leans||[]).length||"";
