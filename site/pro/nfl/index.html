@@ -43,7 +43,7 @@
   .header-inner{max-width:1160px;margin:0 auto}
   .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand h1 .pro{margin-left:12px;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
+  .brand h1 .pro{margin-left:12px;background:#F08A3C;color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
   .brand .tagline b{color:#F08A3C;font-weight:700}
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
@@ -101,19 +101,19 @@
   /* paywall */
   #paywall{display:none}
   .pay-hero{background:linear-gradient(120deg,#252A35 0%,var(--navy2) 90%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:34px 30px;color:#dde5f5;text-align:center}
-  .pay-hero .pay-badge{display:inline-block;background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
+  .pay-hero .pay-badge{display:inline-block;background:#F08A3C;color:#1B1206;border-radius:12px;padding:4px 16px;font-size:13px;letter-spacing:2px;font-weight:800;margin-bottom:14px}
   .pay-hero h2{color:#fff;font-size:24px;margin-bottom:6px}
   .pay-hero .pay-price{font-size:38px;font-weight:800;color:#F08A3C;margin:12px 0 2px}
   .pay-hero .pay-price span{font-size:15px;color:#95a1b5;font-weight:700}
   .pay-feats{max-width:640px;margin:16px auto 22px;font-size:13.5px;line-height:2;text-align:left;color:#c9d4ea}
   .pay-feats b{color:#fff}
   .pay-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .pay-cta{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
+  .pay-cta{background:#F08A3C;color:#1B1206;font-size:15px;font-weight:800;letter-spacing:.4px;border:0;border-radius:24px;padding:13px 34px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px rgba(255,217,74,.35)}
   .pay-cta:hover{filter:brightness(1.06)}
   .pay-login{background:transparent;color:#dde5f5;font-size:14px;font-weight:800;border:1.5px solid rgba(255,255,255,.35);border-radius:24px;padding:13px 30px;cursor:pointer;font-family:inherit}
   .pay-login:hover{border-color:#fff;color:#fff}
   .pay-kitchen{margin-top:18px;font-size:12.5px;color:#95a1b5}
-  .pay-kitchen a{color:#FFA05A;font-weight:800;text-decoration:none}
+  .pay-kitchen a{color:#F08A3C;font-weight:800;text-decoration:none}
   .member-bar{display:none;align-items:center;gap:10px;justify-content:flex-end;font-size:11.5px;color:var(--muted);margin:-8px 0 12px}
   .member-bar a{color:var(--gold);font-weight:700;cursor:pointer;text-decoration:none}
   footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.7}
@@ -136,6 +136,40 @@
   ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
   :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
   .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
+  /* ===== v2: reading density + cyan lift =====
+     dfskitchen.com sets 19.5px body on a ~680px measure with 64px section
+     padding. A dense data board can't go that far, but 14px text inside 14px
+     card padding was the "clustered" complaint; this is the same intent at
+     table scale. ===== */
+  body{font-size:15.5px;
+    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
+    background-repeat:no-repeat;background-attachment:fixed;
+    padding:26px 26px 88px}
+  main{max-width:1180px}
+  .summary-strip{gap:16px;margin-bottom:30px}
+  .board{gap:14px}
+  .sum-card{padding:20px 22px}
+  .wxc{padding:20px 22px}
+  .m-sec{padding:22px 24px;margin-bottom:16px}
+  .p-card{padding:16px 18px}
+  .brief-card{padding:24px 28px 25px;margin-bottom:26px}
+  .pro-card,.kx-card,.pro-tease{padding:18px 22px;margin-bottom:26px}
+  .b-row{padding:17px 20px}
+  .method{padding:36px 40px}
+  .controls{margin-bottom:20px}
+  .controls h2{font-size:14px;letter-spacing:1.5px}
+  table td,table th{padding-top:11px;padding-bottom:11px}
+  /* prose keeps a readable measure instead of running the full 1180px */
+  .method p,.hist-note,.mx-note,.fcs-note,.empty-season,.tagline{max-width:70ch}
+
+  /* cyan lift -- all-grey was underwhelming; this is DFSRADAR's own colour
+     from the Kitchen system (--radar #22d3ee), spent only where the eye lands. */
+  .brief-card{border-left:3px solid rgba(34,211,238,.6)}
+  .sum-card{border-top:2px solid rgba(34,211,238,.5)}
+  .sum-card:hover,.b-row:hover,.wxc:hover{border-color:rgba(34,211,238,.45)}
+  .m-sec h5,.method h4,.sub-h{color:#67e8f9}
+  .m-head .teams{color:#EFF1F7}
+  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"NFL Weekly Board: Referee, Travel & Weather Edges","url":"https://dfsradar.com/pro/nfl/","description":"The NFL weekly board: referee crew tendencies, travel and rest spots with real ATS records, team weather identities, and QB & kicker condition splits priced against live prop lines. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/nfl/","availability":"https://schema.org/InStock"}}</script>
 </head>
