@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DFSRADAR PRO — MLB Home Run Prop Targets & Umpire Model</title>
-<link rel="canonical" href="https://dfsradar.com/pro/">
+<link rel="canonical" href="https://dfsradar.com/pro/mlb/">
 <meta name="description" content="Tonight's ranked MLB home run prop targets: our probability vs the books' live price, built from weather, a 22,000-game umpire dataset, pitcher and batter data. Every card graded in public. $15/mo covers MLB, NFL, PGA and NASCAR.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
@@ -247,6 +247,33 @@
   .m-sec h5,.method h4,.sub-h{color:#67e8f9}
   .m-head .teams{color:#EFF1F7}
   ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
+  /* ===== v3: narrow-screen header =====
+     Four things pushed every sport page sideways on a phone: .sport-tabs was a
+     non-wrapping flex row holding the header open at a 400px minimum; the
+     .controls heading is a flex item that would not shrink below its own text;
+     .b-row is a fixed six-column grid; and .tip::after is a 250px absolutely
+     positioned tooltip that hangs past the viewport on any tip near the right
+     edge. The tooltip only appears on hover, which is unreliable on touch, so
+     it is suppressed rather than re-anchored. ===== */
+  .sport-tabs{flex-wrap:wrap}
+  .brand,.brand h1{min-width:0;max-width:100%}
+  .brand h1{flex-wrap:wrap;row-gap:6px}
+  .tagline{max-width:100%}
+  .controls h2{min-width:0;overflow-wrap:anywhere}
+  @media(max-width:680px){
+    body{padding-left:14px;padding-right:14px}
+    .brand h1{font-size:21px}
+    .tip::after,.tip::before{display:none}
+    nav{flex-wrap:wrap;row-gap:4px}
+    nav button{white-space:normal}
+    .b-row{grid-template-columns:1fr!important;gap:8px;row-gap:8px}
+    .b-row>*{min-width:0}
+    .summary-strip{grid-template-columns:1fr}
+    .m-tiles,.mx-grid{grid-template-columns:1fr!important}
+    table{display:block;overflow-x:auto;white-space:nowrap}
+    .method{padding:24px 20px}
+    .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
+  }
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"MLB Home Run Prop Targets & Umpire Model","url":"https://dfsradar.com/pro/","description":"Tonight's ranked MLB home run prop targets: our probability vs the books' live price, built from weather, a 22,000-game umpire dataset, pitcher and batter data. Every card graded in public. $15/mo covers MLB, NFL, PGA and NASCAR.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/","availability":"https://schema.org/InStock"}}</script>
 </head>
@@ -258,7 +285,7 @@
       <div class="tagline">Tonight's HR prop targets — <b>our probability vs the books' price.</b> Weather × umpire × pitcher × batter, shrunk and capped. No hype numbers.</div>
       <div class="pro-nav">
         <a href="/pro/props/">🎯 Props</a>
-        <a class="on" href="/pro/">⚾ MLB</a>
+        <a class="on" href="/pro/mlb/">⚾ MLB</a>
         <a href="/pro/nfl/">🏈 NFL</a>
         <a href="/pro/cfb/">🎓 CFB</a>
         <a href="/pro/pga/">⛳ PGA</a>
@@ -720,7 +747,7 @@ async function pollLive(){
 }
 async function loadLive(){
   try{
-    const r=await fetch("data.json?_="+Date.now());
+    const r=await fetch("/pro/data.json?_="+Date.now());
     if(!r.ok) return;
     DATA=await r.json();
     if(0) void 0;  // live bar removed
@@ -783,7 +810,7 @@ function renderLogTab(){
 }
 async function loadUmps(){
   try{
-    const r=await fetch("umps.json?_="+Date.now());
+    const r=await fetch("/pro/umps.json?_="+Date.now());
     if(!r.ok){document.getElementById("ump-lb-note").textContent="Umpire dataset builds on the next nightly run.";return;}
     UMPS=await r.json();
     renderAll();
@@ -814,7 +841,7 @@ function renderRecord(rec){
 }
 async function loadRecord(){
   try{
-    const r=await fetch("record.json?_="+Date.now());
+    const r=await fetch("/pro/record.json?_="+Date.now());
     if(r.ok) renderRecord(await r.json());
   }catch(e){}
 }
