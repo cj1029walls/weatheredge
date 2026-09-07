@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DFSRADAR PRO — The Desks</title>
+<meta name="description" content="Every DFSRADAR PRO desk in one place: MLB, NFL, CFB, PGA, NASCAR and cross-sport props, each with its own graded record.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://dfsradar.com/pro/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
+<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<style>
+  :root{
+    --bg:#2E3240; --panel:#323A4A; --panel2:#3C4455; --inset:#252A35;
+    --line:#454E61; --line-soft:rgba(255,255,255,.07);
+    --ink:#EFF1F7; --body:#C7CEDC; --dim:#8E97AD;
+    --radar:#22d3ee; --radar-soft:#67e8f9;
+    --accent:#F08A3C; --accent-soft:#FFA05A; --on-accent:#1B1206;
+    --good:#22c55e; --warn:#fbbf24;
+    --radius:16px;
+    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
+    --shadow-hi:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
+    --font:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --display:Sora,Ubuntu,-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--body);font-size:16px;line-height:1.65;
+    background:var(--bg);
+    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
+    background-repeat:no-repeat;background-attachment:fixed;-webkit-font-smoothing:antialiased}
+  a{color:var(--radar-soft)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  header{border-bottom:1px solid var(--line-soft);background:rgba(37,42,53,.6)}
+  .hrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:18px 0}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+  .logo .n{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.4px}
+  .logo .r{color:var(--radar)}
+  .pro-pill{font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:1.6px;
+    background:var(--accent);color:var(--on-accent);border-radius:7px;padding:4px 9px}
+  .hgap{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .hgap a{color:var(--body);text-decoration:none;font-size:14px;padding:8px 13px;
+    border-radius:9px;border:1px solid var(--line)}
+  .hgap a:hover{border-color:rgba(34,211,238,.5);color:var(--radar-soft)}
+  #member-bar{display:none;align-items:center;gap:10px;font-size:13px;color:var(--dim);padding:0 0 14px}
+
+  .lede{padding:52px 0 8px}
+  .lede h1{font-family:var(--display);font-weight:800;color:var(--ink);
+    font-size:clamp(27px,4vw,38px);line-height:1.12;letter-spacing:-1.1px;margin:0 0 14px;text-wrap:balance}
+  .lede p{font-size:17px;max-width:68ch;margin:0}
+
+  section{padding:38px 0 72px}
+  .desks{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media (max-width:780px){.desks{grid-template-columns:1fr}}
+
+  .desk{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 26px 22px;
+    text-decoration:none;color:inherit;transition:.15s}
+  .desk:hover{border-color:rgba(34,211,238,.45);box-shadow:var(--shadow-hi);transform:translateY(-1px)}
+  .d-top{display:flex;align-items:baseline;gap:11px;margin-bottom:5px}
+  .d-name{font-family:var(--display);font-weight:700;font-size:20px;color:var(--ink);letter-spacing:-.4px}
+  .d-state{margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+    padding:4px 10px;border-radius:20px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+  .d-state.live{color:var(--radar-soft);border-color:rgba(34,211,238,.45);background:rgba(34,211,238,.10)}
+  .d-edge{font-size:15px;color:var(--body);margin:0 0 16px;max-width:46ch}
+  .tools{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+  .tool{font-size:12.5px;color:var(--body);background:var(--inset);border:1px solid var(--line);
+    border-radius:8px;padding:5px 10px}
+  .tool.soon{color:var(--dim);border-style:dashed}
+  .d-foot{margin-top:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    border-top:1px solid var(--line-soft);padding-top:15px}
+  .rec{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .rec b{color:var(--ink);font-weight:700}
+  .rec .bar{color:var(--dim)}
+  .go{margin-left:auto;font-size:13.5px;font-weight:700;color:var(--radar-soft)}
+
+  .note{margin-top:26px;font-size:13.5px;color:var(--dim);background:var(--inset);
+    border:1px solid var(--line);border-left:3px solid rgba(34,211,238,.6);
+    border-radius:12px;padding:16px 20px;max-width:74ch}
+
+  #paywall{display:none;max-width:560px;margin:64px auto;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px 32px;text-align:center}
+  #paywall h2{font-family:var(--display);font-weight:700;color:var(--ink);font-size:23px;margin:0 0 10px}
+  #paywall p{font-size:15.5px;margin:0 0 22px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font);
+    font-weight:700;font-size:15px;text-decoration:none;padding:12px 22px;border-radius:11px;border:1px solid transparent}
+  .btn-pro{background:var(--accent);color:var(--on-accent)} .btn-pro:hover{background:var(--accent-soft)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);margin-left:8px}
+
+  footer{border-top:1px solid var(--line-soft);padding:30px 0 46px;font-size:13px;color:var(--dim);text-align:center}
+  :focus-visible{outline:2px solid var(--radar);outline-offset:2px}
+  ::selection{background:rgba(34,211,238,.32);color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hrow">
+    <a class="logo" href="/"><span class="n">DFS<span class="r">RADAR</span></span><span class="pro-pill">PRO</span></a>
+    <div class="hgap">
+      <a href="/mlb/">← Free radars</a>
+      <a href="#" id="logout-link">Log out</a>
+    </div>
+  </div>
+  <div class="wrap" id="member-bar"><span id="member-email"></span></div>
+</header>
+
+<div id="paywall">
+  <h2>This is the PRO side</h2>
+  <p>The desks below are for DFSRADAR PRO and DFS Kitchen All-Access members. The
+     free weather radars stay open to everyone.</p>
+  <a class="btn btn-pro" href="/#pricing">See pricing</a>
+  <a class="btn btn-ghost" href="#login" id="login-link">Log in</a>
+</div>
+
+<main id="pro-app" style="display:none">
+  <div class="wrap lede">
+    <h1>Six desks. One record.</h1>
+    <p>Each desk is built around the edge that actually exists in that sport — not the same
+       template five times. Every call one of them makes settles from the box score and lands
+       in a public record, losing stretches included.</p>
+  </div>
+
+  <section class="wrap">
+    <div class="desks" id="desks"></div>
+    <div class="note" id="rebuild-note">
+      Desks rebuild every morning as forecasts sharpen toward first pitch or kickoff. A desk
+      shows <b>off-season</b> when its sport has nothing inside the forecast window — the
+      history engine behind it stays loaded either way.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">DFSRADAR PRO · part of
+    <a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=pro" target="_blank" rel="noopener">The DFS Kitchen</a>
+    · Weather-adjusted insights are informational, not betting advice.</div>
+</footer>
+
+<script>
+/* Every desk that exists today, described by what it actually contains right now.
+   Tools marked "soon" are not built yet and say so rather than implying depth. */
+const DESKS = [
+  { key:"mlb",  name:"MLB",  href:"/pro/mlb/",    rec:"/pro/record.json",
+    edge:"Weather, park and umpire against every comparable night that park has already played.",
+    tools:["Slate","Confirmed lineups","HR targets","Umpire board","Park factors","Game log","Record"] },
+  { key:"cfb",  name:"CFB",  href:"/pro/cfb/",    rec:"/pro/cfb_record.json",
+    edge:"Offensive-line against defensive-line weight edges, graded every week.",
+    tools:["Trench board","Record"], soon:["Venue weather","Wind factor"] },
+  { key:"nfl",  name:"NFL",  href:"/pro/nfl/",    rec:"/pro/nfl_record.json",
+    edge:"Wind and cold at the stadiums where it actually moves a total.",
+    tools:["Weather board","Record"], soon:["Venue history","Kicking game"] },
+  { key:"pga",  name:"PGA",  href:"/pro/pga/",    rec:"/pro/pga_record.json",
+    edge:"Course fit and the wind each tee-time wave actually plays into.",
+    tools:["Course board","Record"], soon:["Tee-time waves"] },
+  { key:"nascar", name:"NASCAR", href:"/pro/nascar/", rec:"/pro/nascar_record.json",
+    edge:"Track profile and conditions against every comparable race run there.",
+    tools:["Track board","Record"] },
+  { key:"props", name:"Props", href:"/pro/props/", rec:null,
+    edge:"One cross-sport feed: our probability beside the book's price, with the gap shown.",
+    tools:["Prop feed","Value flags"] }
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function card(d){
+  const tools = (d.tools||[]).map(t=>`<span class="tool">${esc(t)}</span>`).join("")
+              + (d.soon||[]).map(t=>`<span class="tool soon">${esc(t)} · soon</span>`).join("");
+  return `<a class="desk" href="${d.href}" data-key="${d.key}">
+    <div class="d-top"><span class="d-name">${esc(d.name)} Desk</span>
+      <span class="d-state" data-state>—</span></div>
+    <p class="d-edge">${esc(d.edge)}</p>
+    <div class="tools">${tools}</div>
+    <div class="d-foot"><span class="rec" data-rec>Record loading…</span><span class="go">Open →</span></div>
+  </a>`;
+}
+
+document.getElementById("desks").innerHTML = DESKS.map(card).join("");
+
+/* Pull each desk's graded record so this page states the same numbers the desk does. */
+async function loadRecords(){
+  await Promise.all(DESKS.map(async d=>{
+    const el = document.querySelector(`.desk[data-key="${d.key}"]`);
+    if(!el) return;
+    const recEl = el.querySelector("[data-rec]"), stateEl = el.querySelector("[data-state]");
+    if(!d.rec){ recEl.textContent = "Graded with each sport"; stateEl.textContent = "Live"; stateEl.classList.add("live"); return; }
+    try{
+      const r = await fetch(d.rec + "?_=" + Date.now());
+      if(!r.ok) throw 0;
+      const j = await r.json();
+      const s = (j.summary)||{}, o = s.overall||{};
+      if(o.n){
+        /* Weekly/event sports: a win-loss record against a stated bar. */
+        const pct = Math.round(o.w / o.n * 100);
+        recEl.innerHTML = `<b>${o.w}–${o.n - o.w}</b> graded · ${pct}%` +
+          (s.bar ? ` <span class="bar">vs ${esc(s.bar)}</span>` : "");
+        stateEl.textContent = "Live"; stateEl.classList.add("live");
+      }else if(s.graded){
+        /* MLB grades probabilities rather than calls, so it reports volume and
+           calibration — how close the predicted rate landed to the real one. */
+        const cal = (s.cal||[]).filter(c=>c.n);
+        const worst = cal.length
+          ? cal.reduce((a,c)=>Math.abs(c.act-c.exp)>Math.abs(a.act-a.exp)?c:a)
+          : null;
+        recEl.innerHTML = `<b>${s.graded}</b> graded · ${s.nights} nights` +
+          (worst ? ` <span class="bar">· widest gap ${worst.range}: ${worst.exp}% called, ${worst.act}% hit</span>` : "");
+        stateEl.textContent = "Live"; stateEl.classList.add("live");
+      }else{
+        recEl.textContent = "No graded calls yet this season";
+        stateEl.textContent = "Off-season";
+      }
+    }catch(e){
+      recEl.textContent = "Record unavailable";
+      stateEl.textContent = "—";
+    }
+  }));
+}
+
+/* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
+const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
+let GATED=null, LOADED=false;
+function msReady(timeout=6000){
+  return new Promise(res=>{
+    const t0=Date.now();
+    (function poll(){
+      if(window.$memberstackDom) return res(window.$memberstackDom);
+      if(Date.now()-t0>timeout) return res(null);
+      setTimeout(poll,150);
+    })();
+  });
+}
+async function gate(){
+  let member=null, ok=false;
+  try{
+    const ms=await msReady();
+    if(ms){
+      const r=await ms.getCurrentMember();
+      member=r&&r.data;
+      ok=!!(member&&(member.planConnections||[]).some(pc=>
+        MS_PLANS.includes(pc.planId)&&["ACTIVE","TRIALING"].includes(String(pc.status||"").toUpperCase())));
+    }
+  }catch(e){}
+  GATED=ok;
+  /* Records are fetched only once the gate says this visitor is a member. */
+  if(ok&&!LOADED){ LOADED=true; loadRecords(); }
+  document.getElementById("pro-app").style.display=ok?"block":"none";
+  document.getElementById("paywall").style.display=ok?"none":"block";
+  const bar=document.getElementById("member-bar");
+  if(ok&&member){bar.style.display="flex";document.getElementById("member-email").textContent=(member.auth&&member.auth.email)||"";}
+  else bar.style.display="none";
+  return ok;
+}
+(async()=>{
+  await gate();
+  const ms=window.$memberstackDom;
+  if(ms&&ms.onAuthChange) ms.onAuthChange(()=>gate());
+  if(location.hash==="#login"&&!GATED&&ms){ try{ await ms.openModal("LOGIN"); gate(); }catch(e){} }
+  const li=document.getElementById("login-link");
+  if(li) li.addEventListener("click", async e=>{ e.preventDefault();
+    const m=window.$memberstackDom; if(m){ try{ await m.openModal("LOGIN"); gate(); }catch(err){} } });
+  const lo=document.getElementById("logout-link");
+  if(lo) lo.addEventListener("click", async e=>{ e.preventDefault();
+    const m=window.$memberstackDom; if(m){ try{ await m.logout(); gate(); }catch(err){} } });
+})();
+</script>
+</body>
+</html>
