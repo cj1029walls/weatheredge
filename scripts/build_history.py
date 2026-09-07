@@ -114,6 +114,20 @@ def season_games(year):
     print(f"  {year}: {len(kept)} qualifying games (league HR parsed: {total_hr})")
     return kept
 
+def roof_closed_hist(meta, temp, precip_in):
+    """Roof state for a PAST game, mirroring daily_build.roof_closed().
+
+    daily_build decides today's roof from the forecast (temp >= 95, <= 48, or
+    rain chance >= 45%). History has measured inches rather than a chance, so
+    any measurable precipitation in the game window stands in for that rung.
+    """
+    if meta["roof"] == "dome":
+        return True
+    if meta["roof"] == "retract":
+        return temp >= 95 or temp <= 48 or (precip_in or 0) >= 0.01
+    return False
+
+
 def park_weather(code, years):
     """Hourly weather dict keyed 'YYYY-MM-DDTHH' for the park, local time."""
     meta = PARKS[code]
@@ -170,8 +184,14 @@ def main():
                 if slot and slot[4] is not None:
                     precip += slot[4]
             rel = round(wind_rel_angle(wd, meta["bearing"]))
+            # Retractable parks: the archive gives OUTDOOR weather, but if the roof
+            # was shut none of it reached the field. Tag each game with the roof
+            # state inferred from the same rule the live slate uses, so matching can
+            # keep open-roof and closed-roof games apart instead of averaging a
+            # 114F reading into a game played in climate control.
+            rc = 1 if roof_closed_hist(meta, round(temp), round(precip, 2)) else 0
             rows.append(dict(d=d, dn=dn, t=round(temp), dew=round(dew),
-                             w=round(ws), rel=rel, p=round(precip, 2),
+                             w=round(ws), rel=rel, p=round(precip, 2), rc=rc,
                              r=runs, hr=hr, so=so))
             league["r"].append(runs); league["hr"].append(hr); league["so"].append(so)
         avg = dict(r=round(statistics.mean(x["r"] for x in rows), 2),
