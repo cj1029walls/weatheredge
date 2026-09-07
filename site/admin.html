@@ -82,6 +82,18 @@
   <div class="card" id="days-card"><div class="empty" id="empty"><b>No graded days yet</b>Accuracy appears here after the first full day of predictions is graded (tomorrow morning's build).</div></div>
 </main>
 <script>
+/* The announce / ticker / live-note nodes were removed from the markup; any
+   code still reaching for them gets null instead of a crash. */
+(function(){
+  const _g = document.getElementById.bind(document);
+  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
+  document.getElementById = function(id){
+    const el = _g(id);
+    if(el || !GONE[id]) return el;
+    return new Proxy({}, {get:()=>function(){}, set:()=>true});
+  };
+})();
+
 function pct(w,l){ const n=w+l; return n? Math.round(w/n*100)+"%" : "—"; }
 function cls(w,l){ const n=w+l; if(!n) return ""; return w/n>=0.5? "pos":"neg"; }
 async function load(){
