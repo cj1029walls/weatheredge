@@ -68,6 +68,40 @@
   ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
   :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
   .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
+  /* ===== v2: reading density + cyan lift =====
+     dfskitchen.com sets 19.5px body on a ~680px measure with 64px section
+     padding. A dense data board can't go that far, but 14px text inside 14px
+     card padding was the "clustered" complaint; this is the same intent at
+     table scale. ===== */
+  body{font-size:15.5px;
+    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
+    background-repeat:no-repeat;background-attachment:fixed;
+    padding:26px 26px 88px}
+  main{max-width:1180px}
+  .summary-strip{gap:16px;margin-bottom:30px}
+  .board{gap:14px}
+  .sum-card{padding:20px 22px}
+  .wxc{padding:20px 22px}
+  .m-sec{padding:22px 24px;margin-bottom:16px}
+  .p-card{padding:16px 18px}
+  .brief-card{padding:24px 28px 25px;margin-bottom:26px}
+  .pro-card,.kx-card,.pro-tease{padding:18px 22px;margin-bottom:26px}
+  .b-row{padding:17px 20px}
+  .method{padding:36px 40px}
+  .controls{margin-bottom:20px}
+  .controls h2{font-size:14px;letter-spacing:1.5px}
+  table td,table th{padding-top:11px;padding-bottom:11px}
+  /* prose keeps a readable measure instead of running the full 1180px */
+  .method p,.hist-note,.mx-note,.fcs-note,.empty-season,.tagline{max-width:70ch}
+
+  /* cyan lift -- all-grey was underwhelming; this is DFSRADAR's own colour
+     from the Kitchen system (--radar #22d3ee), spent only where the eye lands. */
+  .brief-card{border-left:3px solid rgba(34,211,238,.6)}
+  .sum-card{border-top:2px solid rgba(34,211,238,.5)}
+  .sum-card:hover,.b-row:hover,.wxc:hover{border-color:rgba(34,211,238,.45)}
+  .m-sec h5,.method h4,.sub-h{color:#67e8f9}
+  .m-head .teams{color:#EFF1F7}
+  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
 </style>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
