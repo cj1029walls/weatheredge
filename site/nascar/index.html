@@ -50,25 +50,25 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#FFA05A;font-weight:600}
+  .brand .tagline b{color:#F08A3C;font-weight:600}
   .sport-tabs{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
   .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .protab{background:linear-gradient(135deg,#F08A3C,#CC7533);color:#1B1206 !important;border-color:transparent;font-weight:800}
+  .sport-tabs .protab{background:#F08A3C;color:#1B1206 !important;border-color:transparent;font-weight:800}
   .sport-tabs .protab:hover{filter:brightness(1.06)}
   .sport-tabs .on{background:var(--card);color:var(--navy);border-color:#fff}
-  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#F08A3C,#FFA05A);color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:#F08A3C;color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
   @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
   .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#FFA05A}
+  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
   .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
   .kx-card .kx-t b{color:#fff}
   .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
-  .kx-card .kx-go{background:linear-gradient(135deg,#F08A3C,#FFA05A);color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
+  .kx-card .kx-go{background:#F08A3C;color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
   .kx-card .kx-go:hover{filter:brightness(1.1)}
   .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
-  .kx-hook a{color:#CC7533;font-weight:800;text-decoration:none}
+  .kx-hook a{color:#F08A3C;font-weight:800;text-decoration:none}
   .kx-hook a:hover{text-decoration:underline}
   main{max-width:1100px;margin:0 auto;padding:22px 24px 70px}
   .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
@@ -145,6 +145,40 @@
   ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
   :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
   .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
+  /* ===== v2: reading density + cyan lift =====
+     dfskitchen.com sets 19.5px body on a ~680px measure with 64px section
+     padding. A dense data board can't go that far, but 14px text inside 14px
+     card padding was the "clustered" complaint; this is the same intent at
+     table scale. ===== */
+  body{font-size:15.5px;
+    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
+    background-repeat:no-repeat;background-attachment:fixed;
+    padding:26px 26px 88px}
+  main{max-width:1180px}
+  .summary-strip{gap:16px;margin-bottom:30px}
+  .board{gap:14px}
+  .sum-card{padding:20px 22px}
+  .wxc{padding:20px 22px}
+  .m-sec{padding:22px 24px;margin-bottom:16px}
+  .p-card{padding:16px 18px}
+  .brief-card{padding:24px 28px 25px;margin-bottom:26px}
+  .pro-card,.kx-card,.pro-tease{padding:18px 22px;margin-bottom:26px}
+  .b-row{padding:17px 20px}
+  .method{padding:36px 40px}
+  .controls{margin-bottom:20px}
+  .controls h2{font-size:14px;letter-spacing:1.5px}
+  table td,table th{padding-top:11px;padding-bottom:11px}
+  /* prose keeps a readable measure instead of running the full 1180px */
+  .method p,.hist-note,.mx-note,.fcs-note,.empty-season,.tagline{max-width:70ch}
+
+  /* cyan lift -- all-grey was underwhelming; this is DFSRADAR's own colour
+     from the Kitchen system (--radar #22d3ee), spent only where the eye lands. */
+  .brief-card{border-left:3px solid rgba(34,211,238,.6)}
+  .sum-card{border-top:2px solid rgba(34,211,238,.5)}
+  .sum-card:hover,.b-row:hover,.wxc:hover{border-color:rgba(34,211,238,.45)}
+  .m-sec h5,.method h4,.sub-h{color:#67e8f9}
+  .m-head .teams{color:#EFF1F7}
+  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
 </style>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
@@ -171,7 +205,7 @@
         </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">NASCAR</span></h1>
         <div class="tagline">Race-day weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
         <div class="sport-tabs">
-          <a href="/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a class="on" href="/nascar/">NASCAR</a><a class="protab" href="/pro/nascar/">★ PRO</a>
+          <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a class="on" href="/nascar/">NASCAR</a><a class="protab" href="/pro/nascar/">★ PRO</a>
         </div>
       </div>
     </div>
