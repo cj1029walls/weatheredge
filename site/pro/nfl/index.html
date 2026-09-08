@@ -233,6 +233,13 @@
   .toolrail .cnt{position:absolute;top:10px;right:11px}
   /* Anchored sections need room under the sticky-free header when jumped to. */
   .sec-h[id]{scroll-margin-top:18px}
+
+  /* ===== v5: home =====
+     The wordmark is the link people reach for; the nav item is the one they
+     can see. Both go to the landing page. ===== */
+  .home-link{color:inherit;text-decoration:none;border-radius:4px}
+  .home-link:hover{opacity:.82}
+  .hometab{white-space:nowrap}
 </style>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"NFL Weekly Board: Referee, Travel & Weather Edges","url":"https://dfsradar.com/pro/nfl/","description":"The NFL weekly board: referee crew tendencies, travel and rest spots with real ATS records, team weather identities, and QB & kicker condition splits priced against live prop lines. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/nfl/","availability":"https://schema.org/InStock"}}</script>
@@ -241,9 +248,10 @@
 <header>
   <div class="header-inner">
     <div class="brand">
-      <h1>DFS<span class="brand-rad">RADAR</span><span class="pro">PRO</span></h1>
+      <h1><a class="home-link" href="/" aria-label="DFSRADAR home">DFS<span class="brand-rad">RADAR</span></a><span class="pro">PRO</span></h1>
       <div class="tagline">The NFL weekly board — <b>crews, travel spots, and condition splits the box score hides.</b> Every lean archived and graded in public.</div>
       <div class="pro-nav">
+        <a class="hometab" href="/">← Home</a>
         <a href="/pro/props/">🎯 Props</a>
         <a href="/pro/mlb/">⚾ MLB</a>
         <a class="on" href="/pro/nfl/">🏈 NFL</a>
