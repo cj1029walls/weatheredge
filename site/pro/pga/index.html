@@ -185,7 +185,44 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+  /* ===== v4: the desk shell =====
+     Same three pieces on every PRO sport: a way back to the desk index, a rail
+     of NAMED tools (a rail entry that says what it answers tells you whether to
+     click it; "Tab 3" does not), and the sport's current subject in the header.
+     On pages built as panes the rail switches panes; on single-scroll pages it
+     is a set of anchors to the sections that are already there — same shape,
+     no restructuring, nothing hidden behind a click that wasn't before. ===== */
+  .desk-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;margin:2px 0 16px}
+  .desk-back:hover{color:var(--gold-deep);border-color:var(--gold)}
+  .desk-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0 0 4px}
+  .desk-head h2{font-family:Sora,Ubuntu,sans-serif;font-size:27px;font-weight:800;
+    letter-spacing:-.7px;line-height:1.1;color:var(--ink)}
+  .desk-head .wk{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--gold-deep);background:var(--gold-bg);border:1px solid rgba(34,211,238,.3);
+    border-radius:8px;padding:4px 11px}
+
+  .toolrail{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:8px;
+    margin:14px 0 22px;position:static;padding:0}
+  .toolrail button,.toolrail a{font-family:inherit;display:flex;flex-direction:column;
+    align-items:flex-start;gap:3px;text-align:left;text-decoration:none;cursor:pointer;
+    background:var(--card);border:1.5px solid var(--line-strong);border-radius:12px;
+    padding:11px 14px 12px;position:relative;text-transform:none;letter-spacing:0;
+    line-height:1.3;transition:border-color .12s,background .12s}
+  .toolrail button:hover,.toolrail a:hover{border-color:var(--gold-deep)}
+  .toolrail .t{font-family:Sora,Ubuntu,sans-serif;font-size:13.5px;font-weight:700;
+    letter-spacing:-.1px;color:var(--ink)}
+  .toolrail .s{font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:0}
+  .toolrail button.on{background:linear-gradient(135deg,#252A35,var(--navy2));border-color:transparent;
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
+  .toolrail button.on .t{color:#fff}
+  .toolrail button.on .s{color:#9fb4c9}
+  .toolrail .cnt{position:absolute;top:10px;right:11px}
+  /* Anchored sections need room under the sticky-free header when jumped to. */
+  .sec-h[id]{scroll-margin-top:18px}
 </style>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"PGA Course History & Wind Pedigree Board","url":"https://dfsradar.com/pro/pga/","description":"This week's PGA board: every player's course history since 2018, wind pedigree from weather-tagged past editions, wave draw and recent form \u2014 graded against the final leaderboard. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/pga/","availability":"https://schema.org/InStock"}}</script>
 </head>
 <body>
@@ -232,25 +269,34 @@
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
-  <div class="sec-h" id="ev-h">PGA weekly board</div>
-  <div class="split-note" id="ev-note" style="margin-bottom:12px"></div>
+  <a class="desk-back" href="/pro/">← All desks</a>
+  <div class="desk-head"><h2>PGA Desk</h2><span class="wk" id="desk-wk">No event this week</span></div>
+  <div class="split-note" id="ev-note" style="margin-bottom:2px"></div>
 
-  <div class="sec-h">Leans</div>
+  <nav class="toolrail">
+    <a href="#s-leans"><span class="t">Leans</span><span class="s">This week's course horses</span></a>
+    <a href="#s-course"><span class="t">Course History</span><span class="s">Who has played here before</span></a>
+    <a href="#s-wind"><span class="t">Wind Pedigree</span><span class="s">Who holds up when it blows</span></a>
+    <a href="#s-form"><span class="t">Recent Form</span><span class="s">The last five starts</span></a>
+    <a href="#s-record"><span class="t">Record</span><span class="s">Graded on a top-20 bar</span></a>
+    <a href="#s-method"><span class="t">Method</span><span class="s">How a lean is chosen</span></a>
+  </nav>
+  <div class="sec-h" id="s-leans">Leans</div>
   <div class="gamestrip" id="leans"></div>
 
-  <div class="sec-h" style="margin-top:18px">Course history — horses for this course</div>
+  <div class="sec-h" id="s-course" style="margin-top:18px">Course history — horses for this course</div>
   <div id="course-board"></div>
 
-  <div class="sec-h" style="margin-top:18px">Wind pedigree <span id="wind-flag"></span></div>
+  <div class="sec-h" id="s-wind" style="margin-top:18px">Wind pedigree <span id="wind-flag"></span></div>
   <div id="wind-board"></div>
 
-  <div class="sec-h" style="margin-top:18px">Recent form — last 5 starts</div>
+  <div class="sec-h" id="s-form" style="margin-top:18px">Recent form — last 5 starts</div>
   <div id="form-board"></div>
 
-  <div class="sec-h" style="margin-top:18px">The record — every lean graded against the final leaderboard</div>
+  <div class="sec-h" id="s-record" style="margin-top:18px">The record — every lean graded against the final leaderboard</div>
   <div class="m-sec" id="pga-record"><p class="split-note">A COURSE HORSE is scored on one bar: <b>a top-20 finish</b>. Grades post the day after each event ends — every lean above is already archived.</p></div>
 
-  <div class="m-sec" style="margin-top:18px">
+  <div class="m-sec" id="s-method" style="margin-top:18px">
     <h5>How the PGA board works</h5>
     <p>Player results for every PGA Tour event since 2018, with every finish expressed as a field percentile (winning a 156-man open ≠ 20th of 30 at East Lake). <b>Course history</b> ranks players by their shrunk average percentile at this exact event — small samples get pulled toward the field median so a one-start fluke can't top the board. <b>Wind pedigree</b> rebuilds past event-week weather from the archive, tags each edition windy or calm (12+ mph average daytime wind), and measures who holds up when it blows — those leans activate only when this week's forecast is windy. <b>Wave splits</b> from the free radar carry forward so the draw edge sits on the same card. Every lean is archived the moment it posts and graded against the final leaderboard. Historical records are tendencies, not guarantees; sample sizes are shown on every number.</p>
   </div>
@@ -291,7 +337,7 @@ function render(){
   if(0) void 0;  // live bar removed
     void`⛳ <span><b>Live</b> — built ${esc(D.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
   const ev=D.event;
-  document.getElementById("ev-h").textContent=ev?`${ev.name} — ${ev.course}, ${ev.city}`:"PGA weekly board";
+  document.getElementById("desk-wk").textContent=ev?`${ev.name} · ${ev.course}`:"No event this week";
   document.getElementById("ev-note").textContent=[(ev&&ev.histNote)||"",D.note||"",D.fieldN?`Field: ${D.fieldN} players.`:""].filter(Boolean).join(" ");
   document.getElementById("leans").innerHTML=(D.leans||[]).length?(D.leans||[]).map(leanCard).join(""):`<div class="split-note">Leans post as the field, forecast, and history line up.</div>`;
   document.getElementById("course-board").innerHTML=`<table><thead><tr><th>#</th><th>Player</th><th>Starts</th><th>Course score</th><th>Avg finish</th><th>Best</th><th class="hide-m">Recent editions</th></tr></thead><tbody>${(D.course||[]).map((c,i)=>`
