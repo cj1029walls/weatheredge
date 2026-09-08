@@ -206,6 +206,13 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+
+  /* ===== v5: home =====
+     The wordmark is the link people reach for; the nav item is the one they
+     can see. Both go to the landing page. ===== */
+  .home-link{color:inherit;text-decoration:none;border-radius:4px}
+  .home-link:hover{opacity:.82}
+  .hometab{white-space:nowrap}
 </style>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
@@ -229,10 +236,10 @@
           <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
           <circle cx="13" cy="28.5" r="1.9" fill="#22c55e"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
           <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
-        </svg>DFS<span class="brand-rad">RADAR</span><span class="sport">NASCAR</span></h1>
+        </svg><a class="home-link" href="/" aria-label="DFSRADAR home">DFS<span class="brand-rad">RADAR</span></a><span class="sport">NASCAR</span></h1>
         <div class="tagline">Race-day weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
         <div class="sport-tabs">
-          <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a class="on" href="/nascar/">NASCAR</a><a class="protab" href="/pro/nascar/">★ PRO</a>
+          <a class="hometab" href="/">← Home</a><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a class="on" href="/nascar/">NASCAR</a><a class="protab" href="/pro/nascar/">★ PRO</a>
         </div>
       </div>
     </div>
