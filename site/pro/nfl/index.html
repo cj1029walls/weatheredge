@@ -197,7 +197,44 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+  /* ===== v4: the desk shell =====
+     Same three pieces on every PRO sport: a way back to the desk index, a rail
+     of NAMED tools (a rail entry that says what it answers tells you whether to
+     click it; "Tab 3" does not), and the sport's current subject in the header.
+     On pages built as panes the rail switches panes; on single-scroll pages it
+     is a set of anchors to the sections that are already there — same shape,
+     no restructuring, nothing hidden behind a click that wasn't before. ===== */
+  .desk-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;margin:2px 0 16px}
+  .desk-back:hover{color:var(--gold-deep);border-color:var(--gold)}
+  .desk-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0 0 4px}
+  .desk-head h2{font-family:Sora,Ubuntu,sans-serif;font-size:27px;font-weight:800;
+    letter-spacing:-.7px;line-height:1.1;color:var(--ink)}
+  .desk-head .wk{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--gold-deep);background:var(--gold-bg);border:1px solid rgba(34,211,238,.3);
+    border-radius:8px;padding:4px 11px}
+
+  .toolrail{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:8px;
+    margin:14px 0 22px;position:static;padding:0}
+  .toolrail button,.toolrail a{font-family:inherit;display:flex;flex-direction:column;
+    align-items:flex-start;gap:3px;text-align:left;text-decoration:none;cursor:pointer;
+    background:var(--card);border:1.5px solid var(--line-strong);border-radius:12px;
+    padding:11px 14px 12px;position:relative;text-transform:none;letter-spacing:0;
+    line-height:1.3;transition:border-color .12s,background .12s}
+  .toolrail button:hover,.toolrail a:hover{border-color:var(--gold-deep)}
+  .toolrail .t{font-family:Sora,Ubuntu,sans-serif;font-size:13.5px;font-weight:700;
+    letter-spacing:-.1px;color:var(--ink)}
+  .toolrail .s{font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:0}
+  .toolrail button.on{background:linear-gradient(135deg,#252A35,var(--navy2));border-color:transparent;
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
+  .toolrail button.on .t{color:#fff}
+  .toolrail button.on .s{color:#9fb4c9}
+  .toolrail .cnt{position:absolute;top:10px;right:11px}
+  /* Anchored sections need room under the sticky-free header when jumped to. */
+  .sec-h[id]{scroll-margin-top:18px}
 </style>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"NFL Weekly Board: Referee, Travel & Weather Edges","url":"https://dfsradar.com/pro/nfl/","description":"The NFL weekly board: referee crew tendencies, travel and rest spots with real ATS records, team weather identities, and QB & kicker condition splits priced against live prop lines. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/nfl/","availability":"https://schema.org/InStock"}}</script>
 </head>
 <body>
@@ -244,14 +281,15 @@
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
-  <div class="sec-h" id="nfl-week-h">NFL weekly board</div>
-  <div class="split-note" id="nfl-note" style="margin-bottom:12px"></div>
+  <a class="desk-back" href="/pro/">← All desks</a>
+  <div class="desk-head"><h2>NFL Desk</h2><span class="wk" id="desk-wk">Week —</span></div>
+  <div class="split-note" id="nfl-note" style="margin-bottom:2px"></div>
 
-  <nav class="tabbar" id="tabbar">
-    <button data-tab="targets" class="on">🎯 Targets <span class="cnt" id="cnt-targets"></span></button>
-    <button data-tab="slate">🏟️ Slate <span class="cnt" id="cnt-slate"></span></button>
-    <button data-tab="record">📊 Record</button>
-    <button data-tab="method">📐 Method</button>
+  <nav class="tabbar toolrail" id="tabbar">
+    <button data-tab="targets" class="on"><span class="t">Prop Targets</span><span class="s">Priced where books have posted</span><span class="cnt" id="cnt-targets"></span></button>
+    <button data-tab="slate"><span class="t">Full Slate</span><span class="s">Every game's weather read</span><span class="cnt" id="cnt-slate"></span></button>
+    <button data-tab="record"><span class="t">Record</span><span class="s">Graded every week</span></button>
+    <button data-tab="method"><span class="t">Method</span><span class="s">How the read is built</span></button>
   </nav>
 
   <div class="tab-pane on" id="tab-targets">
@@ -366,7 +404,7 @@ function renderNFL(){
   if(!NFL) return;
   if(0) void 0;  // live bar removed
     void`🏈 <span><b>Live</b> — built ${esc(NFL.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
-  document.getElementById("nfl-week-h").textContent=NFL.season?`NFL — ${NFL.season} Week ${NFL.week} · ${(NFL.games||[]).length} games`:"NFL weekly board";
+  document.getElementById("desk-wk").textContent=NFL.season?`${NFL.season} · Week ${NFL.week} · ${(NFL.games||[]).length} game${(NFL.games||[]).length===1?"":"s"}`:"Off-season";
   document.getElementById("nfl-note").textContent=NFL.note||"";
   document.getElementById("cnt-targets").textContent=(NFL.leans||[]).length||"";
   document.getElementById("cnt-slate").textContent=(NFL.games||[]).length||"";
