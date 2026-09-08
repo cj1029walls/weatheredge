@@ -205,7 +205,44 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+  /* ===== v4: the desk shell =====
+     Same three pieces on every PRO sport: a way back to the desk index, a rail
+     of NAMED tools (a rail entry that says what it answers tells you whether to
+     click it; "Tab 3" does not), and the sport's current subject in the header.
+     On pages built as panes the rail switches panes; on single-scroll pages it
+     is a set of anchors to the sections that are already there — same shape,
+     no restructuring, nothing hidden behind a click that wasn't before. ===== */
+  .desk-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;margin:2px 0 16px}
+  .desk-back:hover{color:var(--gold-deep);border-color:var(--gold)}
+  .desk-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0 0 4px}
+  .desk-head h2{font-family:Sora,Ubuntu,sans-serif;font-size:27px;font-weight:800;
+    letter-spacing:-.7px;line-height:1.1;color:var(--ink)}
+  .desk-head .wk{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--gold-deep);background:var(--gold-bg);border:1px solid rgba(34,211,238,.3);
+    border-radius:8px;padding:4px 11px}
+
+  .toolrail{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:8px;
+    margin:14px 0 22px;position:static;padding:0}
+  .toolrail button,.toolrail a{font-family:inherit;display:flex;flex-direction:column;
+    align-items:flex-start;gap:3px;text-align:left;text-decoration:none;cursor:pointer;
+    background:var(--card);border:1.5px solid var(--line-strong);border-radius:12px;
+    padding:11px 14px 12px;position:relative;text-transform:none;letter-spacing:0;
+    line-height:1.3;transition:border-color .12s,background .12s}
+  .toolrail button:hover,.toolrail a:hover{border-color:var(--gold-deep)}
+  .toolrail .t{font-family:Sora,Ubuntu,sans-serif;font-size:13.5px;font-weight:700;
+    letter-spacing:-.1px;color:var(--ink)}
+  .toolrail .s{font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:0}
+  .toolrail button.on{background:linear-gradient(135deg,#252A35,var(--navy2));border-color:transparent;
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
+  .toolrail button.on .t{color:#fff}
+  .toolrail button.on .s{color:#9fb4c9}
+  .toolrail .cnt{position:absolute;top:10px;right:11px}
+  /* Anchored sections need room under the sticky-free header when jumped to. */
+  .sec-h[id]{scroll-margin-top:18px}
 </style>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"DFSRADAR PRO Props Hub","url":"https://dfsradar.com/pro/props/","description":"Every in-season sport's player-prop targets in one browsing feed — MLB home run targets, NFL and CFB prop leans, PGA and NASCAR value flags — priced against the books and graded in public.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/props/","availability":"https://schema.org/InStock"}}</script>
 </head>
 <body>
@@ -252,6 +289,8 @@
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
+  <a class="desk-back" href="/pro/">← All desks</a>
+  <div class="desk-head"><h2>Props Desk</h2><span class="wk" id="desk-wk">All sports</span></div>
   <div class="sec-h" id="hub-h">Every sport's targets, one feed</div>
   <div class="split-note" style="margin-bottom:14px">Pulled live from every PRO board. Cards link back to each sport's full section — factor breakdowns, slates, and graded records live there. Out-of-season sports drop off automatically.</div>
   <div id="hub-feed"></div>
