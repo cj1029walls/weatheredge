@@ -274,7 +274,44 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+  /* ===== v4: the desk shell =====
+     Same three pieces on every PRO sport: a way back to the desk index, a rail
+     of NAMED tools (a rail entry that says what it answers tells you whether to
+     click it; "Tab 3" does not), and the sport's current subject in the header.
+     On pages built as panes the rail switches panes; on single-scroll pages it
+     is a set of anchors to the sections that are already there — same shape,
+     no restructuring, nothing hidden behind a click that wasn't before. ===== */
+  .desk-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;margin:2px 0 16px}
+  .desk-back:hover{color:var(--gold-deep);border-color:var(--gold)}
+  .desk-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0 0 4px}
+  .desk-head h2{font-family:Sora,Ubuntu,sans-serif;font-size:27px;font-weight:800;
+    letter-spacing:-.7px;line-height:1.1;color:var(--ink)}
+  .desk-head .wk{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--gold-deep);background:var(--gold-bg);border:1px solid rgba(34,211,238,.3);
+    border-radius:8px;padding:4px 11px}
+
+  .toolrail{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:8px;
+    margin:14px 0 22px;position:static;padding:0}
+  .toolrail button,.toolrail a{font-family:inherit;display:flex;flex-direction:column;
+    align-items:flex-start;gap:3px;text-align:left;text-decoration:none;cursor:pointer;
+    background:var(--card);border:1.5px solid var(--line-strong);border-radius:12px;
+    padding:11px 14px 12px;position:relative;text-transform:none;letter-spacing:0;
+    line-height:1.3;transition:border-color .12s,background .12s}
+  .toolrail button:hover,.toolrail a:hover{border-color:var(--gold-deep)}
+  .toolrail .t{font-family:Sora,Ubuntu,sans-serif;font-size:13.5px;font-weight:700;
+    letter-spacing:-.1px;color:var(--ink)}
+  .toolrail .s{font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:0}
+  .toolrail button.on{background:linear-gradient(135deg,#252A35,var(--navy2));border-color:transparent;
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
+  .toolrail button.on .t{color:#fff}
+  .toolrail button.on .s{color:#9fb4c9}
+  .toolrail .cnt{position:absolute;top:10px;right:11px}
+  /* Anchored sections need room under the sticky-free header when jumped to. */
+  .sec-h[id]{scroll-margin-top:18px}
 </style>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"MLB Home Run Prop Targets & Umpire Model","url":"https://dfsradar.com/pro/","description":"Tonight's ranked MLB home run prop targets: our probability vs the books' live price, built from weather, a 22,000-game umpire dataset, pitcher and batter data. Every card graded in public. $15/mo covers MLB, NFL, PGA and NASCAR.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/","availability":"https://schema.org/InStock"}}</script>
 </head>
 <body>
@@ -321,20 +358,23 @@
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
+  <a class="desk-back" href="/pro/">← All desks</a>
+  <div class="desk-head"><h2>MLB Desk</h2><span class="wk" id="desk-wk">Loading…</span></div>
+
   <div class="brief-card" id="brief-card" style="display:none">
     <div class="brief-head"><span class="pulse"></span>Tonight's card — live from the radar</div>
     <div class="brief-body" id="brief-body"></div>
   </div>
 
-  <nav class="tabbar" id="tabbar">
-    <button data-tab="slate" class="on">🏟️ Slate</button>
-    <button data-tab="lineups">🧢 Lineups</button>
-    <button data-tab="targets">🎯 Targets <span class="cnt" id="cnt-targets"></span></button>
-    <button data-tab="intel">🧠 Intel <span class="cnt" id="cnt-intel"></span></button>
-    <button data-tab="umps">⚖️ Umpires</button>
-    <button data-tab="parks">🏟️ Parks</button>
-    <button data-tab="log">📜 Game Log</button>
-    <button data-tab="record">📊 Record &amp; method</button>
+  <nav class="tabbar toolrail" id="tabbar">
+    <button data-tab="slate" class="on"><span class="t">Slate</span><span class="s">Tonight's expected home runs</span></button>
+    <button data-tab="lineups"><span class="t">Confirmed Lineups</span><span class="s">Who is actually in the order</span></button>
+    <button data-tab="targets"><span class="t">HR Targets</span><span class="s">Our number beside the book's</span><span class="cnt" id="cnt-targets"></span></button>
+    <button data-tab="intel"><span class="t">Intel</span><span class="s">What moved since this morning</span><span class="cnt" id="cnt-intel"></span></button>
+    <button data-tab="umps"><span class="t">Umpire Board</span><span class="s">Tonight's plate crew, by tendency</span></button>
+    <button data-tab="parks"><span class="t">Park Factors</span><span class="s">What each yard does to the ball</span></button>
+    <button data-tab="log"><span class="t">Game Log</span><span class="s">Every night we have called</span></button>
+    <button data-tab="record"><span class="t">Record & Method</span><span class="s">Calibration, and how it is built</span></button>
   </nav>
 
   <!-- ============ SLATE ============ -->
@@ -492,6 +532,16 @@ const LIVE={byPk:{},hrNames:new Set(),any:false};
 const OPEN=new Set();
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
 const normN=s=>(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").replace(/jr/g,"").trim();
+/* The desk chip states tonight's subject: the slate size and when it was
+   built. Before the live fetch lands the page is on SAMPLE, and saying so
+   beats showing a game count that is not tonight's. */
+function setDeskChip(){
+  const el=document.getElementById("desk-wk"); if(!el) return;
+  const n=(DATA.games||[]).length;
+  el.textContent = DATA.date
+    ? `${n} game${n===1?"":"s"} · built ${DATA.generated||"—"}`
+    : "Preview — tonight's card not posted yet";
+}
 /* ---- tabs ---- */
 function showTab(id){
   document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
@@ -677,6 +727,7 @@ function renderTotals(){
     </tr>`;}).join("");
 }
 function renderAll(){
+  setDeskChip();
   renderSlate(); renderLineups(); renderIntel(); renderTotals(); renderUmpsTab(); renderParksTab(); renderLogTab();
   document.getElementById("cnt-targets").textContent=(DATA.targets||[]).length||"";
   const tb=document.getElementById("tbody");
