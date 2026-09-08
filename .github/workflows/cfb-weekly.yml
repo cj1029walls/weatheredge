@@ -30,12 +30,16 @@ jobs:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pro/cfb_build.py || echo "trench board skipped — using last committed board"
+      - name: Build PRO Wind Factor (site/pro/cfb_wx.json)
+        # Reads the history dataset and this week's forecasts already on disk —
+        # no API keys, so it can only fail on a genuine data problem.
+        run: python scripts/pro/cfb_wx.py || echo "wind factor skipped — using last committed dataset"
       - name: Commit slate data
         run: |
           git config user.name "weatheredge-bot"
           git config user.email "actions@users.noreply.github.com"
           git add site/cfb/data.json 2>/dev/null || true
-          git add site/pro/cfb.json data/pro/cfb_predictions 2>/dev/null || true
+          git add site/pro/cfb.json site/pro/cfb_wx.json data/pro/cfb_predictions 2>/dev/null || true
           git add site/cfb/teaser.json site/pro/cfb_record.json data/pro/cfb_results.json 2>/dev/null || true
           git commit -m "CFB slate refresh" || echo "no changes"
           git pull --rebase origin main
