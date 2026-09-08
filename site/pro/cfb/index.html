@@ -206,7 +206,97 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+  /* ===== v4: the desk shell =====
+     Every PRO sport gets the same three pieces: a way back to the desk index,
+     a rail of NAMED tools (a tab that says "Wind Factor · 16 seasons of what
+     wind does" tells you whether to click it; one that says "Tab 4" does not),
+     and panes that each answer one question. The rail keeps class "tabbar" as
+     well so the existing showTab() selectors keep matching. ===== */
+  .desk-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;margin:2px 0 16px}
+  .desk-back:hover{color:var(--gold-deep);border-color:var(--gold)}
+  .desk-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0 0 4px}
+  .desk-head h2{font-family:Sora,Ubuntu,sans-serif;font-size:27px;font-weight:800;
+    letter-spacing:-.7px;line-height:1.1;color:var(--ink)}
+  .desk-head .wk{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--gold-deep);background:var(--gold-bg);border:1px solid rgba(34,211,238,.3);
+    border-radius:8px;padding:4px 11px}
+
+  .toolrail{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:8px;
+    margin:14px 0 22px;position:static;padding:0}
+  .toolrail button{flex-direction:column;align-items:flex-start;gap:3px;text-align:left;
+    border-radius:12px;padding:11px 14px 12px;position:relative;text-transform:none;
+    letter-spacing:0;line-height:1.3;transition:border-color .12s,background .12s}
+  .toolrail button .t{font-family:Sora,Ubuntu,sans-serif;font-size:13.5px;font-weight:700;
+    letter-spacing:-.1px;color:var(--ink)}
+  .toolrail button .s{font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:0}
+  .toolrail button.on{background:linear-gradient(135deg,#252A35,var(--navy2));border-color:transparent;
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
+  .toolrail button.on .t{color:#fff}
+  .toolrail button.on .s{color:#9fb4c9}
+  .toolrail button .cnt{position:absolute;top:10px;right:11px}
+
+  /* ===== v4: Wind Factor =====
+     A ladder table, two callouts for the findings that cut against the
+     obvious reading, and this week's slate placed on the ladder. ===== */
+  .wx-lede{font-size:15px;color:var(--body2);max-width:74ch;margin:0 0 6px;line-height:1.6}
+  .wx-lede b{color:var(--ink)}
+  .wx-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--card);box-shadow:var(--shadow)}
+  table.wx{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
+  table.wx th,table.wx td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--line)}
+  table.wx tr:last-child td{border-bottom:none}
+  table.wx thead th{font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--muted);background:var(--gray-bg);white-space:nowrap}
+  table.wx th.b,table.wx td.b{text-align:left;min-width:190px}
+  table.wx td.b .bn{font-family:Sora,Ubuntu,sans-serif;font-size:14px;font-weight:700;color:var(--ink)}
+  table.wx td.b .br{font-size:11.5px;color:var(--muted)}
+  table.wx td.b .bnote{font-size:11.5px;color:var(--faint);margin-top:3px;max-width:34ch;line-height:1.4}
+  table.wx tbody tr.top td{background:rgba(248,113,113,.07)}
+  .wxv{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+  .wxv.up{color:var(--green)} .wxv.dn{color:var(--red)}
+  .wxv.flat{color:var(--faint);font-weight:400}
+  .wxv .raw{display:block;font-size:11px;font-weight:400;color:var(--muted);
+    font-variant-numeric:tabular-nums}
+  .wx-key{font-size:12px;color:var(--faint);margin-top:10px;line-height:1.6;max-width:82ch}
+  .wx-key b{color:var(--body2)}
+
+  .wx-finds{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  @media(max-width:760px){.wx-finds{grid-template-columns:1fr}}
+  .wx-find{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+  .wx-find h6{font-family:Sora,Ubuntu,sans-serif;font-size:14.5px;font-weight:700;color:var(--ink);
+    margin-bottom:6px;letter-spacing:-.2px}
+  .wx-find p{font-size:13px;color:var(--body2);line-height:1.62}
+  .wx-find .fig{font-variant-numeric:tabular-nums;color:var(--gold-deep);font-weight:700}
+
+  .wx-games{display:flex;flex-direction:column;gap:7px}
+  .wx-g{display:grid;grid-template-columns:74px 1fr auto;align-items:center;gap:14px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+  .wx-g .mph{font-family:Sora,Ubuntu,sans-serif;font-variant-numeric:tabular-nums;
+    font-size:19px;font-weight:800;color:var(--ink);line-height:1}
+  .wx-g .mph small{display:block;font-family:Ubuntu,sans-serif;font-size:10px;font-weight:700;
+    letter-spacing:1.1px;text-transform:uppercase;margin-top:3px}
+  .wx-g .mu{font-size:14px;font-weight:700;color:var(--ink)}
+  .wx-g .meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .wx-g .rt{text-align:right;font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .wx-g .rt b{display:block;font-size:12.5px;color:var(--gold-deep);font-variant-numeric:tabular-nums}
+  .band-Windy{border-color:rgba(248,113,113,.45)}
+  .band-Windy .mph small{color:var(--red)}
+  .band-Blustery{border-color:rgba(251,191,36,.35)}
+  .band-Blustery .mph small{color:var(--note-text)}
+  .band-Breezy .mph small,.band-Calm .mph small{color:var(--faint)}
+  .wx-more{font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--muted);
+    background:transparent;border:1px dashed var(--line-strong);border-radius:11px;
+    padding:10px 16px;cursor:pointer;margin:3px 0}
+  .wx-more:hover{color:var(--gold-deep);border-color:var(--gold)}
+  @media(max-width:600px){
+    .wx-g{grid-template-columns:60px 1fr;row-gap:6px}
+    .wx-g .rt{grid-column:1 / -1;text-align:left}
+  }
 </style>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"CFB Trench Edge: OL/DL Weight Mismatches for Rushing Props","url":"https://dfsradar.com/pro/cfb/","description":"Every college football game's offensive-line vs defensive-line weight mismatch, quintile-ranked against the league norm and validated on four seasons of data — paired with kickoff weather for rushing-prop leans. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/cfb/","availability":"https://schema.org/InStock"}}</script>
 </head>
 <body>
@@ -253,15 +343,17 @@
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
-  <div class="sec-h" id="cfb-week-h">CFB trench board</div>
-  <div class="split-note" id="cfb-note" style="margin-bottom:12px"></div>
+  <a class="desk-back" href="/pro/">← All desks</a>
+  <div class="desk-head"><h2>CFB Desk</h2><span class="wk" id="desk-wk">Week —</span></div>
+  <div class="split-note" id="cfb-note" style="margin-bottom:2px"></div>
 
-  <nav class="tabbar" id="tabbar">
-    <button data-tab="leans" class="on">🎯 Leans <span class="cnt" id="cnt-leans"></span></button>
-    <button data-tab="slate">🏟️ Slate <span class="cnt" id="cnt-slate"></span></button>
-    <button data-tab="trench">🏋️ Trench View</button>
-    <button data-tab="record">📊 Record</button>
-    <button data-tab="method">📐 Receipts &amp; method</button>
+  <nav class="tabbar toolrail" id="tabbar">
+    <button data-tab="leans" class="on"><span class="t">Trench Board</span><span class="s">This week's rushing-prop leans</span><span class="cnt" id="cnt-leans"></span></button>
+    <button data-tab="slate"><span class="t">Full Slate</span><span class="s">Every game's edge, both ways</span><span class="cnt" id="cnt-slate"></span></button>
+    <button data-tab="trench"><span class="t">Trench View</span><span class="s">The mismatch drawn to scale</span></button>
+    <button data-tab="wind"><span class="t">Wind Factor</span><span class="s">What wind does to a football game</span></button>
+    <button data-tab="record"><span class="t">Record</span><span class="s">Graded every week</span></button>
+    <button data-tab="method"><span class="t">Method</span><span class="s">The backtest and the receipts</span></button>
   </nav>
 
   <div class="tab-pane on" id="tab-leans">
@@ -295,6 +387,18 @@
     <div class="t3d-hud"><div class="t">Line of scrimmage · this week</div><div class="w" id="t3d-title"></div><div class="q" id="t3d-sub"></div></div>
     <div class="t3d-hint">drag to look around</div>
   </div>
+  </div>
+
+  <div class="tab-pane" id="tab-wind">
+  <div class="sec-h">Wind factor — sixteen seasons of outdoor Power 4 football</div>
+  <p class="wx-lede" id="wx-lede">Loading…</p>
+  <div class="sec-h" style="margin-top:22px">The ladder</div>
+  <div class="wx-scroll"><table class="wx" id="wx-table"></table></div>
+  <p class="wx-key" id="wx-key"></p>
+  <div id="wx-finds" class="wx-finds"></div>
+  <div class="sec-h" style="margin-top:26px">This week, placed on the ladder</div>
+  <div class="split-note" style="margin-bottom:10px">Outdoor games only, windiest first. The percentile says how unusual that kickoff wind is <b>for that stadium</b> — a figure the sample can actually carry, unlike a per-venue effect size.</div>
+  <div class="wx-games" id="wx-games"></div>
   </div>
 
   <div class="tab-pane" id="tab-record">
@@ -343,10 +447,135 @@ function showTab(id){
   document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
   document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
   if(id==="trench") setupTrenchControls();
+  if(id==="wind") loadWind();
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("#tabbar button"); if(b) showTab(b.dataset.tab);
 });
+
+/* ==================================================================
+   WIND FACTOR — site/pro/cfb_wx.json
+   A ladder of what wind measurably does, with the not-significant cells
+   shown greyed rather than dropped, and the venue shuffle test printed
+   as a finding instead of quietly omitted.
+================================================================== */
+let WX=null, WX_TRIED=false;
+function wxCell(m){
+  if(!m) return '<td class="wxv flat">—</td>';
+  const cls = !m.sig ? "flat" : (m.pct>0 ? "up" : "dn");
+  const sign = m.pct>0 ? "+" : (m.pct<0 ? "−" : "");
+  const val  = Math.abs(m.pct).toFixed(1);
+  return `<td><span class="wxv ${cls}">${sign}${val}%<span class="raw">${m.avg}</span></span></td>`;
+}
+function renderWind(d){
+  const M=d.metrics||[];
+  document.getElementById("wx-lede").innerHTML =
+    `Every outdoor game at a Power 4 home venue from ${d.seasons?d.seasons[0]:2010} through `+
+    `${d.seasons?d.seasons[1]:2025} — <b>${d.nGames.toLocaleString()} games</b> across `+
+    `<b>${d.nVenues} stadiums</b> — sorted by the wind at kickoff. Every figure on both sides `+
+    `of the comparison is era-adjusted first, so a band that happens to hold more old games `+
+    `can't masquerade as a wind effect.`;
+
+  const head = `<thead><tr><th class="b">Band</th>`+
+    M.map(m=>`<th>${esc(m.label)}</th>`).join("")+`<th>GAMES</th></tr></thead>`;
+  const body = (d.bands||[]).map(b=>{
+    const top = b.name==="Windy" ? " class=\"top\"" : "";
+    return `<tr${top}><td class="b"><span class="bn">${esc(b.name)}</span> `+
+      `<span class="br">${esc(b.label.split("· ")[1]||"")}</span>`+
+      `<div class="bnote">${esc(b.note)}</div></td>`+
+      M.map(m=>wxCell(b.m[m.k])).join("")+
+      `<td class="wxv flat">${b.n.toLocaleString()}</td></tr>`;
+  }).join("");
+  document.getElementById("wx-table").innerHTML = head+"<tbody>"+body+"</tbody>";
+
+  document.getElementById("wx-key").innerHTML =
+    `Each cell is that band's gap from the all-outdoor baseline, with the band's own average `+
+    `underneath. <b>Coloured</b> means the gap clears ${d.sigZ} standard errors — it is separable `+
+    `from noise. <b>Grey</b> means we measured it and it isn't; we show those rather than hide `+
+    `them, because a table with only the winners in it is how you end up believing things that `+
+    `aren't there. Baseline: ${d.base.pts} points, ${d.base.pa} passing yards, ${d.base.ru} rushing `+
+    `yards, ${d.base.cp}% completions, ${d.base.to} turnovers.`;
+
+  /* The two findings that cut against the obvious reading. Both are stated
+     from the data on this page rather than hardcoded. */
+  const windy=(d.bands||[]).find(b=>b.name==="Windy")||{m:{}};
+  const ru=windy.m.ru, pa=windy.m.pa, pts=windy.m.pts;
+  const vt=d.venueTest;
+  const finds=[];
+  if(ru && pa){
+    finds.push(`<div class="wx-find"><h6>Wind doesn't help the run. It hurts the pass.</h6>
+      <p>At ${windy.lo}+ mph, passing yards fall <span class="fig">${Math.abs(pa.pct).toFixed(1)}%</span>
+      and scoring falls <span class="fig">${Math.abs(pts.pct).toFixed(1)}%</span> — but rushing yards
+      move <span class="fig">${ru.pct>0?"+":"−"}${Math.abs(ru.pct).toFixed(1)}%</span>, which at
+      z&nbsp;${ru.z>0?"+":"−"}${Math.abs(ru.z).toFixed(1)} is nothing at all. Teams run <i>more</i> in
+      wind; they do not gain more. Buy wind against the passing game, not for the rushing yardage.</p></div>`);
+  }
+  if(vt){
+    finds.push(`<div class="wx-find"><h6>There is no such thing as a windy stadium.</h6>
+      <p>The per-venue table is the one everybody in this space sells, and it does not survive
+      testing. Across the <span class="fig">${vt.nVenues}</span> stadiums with ${vt.minN}+ games on
+      both sides of ${vt.cut}&nbsp;mph, the real spread of windy-minus-calm scoring is
+      <span class="fig">${vt.realSd}</span> points. Shuffle the wind labels inside each stadium
+      ${vt.shuffles} times and pure chance produces <span class="fig">${vt.shuffledSd}</span>
+      (95th percentile <span class="fig">${vt.shuffledSd95}</span>). The real answer sits inside the
+      noise, so we don't rank stadiums by it — we report how unusual the forecast is for each one
+      instead.</p></div>`);
+  }
+  document.getElementById("wx-finds").innerHTML = finds.join("");
+
+  WX_GAMES = d.games||[];
+  renderWxGames(false);
+}
+
+/* The slate list shows only the bands the ladder above found something in.
+   Listing seventy Calm games as readings would contradict the table that
+   just said Calm is indistinguishable from the baseline — so the rest sit
+   behind a toggle, counted honestly rather than hidden. */
+let WX_GAMES=[], WX_ALL=false;
+const WX_LIVE=["Windy","Blustery"];
+function wxCard(g){
+  const pct = g.vPct==null ? `<b>—</b>no venue history`
+    : g.vPct>=100 ? `<b>Windiest</b>on record here · ${g.vN} games`
+    : `<b>${g.vPct}<sup>th</sup> pct</b>wind here · ${g.vN} games`;
+  return `<div class="wx-g band-${esc(g.band)}">
+    <div class="mph">${g.wind}<small>${esc(g.band)}</small></div>
+    <div><div class="mu">${esc(g.away)} @ ${esc(g.home)}</div>
+      <div class="meta">${esc(g.stadium||"")} · ${esc(g.day||"")} ${esc(g.time||"")} · ${g.temp}° ${esc(g.sky||"")}</div></div>
+    <div class="rt">${pct}</div></div>`;
+}
+function renderWxGames(all){
+  WX_ALL=all;
+  const live=WX_GAMES.filter(g=>WX_LIVE.includes(g.band));
+  const rest=WX_GAMES.filter(g=>!WX_LIVE.includes(g.band));
+  const el=document.getElementById("wx-games");
+  if(!WX_GAMES.length){ el.innerHTML=`<p class="split-note">No outdoor games on this slate.</p>`; return; }
+  let h = live.length
+    ? live.map(wxCard).join("")
+    : `<p class="split-note">Nothing on this slate reaches 11 mph — every outdoor game is in a band the ladder can't separate from baseline.</p>`;
+  if(rest.length){
+    h += `<button class="wx-more" id="wx-more">${all
+      ? "Hide the quiet games"
+      : `Show the other ${rest.length} outdoor game${rest.length===1?"":"s"} — all under 11 mph`}</button>`;
+    if(all) h += rest.map(wxCard).join("");
+  }
+  el.innerHTML=h;
+  const btn=document.getElementById("wx-more");
+  if(btn) btn.addEventListener("click",()=>renderWxGames(!WX_ALL));
+}
+async function loadWind(){
+  if(WX||WX_TRIED) return;
+  WX_TRIED=true;
+  try{
+    const r=await fetch("/pro/cfb_wx.json?_="+Date.now());
+    if(!r.ok) throw 0;
+    WX=await r.json();
+    renderWind(WX);
+  }catch(e){
+    document.getElementById("wx-lede").textContent =
+      "The wind dataset hasn't been built yet this week — it rebuilds with the slate.";
+  }
+}
+
 /* ==================================================================
    TRENCH VIEW — 3D line of scrimmage, blockers drawn to unit weight
 ================================================================== */
@@ -528,7 +757,7 @@ function renderCFB(){
   if(!CFB) return;
   if(0) void 0;  // live bar removed
     void`🎓 <span><b>Live</b> — built ${esc(CFB.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
-  document.getElementById("cfb-week-h").textContent=CFB.week?`CFB — ${CFB.season} Week ${CFB.week} · ${(CFB.games||[]).length} FBS games`:"CFB trench board";
+  document.getElementById("desk-wk").textContent=CFB.week?`${CFB.season} · Week ${CFB.week} · ${(CFB.games||[]).length} game${(CFB.games||[]).length===1?"":"s"}`:"Off-season";
   document.getElementById("cfb-note").textContent=CFB.note||"";
   document.getElementById("cnt-leans").textContent=(CFB.leans||[]).length||"";
   document.getElementById("cnt-slate").textContent=(CFB.games||[]).length||"";
