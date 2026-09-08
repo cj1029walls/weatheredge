@@ -185,7 +185,44 @@
     .method{padding:24px 20px}
     .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
   }
+  /* ===== v4: the desk shell =====
+     Same three pieces on every PRO sport: a way back to the desk index, a rail
+     of NAMED tools (a rail entry that says what it answers tells you whether to
+     click it; "Tab 3" does not), and the sport's current subject in the header.
+     On pages built as panes the rail switches panes; on single-scroll pages it
+     is a set of anchors to the sections that are already there — same shape,
+     no restructuring, nothing hidden behind a click that wasn't before. ===== */
+  .desk-back{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+    letter-spacing:.7px;text-transform:uppercase;color:var(--muted);text-decoration:none;
+    border:1px solid var(--line);border-radius:20px;padding:6px 14px;margin:2px 0 16px}
+  .desk-back:hover{color:var(--gold-deep);border-color:var(--gold)}
+  .desk-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:0 0 4px}
+  .desk-head h2{font-family:Sora,Ubuntu,sans-serif;font-size:27px;font-weight:800;
+    letter-spacing:-.7px;line-height:1.1;color:var(--ink)}
+  .desk-head .wk{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+    color:var(--gold-deep);background:var(--gold-bg);border:1px solid rgba(34,211,238,.3);
+    border-radius:8px;padding:4px 11px}
+
+  .toolrail{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:8px;
+    margin:14px 0 22px;position:static;padding:0}
+  .toolrail button,.toolrail a{font-family:inherit;display:flex;flex-direction:column;
+    align-items:flex-start;gap:3px;text-align:left;text-decoration:none;cursor:pointer;
+    background:var(--card);border:1.5px solid var(--line-strong);border-radius:12px;
+    padding:11px 14px 12px;position:relative;text-transform:none;letter-spacing:0;
+    line-height:1.3;transition:border-color .12s,background .12s}
+  .toolrail button:hover,.toolrail a:hover{border-color:var(--gold-deep)}
+  .toolrail .t{font-family:Sora,Ubuntu,sans-serif;font-size:13.5px;font-weight:700;
+    letter-spacing:-.1px;color:var(--ink)}
+  .toolrail .s{font-size:11.5px;font-weight:400;color:var(--muted);letter-spacing:0}
+  .toolrail button.on{background:linear-gradient(135deg,#252A35,var(--navy2));border-color:transparent;
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
+  .toolrail button.on .t{color:#fff}
+  .toolrail button.on .s{color:#9fb4c9}
+  .toolrail .cnt{position:absolute;top:10px;right:11px}
+  /* Anchored sections need room under the sticky-free header when jumped to. */
+  .sec-h[id]{scroll-margin-top:18px}
 </style>
+
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"NASCAR Track History & Heat Edge Board","url":"https://dfsradar.com/pro/nascar/","description":"This week's NASCAR board: driver track history with the Next Gen era split out, track-type form, and the heat edge \u2014 who gains spots when the track runs hot. Graded against the finishing order. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/nascar/","availability":"https://schema.org/InStock"}}</script>
 </head>
 <body>
@@ -232,25 +269,34 @@
   <div id="pro-app" style="display:none">
   <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
-  <div class="sec-h" id="ev-h">NASCAR weekly board</div>
-  <div class="split-note" id="ev-note" style="margin-bottom:12px"></div>
+  <a class="desk-back" href="/pro/">← All desks</a>
+  <div class="desk-head"><h2>NASCAR Desk</h2><span class="wk" id="desk-wk">No race this week</span></div>
+  <div class="split-note" id="ev-note" style="margin-bottom:2px"></div>
 
-  <div class="sec-h">Leans</div>
+  <nav class="toolrail">
+    <a href="#s-leans"><span class="t">Leans</span><span class="s">This week's track targets</span></a>
+    <a href="#s-track"><span class="t">Track History</span><span class="s">Every driver, this track</span></a>
+    <a href="#s-type"><span class="t">Track-Type Form</span><span class="s">Next Gen era, same kind of track</span></a>
+    <a href="#s-heat"><span class="t">Heat Edge</span><span class="s">Who holds up when it's hot</span></a>
+    <a href="#s-record"><span class="t">Record</span><span class="s">Graded on finishing position</span></a>
+    <a href="#s-method"><span class="t">Method</span><span class="s">How a lean is chosen</span></a>
+  </nav>
+  <div class="sec-h" id="s-leans">Leans</div>
   <div class="gamestrip" id="leans"></div>
 
-  <div class="sec-h" style="margin-top:18px">Track history — this track, every driver</div>
+  <div class="sec-h" id="s-track" style="margin-top:18px">Track history — this track, every driver</div>
   <div id="track-board"></div>
 
-  <div class="sec-h" style="margin-top:18px">Track-type form — Next Gen era, last 10 of this type</div>
+  <div class="sec-h" id="s-type" style="margin-top:18px">Track-type form — Next Gen era, last 10 of this type</div>
   <div id="type-board"></div>
 
-  <div class="sec-h" style="margin-top:18px">Heat edge <span id="heat-flag"></span></div>
+  <div class="sec-h" id="s-heat" style="margin-top:18px">Heat edge <span id="heat-flag"></span></div>
   <div id="heat-board"></div>
 
-  <div class="sec-h" style="margin-top:18px">The record — every lean graded against the finishing order</div>
+  <div class="sec-h" id="s-record" style="margin-top:18px">The record — every lean graded against the finishing order</div>
   <div class="m-sec" id="nascar-record"><p class="split-note">A TRACK TARGET is scored on <b>a top-10 finish</b>; a DOMINATOR is the stronger claim, so it carries the stronger bar — <b>a top-5</b>. Grades post the day after each race — every lean above is already archived.</p></div>
 
-  <div class="m-sec" style="margin-top:18px">
+  <div class="m-sec" id="s-method" style="margin-top:18px">
     <h5>How the NASCAR board works</h5>
     <p>Cup Series finishing orders for every points race since 2018, mapped to tracks and track types. <b>Track history</b> ranks drivers by average finish at this exact track, with the Next Gen era (2022+) split out — the car changed in 2022 and old-car track records mislead. <b>Track-type form</b> covers the last 10 races on this track's type (superspeedway / intermediate / short / flat / road) in the current car. <b>Heat edge</b> rebuilds race-day temperatures from the weather archive: 88°+ race-day highs mean a hot, slick track, and some drivers consistently gain or lose spots in those conditions — those leans activate when the forecast runs hot. Rain/delay outlook carries over from the free radar. Every lean is archived the moment it posts and graded against the finishing order. Historical records are tendencies, not guarantees; sample sizes are shown on every number.</p>
   </div>
@@ -290,7 +336,7 @@ function render(){
   if(0) void 0;  // live bar removed
     void`🏁 <span><b>Live</b> — built ${esc(D.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
   const r=D.race;
-  document.getElementById("ev-h").textContent=r?`${r.name} — ${r.track}${r.playoff?" · PLAYOFFS":""}`:"NASCAR weekly board";
+  document.getElementById("desk-wk").textContent=r?`${r.name} · ${r.track}${r.playoff?" · PLAYOFFS":""}`:"No race this week";
   const delayTxt=D.delay&&D.delay.level&&D.delay.level!=="clear"?` Delay outlook: ${D.delay.level} (${D.delay.pct}% peak rain).`:"";
   document.getElementById("ev-note").textContent=[(D.note||""),r&&r.date?`Green flag ${r.date} ${r.time||""} ET.`:"",delayTxt].filter(Boolean).join(" ");
   document.getElementById("leans").innerHTML=(D.leans||[]).length?(D.leans||[]).map(leanCard).join(""):`<div class="split-note">Leans post as history and forecast line up.</div>`;
