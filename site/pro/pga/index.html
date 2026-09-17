@@ -347,8 +347,19 @@ function render(){
   const ev=D.event;
   document.getElementById("desk-wk").textContent=ev?`${ev.name} · ${ev.course}`:"No event this week";
   document.getElementById("ev-note").textContent=[(ev&&ev.histNote)||"",D.note||"",D.fieldN?`Field: ${D.fieldN} players.`:""].filter(Boolean).join(" ");
-  document.getElementById("leans").innerHTML=(D.leans||[]).length?(D.leans||[]).map(leanCard).join(""):`<div class="split-note">Leans post as the field, forecast, and history line up.</div>`;
-  document.getElementById("course-board").innerHTML=`<table><thead><tr><th>#</th><th>Player</th><th>Starts</th><th>Course score</th><th>Avg finish</th><th>Best</th><th class="hide-m">Recent editions</th></tr></thead><tbody>${(D.course||[]).map((c,i)=>`
+  /* An empty board has to say WHY. A first-year event has no course history
+     for anyone, so there is nothing for a horse to be a horse at - that is the
+     model being honest, and it should read that way, not like a broken page. */
+  const firstYear = ev && !(D.course||[]).length;
+  const whyNoLeans = firstYear
+    ? `No course horses this week — <b>${esc(ev.name)}</b> is a first-year event, so no one has history at ${esc(ev.course)} yet. Course history builds from this edition.`
+      + (D.windWeek ? "" : ` Wind pedigree is idle too: calm forecast${(D.fcWinds||[]).length?` (round winds ${Math.min(...D.fcWinds)}–${Math.max(...D.fcWinds)} mph; leans activate at 12+)`:""}.`)
+      + ` The one signal that exists for a course nobody has played is <a href="#s-form">recent form</a>.`
+    : `Leans post as the field, forecast, and history line up.`;
+  document.getElementById("leans").innerHTML=(D.leans||[]).length?(D.leans||[]).map(leanCard).join(""):`<div class="split-note" style="font-size:13.5px;line-height:1.65">${whyNoLeans}</div>`;
+  document.getElementById("course-board").innerHTML = firstYear
+    ? `<div class="split-note" style="font-size:13.5px;line-height:1.65"><b>${esc(ev.histNote||"First year on file for this event.")}</b> Every player's finish this week is archived, so next year this table has its first column.</div>`
+    : `<table><thead><tr><th>#</th><th>Player</th><th>Starts</th><th>Course score</th><th>Avg finish</th><th>Best</th><th class="hide-m">Recent editions</th></tr></thead><tbody>${(D.course||[]).map((c,i)=>`
     <tr><td>${i+1}</td><td><div class="pname">${esc(c.player)}${c.inField===false?' <span class="chip">not in field</span>':""}</div></td>
     <td>${c.starts}</td><td><b>${c.score}</b></td><td>${c.avgFin}</td><td>${c.best}</td>
     <td class="hide-m"><span class="imp">${lastStr(c.last)}</span></td></tr>`).join("")}</tbody></table>
