@@ -86,6 +86,11 @@ CANON = [
     (r"corales|punta cana", "corales"),
     (r"olympic|olympics", "olympics"),
     (r"presidents cup|ryder cup", "team-cup"),
+    # ESPN lists the 2026 debut as "Biltmore Championship Asheville"; our
+    # schedule says "Biltmore Championship". Without an anchor the two slug
+    # differently, the field lookup silently finds nothing, and next year's
+    # editions would never file under the same key as this one.
+    (r"biltmore", "biltmore"),
 ]
 
 # stable-course coordinates for wind tagging (lat, lon, tz)
