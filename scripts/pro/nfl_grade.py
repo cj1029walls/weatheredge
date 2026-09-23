@@ -26,10 +26,17 @@ ARCH = os.path.join(ROOT, "data", "pro", "nfl_predictions")
 RESULTS = os.path.join(ROOT, "data", "pro", "nfl_results.json")
 RECORD = os.path.join(ROOT, "site", "pro", "nfl_record.json")
 
-STATS_URL = ("https://github.com/nflverse/nflverse-data/releases/download/"
-             "player_stats/player_stats_{season}.csv.gz")
+# nflverse moved weekly player stats to the `stats_player` release in 2025 (one
+# file per season, kicking columns included). The old `player_stats` release
+# stops at 2024, so for 2025+ it 404s and no player-prop lean ever graded.
+STATS_URLS = (
+    "https://github.com/nflverse/nflverse-data/releases/download/"
+    "stats_player/stats_player_week_{season}.csv.gz",
+    "https://github.com/nflverse/nflverse-data/releases/download/"
+    "player_stats/player_stats_{season}.csv.gz",          # 2024 and earlier
+)
 KICK_URL = ("https://github.com/nflverse/nflverse-data/releases/download/"
-            "player_stats/player_stats_kicking_{season}.csv.gz")
+            "player_stats/player_stats_kicking_{season}.csv.gz")   # legacy only
 GAMES_URL = "https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv"
 
 
@@ -81,23 +88,42 @@ def week_stats(season, week):
         by_last.setdefault(last, set()).add(k)
         return out.setdefault(k, {})
 
-    try:
-        for r in read_csv_gz(fetch(STATS_URL.format(season=season))):
-            if str(r.get("week")) != str(week):
-                continue
-            nm = norm_name(r.get("player_display_name") or r.get("player_name"))
-            if not nm:
-                continue
-            e = bucket(row_team(r), nm)
-            for k, col in (("passYds", "passing_yards"), ("rushYds", "rushing_yards"),
-                           ("rec", "receptions")):
-                try:
-                    e[k] = e.get(k, 0) + float(r.get(col) or 0)
-                except (TypeError, ValueError):
-                    pass
-    except Exception as e:
-        print(f"  player stats unavailable ({e})")
+    rows, errs = None, []
+    for url in STATS_URLS:
+        try:
+            rows = read_csv_gz(fetch(url.format(season=season)))
+            break
+        except Exception as e:
+            errs.append(f"{url.format(season=season).rsplit('/', 2)[-2]}: {e}")
+    if rows is None:
+        print(f"  player stats unavailable ({'; '.join(errs)})")
         return None
+    # the stats_player file carries kicking too; the legacy one needs KICK_URL
+    has_kick = bool(rows) and "fg_made" in rows[0] and "pat_made" in rows[0]
+
+    def num(r, col):
+        try:
+            return float(r.get(col) or 0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    for r in rows:
+        if str(r.get("week")) != str(week):
+            continue
+        nm = norm_name(r.get("player_display_name") or r.get("player_name"))
+        if not nm:
+            continue
+        e = bucket(row_team(r), nm)
+        for k, col in (("passYds", "passing_yards"), ("rushYds", "rushing_yards"),
+                       ("rec", "receptions")):
+            e[k] = e.get(k, 0) + num(r, col)
+        # a kicker who went 0-for-0 still scored 0 kicking points
+        if has_kick and ((r.get("position") or "").upper() == "K"
+                         or num(r, "fg_att") or num(r, "pat_att")):
+            e["kickPts"] = e.get("kickPts", 0) + num(r, "fg_made") * 3 + num(r, "pat_made")
+    if has_kick:
+        out["_last"] = {k: sorted(v) for k, v in by_last.items()}
+        return out
     try:
         for r in read_csv_gz(fetch(KICK_URL.format(season=season))):
             if str(r.get("week")) != str(week):
