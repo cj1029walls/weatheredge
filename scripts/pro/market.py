@@ -24,7 +24,10 @@ def _get(url, timeout=45):
 
 def _norm(nm):
     nm = unicodedata.normalize("NFKD", nm or "").encode("ascii", "ignore").decode()
-    return re.sub(r"[^a-z ]", "", nm.lower()).strip()
+    nm = re.sub(r"[.'’]", "", nm.lower())                # "J.J. Spaun" == "JJ Spaun"
+    nm = re.sub(r"[^a-z ]", " ", nm)                     # "Byeong-Hun" == "Byeong Hun"
+    nm = re.sub(r"\s+(jr|sr|ii|iii|iv)\s*$", "", nm)     # "Stenhouse Jr" == "Stenhouse"
+    return re.sub(r"\s+", " ", nm).strip()
 
 
 def _implied(price):
