@@ -1,0 +1,14 @@
+{
+ "_meta": {
+  "down": {
+   "at": "2026-09-23T05:24:28Z",
+   "reason": "CollegeFootballData refused the call (HTTP 429 \u2014 monthly call quota exhausted or rate-limited)",
+   "until": 1790162668
+  },
+  "remaining": {
+   "at": "2026-09-23T05:24:28Z",
+   "n": 0,
+   "t": 1790141068
+  }
+ }
+}
