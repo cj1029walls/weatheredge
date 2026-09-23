@@ -3,35 +3,59 @@ name: NASCAR weekly build
 on:
   workflow_dispatch:
   schedule:
-    - cron: "15 10 * * *"   # daily ~6:15 AM ET — race-day forecasts sharpen
+    - cron: "19 10 * * *"   # daily ~6:19 AM ET — race-day forecasts sharpen
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   nascar:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Build site/nascar/data.json
+        id: free
+        continue-on-error: true
         run: python scripts/nascar/weekly_build.py
+      - name: Mark free page stale
+        if: steps.free.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/nascar/data.json "the race forecast refresh failed"
       - name: Refresh deep history (results + archive weather)
-        run: python scripts/nascar/deep_history.py || echo "deep history refresh failed — keeping last dataset"
+        id: deep
+        continue-on-error: true
+        run: python scripts/nascar/deep_history.py
       - name: Grade PRO leans (completed races)
-        run: python scripts/pro/nascar_grade.py || echo "grading skipped"
+        id: grade
+        continue-on-error: true
+        run: python scripts/pro/nascar_grade.py
       - name: Build PRO board (site/pro/nascar.json)
+        id: pro
+        continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pro/nascar_build.py
+      - name: Mark PRO board stale
+        if: steps.pro.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/nascar.json "the PRO board rebuild failed"
       - name: Commit data
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add site/nascar/data.json site/pro/nascar.json site/pro/nascar_record.json \
-                  data/nascar data/pro/nascar_predictions data/pro/nascar_results.json
-          git commit -m "NASCAR refresh" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/commit_push.sh "NASCAR refresh"
+          site/nascar/data.json site/pro/nascar.json site/pro/nascar_record.json
+          data/nascar data/pro/nascar_predictions data/pro/nascar_results.json
+      - name: Report
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/gate.sh
+          "NASCAR free page=${{ steps.free.outcome }}"
+          "NASCAR PRO board=${{ steps.pro.outcome }}"
+          -- "NASCAR deep history=${{ steps.deep.outcome }}"
+          "NASCAR grading=${{ steps.grade.outcome }}"
