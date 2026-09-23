@@ -8,20 +8,21 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
 <meta property="og:title" content="DFSRADAR CFB — College Football Weather Edges">
-<meta property="og:description" content="Every FBS game's weather, with Power 4 venues backed by 3,000 games of history against real closing totals. Free.">
+<meta property="og:description" content="Every FBS game's weather, with Power 4 venues backed by more than 6,700 games of history against real closing totals. Free.">
 <meta property="og:image" content="https://dfsradar.com/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://dfsradar.com/cfb/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="DFSRADAR CFB — College Football Weather Edges">
-<meta name="twitter:description" content="Every FBS game's weather, with Power 4 venues backed by 3,000 games of history against real closing totals. Free.">
+<meta name="twitter:description" content="Every FBS game's weather, with Power 4 venues backed by more than 6,700 games of history against real closing totals. Free.">
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
 
 <meta name="description" content="CFB weather edges: kickoff forecasts for every game and how wind, cold and rain have moved scoring at each stadium historically.">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%2322d3ee" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23a5f3fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<script src="/assets/fresh.js" defer></script>
 <style>
   :root{
     --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
@@ -39,9 +40,6 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
-  .announce{background:linear-gradient(90deg,#252A35,#2450b8 55%,#252A35);color:#c8d5f2;font-size:12.5px;letter-spacing:.4px;text-align:center;padding:8px 14px}
-  .announce b{color:#fff}
-  .announce .soon{display:inline-block;margin-left:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:1.5px 10px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#F08A3C}
   header{position:relative;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 0}
   .header-inner{max-width:1240px;margin:0 auto}
   .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -50,7 +48,7 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#F08A3C;font-weight:600}
+  .brand .tagline b{color:#22d3ee;font-weight:600}
   .sport-tabs{display:flex;gap:6px;margin-top:14px}
   .sport-tabs a,.sport-tabs span{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
   .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
@@ -77,7 +75,6 @@
   nav button:hover{color:#fff}
   nav button.active{background:var(--surface);color:var(--ink)}
   main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
-  .proto-note{display:flex;align-items:center;gap:8px;background:var(--note-bg);border:1px solid var(--note-border);color:var(--note-text);font-size:12.5px;padding:8px 14px;border-radius:10px;margin-bottom:18px}
   .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
   .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
   .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
@@ -166,6 +163,7 @@
   .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px;white-space:nowrap}
   .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
   .hr-rain.warn{color:var(--red);font-weight:800}
+  .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
   .field3d-wrap{position:relative;height:340px;background:#10151f;border-radius:11px;overflow:hidden;margin-bottom:14px}
   .field3d-wrap canvas{width:100%;height:100%;display:block;cursor:grab}
   .field3d-wrap canvas:active{cursor:grabbing}
@@ -173,7 +171,10 @@
   .f3d-hud .t{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
   .f3d-hud .w{font-size:15px;font-weight:800;margin-top:3px}
   .f3d-badge{position:absolute;top:14px;right:16px;background:rgba(8,12,20,.42);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.7px;padding:5px 11px;border-radius:14px;text-transform:uppercase;pointer-events:none}
-  .f3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none}
+  .f3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none;display:none}
+  .is-3d .f3d-hint{display:block}
+  .f3d-load{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:rgba(255,255,255,.55);font-size:12px;pointer-events:none}
+  .is-3d .f3d-load{display:none}
   .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
   .dl-clear{background:var(--green-bg);color:var(--green-deep)}
   .dl-watch{background:var(--amber-bg);color:#fbbf24}
@@ -220,7 +221,16 @@
   .hist-note{font-size:11.5px;color:var(--muted);margin-top:10px}
   .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
   .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
-  footer{max-width:1240px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--faint);text-align:center}
+  footer.site-foot{max-width:1180px;margin:36px auto 0;padding:24px 24px 8px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:#A7B0C4;text-align:center}
+  footer.site-foot .fnav{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 4px;margin:0 0 10px}
+  footer.site-foot .fnav a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:20px;color:#C7CEDC;font-size:12.5px;font-weight:700;letter-spacing:.4px;text-decoration:none}
+  footer.site-foot .fnav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+  footer.site-foot .fnav a[aria-current="page"]{color:#67e8f9}
+  footer.site-foot .fnav .f-pro{color:#F08A3C}
+  footer.site-foot p{margin:0 auto 6px;max-width:74ch}
+  footer.site-foot .f-rg b{color:#EFF1F7}
+  footer.site-foot .f-rg a{color:#67e8f9;font-weight:700;text-decoration:none}
+  footer.site-foot .f-rg a:hover{text-decoration:underline}
   @media(max-width:900px){.b-row{grid-template-columns:80px 1fr 1fr;row-gap:10px}.b-ou,.b-badge{grid-column:span 2}}
 
   /* ===== DFS Kitchen family — cyan-forward chrome (appended) ===== */
@@ -305,6 +315,126 @@
   .home-link{color:inherit;text-decoration:none;border-radius:4px}
   .home-link:hover{opacity:.82}
   .hometab{white-space:nowrap}
+
+  /* ===== v6: honest data states + freshness =====
+     The page used to paint a built-in sample first and keep it whenever
+     data.json failed or had no games. Now it paints a neutral skeleton, then
+     exactly one of: the live slate, a real empty state, or an error with a
+     retry. The sample only appears behind ?demo=1, labelled as demo data. ===== */
+  [hidden]{display:none!important}
+  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .slate-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .slate-meta .fresh{min-height:0}
+  .state-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:38px 28px;text-align:center}
+  .state-card h3{font:700 18px/1.35 Sora,Ubuntu,-apple-system,sans-serif;color:var(--ink);margin-bottom:8px}
+  .state-card p{font-size:14px;line-height:1.65;color:var(--body2);max-width:60ch;margin:0 auto}
+  .state-card.err{border-color:rgba(251,191,36,.38)}
+  .retry-btn{margin-top:18px;appearance:none;cursor:pointer;min-height:40px;padding:0 22px;border-radius:22px;border:1px solid rgba(34,211,238,.5);background:rgba(34,211,238,.12);color:#67e8f9;font:700 13px/1 Ubuntu,-apple-system,sans-serif;letter-spacing:.3px}
+  .retry-btn:hover{background:rgba(34,211,238,.2)}
+  .skel{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px}
+  .skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);animation:skel 1.5s ease-in-out infinite}
+  @keyframes skel{to{transform:translateX(100%)}}
+  .skel-row{height:84px}
+  .skel-card{height:108px;border-radius:var(--radius)}
+  .demo-flag{display:flex;align-items:center;gap:10px;border:1px dashed rgba(251,191,36,.55);background:rgba(251,191,36,.08);color:#fcd34d;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:20px}
+  .demo-flag b{letter-spacing:.8px;text-transform:uppercase;font-size:11.5px}
+  .summary-strip:empty{display:none}
+  .brief-card.is-warn .brief-head .pulse{background:#fbbf24;box-shadow:0 0 8px #fbbf24;animation:none}
+  @media(max-width:680px){.slate-meta{align-items:flex-start}}
+
+  /* ===== v6: Free → PRO path =====
+     One compact card per page pointing at THAT sport's Desk, with a member
+     log in. It sits beside The Optimizer card after the board, so the board
+     comes first. Orange stays reserved for PRO / The Optimizer. ===== */
+  .cta-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;margin-top:30px}
+  .cta-row>*{margin:0!important}
+  .cta-row .kx-card{align-content:center}
+  .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;background:linear-gradient(120deg,#252A35,var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px}
+  .pro-card .px-main{flex:1 1 300px;min-width:0}
+  .pro-card .px-k{font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
+  .pro-card .px-t{font-size:14px;line-height:1.55;color:#dde5f5;margin-top:4px}
+  .pro-card .px-t b{color:#fff}
+  .pro-card .px-s{font-size:12px;color:#A7B0C4;margin-top:4px}
+  .pro-card .px-btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pro-card .px-go{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border-radius:22px;background:#F08A3C;color:#1B1206;font-size:13px;font-weight:800;letter-spacing:.3px;text-decoration:none;white-space:nowrap}
+  .pro-card .px-go:hover{filter:brightness(1.06)}
+  .pro-card .px-login{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.25);color:#C7CEDC;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
+  .pro-card .px-login:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+
+  /* ===== v6: keyboard, screen readers, touch =====
+     Info tips: the CSS-only bubble was hover-only and hidden ≤680px; a single
+     JS-positioned #tipbox now opens on hover, focus or tap. Icons keep their
+     15px look with a 40px hit area. ===== */
+  .tip::after,.tip::before{content:none!important;display:none!important}
+  .tip{cursor:pointer;border-radius:8px}
+  .info-i{position:relative}
+  .info-i::before{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%)}
+  #tipbox{position:fixed;z-index:300;left:0;top:0;max-width:300px;background:#1F2430;color:#E6EAF2;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:10px 12px;font:500 12.5px/1.55 Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.1px;text-transform:none;text-align:left;white-space:normal}
+  [role="button"][data-game]{cursor:pointer}
+  [role="button"][data-game]:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
+  .m-close{display:inline-flex;align-items:center;justify-content:center}
+  .m-close:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
+
+  /* ===== v6: contrast + phone ergonomics =====
+     Small secondary text was #8E97AD on #323A4A (3.9:1); #A7B0C4 clears 4.5:1
+     on every card and header surface. Text on orange buttons is #1B1206 (7.4:1,
+     was white at 2.5:1). On phones every tab/chip/button is at least 40px tall. ===== */
+  :root{--muted:#A7B0C4;--faint:#A7B0C4}
+  .b-teams .at,.hero-teams .at,.wxc-teams .at{color:#8E97AD}
+  .brand .tagline,nav button{color:#A7B0C4}
+  .m-head .meta{color:#A7B0C4!important}
+  .kx-btn,.kx-btn:hover{color:#1B1206!important}
+  .kx-card .kx-go,.kx-card .kx-go:hover{color:#1B1206}
+  .kx-card .kx-s{color:#A7B0C4}
+  select{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%23C7CEDC"/></svg>')!important;background-repeat:no-repeat!important;background-position:right 12px center!important;padding-right:32px!important}
+  @media(max-width:680px),(pointer:coarse){
+    .sport-tabs a{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
+    nav button{min-height:40px}
+    select{min-height:40px}
+    .kx-btn{min-height:40px}
+    .kx-card .kx-go{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
+    .m-close{width:40px;height:40px}
+  }
+  @media(max-width:680px){
+    .summary-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-bottom:22px}
+    .sum-card{padding:14px 14px!important}
+    .sum-card .k{font-size:10.5px;letter-spacing:.8px}
+    .sum-card .v{font-size:15px!important;line-height:1.3}
+    .sum-card .s{font-size:12px}
+    .scene-card{height:220px}
+  }
+  @media(max-width:359px){.summary-strip{grid-template-columns:1fr!important}}
+
+  /* phone board rows: teams + time on one line, weather beside the badge (PPD /
+     Delay likely / Wind game stay visible), then impact and the O/U lean */
+  @media(max-width:680px){
+    .b-row{grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"match time" "wx badge" "imp imp" "ou ou";gap:10px 12px!important;padding:15px 16px!important}
+    .b-row>.b-match{grid-area:match}
+    .b-row>.b-time{grid-area:time;text-align:right;align-self:start}
+    .b-row>.b-wx{grid-area:wx}
+    .b-row>.b-badge{grid-area:badge;display:block!important;align-self:center;text-align:right}
+    .b-row>.b-imp,.b-row>.b-pts{grid-area:imp}
+    .b-row>.b-ou{grid-area:ou}
+  }
+  /* selected conference chip reads as selected (it was navy-on-card) */
+  .conf-chips button.on{background:rgba(34,211,238,.14);border-color:rgba(34,211,238,.55);color:#67e8f9}
+  .sortwrap select{padding-top:7px;padding-bottom:7px}
+  @media(max-width:680px),(pointer:coarse){
+    .conf-chips button{min-height:40px;padding-top:0;padding-bottom:0}
+    .mx-toggle button{min-height:40px}
+  }
+
+  /* ===== v6: reduced motion =====
+     Honour the OS setting: no CSS animation or transition, no smooth
+     scrolling, the radar logo's SMIL sweep is paused (see script) and the 3D
+     scenes stop orbiting and render still frames. ===== */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+    html{scroll-behavior:auto!important}
+    .brief-head .pulse{animation:none!important}
+    .skel::after{animation:none!important;display:none}
+    .b-row:hover{transform:none}
+  }
 </style>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 </head>
@@ -334,47 +464,40 @@
           <a class="hometab" href="/">← Home</a><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a class="on" href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="protab" href="/pro/cfb/">★ PRO</a>
         </div>
       </div>
-      <div class="date-chip">This week's slate · <b id="game-count">0</b> games</div>
+      <div class="slate-meta">
+        <div class="date-chip" id="date-chip">Loading this week's slate…</div>
+        <div class="fresh" id="fresh" hidden></div>
+      </div>
     </div>
-    <nav><button class="active" data-view="slate">This Week</button><button data-view="method">How It Works</button></nav>
+    <nav><button type="button" class="active" data-view="slate" aria-pressed="true">This Week</button><button type="button" data-view="method" aria-pressed="false">How It Works</button></nav>
   </div>
   <a class="kx-btn" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=header&utm_campaign=cfb" target="_blank" rel="noopener">⚡ The Optimizer</a>
 </header>
 
 <main>
 
+  <div class="demo-flag" id="demo-flag" role="note" hidden><b>Demo data</b> A built-in sample slate for design work — none of these games, forecasts or numbers are live.</div>
+
   <div class="brief-card" id="brief-card" style="display:none">
-    <div class="brief-head"><span class="pulse"></span>This week's read — live from the radar<span class="tip" data-tip="Auto-generated from this week's data on every build — cold, wind, and rain risks straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
+    <div class="brief-head"><span class="pulse"></span><span id="brief-label">This week's read — live from the radar</span><span class="tip" data-tip="Auto-generated from this week's data on every build — cold, wind, and rain risks straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
     <div class="brief-body" id="brief-body"></div>
   </div>
 
-  <div class="kx-card">
-    <div><div class="kx-k">⚡ Found your edge?</div>
-    <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
-    <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
-    <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=cfb" target="_blank" rel="noopener">Build lineups →</a>
-  </div>
 
-  <div class="kx-card" id="pro-tease" style="display:none;border-left-color:#F08A3C">
-    <div><div class="kx-k" style="color:#F08A3C">🔒 THIS WEEK'S TRENCH BOARD — PRO</div>
-    <div class="kx-t" id="pro-tease-txt"></div>
-    <div class="kx-s">OL-vs-DL weight edges, backtested on 4 seasons — every lean graded in public.</div></div>
-    <a class="kx-go" style="background:#F08A3C;color:#1B1206" href="/pro/cfb/">Unlock the board →</a>
-  </div>
 
   <section class="view active" id="view-slate">
     <div class="summary-strip" id="summary-strip"></div>
     <div class="controls">
       <h2>Weather impact vs each venue<span class="tip" data-tip="PTS shows how total scoring in historically similar weather at that venue compares to the venue's own average (Power 4 venues, 2010–2025, era-adjusted). O/U hit rates are measured against each past game's REAL closing total — the actual lines that existed."><span class="info-i">i</span></span></h2>
-      <div class="conf-chips" id="conf-chips">
-        <button data-conf="P4" class="on">Power 4</button>
-        <button data-conf="SEC">SEC</button>
-        <button data-conf="Big Ten">Big Ten</button>
-        <button data-conf="Big 12">Big 12</button>
-        <button data-conf="ACC">ACC</button>
-        <button data-conf="ALL">All FBS</button>
+      <div class="conf-chips" id="conf-chips" role="group" aria-label="Conference">
+        <button type="button" data-conf="P4" class="on" aria-pressed="true">Power 4</button>
+        <button type="button" data-conf="SEC" aria-pressed="false">SEC</button>
+        <button type="button" data-conf="Big Ten" aria-pressed="false">Big Ten</button>
+        <button type="button" data-conf="Big 12" aria-pressed="false">Big 12</button>
+        <button type="button" data-conf="ACC" aria-pressed="false">ACC</button>
+        <button type="button" data-conf="ALL" aria-pressed="false">All FBS</button>
       </div>
-      <div class="sortwrap">SORT
+      <label class="sortwrap">SORT
         <select id="sort-sel">
           <option value="edge">Weather edge</option>
           <option value="time">Kickoff time</option>
@@ -383,11 +506,10 @@
           <option value="cold">Temperature (coldest)</option>
           <option value="total">Closing total</option>
         </select>
-      </div>
+      </label>
     </div>
     <div class="edge-strip" id="edge-strip"></div>
     <div class="board" id="board"></div>
-    <div class="empty-season" id="empty-state" style="display:none"><b>Kickoff is almost here</b>Games appear once they're inside the 8-day forecast window. The history engine is already loaded: 2010–2025, every Power 4 venue, real closing totals.</div>
   </section>
 
   <section class="view" id="view-method" style="display:none">
@@ -396,26 +518,34 @@
       <p style="font-size:14px;line-height:1.7;color:var(--body2)">For every FBS game inside the forecast window, we take the kickoff forecast at that stadium — temperature, wind, and rain chances — and, at <b>Power 4 home venues</b>, find every game played there in similar conditions since 2010. Then we report what actually happened: total points, and how often those games went over or under <b>their own real closing totals</b>. Scoring environments drift from season to season — Power 4 venues have run several points a game higher in some years than others for reasons that have nothing to do with weather — so older seasons are adjusted onto today's environment before they are averaged, and an era gap isn't mistaken for a weather effect. Domes are weather-neutral and flagged as such. Games at venues outside the Power 4 history set still show the full kickoff forecast and delay outlook. Rebuilt automatically every morning as forecasts sharpen toward kickoff.</p>
     </div>
   </section>
+
+  <div class="cta-row">
+    <aside class="pro-card" id="pro-card" aria-label="DFSRADAR PRO CFB Desk">
+      <div class="px-main"><div class="px-k" id="pro-card-k">★ PRO · CFB Desk</div>
+      <div class="px-t" id="pro-card-txt">Every game's offensive-line vs defensive-line weight mismatch, paired with kickoff weather for rushing-prop leans.</div>
+      <div class="px-s">$15/mo, every sport included · free with DFS Kitchen All-Access · graded in public</div></div>
+      <div class="px-btns"><a class="px-go" href="/pro/cfb/">See the CFB Desk →</a><a class="px-login" href="/pro/cfb/#login">Member log in</a></div>
+    </aside>
+    <div class="kx-card">
+      <div><div class="kx-k">⚡ Found your edge?</div>
+      <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
+      <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
+      <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=cfb" target="_blank" rel="noopener">Build lineups →</a>
+    </div>
+  </div>
 </main>
 
-<div class="overlay" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="overlay" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title"></div></div>
 
-<footer>DFSRADAR · CFB weather edges for DFS · part of the DFS Kitchen family · Weather-adjusted insights are informational, not betting advice.</footer>
+<footer class="site-foot">
+  <nav class="fnav" aria-label="DFSRADAR"><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/" aria-current="page">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="f-pro" href="/pro/">PRO</a><a href="/record/">Record</a><a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=cfb" target="_blank" rel="noopener">DFS Kitchen</a></nav>
+  <p>DFSRADAR · College football weather edges for DFS · part of The DFS Kitchen family.</p>
+  <p class="f-rg">Weather-adjusted insights are informational, not betting advice. <b>21+.</b> If you or someone you know has a gambling problem, call <a href="tel:+18004262537">1-800-GAMBLER</a>.</p>
+</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* The announce / ticker / live-note nodes were removed from the markup; any
-   code still reaching for them gets null instead of a crash. */
-(function(){
-  const _g = document.getElementById.bind(document);
-  const GONE = {"proto-note":1, "ticker":1, "ticker-wrap":1};
-  document.getElementById = function(id){
-    const el = _g(id);
-    if(el || !GONE[id]) return el;
-    return new Proxy({}, {get:()=>function(){}, set:()=>true});
-  };
-})();
-
+/* DEMO DATA — used ONLY with ?demo=1 (design work) and always labelled "Demo
+   data" on the page. The live page never falls back to it. */
 const SAMPLE = {generated:"preview", league:{pts:56.0,n:6842}, counts:{severe:0,elevated:2,watch:1,none:1,indoor:1}, brief:"Coldest kickoff: 27° for Ohio State @ Michigan. Wind watch: 19 mph for Kansas State @ Iowa State at Jack Trice Stadium. No serious rain threats on the Power 4 slate. 1 game indoors — weather-neutral.",
 games:[
  {id:"s1", away:"Ohio State", home:"Michigan", conf:"Big Ten", p4:true, stadium:"Michigan Stadium", day:"Sat Nov 28", time:"12:00 PM ET", sortTime:"1",
@@ -449,6 +579,28 @@ games:[
    (same visual language as the MLB park engine: one weather-tinted
    hue, drag orbit, wind streamlines, rain)
 ================================================================== */
+/* ---------- three.js on demand ----------
+   Only the game dialog uses 3D, so three.js is fetched the first time a game
+   is opened (never render-blocking). If it can't load, or WebGL is off, the
+   3D card is removed instead of leaving an empty box. */
+const THREE_SRC = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+const RM = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : {matches:false};
+let threeP = null, threeDead = false, fieldToken = 0;
+function loadThree(){
+  if(window.THREE) return Promise.resolve(window.THREE);
+  if(threeDead) return Promise.reject(new Error("three.js unavailable"));
+  if(!threeP) threeP = new Promise((resolve, reject)=>{
+    const sc = document.createElement("script");
+    let settled = false;
+    const done = (ok, err)=>{ if(settled) return; settled = true; clearTimeout(timer); if(ok) resolve(window.THREE); else { threeP = null; reject(err); } };
+    const timer = setTimeout(()=>done(false, new Error("three.js timed out")), 12000);
+    sc.src = THREE_SRC; sc.async = true;
+    sc.onload = ()=>{ if(window.THREE) done(true); else { threeDead = true; done(false, new Error("three.js missing")); } };
+    sc.onerror = ()=>{ threeDead = true; done(false, new Error("three.js failed to load")); };
+    document.head.appendChild(sc);
+  });
+  return threeP;
+}
 function compass(d){const P=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return P[Math.round(((d%360)+360)%360/22.5)%16];}
 let field3D=null;
 function destroyField3D(){
@@ -469,10 +621,12 @@ function ezLabel(txt, fg){
   return new THREE.CanvasTexture(cv);
 }
 function initField3D(g, canvas){
-  if(typeof THREE==="undefined"){ canvas.parentElement.style.display="none"; return; }
+  if(typeof THREE==="undefined") return false;
   destroyField3D();
   const W=canvas.clientWidth||780, H=canvas.clientHeight||340;
-  const renderer=new THREE.WebGLRenderer({canvas, antialias:true});
+  let renderer;
+  try{ renderer=new THREE.WebGLRenderer({canvas, antialias:true}); }catch(e){ return false; }   // WebGL unavailable
+  let dirty=true;          // reduced-motion mode renders only when something changed
   renderer.setSize(W,H,false);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
   const scene=new THREE.Scene();
@@ -530,7 +684,7 @@ function initField3D(g, canvas){
     new THREE.TextureLoader().load(g.homeLogo.replace(/^http:/,"https:"),tex=>{
       const lg=new THREE.Mesh(new THREE.PlaneGeometry(64,64),
         new THREE.MeshBasicMaterial({map:tex,transparent:true,opacity:0.92,depthWrite:false}));
-      lg.rotation.x=-Math.PI/2; lg.position.set(0,0.14,0); scene.add(lg);
+      lg.rotation.x=-Math.PI/2; lg.position.set(0,0.14,0); scene.add(lg); dirty=true;
     },undefined,()=>{});
   }
   /* white perimeter wall */
@@ -632,16 +786,12 @@ function initField3D(g, canvas){
   canvas.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
   canvas.addEventListener("pointermove",e=>{if(!dragging)return;
     theta-=(e.clientX-lastX)*0.006;el=Math.min(1.15,Math.max(0.22,el+(e.clientY-lastY)*0.004));
-    lastX=e.clientX;lastY=e.clientY;idleT=0;});
+    lastX=e.clientX;lastY=e.clientY;idleT=0;dirty=true;});
   canvas.addEventListener("pointerup",()=>dragging=false);
   canvas.addEventListener("pointercancel",()=>dragging=false);
   const clock=new THREE.Clock();
   const inst={renderer,scene,raf:0}; field3D=inst;
-  (function tick(){
-    inst.raf=requestAnimationFrame(tick);
-    const dt=Math.min(clock.getDelta(),0.05);
-    idleT+=dt;
-    if(!dragging&&idleT>2.5)theta+=dt*0.07;
+  function advance(dt){
     if(wind){
       wind.t+=dt;
       const pos=wind.mesh.geometry.attributes.position.array;
@@ -684,30 +834,66 @@ function initField3D(g, canvas){
       });
       rain.mesh.geometry.attributes.position.needsUpdate=true;
     }
+  }
+  function draw(){
     const r=560;
     cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r,target.y+Math.sin(el)*r,target.z+Math.cos(theta)*Math.cos(el)*r);
     cam.lookAt(target);
     renderer.render(scene,cam);
+  }
+  /* reduced motion: no auto-rotation, wind and rain warmed up into a still frame */
+  const still=RM.matches;
+  if(still) for(let i=0;i<90;i++) advance(1/60);
+  (function tick(){
+    inst.raf=requestAnimationFrame(tick);
+    const dt=Math.min(clock.getDelta(),0.05);
+    if(still){ if(dirty){ dirty=false; draw(); } return; }
+    idleT+=dt;
+    if(!dragging&&idleT>2.5)theta+=dt*0.07;
+    advance(dt);
+    draw();
   })();
+  return true;
 }
 
 const MIN_METRIC_N = 12;   // mirrors MIN_METRIC_N in scripts/cfb/weekly_build.py
-let DATA = SAMPLE, LIVE = false, FILTER = "P4", SORTBY = "edge", MX_MODE = "fbs";
-(async()=>{
-  try{
-    const r=await fetch("/cfb/teaser.json?_="+Date.now());
-    if(!r.ok) return;
-    const t=await r.json();
-    if(!t||!(t.targets+t.fades)) return;
-    const bits=[];
-    if(t.stacked) bits.push(`<b>${t.stacked} STACKED RUSH</b> (trench edge × wind)`);
-    bits.push(`<b>${t.targets} rushing-prop targets</b>`);
-    if(t.fades) bits.push(`<b>${t.fades} fades</b>`);
-    document.getElementById("pro-tease-txt").innerHTML=
-      `Week ${t.week}: ${bits.join(" · ")} — with the backs to play and the fronts to avoid.`;
-    document.getElementById("pro-tease").style.display="";
-  }catch(e){}
-})();
+let DATA = {games:[]}, LIVE = null, FILTER = "P4", SORTBY = "edge", MX_MODE = "fbs";
+const DEMO = /[?&]demo=1(?:&|$)/.test(location.search);
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* ---------- PRO teaser (Trench board) ----------
+   Only shown when teaser.json is live and describes the SAME week as the
+   free board: never when it's stale or paused (week:null, targets:0), and
+   never for a different week than the games below. */
+let TEASER = null;
+function boardWeek(){
+  const n = {};
+  (DATA.games||[]).forEach(g=>{ if(g.week!=null) n[g.week] = (n[g.week]||0) + 1; });
+  const ws = Object.keys(n).sort((a,b)=>n[b]-n[a]);
+  return ws.length ? +ws[0] : null;
+}
+function teaserOK(t){
+  if(!t || !LIVE || DEMO) return false;
+  if(t.stale || t.paused || (t.status && t.status.ok === false)) return false;
+  if(t.week == null || !((t.targets||0) + (t.fades||0))) return false;
+  const w = boardWeek();
+  return w != null && +t.week === w;
+}
+const PRO_TXT = document.getElementById("pro-card-txt").innerHTML;
+function renderTeaser(){
+  const t = TEASER, k = document.getElementById("pro-card-k"), txt = document.getElementById("pro-card-txt");
+  if(!teaserOK(t)){ k.textContent = "★ PRO · CFB Desk"; txt.innerHTML = PRO_TXT; return; }
+  const bits = [];
+  if(t.stacked) bits.push(`<b>${+t.stacked} STACKED RUSH</b> (trench edge × wind)`);
+  bits.push(`<b>${+t.targets||0} rushing-prop targets</b>`);
+  if(t.fades) bits.push(`<b>${+t.fades} fades</b>`);
+  k.textContent = `★ PRO · Week ${+t.week} Trench board`;
+  txt.innerHTML = `${bits.join(" · ")} — with the backs to play and the fronts to avoid.`;
+}
+async function loadTeaser(){
+  TEASER = null;
+  try{ const r = await fetch("/cfb/teaser.json?_=" + Date.now(), {cache: "no-store"}); if(r.ok) TEASER = await r.json(); }catch(e){}
+  renderTeaser();
+}
 const pct = v => (v>0?"+":"")+v+"%";
 const cls = v => v>0?"pos":(v<0?"neg":"neu");
 function edgeBadge(g){
@@ -723,7 +909,7 @@ function gauge(g, size=48){
   const r=17, c=2*Math.PI*r;
   const o=g.ou.over/100*c, p=g.ou.push/100*c, u=g.ou.under/100*c;
   const center = g.total!=null ? g.total.toFixed(1) : "—";
-  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46">
+  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46" aria-hidden="true" focusable="false">
     <circle cx="23" cy="23" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>
     <circle cx="23" cy="23" r="${r}" fill="none" stroke="#22d3ee" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
     <circle cx="23" cy="23" r="${r}" fill="none" stroke="#454E61" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
@@ -743,11 +929,11 @@ function rowHTML(g){
   const wx = g.dome ? `<div class="w">dome<br>weather sealed out</div>`
     : `<div class="w">${g.windLabel}<br>${(g.rain!=null&&g.rain>=15)?`Rain ${g.rain}% · `:""}dew ${g.dew}°</div>`;
   const sub = g.p4 ? `vs real closing totals · ${g.ou.n||g.sample} gms` : `no venue history yet`;
-  return `<div class="b-row lv-${edgeLevel(g)}" data-game="${g.id}">
+  return `<div class="b-row lv-${edgeLevel(g)}" data-game="${g.id}" role="button" tabindex="0">
     <div class="b-time">${g.day}<span>${g.time.replace(" ET","")} ET</span></div>
-    <div><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}<span class="conf-tag">${g.conf}</span></div><div class="b-stad">${g.stadium}${(g.badges||[]).map(x=>` · ${x.k==="LONG HAUL"?"✈️":"⛰️"} ${x.txt}`).join("")}</div></div>
+    <div class="b-match"><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}<span class="conf-tag">${g.conf}</span></div><div class="b-stad">${g.stadium}${(g.badges||[]).map(x=>` · ${x.k==="LONG HAUL"?"✈️":"⛰️"} ${x.txt}`).join("")}</div></div>
     <div class="b-wx"><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div>
-    <div>${imp}</div>
+    <div class="b-pts">${imp}</div>
     <div class="b-ou">${gauge(g)}<div class="txt">${leanTxt(g)}<span>${sub}</span></div></div>
     <div class="b-badge">${edgeBadge(g)}</div>
   </div>`;
@@ -797,7 +983,7 @@ function renderSummary(){
     cards.push({k:"Strongest under history", v:`${under.away} @ ${under.home} <span class="neg">${under.ou.under}%</span>`, s:"vs real closing totals in similar weather", id:under.id},
                {k:"Strongest over history", v:`${over.away} @ ${over.home} <span class="pos">${over.ou.over}%</span>`, s:"vs real closing totals in similar weather", id:over.id});
   }
-  el.innerHTML = cards.map(c=>`<div class="sum-card" data-game="${c.id}"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s}</div></div>`).join("");
+  el.innerHTML = cards.map(c=>`<div class="sum-card" data-game="${c.id}" role="button" tabindex="0"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s}</div></div>`).join("");
 }
 function hourlyStrip(g){
   if(g.dome || !g.hourly || !g.hourly.length) return "";
@@ -807,7 +993,7 @@ function hourlyStrip(g){
       <div class="hr-t">${h.c?h.c+" ":""}${h.t}°</div>
       <div class="hr-w">${h.w} mph wind</div>
       <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
-    </div>`).join("")}</div>`;
+    </div>`).join("")}<div class="hr-note">Hour by hour at the stadium · local time</div></div>`;
 }
 function delayChip(g){
   if(g.dome || !g.delay) return "";
@@ -847,8 +1033,8 @@ function metricGrid(g){
   return `<div class="m-sec">
     <div class="mx-head"><h5 style="margin:0">Weather impact in similar weather</h5>
       <div class="mx-toggle" id="mx-toggle">
-        <button data-mx="fbs" class="${mode==="fbs"?"on":""}">FBS AVG</button>
-        <button data-mx="venue" class="${mode==="venue"?"on":""}">THIS VENUE</button>
+        <button type="button" data-mx="fbs" class="${mode==="fbs"?"on":""}" aria-pressed="${mode==="fbs"}">FBS AVG</button>
+        <button type="button" data-mx="venue" class="${mode==="venue"?"on":""}" aria-pressed="${mode==="venue"}">THIS VENUE</button>
       </div></div>
     <div class="mx-grid">${cells}</div>${note}
     ${g.fcs?`<div class="fcs-note">Non-conference vs an FCS opponent — weather typically moves these games less, and blowouts distort totals. Treat the read as softer.</div>`:""}
@@ -888,11 +1074,12 @@ function openModal(g){
         <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (book median).`:"No total posted yet."}${(g.ou.n&&g.ou.n<MIN_METRIC_N)?` Only ${g.ou.n} matched game${g.ou.n===1?"":"s"} had a closing total on record — read these rates as thin.`:""}</div>
       </div>`;
   modal.innerHTML=`
-    <div class="m-head"><div><div class="teams">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
+    <div class="m-head"><div><div class="teams" id="m-title">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
       <div class="meta">${g.day} · ${g.time} · ${g.stadium} · ${g.conf}</div></div>
-      <button class="m-close">✕</button></div>
+      <button type="button" class="m-close" aria-label="Close game breakdown">✕</button></div>
     <div class="m-body">
-      <div class="field3d-wrap"><canvas id="field3d"></canvas>
+      <div class="field3d-wrap"><canvas id="field3d" hidden></canvas>
+        <div class="f3d-load">Loading 3D view…</div>
         <div class="f3d-hud"><div class="t">${g.stadium} · live view</div>
           <div class="w">${g.dome?"Indoor — weather sealed out":`${g.wind} mph${g.windDir!=null?" from "+compass(g.windDir):""} · ${g.temp}°`}</div></div>
         <div class="f3d-badge">${g.skyIcon} ${g.sky}</div>
@@ -915,14 +1102,69 @@ function openModal(g){
   document.getElementById("overlay").classList.add("open");
   document.body.style.overflow="hidden";
   modal.querySelector(".m-close").addEventListener("click", closeModal);
+  dialogOpened();
   modal.querySelectorAll("#mx-toggle button").forEach(b=>{
-    b.addEventListener("click", ev=>{ ev.stopPropagation(); MX_MODE=b.dataset.mx; openModal(g); });
+    b.addEventListener("click", ev=>{ ev.stopPropagation(); MX_MODE=b.dataset.mx; openModal(g);
+      const again = document.querySelector(`#mx-toggle [data-mx="${MX_MODE}"]`); if(again) again.focus(); });
   });
-  const f3d=document.getElementById("field3d");
-  if(f3d) initField3D(g, f3d);
+  const fw=modal.querySelector(".field3d-wrap"), token=++fieldToken;
+  loadThree().then(()=>{
+    if(token!==fieldToken || !document.getElementById("overlay").classList.contains("open")) return;
+    const cv=fw.querySelector("canvas"); cv.hidden=false;
+    if(initField3D(g, cv)) fw.classList.add("is-3d"); else fw.hidden=true;
+  }).catch(()=>{ if(token===fieldToken) fw.hidden=true; });
 }
-function closeModal(){ destroyField3D(); document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
+function closeModal(){ fieldToken++; destroyField3D(); document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; dialogClosed(); }
 document.getElementById("overlay").addEventListener("click", e=>{ if(e.target.id==="overlay") closeModal(); });
+/* ---------- dialog focus ----------
+   Open: remember what opened it, lock the page behind (inert), move focus to
+   the close button. Tab stays inside. Esc / close / backdrop: restore focus
+   to the row or card that opened it. */
+const DLG = {open:false, opener:null, key:null};
+const DLG_BG = ["body > header", "main", "footer.site-foot"];
+function dialogOpened(){
+  const md = document.getElementById("modal");
+  if(!DLG.open){
+    const a = document.activeElement;
+    DLG.opener = (a && a !== document.body && !md.contains(a)) ? a : null;
+    const host = DLG.opener && DLG.opener.closest ? DLG.opener.closest("[data-game]") : null;
+    DLG.key = host ? host.dataset.game : null;
+    DLG.open = true;
+    DLG_BG.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.inert = true; });
+  }
+  document.getElementById("overlay").scrollTop = 0;
+  const c = md.querySelector(".m-close"); if(c) c.focus({preventScroll:true});
+}
+function dialogClosed(){
+  if(!DLG.open) return;
+  DLG.open = false;
+  DLG_BG.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.inert = false; });
+  let el = DLG.opener;
+  if((!el || !document.contains(el)) && DLG.key)
+    el = document.querySelector(`[data-game="${DLG.key}"][tabindex="0"], button[data-game="${DLG.key}"]`);
+  DLG.opener = null; DLG.key = null;
+  if(el && el.focus) el.focus();
+}
+document.addEventListener("keydown", e=>{
+  if(!DLG.open) return;
+  if(e.key === "Escape"){ e.preventDefault(); closeModal(); return; }
+  if(e.key !== "Tab") return;
+  const md = document.getElementById("modal");
+  const f = [...md.querySelectorAll('a[href],button:not([disabled]),select,input,textarea,[tabindex="0"]')]
+    .filter(x=>x.getClientRects().length);
+  if(!f.length) return;
+  const first = f[0], last = f[f.length-1], a = document.activeElement;
+  if(e.shiftKey && (a === first || !md.contains(a))){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && (a === last || !md.contains(a))){ e.preventDefault(); first.focus(); }
+});
+/* game rows and summary cards are role="button": Enter / Space open them */
+document.addEventListener("keydown", e=>{
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const t = e.target;
+  if(!t || !t.matches || !t.matches('[data-game][role="button"]')) return;
+  e.preventDefault(); t.click();
+});
+
 document.addEventListener("click", e=>{
   const el=e.target.closest("[data-game]");
   if(!el) return;
@@ -931,8 +1173,8 @@ document.addEventListener("click", e=>{
 });
 document.querySelectorAll("nav button").forEach(b=>{
   b.addEventListener("click", ()=>{
-    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");
+    document.querySelectorAll("nav button").forEach(x=>{ x.classList.remove("active"); x.setAttribute("aria-pressed","false"); });
+    b.classList.add("active"); b.setAttribute("aria-pressed","true");
     document.getElementById("view-slate").style.display = b.dataset.view==="slate"?"":"none";
     document.getElementById("view-method").style.display = b.dataset.view==="method"?"":"none";
   });
@@ -945,40 +1187,202 @@ document.querySelectorAll("#conf-chips button").forEach(b=>{
   b.addEventListener("click", e=>{
     e.stopPropagation();
     FILTER=b.dataset.conf;
-    document.querySelectorAll("#conf-chips button").forEach(x=>x.classList.toggle("on", x===b));
+    document.querySelectorAll("#conf-chips button").forEach(x=>{ x.classList.toggle("on", x===b); x.setAttribute("aria-pressed", String(x===b)); });
     renderAll();
   });
 });
+/* ---------- data states ----------
+   loading (skeleton) → live | empty (season-aware) | error (retry). */
+const MAIN = document.querySelector("main");
+function setChip(html){ document.getElementById("date-chip").innerHTML = html; }
+function stateCard(title, body, retry){
+  return `<div class="state-card${retry?" err":""}" role="${retry?"alert":"status"}"><h3>${esc(title)}</h3>`
+    + (body?`<p>${esc(body)}</p>`:"")
+    + (retry?`<button type="button" class="retry-btn" data-retry>Try again</button>`:"") + `</div>`;
+}
+function todayET(){ return window.RadarFresh ? RadarFresh.todayET() : new Date(Date.now() - 4*36e5).toISOString().slice(0,10); }
+/* Empty-board copy follows the college football calendar — "Kickoff is
+   almost here" is only true in August. */
+function emptyCopy(d){
+  const t = todayET(), md = (+t.slice(5,7))*100 + (+t.slice(8,10));
+  const yrs = (d && d.seasons && d.seasons.length) ? `${d.seasons[0]}–${d.seasons[d.seasons.length-1]}, ` : "";
+  const hist = `The history engine stays loaded: ${yrs}every Power 4 venue, real closing totals.`;
+  if(md >= 801 && md <= 831) return {chip: "Preseason", title: "Kickoff is almost here",
+    body: `Games appear once they're inside the 8-day forecast window. ${hist}`};
+  if(md >= 121 && md < 801) return {chip: "Offseason", title: "The college football season is over",
+    body: `The radar returns in late August, as soon as the first games are inside the forecast window. ${hist}`};
+  return {chip: "No games in the window", title: "No games in the forecast window yet",
+    body: "Games appear once they're inside the 8-day forecast window — the board rebuilds every morning as forecasts sharpen."};
+}
+const FILTER_NAME = {P4: "Power 4", ALL: "FBS"};
+function niceStamp(text){
+  return window.RadarFresh ? String(text).replace(/(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2}) ET/g,
+    (m, t)=>{ const d = RadarFresh.parseET(t); return d ? RadarFresh.fmt(d, true) : m; }) : String(text);
+}
+function renderBrief(text){
+  const card = document.getElementById("brief-card");
+  if(!text){ card.style.display = "none"; return; }
+  document.getElementById("brief-body").innerHTML = esc(niceStamp(text)).replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
+  card.style.display = "";
+}
+function renderLoading(){
+  MAIN.setAttribute("aria-busy","true");
+  DATA = {games:[]};
+  document.getElementById("conf-chips").hidden = true;
+  document.querySelector(".sortwrap").hidden = true;
+  setChip("Loading this week's slate…");
+  document.getElementById("fresh").hidden = true;
+  renderBrief("");
+  TEASER = null; renderTeaser();
+  document.getElementById("edge-strip").innerHTML = "";
+  document.getElementById("summary-strip").innerHTML = '<div class="skel skel-card"></div>'.repeat(4);
+  document.getElementById("board").innerHTML = '<div class="skel skel-row"></div>'.repeat(5)
+    + '<span class="sr-only" role="status">Loading this week’s slate</span>';
+}
+function renderError(){
+  MAIN.removeAttribute("aria-busy");
+  DATA = {games:[]};
+  document.getElementById("conf-chips").hidden = true;
+  document.querySelector(".sortwrap").hidden = true;
+  setChip("Slate unavailable");
+  document.getElementById("fresh").hidden = true;
+  renderBrief("");
+  TEASER = null; renderTeaser();
+  document.getElementById("edge-strip").innerHTML = "";
+  document.getElementById("summary-strip").innerHTML = "";
+  document.getElementById("board").innerHTML = stateCard("We couldn't load this week's slate",
+    "The radar data didn't come through — usually a brief network hiccup. Nothing is shown until the real numbers load.", true);
+}
 function renderAll(){
-  const vis = visibleGames();
-  document.getElementById("game-count").textContent = vis.length;
-  document.getElementById("board").innerHTML = vis.map(rowHTML).join("");
-  renderEdgeStrip();
-  document.getElementById("empty-state").style.display = vis.length? "none":"";
-  renderSummary();
-  if(DATA.brief){
-    const safe=DATA.brief.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
-    document.getElementById("brief-body").innerHTML = safe
-      .replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
-    document.getElementById("brief-card").style.display="";
+  MAIN.removeAttribute("aria-busy");
+  const vis = visibleGames(), all = DATA.games.length;
+  const wk = boardWeek();
+  document.getElementById("conf-chips").hidden = !all;          // nothing to filter or sort on an empty board
+  document.querySelector(".sortwrap").hidden = !all;
+  if(!all){
+    const c = emptyCopy(DATA);
+    setChip(c.chip);
+    document.getElementById("board").innerHTML = stateCard(c.title, c.body);
   } else {
-    document.getElementById("brief-card").style.display="none";
+    const fname = FILTER_NAME[FILTER] || FILTER;
+    setChip(`${DEMO ? "<b>Demo slate</b>" : (wk!=null ? `Week ${wk}` : "This week")} · <b>${vis.length}</b> ${esc(fname)} game${vis.length===1?"":"s"}`);
+    document.getElementById("board").innerHTML = vis.length ? vis.map(rowHTML).join("")
+      : stateCard(`No ${fname} games in the window`, `Pick another conference above — ${all} FBS game${all===1?" is":"s are"} on this week's board.`);
   }
+  renderEdgeStrip();
+  renderSummary();
+  renderBrief(DATA.brief);
 }
-async function loadLive(){
+/* freshness chip (shared /assets/fresh.js) + the brief's live/stale cue */
+function applyFreshness(){
+  const el = document.getElementById("fresh");
+  if(!LIVE){ el.hidden = true; return; }
+  let warn = !!(LIVE.stale || (LIVE.status && LIVE.status.ok === false));
+  if(window.RadarFresh){
+    const a = RadarFresh.render(el, {built: LIVE.generated, stale: LIVE.stale, status: LIVE.status, maxAgeH: 36});
+    warn = warn || !!(a && a.level === "warn");
+    renderBrief(LIVE.brief);
+  }
+  document.getElementById("brief-card").classList.toggle("is-warn", warn);
+  document.getElementById("brief-label").textContent = warn ? "Latest read — from the radar" : "This week's read — live from the radar";
+}
+window.addEventListener("load", applyFreshness);   // fresh.js is deferred; re-apply once it has run
+async function load(){
+  if(DEMO){
+    document.getElementById("demo-flag").hidden = false;
+    document.getElementById("brief-label").textContent = "Demo read — sample data";
+    DATA = SAMPLE; renderAll(); return;
+  }
+  renderLoading();
+  let d = null;
   try{
-    const r=await fetch("data.json?_="+Date.now());
-    if(!r.ok) return;
-    const d=await r.json();
-    DATA=d; LIVE=true;
-    if(0) void 0;  // live bar removed
-    void
-      `🟢 <span><b>Live</b> — real schedule, kickoff forecasts & Power 4 venue history (2010–2025, era-adjusted, real closing totals). Updated ${d.generated}.</span>`;
-    renderAll();
-  }catch(e){}
+    const r = await fetch("data.json?_=" + Date.now(), {cache: "no-store"});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    d = await r.json();
+    if(!d || !Array.isArray(d.games)) throw new Error("unexpected data.json");
+  }catch(e){ LIVE = null; renderError(); return; }
+  DATA = d; LIVE = d;
+  renderAll();
+  applyFreshness();
+  loadTeaser();
 }
-renderAll();
-loadLive();
+document.addEventListener("click", e=>{ if(e.target.closest("[data-retry]")) load(); });
+/* ---------- info tips: hover (mouse), keyboard focus and tap (touch) ----------
+   One positioned #tipbox serves every .tip (the old CSS bubble was hover-only
+   and hidden on phones). Enter/Space or a tap pins it; Esc, a second tap or a
+   tap elsewhere closes it. */
+(function(){
+  const box = document.createElement("div");
+  box.id = "tipbox"; box.setAttribute("role", "tooltip"); box.hidden = true;
+  document.body.appendChild(box);
+  let cur = null, pinned = false;
+  function prep(){
+    document.querySelectorAll(".tip:not([data-tipready])").forEach(t=>{
+      t.setAttribute("data-tipready", ""); t.tabIndex = 0;
+      t.setAttribute("role", "button"); t.setAttribute("aria-expanded", "false");
+      const i = t.querySelector(".info-i"); if(i) i.setAttribute("aria-hidden", "true");
+      const own = [...t.childNodes].filter(n=>!(n.classList && n.classList.contains("info-i"))).map(n=>n.textContent).join("").trim();
+      if(!own) t.setAttribute("aria-label", "More info");
+    });
+  }
+  function place(){
+    if(!cur) return;
+    const r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    box.style.maxWidth = Math.min(300, vw - 24) + "px";
+    const bw = box.offsetWidth, bh = box.offsetHeight;
+    let x = r.left + r.width/2 - bw/2; x = Math.max(12, Math.min(x, vw - bw - 12));
+    let y = r.top - bh - 10; if(y < 8) y = r.bottom + 10; if(y + bh > vh - 8) y = Math.max(8, vh - bh - 8);
+    box.style.left = Math.round(x) + "px"; box.style.top = Math.round(y) + "px";
+  }
+  function show(t, pin){
+    if(cur && cur !== t) hide();
+    cur = t; pinned = !!pin;
+    box.textContent = t.getAttribute("data-tip") || "";
+    box.hidden = false; place();
+    t.setAttribute("aria-describedby", "tipbox"); t.setAttribute("aria-expanded", "true");
+  }
+  function hide(){
+    if(cur){ cur.removeAttribute("aria-describedby"); cur.setAttribute("aria-expanded", "false"); }
+    cur = null; pinned = false; box.hidden = true;
+  }
+  const tipOf = el => (el && el.closest) ? el.closest(".tip") : null;
+  document.addEventListener("mouseover", e=>{ const t = tipOf(e.target); if(t && !pinned && t !== cur) show(t, false); });
+  document.addEventListener("mouseout", e=>{ const t = tipOf(e.target); if(t && t === cur && !pinned && !t.contains(e.relatedTarget)) hide(); });
+  document.addEventListener("focusin", e=>{ const t = tipOf(e.target); if(t){ if(t !== cur) show(t, false); } else if(cur && !pinned) hide(); });
+  document.addEventListener("focusout", e=>{ if(cur && e.target === cur && !pinned) hide(); });
+  document.addEventListener("click", e=>{
+    if(box.contains(e.target)){ e.preventDefault(); e.stopPropagation(); hide(); return; }
+    const t = tipOf(e.target);
+    if(t){ e.preventDefault(); e.stopPropagation(); if(t === cur && pinned) hide(); else show(t, true); return; }
+    if(pinned) hide();
+  }, true);
+  document.addEventListener("keydown", e=>{
+    const t = tipOf(e.target);
+    if(t && t === e.target && (e.key === "Enter" || e.key === " ")){
+      e.preventDefault(); e.stopPropagation();
+      if(t === cur && pinned) hide(); else show(t, true);
+      return;
+    }
+    if(e.key === "Escape" && cur){ e.preventDefault(); e.stopImmediatePropagation(); hide(); }
+  }, true);
+  window.addEventListener("scroll", ()=>{ if(!cur) return; if(pinned) place(); else hide(); }, true);
+  window.addEventListener("resize", ()=>{ if(cur) hide(); });
+  new MutationObserver(prep).observe(document.body, {childList:true, subtree:true});
+  prep();
+})();
+/* reduced motion: pause the radar logo's SMIL sweep (held mid-sweep, both blips lit) */
+(function(){
+  if(!window.matchMedia) return;
+  const mq = matchMedia("(prefers-reduced-motion: reduce)");
+  function apply(){
+    document.querySelectorAll("svg.radar-logo").forEach(svg=>{
+      try{ if(mq.matches){ svg.setCurrentTime(0.6); svg.pauseAnimations(); } else svg.unpauseAnimations(); }catch(e){}
+    });
+  }
+  apply();
+  if(mq.addEventListener) mq.addEventListener("change", apply); else if(mq.addListener) mq.addListener(apply);
+})();
+load();
 </script>
 </body>
 </html>
