@@ -71,6 +71,14 @@ def main():
             continue
         hitters = [r for r in roster.get("roster", [])
                    if r.get("position", {}).get("abbreviation") not in ("P", None)]
+        if len(hitters) < 9:
+            # offseason: the active roster can come back empty — use the 40-man
+            try:
+                roster = get_json(ROSTER_URL.format(tid=meta["mlbid"]).replace("active", "40Man"))
+                hitters = [r for r in roster.get("roster", [])
+                           if r.get("position", {}).get("abbreviation") not in ("P", None)]
+            except Exception as e:
+                print(f"  {code}: 40-man roster unavailable ({e})")
         players = {}
         for r in hitters:
             pid = r["person"]["id"]
@@ -107,6 +115,11 @@ def main():
         total_players += len(players)
         print(f"  {code}: {len(players)} hitters with weather-joined games")
 
+    if total_players < 200:
+        # a normal build finds ~350; overwriting with a gutted file would blank
+        # Conditions MVP and the PRO board until next Monday
+        sys.exit(f"::error::only {total_players} hitters found — keeping the existing "
+                 f"{os.path.basename(OUT)}")
     out["_built"] = date.today().isoformat()
     out["_seasons"] = SEASONS
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
