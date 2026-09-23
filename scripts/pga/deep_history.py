@@ -30,7 +30,7 @@ ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 OUT = os.path.join(ROOT, "data", "pga", "deep.json")
 WX_CACHE = os.path.join(ROOT, "data", "pga", "wx_cache.json")
 
-SEASONS = list(range(2018, 2027))
+SEASONS = list(range(2018, datetime.now().year + 1))   # through the current season
 SB_URL = "https://site.web.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates={y}"
 ARC_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
            "&start_date={d0}&end_date={d1}&hourly=wind_speed_10m,wind_gusts_10m"
@@ -91,6 +91,9 @@ CANON = [
     # differently, the field lookup silently finds nothing, and next year's
     # editions would never file under the same key as this one.
     (r"biltmore", "biltmore"),
+    # Next in line for the same bug: the Nov 12-15 debut. Anchor it before
+    # ESPN's name and ours drift apart ("The Good Good Championship ...").
+    (r"good good", "good-good"),
 ]
 
 # stable-course coordinates for wind tagging (lat, lon, tz)
