@@ -16,13 +16,13 @@ Usage:
 
 No third-party dependencies.
 """
-import argparse, csv, functools, io, json, os, statistics, sys, time
+import argparse, csv, functools, io, json, os, re, statistics, sys, time
 import urllib.error, urllib.request
 from datetime import datetime, timedelta, timezone
 
 print = functools.partial(print, flush=True)
 sys.path.insert(0, os.path.dirname(__file__))
-from stadiums import STADIUMS, axis_angle, wind_class
+from stadiums import STADIUMS, axis_angle, wind_class, neutral_venue
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 HISTORY = os.path.join(ROOT, "data", "nfl", "stadiums_history.json")
@@ -51,10 +51,22 @@ ODDS_TEAM_NAMES = {
     "Tennessee Titans":"TEN","Washington Commanders":"WAS",
 }
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 ET_OFFSETS = {"America/New_York": 0, "America/Detroit": 0, "America/Chicago": -1,
               "America/Denver": -2, "America/Phoenix": -2, "America/Los_Angeles": -3,
               "America/Indiana/Indianapolis": 0}
+
+
+# Neutral-site games (international series, Super Bowl) must not borrow the
+# designated home team's stadium: nflverse flags them location="Neutral" and
+# names the real venue in `stadium`. Resolve that name against our stadium
+# table (covers Super Bowls and relocated US games); anything else is skipped
+# loudly rather than shown with the wrong city's weather.
+def _vkey(s):
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+VENUE_TO_TEAM = {_vkey(m["name"]): code for code, m in STADIUMS.items()}
 
 
 def get_json(url, tries=5):
@@ -91,6 +103,10 @@ def fetch_book_totals():
                if oc.get("name") == "Over" and oc.get("point") is not None]
         if pts:
             out[f"{a}@{h}"] = statistics.median(pts)
+    unmapped = sorted({n for ev in events for n in (ev.get("away_team"), ev.get("home_team"))
+                       if n and n not in ODDS_TEAM_NAMES})
+    if unmapped:
+        print(f"::warning::odds api: unmapped NFL team names {unmapped} — no live total for those games")
     print(f"odds api: totals for {len(out)} NFL games")
     return out
 
@@ -220,8 +236,11 @@ def build_edge(r, away, home, deep):
         edge["badges"].append(dict(k="REST EDGE", team=home,
                                    txt=f"{home} +{hr-ar} days rest",
                                    rec=spot_txt(lg_spots.get("restEdgeHome"))))
-    # travel / circadian
-    a_tz, h_tz = _tz(away), _tz(home)
+    # travel / circadian (meaningless at a neutral or overseas site)
+    if (r.get("location") or "Home") != "Home":
+        a_tz = h_tz = 0
+    else:
+        a_tz, h_tz = _tz(away), _tz(home)
     try:
         kick_et = int((r.get("gametime") or "13:00").split(":")[0])
     except ValueError:
@@ -272,24 +291,39 @@ def main():
     games = []
     for r in upcoming:
         home, away = r["home_team"], r["away_team"]
-        meta = STADIUMS.get(home)
+        site = home
+        neutral = (r.get("location") or "Home") != "Home"
+        meta = None
+        if neutral:
+            site = VENUE_TO_TEAM.get(_vkey(r.get("stadium")))
+            if not site:
+                meta = neutral_venue(r.get("stadium"))     # e.g. the Rio / London games
+                if not meta:
+                    print(f"::warning::{away}@{home} {r.get('gameday')} is a neutral-site game at "
+                          f"'{r.get('stadium')}' — no venue on file, card skipped (not shown "
+                          f"with {home}'s home-stadium weather). Add it to NEUTRAL_VENUES.")
+                    continue
+        meta = meta or STADIUMS.get(site)
         if not meta:
             continue
-        neutral = (r.get("location") or "Home") != "Home"
         gt = r.get("gametime") or "13:00"
         try:
             et_h, et_m = int(gt.split(":")[0]), int(gt.split(":")[1])
         except (ValueError, IndexError):
             et_h, et_m = 13, 0
-        local_h = max(0, min(23, et_h + ET_OFFSETS.get(meta["tz"], 0)))
         day = r["gameday"]
         d_obj = datetime.strptime(day, "%Y-%m-%d")
+        # kickoff in the venue's own clock (DST-correct, and right for venues
+        # outside the US where a fixed offset table can't be)
+        kick_local = datetime(d_obj.year, d_obj.month, d_obj.day, et_h, et_m,
+                              tzinfo=ET).astimezone(ZoneInfo(meta["tz"]))
+        local_h = kick_local.hour
         roof = meta["roof"]
         dome = roof == "dome" or (roof == "retract")   # retractables default closed for NFL
 
         fc = forecast(meta)
         h = fc["hourly"]
-        want = f"{day}T{local_h:02d}"
+        want = f"{kick_local.strftime('%Y-%m-%d')}T{local_h:02d}"
         idx = next((i for i, t in enumerate(h["time"]) if t.startswith(want)), None)
         if idx is None:
             print(f"  no forecast slot for {away}@{home} {want} — beyond horizon?")
@@ -298,7 +332,8 @@ def main():
         wind = round(h["wind_speed_10m"][idx]); wdir = h["wind_direction_10m"][idx]
         cloud = h["cloud_cover"][idx]; pp = h["precipitation_probability"][idx]
         rh = h["relative_humidity_2m"][idx]; pres = h["surface_pressure"][idx]
-        ax = round(axis_angle(wdir, meta["bearing"]))
+        axis_known = meta.get("bearing") is not None
+        ax = round(axis_angle(wdir, meta["bearing"])) if axis_known else None
         icon, sky = ("🏟️", "Indoor") if dome else sky_of(cloud, pp, local_h)
 
         hourly = []
@@ -312,7 +347,8 @@ def main():
                 hourly.append(dict(
                     lab=hh.strftime("%-I %p"), fp=(off == 0), c=ic,
                     t=round(h["temperature_2m"][j]), w=round(h["wind_speed_10m"][j]),
-                    ax=round(axis_angle(h["wind_direction_10m"][j], meta["bearing"])),
+                    ax=(round(axis_angle(h["wind_direction_10m"][j], meta["bearing"]))
+                        if axis_known else None),
                     rain=None if h["precipitation_probability"][j] is None else round(h["precipitation_probability"][j]),
                     rh=None if h["relative_humidity_2m"][j] is None else round(h["relative_humidity_2m"][j])))
         delay = None
@@ -321,8 +357,13 @@ def main():
             delay = dict(level=("clear" if worst < 20 else "watch" if worst < 45
                                 else "likely" if worst < 70 else "severe"), pct=worst)
 
-        hist = hist_all.get(home, {"games": [], "avg": {"pts": 0, "n": 0}})
-        rows, note = match_games(hist["games"], temp, wind, ax, dome)
+        hist = (hist_all.get(site) if site and not meta.get("match") else None) \
+            or {"games": [], "avg": {"pts": 0, "n": 0}}
+        if hist["games"]:
+            rows, note = match_games(hist["games"], temp, wind, ax, dome)
+        else:
+            rows, note = [], ("no NFL history at this neutral-site venue" if neutral
+                              else "no history on file")
         n = len(rows)
         m_pts = statistics.mean(x["pts"] for x in rows) if rows else 0
         avg_pts = hist["avg"]["pts"] or league["pts"]
@@ -333,14 +374,16 @@ def main():
         pushes = len(lined) - overs - unders
         today_line = totals.get(f"{away}@{home}")
 
-        wc = wind_class(ax)
+        wc = wind_class(ax) if ax is not None else None
         wind_label = ("ROOF CLOSED" if dome else
+                      "wind (field axis not on file)" if wc is None else
                       {"along": "down the field axis", "cross": "crosswind",
                        "angled": "quartering wind"}[wc])
         games.append(dict(
             id=f"{away.lower()}-{home.lower()}-{day.replace('-','')}",
             away=away, home=home, week=r.get("week"),
-            stadium=meta["name"] + (" · roof closed" if dome and roof != "dome" else ""),
+            stadium=(meta["name"] + (f" · {meta['city']}" if meta.get("city") else "")
+                     + (" · roof closed" if dome and roof != "dome" else "")),
             day=d_obj.strftime("%a %b %-d"), time=f"{et_h % 12 or 12}:{et_m:02d} {'PM' if et_h >= 12 else 'AM'} ET",
             sortTime=day + gt, neutral=neutral,
             temp=temp, dew=dew, wind=0 if dome else wind, ax=ax, windClass=wc,
