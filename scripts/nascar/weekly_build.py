@@ -27,7 +27,7 @@ FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}
           "precipitation_probability,relative_humidity_2m"
           "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone={tz}&forecast_days=16")
 
-ET = timezone(timedelta(hours=-4))
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 
 
 def get_json(url, tries=5):
@@ -60,6 +60,9 @@ def main():
                if datetime.strptime(r["date"], "%Y-%m-%d").date() > (
                    datetime.strptime(nxt["date"], "%Y-%m-%d").date() if nxt else today)][:3]
 
+    left = sum(1 for r in RACES if datetime.strptime(r["date"], "%Y-%m-%d").date() >= today)
+    if left < 3:
+        print(f"::warning::scripts/nascar/schedule.py has {left} race(s) left — add next season's schedule")
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    race=None, brief="",
                    onDeck=[dict(name=r["name"], track=r["track"], city=r["city"],
@@ -104,7 +107,9 @@ def main():
                 race.update(
                     temp=round(h["temperature_2m"][idx]),
                     wind=round(h["wind_speed_10m"][idx]),
-                    gust=round(h["wind_gusts_10m"][idx]),
+                    # forecast models occasionally put gusts under the sustained
+                    # wind ("wind 6 mph (gusts 4)") — a gust is never below it
+                    gust=max(round(h["wind_gusts_10m"][idx] or 0), round(h["wind_speed_10m"][idx])),
                     rain=None if h["precipitation_probability"][idx] is None
                          else round(h["precipitation_probability"][idx]),
                     rh=None if h["relative_humidity_2m"][idx] is None
@@ -116,7 +121,7 @@ def main():
                                       else "likely" if worst < 70 else "severe"), pct=worst))
                 parts = [f"{nxt['name']} at {nxt['track']}: {race['temp']}° and "
                          f"{race['sky'].lower()} at the green flag, wind {race['wind']} mph"
-                         f" (gusts {race['gust']})."]
+                         + (f" (gusts {race['gust']})." if race["gust"] > race["wind"] + 1 else ".")]
                 if worst >= 45:
                     parts.append(f"Rain is the story — {worst}% peak chance in the race window, "
                                  "and Cup cars don't run ovals in the rain. Delay or postponement risk is real.")
@@ -130,6 +135,11 @@ def main():
                 payload["brief"] = " ".join(parts)
         payload["race"] = race
 
+    if not nxt:
+        yr = int(RACES[-1]["date"][:4]) if RACES else today.year
+        payload["seasonComplete"] = True
+        payload["brief"] = (f"The {yr} Cup season is complete — the radar returns for "
+                            f"Daytona Speedweeks in February {yr + 1}.")
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
     print(f"Wrote {OUT}: {payload['race']['name'] if payload['race'] else 'no race'}"
