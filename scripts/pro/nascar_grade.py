@@ -18,7 +18,7 @@ Outputs:
 Runs in the NASCAR weekly workflow before the board build. No third-party deps.
 """
 import functools, json, os, re, unicodedata, urllib.request
-from datetime import date
+from datetime import date, timedelta
 
 print = functools.partial(print, flush=True)
 
@@ -49,8 +49,12 @@ def get_json(url, tries=4, timeout=90):
 
 
 def norm_driver(s):
+    # suffixes dropped: the deep layer stores "Ricky Stenhouse" (it strips
+    # " Jr."), ESPN's finishing order says "Ricky Stenhouse Jr." — without
+    # this his leans were left ungraded as if he never started
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode()
-    return re.sub(r"[^a-z ]", "", s.lower()).strip()
+    s = re.sub(r"[^a-z ]", "", s.lower()).strip()
+    return re.sub(r"\s+(jr|sr|ii|iii|iv)$", "", s)
 
 
 def season_results(year, _cache={}):
@@ -118,6 +122,12 @@ def main():
 
         season = season_results(int(d[:4]))
         race = season.get(d)
+        for k in (1, 2):
+            # rain-postponed to Monday (the free radar's own headline risk), or
+            # a green flag after 8 PM ET, which ESPN dates on the next UTC day
+            if race:
+                break
+            race = season.get((date.fromisoformat(d) + timedelta(days=k)).isoformat())
         if not race:
             print(f"  {akey}: not final on the results feed yet — will retry")
             continue
