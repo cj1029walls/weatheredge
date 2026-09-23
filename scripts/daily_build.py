@@ -30,6 +30,24 @@ FIXTURES = os.path.join(ROOT, "tests", "fixtures")
 
 SCHED_URL = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={date}"
 SCHED_PP_URL = SCHED_URL + "&hydrate=probablePitcher,officials"
+NEXT_URL = ("https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate={start}"
+            "&endDate={end}&gameType=R,F,D,L,W")
+# Regular season + the four postseason rounds. The schedule endpoint also
+# returns spring training (S), exhibitions (E) and the All-Star Game (A):
+# spring games would be built at the home club's MLB park (Yankee Stadium
+# weather for a game in Tampa), and an All-Star-only day tripped the
+# "all games failed" exit below, which also blocks every sport's deploy.
+MLB_GAME_TYPES = {"R", "F", "D", "L", "W"}
+
+
+def playable(g):
+    """An MLB game that can still be played on this date (drops spring and
+    exhibition games, the ASG, and postponed or cancelled — e.g. an unneeded
+    'if necessary' postseason game)."""
+    return (g.get("gameType", "R") in MLB_GAME_TYPES and
+            (g.get("status") or {}).get("detailedState") not in ("Postponed", "Cancelled"))
+
+
 BOX_URL = "https://statsapi.mlb.com/api/v1/game/{pk}/boxscore"
 GAMELOG_URL = ("https://statsapi.mlb.com/api/v1/people/{pid}/stats"
                "?stats=gameLog&group=pitching&season={season}")
@@ -42,7 +60,8 @@ FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}
           "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone={tz}&forecast_days=3")
 UMPS = os.path.join(ROOT, "data", "umps_history.json")
 
-ET = timezone(timedelta(hours=-4))  # ET (DST); slate dates only, precision not critical
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 
 # ---- The Odds API (free tier) — real consensus totals ----
 ODDS_URL = ("https://api.the-odds-api.com/v4/sports/baseball_mlb/odds"
@@ -89,6 +108,11 @@ def fetch_book_lines():
                             points.append(oc["point"])
         if points:
             out[f"{away}@{home}"] = statistics.median(points)
+    unmapped = sorted({n for ev in events for n in (ev.get("away_team"), ev.get("home_team"))
+                       if n and n not in ODDS_TEAM_NAMES})
+    if unmapped:
+        print(f"::warning::odds api: unmapped MLB team names {unmapped} — those games "
+              "silently fall back to estimated totals")
     print(f"odds api: real totals for {len(out)} games")
     return out
 
@@ -167,6 +191,13 @@ def pct_delta(a, b):
 WET_IN = 0.05   # inches over the ~3h game window = "wet game"
 
 # ---- plate umpire: his games vs league, from Retrosheet history ----
+def _fold(s):
+    """Accent/punctuation-insensitive key: statsapi says 'Alfonso Márquez',
+    Retrosheet says 'Alfonso Marquez' — exact lookup lost his 250-game card."""
+    import unicodedata
+    s = unicodedata.normalize("NFD", s or "")
+    return "".join(c for c in s if c.isalpha()).lower()
+
 def ump_card(g_sched, umps_all):
     officials = g_sched.get("officials") or []
     plate = next((o for o in officials
@@ -177,6 +208,8 @@ def ump_card(g_sched, umps_all):
     if not name:
         return None
     out = dict(name=name)
+    if umps_all and name not in umps_all:
+        name = next((k for k in umps_all if not k.startswith("_") and _fold(k) == _fold(name)), name)
     if umps_all and name in umps_all:
         u, lg = umps_all[name], umps_all["_league"]
         out.update(n=u["n"], r=u["r"], hr=u["hr"], so=u["so"],
@@ -638,6 +671,8 @@ def grade_pending(today_str):
             continue
         try:
             preds = json.load(open(os.path.join(PREDS_DIR, fname)))
+            if not preds.get("games"):
+                continue            # off day: nothing to grade, don't re-query it every run
             graded = grade_day(d, preds)
         except Exception as e:
             print(f"  grading {d} failed ({e}) — will retry next run")
@@ -736,19 +771,38 @@ def main():
     games = []
     for day in sched.get("dates", []):
         for g in day.get("games", []):
+            if not playable(g):
+                continue
             try:
                 built = build_game(g, hist_all, league, lines, args.offline, hitters_all, umps_all)
                 if built: games.append(built)
             except Exception as e:
                 print(f"  skip {g.get('gamePk')}: {e}")
 
-    scheduled = sum(len(day.get("games", [])) for day in sched.get("dates", []))
+    scheduled = sum(1 for day in sched.get("dates", []) for g in day.get("games", [])
+                    if playable(g))
     if scheduled and not games:
         sys.exit(f"All {scheduled} scheduled games failed to build — refusing to publish an empty slate.")
 
     label = datetime.strptime(date_str, "%Y-%m-%d").strftime("%A, %B %-d")
+    note = None
+    if not games:
+        # Off day or offseason: say so (the page used to fall back to its
+        # embedded July sample slate whenever games was empty).
+        note = "No MLB games today."
+        if not args.offline:
+            try:
+                d0 = datetime.strptime(date_str, "%Y-%m-%d")
+                nxt = get_json(NEXT_URL.format(start=(d0 + timedelta(days=1)).strftime("%Y-%m-%d"),
+                                               end=(d0 + timedelta(days=21)).strftime("%Y-%m-%d")), tries=2)
+                day = next((x["date"] for x in nxt.get("dates", []) if x.get("games")), None)
+                note = (f"No MLB games today — the board returns "
+                        f"{datetime.strptime(day, '%Y-%m-%d').strftime('%A, %B %-d')}." if day else
+                        "No MLB games scheduled in the next three weeks — the radar returns on Opening Day.")
+            except Exception as e:
+                print(f"next-game lookup failed ({e})")
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
-                   date=date_str, dateLabel=label,
+                   date=date_str, dateLabel=label, note=note,
                    league=league, seasons=hist_all.get("_seasons", []),
                    brief=make_brief(games),
                    games=sorted(games, key=lambda x: x["sortTime"]))
@@ -756,7 +810,8 @@ def main():
         json.dump(payload, f, separators=(",", ":"))
     print(f"Wrote {OUT}: {len(games)} games for {date_str}")
 
-    archive_predictions(date_str, games)
+    if games:
+        archive_predictions(date_str, games)
     if not args.offline:
         grade_pending(date_str)
     elif os.path.exists(ACCURACY):
