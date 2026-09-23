@@ -3,16 +3,21 @@ name: Daily slate build & deploy
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 10 * * *"   # ~6:00 AM ET — morning slate build
-    - cron: "30 14 * * *"  # ~10:30 AM ET — first card with posted prop lines
-    - cron: "30 16 * * *"  # ~12:30 PM ET — refresh before day games
-    - cron: "0 21 * * *"   # ~5:00 PM ET — refresh before night games
+    # Off the top/half hour: GitHub delays schedules there the most (these ran
+    # 2-4.5 h late). ET below is EDT; subtract an hour after DST ends. For
+    # reliable times use the external dispatcher (see the review notes).
+    - cron: "8 10 * * *"    # ~6:08 AM ET — morning slate build
+    - cron: "37 14 * * *"   # ~10:37 AM ET — first card with posted prop lines
+    - cron: "7 16 * * *"    # ~12:07 PM ET — refresh before day games
+    - cron: "52 20 * * *"   # ~4:52 PM ET — refresh before night games (odds-props lands ~4:23)
 
 permissions:
   contents: write
   pages: write
   id-token: write
 
+# Shared with publish.yml. A daily run cancels an in-flight publish (harmless:
+# it deploys a newer main anyway); a publish never cancels a daily run.
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -20,6 +25,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      problems: ${{ steps.gate.outputs.problems }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,37 +37,59 @@ jobs:
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/daily_build.py
+      # Everything below is best-effort: a failure is annotated, the last good
+      # output is used (carried forward from the live site when it isn't
+      # committed), the site still deploys, and the `report` job then turns
+      # the run red so the failure can't pass unnoticed.
       - name: Grade PRO results (yesterday's card)
-        run: python scripts/pro/grade.py || echo "grading skipped"
+        id: grade
+        continue-on-error: true
+        run: python scripts/pro/grade.py
       - name: Refresh props odds (fresh lines for this build)
+        id: props
+        continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python scripts/odds/props_build.py || echo "odds refresh skipped — using last committed feed"
+          PROPS_REUSE_MIN: "75"    # odds-props.yml ran <75 min ago: reuse, 0 credits
+        run: python scripts/odds/props_build.py
+      - name: Mark props feed stale
+        if: steps.props.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/props.json "the odds refresh failed; prices are from the last successful pull"
       - name: Update umpire dataset (site/pro/umps.json)
-        run: python scripts/pro/ump_detail.py || echo "ump dataset skipped — using last committed caches"
+        id: umps
+        continue-on-error: true
+        run: python scripts/pro/ump_detail.py
       - name: Build PRO HR-prop targets (site/pro/data.json)
+        id: pro
+        continue-on-error: true
         run: python scripts/pro/build.py
+      - name: Carry forward live copies of anything this run could not build
+        id: carry
+        continue-on-error: true
+        run: python scripts/ci/carry_forward.py --missing
+      - name: Mark carried-forward PRO card stale
+        if: steps.pro.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/data.json "today's PRO card could not be rebuilt"
       - name: Persist prediction archive & accuracy grades
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          # site/pro/props.json is TRACKED and rewritten by the odds step above.
-          # Leaving it unstaged made every `git pull --rebase` abort on a dirty
-          # worktree, so the push was never rebased — and both failures were
-          # masked, silently discarding the day's archive and grades.
-          git add data/predictions data/accuracy.json data/pro site/pro/props.json
-          git commit -m "Archive predictions / update accuracy" \
-            || { echo "no changes to commit"; exit 0; }
-          for i in 1 2 3 4 5; do
-            if git pull --rebase --autostash origin main && git push; then
-              echo "archive pushed on attempt $i"
-              exit 0
-            fi
-            echo "push attempt $i failed (remote moved) — retrying"
-            sleep $((i * 6))
-          done
-          echo "::error::archive push failed after 5 attempts — predictions and accuracy grades were NOT saved"
-          exit 1
+        id: persist
+        continue-on-error: true
+        # site/pro/props.json is TRACKED and rewritten by the odds step above
+        # (and by odds-props.yml): commit_push.sh rebases with --autostash and
+        # -X theirs, and aborts a failed rebase before retrying.
+        run: >-
+          bash scripts/ci/commit_push.sh "Archive predictions / update accuracy"
+          data/predictions data/accuracy.json data/pro site/pro/props.json
+      - name: Summarize step outcomes
+        id: gate
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/gate.sh --output problems --
+          "MLB grading=${{ steps.grade.outcome }}"
+          "Props odds=${{ steps.props.outcome }}"
+          "Umpire dataset=${{ steps.umps.outcome }}"
+          "PRO card=${{ steps.pro.outcome }}"
+          "Carry-forward=${{ steps.carry.outcome }}"
+          "Archive push=${{ steps.persist.outcome }}"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
@@ -67,9 +97,21 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  report:
+    # The site is live; now make degraded steps visible (red run -> email).
+    needs: [build, deploy]
+    if: ${{ !cancelled() && needs.build.outputs.problems != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: |
+          echo "::error title=Deployed with stale parts::${{ needs.build.outputs.problems }} failed — served from the last good copy (see the build job's annotations)"
+          exit 1
