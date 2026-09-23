@@ -24,7 +24,7 @@ ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 OUT = os.path.join(ROOT, "data", "nascar", "deep.json")
 WX_CACHE = os.path.join(ROOT, "data", "nascar", "wx_cache.json")
 
-SEASONS = list(range(2018, 2027))
+SEASONS = list(range(2018, datetime.now().year + 1))   # through the current season
 SB_URL = "https://site.web.api.espn.com/apis/site/v2/sports/racing/nascar-premier/scoreboard?dates={y}"
 ARC_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
            "&start_date={d}&end_date={d}&daily=temperature_2m_max"
@@ -71,6 +71,19 @@ TRACKS = [
     (r"mexico",               "mexico-city", "ROAD",  19.406, -99.093, "America/Mexico_City"),
     (r"san diego|coronado",   "san-diego",   "ROAD",  32.678, -117.161, "America/Los_Angeles"),
 ]
+
+# ESPN titles every race "NASCAR Cup Series at <place>", so a road course is
+# indistinguishable by name from the oval it shares a city with, and TRACKS
+# matches the oval first: all eight Charlotte Roval races, the Chicago street
+# races and the Indy/Daytona road courses were filed as oval history (the
+# 'roval' and 'chicago-st' keys held zero races). Pin the known editions.
+ROAD_EDITIONS = {
+    "charlotte": ("roval", {"2018-09-30", "2019-09-29", "2020-10-11", "2021-10-10",
+                            "2022-10-09", "2023-10-08", "2024-10-13", "2025-10-05"}),
+    "chicagoland": ("chicago-st", {"2023-07-02", "2024-07-07", "2025-07-06"}),
+    "indy": ("indy-rc", {"2021-08-15", "2022-07-31", "2023-08-13"}),
+    "daytona": ("daytona-rc", {"2020-08-16", "2021-02-21"}),
+}
 
 HOT_F = 88          # race-day high ≥ this at the track -> HOT (slick) race
 
@@ -134,6 +147,7 @@ def main():
             cache = {}
 
     tracks_meta = {key: dict(type=t) for _, key, t, _, _, _ in TRACKS}
+    tracks_meta.update({alt: dict(type="ROAD") for alt, _ in ROAD_EDITIONS.values()})
     drivers, races = {}, []
     for y in SEASONS:
         try:
@@ -162,6 +176,9 @@ def main():
             if done is False:
                 continue
             date = (ev.get("date") or "")[:10]
+            alt = ROAD_EDITIONS.get(key)
+            if alt and date in alt[1]:
+                key, ttype = alt[0], "ROAD"
             hi = day_high(lat, lon, tz, date, cache) if date else None
             hot = None if hi is None else (1 if hi >= HOT_F else 0)
             n = len(rows)
