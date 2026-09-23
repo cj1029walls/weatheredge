@@ -93,10 +93,16 @@ def fetch_book_totals():
     except Exception as e:
         print(f"odds api unavailable ({e})")
         return {}
-    out = {}
+    out, now, live = {}, datetime.now(timezone.utc), 0
     for ev in events:
         a, h = ODDS_TEAM_NAMES.get(ev.get("away_team")), ODDS_TEAM_NAMES.get(ev.get("home_team"))
         if not a or not h:
+            continue
+        try:   # a game in play is priced live (points still to come), not the game total
+            if datetime.fromisoformat(str(ev.get("commence_time")).replace("Z", "+00:00")) <= now:
+                live += 1
+                continue
+        except ValueError:
             continue
         pts = [oc["point"] for bk in ev.get("bookmakers", []) for mk in bk.get("markets", [])
                if mk.get("key") == "totals" for oc in mk.get("outcomes", [])
@@ -107,7 +113,8 @@ def fetch_book_totals():
                        if n and n not in ODDS_TEAM_NAMES})
     if unmapped:
         print(f"::warning::odds api: unmapped NFL team names {unmapped} — no live total for those games")
-    print(f"odds api: totals for {len(out)} NFL games")
+    print(f"odds api: totals for {len(out)} NFL games"
+          + (f" ({live} in play skipped)" if live else ""))
     return out
 
 
