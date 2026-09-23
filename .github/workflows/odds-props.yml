@@ -3,32 +3,41 @@ name: PRO props odds feed
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 15 * * *"    # ~11 AM ET — morning lines
-    - cron: "40 20 * * *"   # ~4:40 PM ET — lands before daily.yml's 21:00 run
-                            # (they collided on 21:00 and raced for the same ref)
+    # Each lands ~25 min before a daily.yml run, which then reuses this feed
+    # (PROPS_REUSE_MIN) instead of buying the same lines again.
+    - cron: "12 14 * * *"   # ~10:12 AM ET — morning lines (daily.yml ~10:37)
+    - cron: "23 20 * * *"   # ~4:23 PM ET — pre-night-game lines (daily.yml ~4:52)
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   props:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Build site/pro/props.json
+        id: props
+        continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           GAMES_CAP: "16"
           MARKETS: "batter_home_runs,batter_home_runs_alternate,pitcher_strikeouts"
         run: python scripts/odds/props_build.py
+      - name: Mark feed stale
+        if: steps.props.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/props.json "the odds refresh failed; prices are from the last successful pull"
       - name: Commit feed
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add site/pro/props.json
-          git commit -m "PRO props refresh" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        if: ${{ !cancelled() }}
+        run: bash scripts/ci/commit_push.sh "PRO props refresh" site/pro/props.json
+      - name: Report
+        if: ${{ !cancelled() }}
+        run: bash scripts/ci/gate.sh "Props odds feed=${{ steps.props.outcome }}"
