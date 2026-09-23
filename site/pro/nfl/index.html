@@ -19,7 +19,10 @@
 <meta name="twitter:description" content="Referee crews, travel & rest spots, team weather identities, QB & kicker condition splits — with prop leans priced against the books and graded in public. $15/mo.">
 <meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
 
-<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
+<script src="/assets/fresh.js" defer></script>
+<!-- deferred: a slow or blocked login script must never hold up the page — the gate
+     shows "Checking your membership…" meanwhile and says so if it never arrives -->
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" defer></script>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%23F08A3C" opacity="0.6"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23F08A3C" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +48,7 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand h1 .pro{margin-left:12px;background:#F08A3C;color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
-  .brand .tagline b{color:#F08A3C;font-weight:700}
+  .brand .tagline b{color:var(--gold-deep);font-weight:700}
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
   .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
   .pro-nav a:hover{color:#fff}
@@ -58,13 +61,13 @@
   .gamestrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
   .intel-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:12px 15px;display:flex;gap:11px;align-items:flex-start}
   .intel-card .ic{font-size:22px;line-height:1.2}
-  .intel-card .tag{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:2px 7px;display:inline-block}
+  .intel-card .tag{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:2px 7px;display:inline-block}
   .intel-card .tag.g{color:var(--muted);background:var(--gray-bg)}
   .intel-card h4{font-size:13px;font-weight:800;margin:5px 0 3px;line-height:1.35}
   .intel-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
   .intel-card .stat{margin-left:auto;font-size:15px;font-weight:800;color:var(--gold-deep);white-space:nowrap;padding-left:8px}
   table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;font-size:13px}
-  th{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--line)}
+  th{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:800;text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--line)}
   td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
   tr:last-child td{border-bottom:0}
   tr.g-row{cursor:pointer}
@@ -73,13 +76,13 @@
   .psub{font-size:11px;color:var(--muted);margin-top:2px}
   .imp{font-size:11px;color:var(--faint)}
   .chips{display:flex;flex-wrap:wrap;gap:5px}
-  .chip{font-size:10px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:14px;background:var(--gray-bg);color:var(--body2);white-space:nowrap}
+  .chip{font-size:11px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:14px;background:var(--gray-bg);color:var(--body2);white-space:nowrap}
   .chip.hot{background:#3a2f24;color:#fbbf24}
-  .chip.ref{background:#2b2836;color:#5b4a9e}
+  .chip.ref{background:rgba(167,139,250,.14);color:#c4b5fd}
   tr.d-row td{background:#2b313d;padding:14px 16px}
   .crew-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .crew-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-  .crew-box .cb-k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
+  .crew-box .cb-k{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
   .crew-box .cb-line{font-size:12.5px;color:var(--body2);margin:3px 0;line-height:1.45}
   .crew-box .cb-line b{color:#EFF1F7}
   .crew-box .cb-hi{color:#fbbf24;font-weight:700}
@@ -90,11 +93,11 @@
   .tabbar button{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--body2);background:var(--card);border:1.5px solid var(--line-strong);border-radius:20px;padding:8px 18px;cursor:pointer;display:flex;align-items:center;gap:7px}
   .tabbar button:hover{border-color:var(--gold-deep);color:var(--gold-deep)}
   .tabbar button.on{background:linear-gradient(135deg,#252A35,var(--navy2));color:#fff;border-color:transparent}
-  .tabbar button .cnt{font-size:10px;background:var(--gray-bg);color:var(--muted);border-radius:9px;padding:1px 7px}
-  .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:#F08A3C}
+  .tabbar button .cnt{font-size:11px;background:var(--gray-bg);color:var(--muted);border-radius:9px;padding:1px 7px}
+  .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:var(--gold-deep)}
   .tab-pane{display:none}
   .tab-pane.on{display:block}
-  .atd-chip{font-size:10px;font-weight:800;background:#3a2f24;color:#fbbf24;border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
+  .atd-chip{font-size:11px;font-weight:800;background:#3a2f24;color:#fbbf24;border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
   .qb2{display:inline-block;font-size:11px;font-weight:800;border-radius:12px;padding:3px 10px;white-space:nowrap}
   .hit2{background:var(--green-bg);color:var(--green-deep)}
   .miss2{background:var(--red-bg);color:var(--red-deep)}
@@ -237,10 +240,65 @@
   /* ===== v5: home =====
      The wordmark is the link people reach for; the nav item is the one they
      can see. Both go to the landing page. ===== */
-  .home-link{color:inherit;text-decoration:none;border-radius:4px}
+  .home-link{color:inherit;text-decoration:none;border-radius:4px;display:inline-flex;align-items:center;min-height:40px}
   .home-link:hover{opacity:.82}
   .hometab{white-space:nowrap}
+
+  /* ===== v6: honest state, phones, tap targets =====
+     Build time beside the desk name; a finished or stale board says so in an
+     amber banner and hides its lines. Tags never below 11px, everything
+     tappable at least 40px tall. On a phone the rail is one sticky row of
+     chips and the slate becomes two-line cards. ===== */
+  .pro-nav a{display:inline-flex;align-items:center;min-height:40px;padding:0 15px}
+  .desk-back{min-height:40px}
+  .cnt:empty{display:none}
+  .desk-head{align-items:center}
+  #desk-fresh[hidden],#nfl-banner[hidden]{display:none}
+  #nfl-banner{margin:14px 0 2px}
+  .m-only{display:none!important}
+  .line-lab{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+  .empty-row td{padding:18px 16px;color:var(--muted);font-size:13px;white-space:normal}
+  .final-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px 20px;font-size:14px;line-height:1.6;color:var(--body2);max-width:760px}
+  .final-card a{font-weight:700;text-decoration:none}
+  .intel-card .stat small{display:block;font-size:11px;font-weight:700;color:var(--faint);text-align:right;letter-spacing:.2px}
+  @media(max-width:640px){
+    main{padding-left:2px;padding-right:2px}
+    header{padding:18px 16px 16px}
+    .pro-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:12px -16px 0;padding:0 16px 2px;gap:6px;
+      -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+    .pro-nav::-webkit-scrollbar{display:none}
+    .pro-nav a{flex:0 0 auto;white-space:nowrap}
+    .pro-nav a[style]{margin-left:0!important}
+    .toolrail{display:flex!important;flex-wrap:nowrap;overflow-x:auto;position:sticky!important;top:0;z-index:40;
+      background:var(--surface);margin:10px -16px 16px!important;padding:8px 16px!important;gap:6px!important;scrollbar-width:none;
+      box-shadow:0 10px 14px -12px rgba(0,0,0,.7)}
+    .toolrail::-webkit-scrollbar{display:none}
+    .toolrail button{flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;gap:7px!important;
+      min-height:40px;padding:0 14px!important;border-radius:999px!important;white-space:nowrap}
+    .toolrail button .s{display:none}
+    .toolrail button .t{font-size:13px}
+    .toolrail button .cnt{position:static!important}
+    .m-only{display:inline!important}
+    .line-lab.m-only{display:block!important}
+    .d-only{display:none!important}
+    /* slate: matchup + the books' line, then the edge chips */
+    #nfl-board table{display:block;overflow:visible;white-space:normal}
+    #nfl-board table>thead{display:none}
+    #nfl-board table>tbody{display:block}
+    #nfl-board tr.g-row{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"game line" "chips chips";
+      gap:8px 12px;padding:13px 14px;border-bottom:1px solid var(--line)}
+    #nfl-board tr.g-row>td{display:block;padding:0;border:0;min-width:0;background:none!important}
+    #nfl-board tr.g-row>td.hide-m{display:none}
+    #nfl-board td.c-game{grid-area:game}
+    #nfl-board td.c-line{grid-area:line;text-align:right}
+    #nfl-board td.c-chips{grid-area:chips}
+    #nfl-board tr.d-row,#nfl-board tr.d-row>td,#nfl-board tr.empty-row,#nfl-board tr.empty-row>td{display:block}
+    #nfl-board tr.d-row>td{border-bottom:1px solid var(--line)}
+    #nfl-record table{display:table;white-space:normal}
+  }
 </style>
+<script src="/pro/gate.js"></script>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"NFL Weekly Board: Referee, Travel & Weather Edges","url":"https://dfsradar.com/pro/nfl/","description":"The NFL weekly board: referee crew tendencies, travel and rest spots with real ATS records, team weather identities, and QB & kicker condition splits priced against live prop lines. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/nfl/","availability":"https://schema.org/InStock"}}</script>
 </head>
@@ -265,6 +323,8 @@
 </header>
 
 <main>
+  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a href="#" class="ms-account" role="button">Account</a> · <a href="#" class="ms-logout" role="button">Log out</a></div>
+  <div id="gate-status" class="gate-status" role="status" aria-live="polite"><div class="gate-box gate-checking"><span class="gate-spin" aria-hidden="true"></span><span><span class="gt">Checking your membership…</span><span class="gs">Your desks open as soon as your login is confirmed.</span></span></div></div>
   <div id="paywall">
     <div class="pay-hero">
       <div class="pay-badge">DFSRADAR PRO · NFL</div>
@@ -287,27 +347,27 @@
   </div>
 
   <div id="pro-app" style="display:none">
-  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
   <a class="desk-back" href="/pro/">← All desks</a>
-  <div class="desk-head"><h2>NFL Desk</h2><span class="wk" id="desk-wk">Week —</span></div>
+  <div class="desk-head"><h2>NFL Desk</h2><span class="wk" id="desk-wk">Loading…</span><span id="desk-fresh" hidden></span></div>
+  <div id="nfl-banner" hidden></div>
   <div class="split-note" id="nfl-note" style="margin-bottom:2px"></div>
 
   <nav class="tabbar toolrail" id="tabbar">
-    <button data-tab="targets" class="on"><span class="t">Prop Targets</span><span class="s">Priced where books have posted</span><span class="cnt" id="cnt-targets"></span></button>
-    <button data-tab="slate"><span class="t">Full Slate</span><span class="s">Every game's weather read</span><span class="cnt" id="cnt-slate"></span></button>
+    <button data-tab="targets" class="on"><span class="t">Leans</span><span class="s">Props, spots &amp; crew angles</span><span class="cnt" id="cnt-targets"></span></button>
+    <button data-tab="slate"><span class="t">Full Slate</span><span class="s">Crews, spots, weather, kickers</span><span class="cnt" id="cnt-slate"></span></button>
     <button data-tab="record"><span class="t">Record</span><span class="s">Graded every week</span></button>
     <button data-tab="method"><span class="t">Method</span><span class="s">How the read is built</span></button>
   </nav>
 
   <div class="tab-pane on" id="tab-targets">
-  <div class="sec-h">This week's prop targets — priced where books have posted</div>
-  <div class="split-note" style="margin-bottom:10px">Every card is a named player, our historical condition split, and the live line when one exists. Weather leans activate as kickoffs enter the forecast window; prop lines post through the week. Archived the moment they post, graded after the games.</div>
+  <div class="sec-h" id="leans-h">This week's leans</div>
+  <div class="split-note" id="leans-note" style="margin-bottom:10px">Player-prop leans (QB, RB, receiver, kicker) come from real weather splits and carry the books' line where one is posted; SPOT, crew and cold/altitude leans are game-level angles shown with their historical records. Weather leans activate as kickoffs enter the forecast window. Archived the moment they post, graded after the games.</div>
   <div class="gamestrip" id="nfl-leans"></div>
   </div>
 
   <div class="tab-pane" id="tab-slate">
-  <div class="sec-h">The slate — click a game for crew &amp; situations</div>
+  <div class="sec-h" id="slate-h">The slate — tap a game for crew &amp; situations</div>
   <div id="nfl-board"></div>
   </div>
 
@@ -346,23 +406,94 @@
 })();
 
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
-let NFL=null;
+let NFL=null, BOARD=null;
 const OPEN=new Set();
 const LEAN_ICON={"REF TOTAL":"🦓","SPOT":"🧭","QB WIND":"💨","QB COLD":"🥶","KICKER":"🦵","COLD":"🥶","ALTITUDE":"⛰️","RB WIND":"🏃","RB COLD":"🏃","WR WIND":"🙌"};
-function showTab(id){
+/* ---- panes: #targets / #slate / #record / #method in the URL, so links work and survive a
+   reload; with no hash, the pane you last used opens ---- */
+const PANES=["targets","slate","record","method"], PANE_KEY="dfsradar.pro.nfl.pane";
+let PANE="targets";
+function showTab(id,opt){
+  if(!PANES.includes(id)) return;
+  PANE=id;
   document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
   document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+  if(!(opt&&opt.init)){
+    if(history.replaceState&&location.hash!=="#"+id) history.replaceState(null,"","#"+id);
+    try{ localStorage.setItem(PANE_KEY,id); }catch(e){}
+    railFollow(id);
+  }
+}
+function railFollow(id){
+  const rail=document.getElementById("tabbar"); if(!rail) return;
+  const b=rail.querySelector(`button[data-tab="${id}"]`);
+  if(b&&rail.scrollWidth>rail.clientWidth){
+    const l=b.offsetLeft-rail.offsetLeft, r=l+b.offsetWidth;
+    if(l<rail.scrollLeft+16) rail.scrollLeft=Math.max(0,l-16);
+    else if(r>rail.scrollLeft+rail.clientWidth-16) rail.scrollLeft=r-rail.clientWidth+16;
+  }
+  if(getComputedStyle(rail).position==="sticky"){
+    const pane=document.getElementById("tab-"+id); if(!pane) return;
+    const target=pane.getBoundingClientRect().top+window.scrollY-rail.offsetHeight-10;
+    if(window.scrollY>target) window.scrollTo(0,Math.max(0,target));
+  }
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("#tabbar button"); if(b) showTab(b.dataset.tab);
 });
+window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(PANES.includes(h)&&h!==PANE) showTab(h); });
+(function initPane(){
+  const h=location.hash.slice(1);
+  let id=PANES.includes(h)?h:null;
+  if(!id){ try{ const m=localStorage.getItem(PANE_KEY); if(PANES.includes(m)) id=m; }catch(e){} }
+  if(id) showTab(id,{init:true});
+})();
+const cap=t=>{ t=String(t||"").trim(); return t?t.charAt(0).toUpperCase()+t.slice(1):""; };
+function whenFresh(fn){
+  if(window.RadarFresh||document.readyState!=="loading") fn();
+  else document.addEventListener("DOMContentLoaded",fn,{once:true});
+}
+function prettyTimes(t){
+  return String(t||"").replace(/\b(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2})(?::\d{2})?\s*ET\b/g,(m,x)=>{
+    if(!window.RadarFresh) return m;
+    const d=RadarFresh.parseET(x); return d?RadarFresh.fmt(d,true):m;
+  });
+}
+/* kickoff: "2026-09-24" + "8:15 PM ET" (Eastern); without a time, the end of that day */
+function kickT(g){
+  const d=/^(\d{4}-\d{2}-\d{2})$/.exec(g.date||""); if(!d) return null;
+  const m=/^(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(g.time||"");
+  let hh=23, mm=59;
+  if(m){ hh=(+m[1])%12+(/pm/i.test(m[3])?12:0); mm=+m[2]; }
+  const s=`${d[1]} ${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`;
+  const t=window.RadarFresh?RadarFresh.parseET(s):null;
+  return t?t.getTime():Date.parse(`${d[1]}T${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:00-04:00`);
+}
+/* live · stale (not refreshed) · final (every game kicked off 4 h ago) · off (no season) */
+function boardState(d){
+  const gs=d.games||[], st=(d.status&&typeof d.status==="object")?d.status:{};
+  const stale=!!(d.stale||st.ok===false);
+  let mode="live";
+  if(d.seasonComplete||(!d.season&&!gs.length)) mode="off";
+  else if(gs.length&&gs.every(g=>{ const t=kickT(g); return t!=null&&t+4*36e5<Date.now(); })) mode="final";
+  else if(stale) mode="stale";
+  return {mode, st, prices: mode==="live"};
+}
+function banner(title,body){
+  const el=document.getElementById("nfl-banner");
+  if(!title){ el.hidden=true; el.innerHTML=""; return; }
+  if(window.RadarFresh) RadarFresh.banner(el,title,body);
+  else { el.hidden=false; el.textContent=title+(body?" "+body:""); }
+}
+function weekLabel(w){ const m=/^(\d{4})-w(\d+)$/.exec(String(w||"")); return m?`Week ${m[2]}`:String(w||""); }
 function nflLeanCard(l){
-  const price=l.line!=null?`<div class="stat">${l.side==="UNDER"?"U":l.side==="OVER"?"O":""} ${l.line}${l.price!=null?` <span style="font-size:11px;color:var(--muted)">${l.price>0?"+":""}${l.price}</span>`:""}</div>`:"";
+  const showLine=!BOARD||BOARD.prices;
+  const price=(showLine&&l.line!=null)?`<div class="stat">${l.side==="UNDER"?"U":l.side==="OVER"?"O":""} ${l.line}${l.price!=null?` <span style="font-size:11.5px;color:var(--muted)">${l.price>0?"+":""}${l.price}</span>`:""}<small>books' line</small></div>`:"";
   return `<div class="intel-card"><div class="ic">${LEAN_ICON[l.k]||"📌"}</div>
-    <div style="flex:1"><span class="tag ${l.side==="WATCH"?"g":""}">${esc(l.k)} · ${esc(l.side)}</span>
-    <h4>${esc(l.who)}${l.prop?` — ${esc(l.prop)}`:""} <span style="color:var(--muted);font-weight:700">· ${esc(l.game)}</span></h4>
-    <p>${esc(l.why)}${l.books?` · line from ${l.books} books`:""}</p>
-    ${l.atd?`<p style="margin-top:4px"><span class="atd-chip">ANYTIME TD ${l.atd>0?"+":""}${l.atd}</span> <span style="font-size:10.5px;color:var(--faint)">books' price, shown for the run-script spot — not our number</span></p>`:""}
+    <div style="flex:1;min-width:0"><span class="tag ${l.side==="WATCH"?"g":""}">${esc(l.k)} · ${esc(l.side)}</span>
+    <h4>${esc(l.who)}${l.prop?` — ${esc(l.prop)}`:""}${l.game?` <span style="color:var(--muted);font-weight:700">· ${esc(l.game)}</span>`:""}</h4>
+    <p>${esc(l.why)}${showLine&&l.books?` · line from ${l.books} books`:""}</p>
+    ${showLine&&l.atd?`<p style="margin-top:4px"><span class="atd-chip">ANYTIME TD ${l.atd>0?"+":""}${l.atd}</span> <span style="font-size:11px;color:var(--faint)">books' price, shown for the run-script spot — not our number</span></p>`:""}
     </div>${price}</div>`;
 }
 function crewBoxes(g){
@@ -410,32 +541,56 @@ function crewBoxes(g){
 }
 function renderNFL(){
   if(!NFL) return;
-  if(0) void 0;  // live bar removed
-    void`🏈 <span><b>Live</b> — built ${esc(NFL.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
-  document.getElementById("desk-wk").textContent=NFL.season?`${NFL.season} · Week ${NFL.week} · ${(NFL.games||[]).length} game${(NFL.games||[]).length===1?"":"s"}`:"Off-season";
-  document.getElementById("nfl-note").textContent=NFL.note||"";
-  document.getElementById("cnt-targets").textContent=(NFL.leans||[]).length||"";
-  document.getElementById("cnt-slate").textContent=(NFL.games||[]).length||"";
+  const B=BOARD=boardState(NFL), gs=NFL.games||[], leans=NFL.leans||[], w=NFL.week;
+  const built=()=>{ const t=window.RadarFresh&&RadarFresh.parseET((B.st&&B.st.lastGood)||NFL.updated); return t?RadarFresh.fmt(t,true):(NFL.updated||"—"); };
+  whenFresh(()=>{
+    const el=document.getElementById("desk-fresh");
+    if(window.RadarFresh) RadarFresh.render(el,{built:NFL.updated,stale:NFL.stale,status:NFL.status,maxAgeH:36});
+    if(B.mode==="final") banner(`Week ${w} is final — the Week ${+w+1} board is delayed.`,
+      `Last built ${built()}.${B.st.reason?` ${cap(B.st.reason)}.`:""} Week ${w}'s leans are graded on the Record tab; lines are hidden until the new board posts.`);
+    else if(B.mode==="stale") banner(`Not refreshed since ${built()}.`,
+      `${B.st.reason?cap(B.st.reason)+". ":""}The Week ${w} leans below are from that build; lines and prices are hidden until it rebuilds.`);
+    else banner("");
+    document.getElementById("nfl-note").textContent = B.mode==="live" ? prettyTimes(NFL.note||"") : (B.mode==="stale" ? prettyTimes(B.st.orig||"") : "");
+  });
+  const current=B.mode==="live"||B.mode==="stale";
+  document.getElementById("desk-wk").textContent = B.mode==="off" ? "Off-season"
+    : B.mode==="final" ? `${NFL.season} · Week ${w} · final`
+    : `${NFL.season} · Week ${w} · ${gs.length} game${gs.length===1?"":"s"}`;
+  document.getElementById("cnt-targets").textContent=current&&leans.length?leans.length:"";
+  document.getElementById("cnt-slate").textContent=current&&gs.length?gs.length:"";
+  document.getElementById("leans-h").textContent = current ? `Week ${w} leans` : B.mode==="final" ? `Week ${w} leans — final` : "Leans";
+  document.getElementById("leans-note").style.display = current ? "" : "none";
   const lw=document.getElementById("nfl-leans");
-  lw.innerHTML=(NFL.leans||[]).length?(NFL.leans||[]).map(nflLeanCard).join(""):
-    `<div class="split-note">No leans yet this week — they load as forecasts, crews, and prop lines post.</div>`;
-  const rows=(NFL.games||[]).map((g,i)=>{
+  if(B.mode==="off"){
+    lw.className=""; lw.innerHTML=`<div class="final-card">${esc(NFL.note||"No upcoming NFL games on the schedule — the board returns with the next season.")}</div>`;
+  }else if(B.mode==="final"){
+    lw.className=""; lw.innerHTML=`<div class="final-card">Week ${w}'s leans are final — every one was archived before kickoff and is graded on the <a href="#record">Record tab</a>. The Week ${+w+1} board posts here as soon as it's built.</div>`;
+  }else{
+    lw.className="gamestrip";
+    lw.innerHTML=leans.length?leans.map(nflLeanCard).join(""):
+      `<div class="split-note">No leans yet this week — they load as forecasts, crews, and prop lines post.</div>`;
+  }
+  document.getElementById("slate-h").textContent = B.mode==="final" ? `Week ${w} slate — final` : "The slate — tap a game for crew & situations";
+  const lines=B.prices, cols=lines?5:3;
+  const rows=gs.map((g,i)=>{
     const e=g.edge||{};
     const chips=[...(e.badges||[]).map(b=>`<span class="chip ${/SHORT WEEK|BODY CLOCK|WEST AT NIGHT/.test(b.k)?"hot":""}" title="${esc((b.txt||"")+(b.rec?" — "+b.rec:""))}">${esc(b.k)}${b.team?" · "+esc(b.team):""}</span>`),
       ...(e.ref&&e.ref.name?[`<span class="chip ref">🦓 ${esc(e.ref.name.split(" ").pop())}</span>`]:[])];
-    const wx=g.wx?(g.wx.dome?"🏟 roof":`${g.wx.temp}° · ${g.wx.wind} mph`):`<span class="imp">—</span>`;
+    const wx=g.wx?(g.wx.dome?"🏟 roof":`${g.wx.temp}° · ${g.wx.wind} mph`):"";
     const open=OPEN.has(i);
+    const line=lines?`<td class="c-line">${g.spread!=null?`<b>${esc(g.spread)}</b>`:'<span class="imp">—</span>'}${g.total!=null?`<span class="m-only line-lab">O/U ${g.total}</span>`:""}</td>
+      <td class="hide-m">${g.total!=null?g.total:'<span class="imp">—</span>'}</td>`:"";
     return `<tr class="g-row" data-i="${i}">
-      <td><div class="pname">${esc(g.away)} @ ${esc(g.home)} <span style="color:var(--faint);font-weight:400">${open?"▾":"▸"}</span></div><div class="psub">${esc(g.day)} ${esc(g.time)} · ${esc(g.stadium)}</div></td>
-      <td>${g.spread!=null?esc(g.spread):'<span class="imp">—</span>'}</td>
-      <td>${g.total!=null?g.total:'<span class="imp">—</span>'}</td>
-      <td class="hide-m">${wx}</td>
-      <td><div class="chips">${chips.join("")||'<span class="imp">—</span>'}</div></td>
-    </tr>${open?`<tr class="d-row"><td colspan="5"><div class="crew-grid">${crewBoxes(g)}</div></td></tr>`:""}`;
+      <td class="c-game"><div class="pname">${esc(g.away)} @ ${esc(g.home)} <span style="color:var(--faint);font-weight:400">${open?"▾":"▸"}</span></div><div class="psub">${esc(g.day)} ${esc(g.time)} · ${esc(g.stadium)}${wx?`<span class="m-only"> · ${wx}</span>`:""}</div></td>
+      ${line}
+      <td class="hide-m">${wx||'<span class="imp">—</span>'}</td>
+      <td class="c-chips"><div class="chips">${chips.join("")||'<span class="imp">no situational edges</span>'}</div></td>
+    </tr>${open?`<tr class="d-row"><td colspan="${cols}"><div class="crew-grid">${crewBoxes(g)}</div></td></tr>`:""}`;
   }).join("");
   document.getElementById("nfl-board").innerHTML=`<table><thead><tr>
-    <th>Game</th><th>Spread</th><th>Total</th><th class="hide-m">Forecast</th><th>Edges</th>
-    </tr></thead><tbody>${rows}</tbody></table>`;
+    <th>Game</th>${lines?"<th>Spread <span style=\"font-weight:400;text-transform:none;letter-spacing:0\">(books')</span></th><th>Total</th>":""}<th class="hide-m">Forecast</th><th>Edges</th>
+    </tr></thead><tbody>${rows||`<tr class="empty-row"><td colspan="${cols}">No games on the board right now.</td></tr>`}</tbody></table>`;
 }
 document.addEventListener("click",e=>{
   const r=e.target.closest("tr.g-row"); if(!r) return;
@@ -446,10 +601,18 @@ document.addEventListener("click",e=>{
 async function loadNFL(){
   try{
     const r=await fetch("/pro/nfl.json?_="+Date.now());
-    if(!r.ok) return;
-    NFL=await r.json();
+    if(!r.ok) throw new Error(r.status);
+    const d=await r.json();
+    if(!d||typeof d!=="object") throw new Error("bad json");
+    NFL=d;
     renderNFL();
-  }catch(e){}
+  }catch(e){
+    document.getElementById("desk-wk").textContent="Board unavailable";
+    document.getElementById("leans-h").textContent="Leans";
+    document.getElementById("leans-note").style.display="none";
+    document.getElementById("nfl-leans").innerHTML=`<div class="final-card">The NFL board didn't load — <a href="${esc(location.pathname)}">reload the page</a> to try again.</div>`;
+    document.getElementById("nfl-board").innerHTML=`<div class="final-card">The slate didn't load — <a href="${esc(location.pathname)}">reload the page</a> to try again.</div>`;
+  }
   try{
     const rr=await fetch("/pro/nfl_record.json?_="+Date.now());
     if(rr.ok) renderNFLRecord(await rr.json());
@@ -458,98 +621,21 @@ async function loadNFL(){
 function renderNFLRecord(R){
   if(!R||!R.summary||!R.summary.overall||!R.summary.overall.n) return;
   const S=R.summary;
-  const chip=(lab,r)=>r&&r.n?`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${r.w}–${r.n-r.w}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`:"";
+  const chip=(lab,r)=>r&&r.n?`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${r.w}–${r.n-r.w}</b><div style="font-size:11px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`:"";
   const kinds=Object.entries(S.byKind||{}).map(([k,r])=>chip(k,r)).join("");
   const weeks=(R.recent||[]).map(w=>{
     const rows=w.leans.map(l=>`<tr><td><span class="qb2 ${l.hit?"hit2":"miss2"}">${l.hit?"HIT":"MISS"}</span></td>
       <td><b>${esc(l.k)}</b> ${esc(l.who||"")}<div class="psub">${esc(l.game)}${l.prop?" · "+esc(l.prop):""}</div></td>
-      <td>${l.side} ${l.line!=null?l.line:""}${l.act!=null?` · actual <b>${l.act}</b>`:""}</td></tr>`).join("");
-    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(w.week)}</b></div><table><tbody>${rows}</tbody></table>`;
+      <td>${esc(l.side)} ${l.line!=null?l.line:""}${l.act!=null?` · actual <b>${l.act}</b>`:""}</td></tr>`).join("");
+    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(weekLabel(w.week))}</b></div><table><tbody>${rows||`<tr class="empty-row"><td colspan="3">No leans were graded this week.</td></tr>`}</tbody></table>`;
   }).join("");
   document.getElementById("nfl-record").innerHTML=
     `<div>${chip("all graded leans",S.overall)}${chip("player props",S.props)}</div><div style="margin-top:6px">${kinds}</div>${weeks}`;
 }
-/* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
-const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null, LOADED=false;
-function msReady(timeout=6000){
-  return new Promise(res=>{
-    const t0=Date.now();
-    (function poll(){
-      if(window.$memberstackDom) return res(window.$memberstackDom);
-      if(Date.now()-t0>timeout) return res(null);
-      setTimeout(poll,150);
-    })();
-  });
-}
-async function gate(){
-  let member=null, ok=false;
-  try{
-    const ms=await msReady();
-    if(ms){
-      const r=await ms.getCurrentMember();
-      member=r&&r.data;
-      ok=!!(member&&(member.planConnections||[]).some(pc=>
-        MS_PLANS.includes(pc.planId)&&["ACTIVE","TRIALING"].includes(String(pc.status||"").toUpperCase())));
-    }
-  }catch(e){}
-  GATED=ok;
-  /* PRO data is fetched only once the gate says this visitor is a member —
-     never before it resolves, and never for a logged-out visitor. */
-  if(ok&&!LOADED){ LOADED=true; loadNFL(); }
-  document.getElementById("pro-app").style.display=ok?"block":"none";
-  document.getElementById("paywall").style.display=ok?"none":"block";
-  const bar=document.getElementById("member-bar");
-  if(ok&&member){bar.style.display="flex";document.getElementById("member-email").textContent=(member.auth&&member.auth.email)||"";}
-  else bar.style.display="none";
-  return ok;
-}
-(async()=>{
-  await gate();
-  const ms=window.$memberstackDom;
-  if(ms&&ms.onAuthChange) ms.onAuthChange(()=>gate());
-  if(location.hash==="#login"&&!GATED&&ms){ try{ await ms.openModal("LOGIN"); gate(); }catch(e){} }
-})();
-document.addEventListener("visibilitychange",()=>{ if(!document.hidden) gate(); });
-/* ---- checkout wiring: the data-ms attributes don't fire for logged-out
-   visitors, so Subscribe/Login/Account/Logout are driven explicitly. ---- */
-const PRO_PRICE="prc_pro-monthly-rdvp0vis";
-async function buyPro(){
-  const ms=await msReady();
-  if(!ms){ alert("Checkout couldn't load — please refresh the page (and disable ad blockers if you use one)."); return; }
-  let member=null;
-  try{ member=(await ms.getCurrentMember()).data; }catch(e){}
-  if(!member){
-    try{ const r=await ms.openModal("SIGNUP"); member=r&&r.data; }catch(e){ return; }
-    try{ ms.hideModal(); }catch(e){}
-  }
-  if(!member) return;
-  if(await gate()) return;   // Kitchen All-Access / existing PRO — already unlocked
-  try{
-    await ms.purchasePlansWithCheckout({ priceId: PRO_PRICE,
-      successUrl: location.origin+location.pathname,
-      cancelUrl: location.origin+location.pathname });
-  }catch(e){
-    console.error("checkout", e);
-    alert("Couldn't open checkout — please try again, or log in first if you already have an account.");
-  }
-}
-document.querySelectorAll(".pay-cta").forEach(b=>b.addEventListener("click", e=>{ e.preventDefault(); buyPro(); }));
-document.querySelectorAll(".pay-login").forEach(b=>b.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(!ms) return;
-  try{ await ms.openModal("LOGIN"); ms.hideModal(); }catch(err){}
-  gate();
-}));
-document.querySelectorAll('.ms-logout').forEach(a=>a.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(ms){ try{ await ms.logout(); }catch(err){} }
-  gate();
-}));
-document.querySelectorAll('.ms-account').forEach(a=>a.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(ms){ try{ await ms.openModal("PROFILE"); }catch(err){} }
-}));
+/* ---- membership: /pro/gate.js decides who sees the desk (PRO or All-Access,
+   ACTIVE or TRIALING). The desk's data is fetched only once it confirms a member. ---- */
+if(window.ProGate) ProGate.start({ load: () => { loadNFL(); } });
+else document.getElementById("gate-status").textContent = "The membership check didn't load — please refresh the page.";
 
 </script>
 </body>
