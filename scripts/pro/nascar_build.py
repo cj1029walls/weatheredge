@@ -32,7 +32,8 @@ FREE = os.path.join(ROOT, "site", "nascar", "data.json")
 OUT = os.path.join(ROOT, "site", "pro", "nascar.json")
 ARCH = os.path.join(ROOT, "data", "pro", "nascar_predictions")
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 NG_YEAR = 2022        # Next Gen car era
 HOT_FC = 88           # forecast high ≥ this -> heat leans active
 
@@ -57,7 +58,9 @@ def main():
             break
     if not nxt:
         json.dump(dict(updated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
-                       race=None, note="No upcoming race on the schedule."),
+                       race=None, seasonComplete=True,
+                       note=f"Season complete — the PRO board returns for the "
+                            f"{int(RACES[-1]['date'][:4]) + 1} Daytona 500."),
                   open(OUT, "w"))
         print("no race — wrote empty board")
         return
