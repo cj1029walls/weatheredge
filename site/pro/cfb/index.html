@@ -19,8 +19,10 @@
 <meta name="twitter:description" content="OL vs DL weight mismatches, quintile-ranked and backtested across 4 seasons — top-quintile trench edges rush for +0.4 YPC. Weather-stacked rushing-prop leans, archived and graded in public. $15/mo.">
 <meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
+<script src="/assets/fresh.js" defer></script>
+<!-- deferred: a slow or blocked login script must never hold up the page — the gate
+     shows "Checking your membership…" meanwhile and says so if it never arrives -->
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" defer></script>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%23F08A3C" opacity="0.6"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23F08A3C" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +48,7 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand h1 .pro{margin-left:12px;background:#F08A3C;color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
-  .brand .tagline b{color:#F08A3C;font-weight:700}
+  .brand .tagline b{color:var(--gold-deep);font-weight:700}
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
   .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
   .pro-nav a:hover{color:#fff}
@@ -58,24 +60,24 @@
   .gamestrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
   .intel-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:12px 15px;display:flex;gap:11px;align-items:flex-start}
   .intel-card .ic{font-size:22px;line-height:1.2}
-  .intel-card .tag{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:2px 7px;display:inline-block}
+  .intel-card .tag{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:2px 7px;display:inline-block}
   .intel-card .tag.fade{color:var(--red);background:var(--red-bg)}
   .intel-card h4{font-size:13px;font-weight:800;margin:5px 0 3px;line-height:1.35}
   .intel-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
   table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;font-size:13px}
-  th{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--line)}
+  th{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:800;text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--line)}
   td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
   tr:last-child td{border-bottom:0}
   .pname{font-weight:800}
   .psub{font-size:11px;color:var(--muted);margin-top:2px}
   .imp{font-size:11px;color:var(--faint)}
   .qb{display:inline-block;font-size:11px;font-weight:800;border-radius:12px;padding:3px 10px;white-space:nowrap}
-  .q5{background:var(--green-bg);color:var(--green-deep)}
-  .q4{background:#17331f;color:#1e7a45}
+  .q5{background:rgba(34,197,94,.2);color:#4ade80}
+  .q4{background:rgba(34,197,94,.09);color:#86efac}
   .q3{background:var(--gray-bg);color:var(--body2)}
-  .q2{background:#3a1f1f;color:#9a5555}
-  .q1{background:var(--red-bg);color:var(--red-deep)}
-  .qsub{font-size:10.5px;color:var(--faint);margin-top:3px}
+  .q2{background:rgba(248,113,113,.09);color:#fecaca}
+  .q1{background:rgba(248,113,113,.2);color:#fca5a5}
+  .qsub{font-size:11px;color:var(--faint);margin-top:3px}
   .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
   .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
   .m-sec p{font-size:13px;line-height:1.75;color:var(--body2)}
@@ -86,26 +88,26 @@
   .tabbar button{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--body2);background:var(--card);border:1.5px solid var(--line-strong);border-radius:20px;padding:8px 18px;cursor:pointer;display:flex;align-items:center;gap:7px}
   .tabbar button:hover{border-color:var(--gold-deep);color:var(--gold-deep)}
   .tabbar button.on{background:linear-gradient(135deg,#252A35,var(--navy2));color:#fff;border-color:transparent}
-  .tabbar button .cnt{font-size:10px;background:var(--gray-bg);color:var(--muted);border-radius:9px;padding:1px 7px}
-  .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:#F08A3C}
+  .tabbar button .cnt{font-size:11px;background:var(--gray-bg);color:var(--muted);border-radius:9px;padding:1px 7px}
+  .tabbar button.on .cnt{background:rgba(255,255,255,.18);color:var(--gold-deep)}
   .tab-pane{display:none}
   .tab-pane.on{display:block}
   .howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:18px}
   .howto .step{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;border-top:3px solid var(--gold)}
-  .howto .step .n{font-size:10px;font-weight:800;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase}
+  .howto .step .n{font-size:11px;font-weight:800;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase}
   .howto .step h6{font-size:13.5px;font-weight:800;margin:6px 0 4px}
   .howto .step p{font-size:12px;color:var(--muted);line-height:1.55;margin:0}
   .trench3d-wrap{position:relative;height:400px;background:#10151f;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
   .trench3d-wrap canvas{width:100%;height:100%;display:block;cursor:grab}
   .trench3d-wrap canvas:active{cursor:grabbing}
   .t3d-hud{position:absolute;top:14px;left:16px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55);pointer-events:none}
-  .t3d-hud .t{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
+  .t3d-hud .t{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
   .t3d-hud .w{font-size:17px;font-weight:800;margin-top:3px}
   .t3d-hud .q{font-size:12px;font-weight:700;margin-top:2px;opacity:.85}
   .t3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none}
   .t3d-ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-  .t3d-ctrl select{font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--line-strong);border-radius:10px;padding:8px 12px}
-  .t3d-ctrl .side-btn{font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.5px;background:var(--card);color:var(--body2);border:1.5px solid var(--line-strong);border-radius:18px;padding:7px 16px;cursor:pointer}
+  .t3d-ctrl select{max-width:100%;min-width:0;min-height:40px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);background:var(--card);border:1.5px solid var(--line-strong);border-radius:10px;padding:8px 12px}
+  .t3d-ctrl .side-btn{min-height:40px;font-family:inherit;font-size:12px;font-weight:800;letter-spacing:.5px;background:var(--card);color:var(--body2);border:1.5px solid var(--line-strong);border-radius:18px;padding:7px 16px;cursor:pointer}
   .t3d-ctrl .side-btn.on{background:linear-gradient(135deg,#252A35,var(--navy2));color:#fff;border-color:transparent}
   /* paywall */
   #paywall{display:none}
@@ -247,7 +249,7 @@
   table.wx{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
   table.wx th,table.wx td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--line)}
   table.wx tr:last-child td{border-bottom:none}
-  table.wx thead th{font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+  table.wx thead th{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
     color:var(--muted);background:var(--gray-bg);white-space:nowrap}
   table.wx th.b,table.wx td.b{text-align:left;min-width:190px}
   table.wx td.b .bn{font-family:Sora,Ubuntu,sans-serif;font-size:14px;font-weight:700;color:var(--ink)}
@@ -276,7 +278,7 @@
     background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
   .wx-g .mph{font-family:Sora,Ubuntu,sans-serif;font-variant-numeric:tabular-nums;
     font-size:19px;font-weight:800;color:var(--ink);line-height:1}
-  .wx-g .mph small{display:block;font-family:Ubuntu,sans-serif;font-size:10px;font-weight:700;
+  .wx-g .mph small{display:block;font-family:Ubuntu,sans-serif;font-size:11px;font-weight:700;
     letter-spacing:1.1px;text-transform:uppercase;margin-top:3px}
   .wx-g .mu{font-size:14px;font-weight:700;color:var(--ink)}
   .wx-g .meta{font-size:11.5px;color:var(--muted);margin-top:2px}
@@ -287,7 +289,7 @@
   .band-Blustery{border-color:rgba(251,191,36,.35)}
   .band-Blustery .mph small{color:var(--note-text)}
   .band-Breezy .mph small,.band-Calm .mph small{color:var(--faint)}
-  .wx-more{font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--muted);
+  .wx-more{min-height:40px;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--muted);
     background:transparent;border:1px dashed var(--line-strong);border-radius:11px;
     padding:10px 16px;cursor:pointer;margin:3px 0}
   .wx-more:hover{color:var(--gold-deep);border-color:var(--gold)}
@@ -302,7 +304,71 @@
   .home-link{color:inherit;text-decoration:none;border-radius:4px}
   .home-link:hover{opacity:.82}
   .hometab{white-space:nowrap}
+
+  /* ===== v6: honest state, phones, tap targets =====
+     A board that is final, stale or paused says so in an amber banner and hides
+     its lines; the build time sits next to the desk name. Tags never below
+     11px; everything tappable at least 40px tall. On a phone the tool rail is
+     one sticky, scrollable row of chips (it was 400-540px of stacked cards
+     before any data) and the Full Slate turns into two-line cards. ===== */
+  .pro-nav a{display:inline-flex;align-items:center;min-height:40px;padding:0 15px}
+  .desk-back{min-height:40px}
+  .cnt:empty{display:none}
+  .desk-head{align-items:center}
+  #desk-fresh[hidden],#cfb-banner[hidden]{display:none}
+  #cfb-banner{margin:14px 0 2px}
+  .m-only{display:none!important}
+  .line-lab{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+  .empty-row td{padding:18px 16px;color:var(--muted);font-size:13px;white-space:normal}
+  .final-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px 20px;font-size:14px;line-height:1.6;color:var(--body2);max-width:760px}
+  .final-card b{color:var(--ink)}
+  .final-card a{font-weight:700;text-decoration:none}
+  .t3d-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    padding:24px;text-align:center;color:var(--body2);font-size:14px;line-height:1.6;background:rgba(16,21,31,.92)}
+  .t3d-msg[hidden]{display:none}
+  .t3d-msg button{font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);background:var(--gold-bg);
+    border:1px solid rgba(34,211,238,.5);border-radius:10px;min-height:40px;padding:0 18px;cursor:pointer}
+  @media(max-width:640px){
+    main{padding-left:2px;padding-right:2px}
+    header{padding:18px 16px 16px}
+    .pro-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:12px -16px 0;padding:0 16px 2px;gap:6px;
+      -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+    .pro-nav::-webkit-scrollbar{display:none}
+    .pro-nav a{flex:0 0 auto;white-space:nowrap}
+    .pro-nav a[style]{margin-left:0!important}
+    .toolrail{display:flex!important;flex-wrap:nowrap;overflow-x:auto;position:sticky!important;top:0;z-index:40;
+      background:var(--surface);margin:10px -16px 16px!important;padding:8px 16px!important;gap:6px!important;scrollbar-width:none;
+      box-shadow:0 10px 14px -12px rgba(0,0,0,.7)}
+    .toolrail::-webkit-scrollbar{display:none}
+    .toolrail button{flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;gap:7px!important;
+      min-height:40px;padding:0 14px!important;border-radius:999px!important;white-space:nowrap}
+    .toolrail button .s{display:none}
+    .toolrail button .t{font-size:13px}
+    .toolrail button .cnt{position:static!important}
+    .t3d-ctrl select{width:100%}
+    .trench3d-wrap{height:320px}
+    .m-only{display:inline!important}
+    .line-lab.m-only{display:block!important}
+    .d-only{display:none!important}
+    /* Full Slate: each game becomes a two-line card — matchup + the books' median line,
+       then both trench edges. */
+    #cfb-board table{display:block;overflow:visible;white-space:normal}
+    #cfb-board thead{display:none}
+    #cfb-board tbody{display:block}
+    #cfb-board tr.sl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"game line" "away home";
+      gap:8px 12px;padding:13px 14px;border-bottom:1px solid var(--line)}
+    #cfb-board tr.sl:last-child{border-bottom:0}
+    #cfb-board tr.sl td{display:block;padding:0;border:0}
+    #cfb-board td.c-game{grid-area:game;min-width:0}
+    #cfb-board td.c-line{grid-area:line;text-align:right}
+    #cfb-board td.c-away{grid-area:away}
+    #cfb-board td.c-home{grid-area:home;text-align:right}
+    #cfb-board tr.sl td.hide-m{display:none}
+    #cfb-board tr.day,#cfb-board tr.day td,#cfb-board tr.empty-row,#cfb-board tr.empty-row td{display:block}
+  }
 </style>
+<script src="/pro/gate.js"></script>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"CFB Trench Edge: OL/DL Weight Mismatches for Rushing Props","url":"https://dfsradar.com/pro/cfb/","description":"Every college football game's offensive-line vs defensive-line weight mismatch, quintile-ranked against the league norm and validated on four seasons of data — paired with kickoff weather for rushing-prop leans. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/cfb/","availability":"https://schema.org/InStock"}}</script>
 </head>
@@ -327,15 +393,17 @@
 </header>
 
 <main>
+  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a href="#" class="ms-account" role="button">Account</a> · <a href="#" class="ms-logout" role="button">Log out</a></div>
+  <div id="gate-status" class="gate-status" role="status" aria-live="polite"><div class="gate-box gate-checking"><span class="gate-spin" aria-hidden="true"></span><span><span class="gt">Checking your membership…</span><span class="gs">Your desks open as soon as your login is confirmed.</span></span></div></div>
   <div id="paywall">
     <div class="pay-hero">
       <div class="pay-badge">DFSRADAR PRO · CFB</div>
       <h2>Trench Edge — the rushing-prop signal nobody else is selling.</h2>
-      <div>Every game's OL-vs-DL weight mismatch, quintile-ranked and backtested across 5,900+ games. Heavier lines control games — we measured it.</div>
+      <div>Every game's OL-vs-DL weight mismatch, quintile-ranked and backtested across 5,900+ offense-games. Heavier lines control games — we measured it.</div>
       <div class="pay-price">$15<span> / month — all sports included</span></div>
       <div class="pay-feats">
         🏋️ <b>Trench edges for every FBS game</b> — each offense's line weight vs the defensive front it's actually facing, centered against the league norm<br>
-        📏 <b>A backtested ladder, not a hunch</b> — 4 seasons, 5,916 games: top-quintile trench edges rushed for 4.40 YPC vs 4.01 for bottom-quintile, +11 rushing yards a game<br>
+        📏 <b>A backtested ladder, not a hunch</b> — 4 seasons, 5,916 offense-games: top-quintile trench edges rushed for 4.40 YPC vs 4.01 for bottom-quintile, +11 rushing yards a game<br>
         💨 <b>Weather-stacked spots</b> — when a top-quintile trench edge meets a 15+ mph kickoff forecast, the run-heavy script gets flagged<br>
         🎯 <b>Rushing-prop leans</b> — TARGET the ground games behind the biggest fronts, FADE the ones getting out-weighed<br>
         📊 <b>A public track record</b> — every lean archived the moment it posts, graded against actual rushing box scores
@@ -349,14 +417,14 @@
   </div>
 
   <div id="pro-app" style="display:none">
-  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
   <a class="desk-back" href="/pro/">← All desks</a>
-  <div class="desk-head"><h2>CFB Desk</h2><span class="wk" id="desk-wk">Week —</span></div>
+  <div class="desk-head"><h2>CFB Desk</h2><span class="wk" id="desk-wk">Loading…</span><span id="desk-fresh" hidden></span></div>
+  <div id="cfb-banner" hidden></div>
   <div class="split-note" id="cfb-note" style="margin-bottom:2px"></div>
 
   <nav class="tabbar toolrail" id="tabbar">
-    <button data-tab="leans" class="on"><span class="t">Trench Board</span><span class="s">This week's rushing-prop leans</span><span class="cnt" id="cnt-leans"></span></button>
+    <button data-tab="leans" class="on"><span class="t">Trench Board</span><span class="s">Rushing-prop leans</span><span class="cnt" id="cnt-leans"></span></button>
     <button data-tab="slate"><span class="t">Full Slate</span><span class="s">Every game's edge, both ways</span><span class="cnt" id="cnt-slate"></span></button>
     <button data-tab="trench"><span class="t">Trench View</span><span class="s">The mismatch drawn to scale</span></button>
     <button data-tab="wind"><span class="t">Wind Factor</span><span class="s">What wind does to a football game</span></button>
@@ -373,13 +441,13 @@
     <div class="step"><div class="n">Step 3 · The bet</div><h6>Rushing props, nothing else</h6>
       <p>Each card names the back and how the team used him last season. This board is for <b>rushing props only</b> — our backtest found no side or total edge, so we don't sell one.</p></div>
   </div>
-  <div class="sec-h">This week's rushing-prop leans</div>
+  <div class="sec-h" id="leans-h">Rushing-prop leans</div>
   <div class="gamestrip" id="cfb-leans"></div>
   </div>
 
   <div class="tab-pane" id="tab-slate">
-  <div class="sec-h">The slate — every game's trench edge, both ways</div>
-  <div class="split-note" style="margin-bottom:10px">Q5 (green) = a line in the top 20% of weight edges this season · Q1 (red) = bottom 20%. The lean cards on the first tab come from these.</div>
+  <div class="sec-h" id="slate-h">The slate — every game's trench edge, both ways</div>
+  <div class="split-note" id="slate-note" style="margin-bottom:10px">Q5 (green) = a line in the top 20% of weight edges this season · Q1 (red) = bottom 20%. The lean cards on the first tab come from these. Spread and total are the books' median line, shown for context — this board makes no side or total calls.</div>
   <div id="cfb-board"></div>
   </div>
 
@@ -392,8 +460,9 @@
     <span class="split-note" style="margin:0">Each blocker is drawn to his unit's average weight — the gold arrow shows which way the trench tilts.</span>
   </div>
   <div class="trench3d-wrap"><canvas id="trench3d"></canvas>
-    <div class="t3d-hud"><div class="t">Line of scrimmage · this week</div><div class="w" id="t3d-title"></div><div class="q" id="t3d-sub"></div></div>
+    <div class="t3d-hud"><div class="t" id="t3d-when">Line of scrimmage</div><div class="w" id="t3d-title"></div><div class="q" id="t3d-sub"></div></div>
     <div class="t3d-hint">drag to look around</div>
+    <div class="t3d-msg" id="t3d-msg" hidden></div>
   </div>
   </div>
 
@@ -451,15 +520,54 @@
 })();
 
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
-function showTab(id){
-  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
-  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+/* ---- panes: the URL hash names the open pane (#slate, #record …) so links work and
+   survive a reload; with no hash, the pane you last used opens. Pane side effects (the
+   3D view, the wind dataset) wait until the gate has confirmed a member. ---- */
+const PANES=["leans","slate","trench","wind","record","method"], PANE_KEY="dfsradar.pro.cfb.pane";
+let PANE="leans", READY=false;
+function paneEnter(id){
+  if(!READY) return;
   if(id==="trench") setupTrenchControls();
   if(id==="wind") loadWind();
+}
+function showTab(id,opt){
+  if(!PANES.includes(id)) return;
+  PANE=id;
+  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.toggle("on",p.id==="tab-"+id));
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===id));
+  if(!(opt&&opt.init)){
+    if(history.replaceState&&location.hash!=="#"+id) history.replaceState(null,"","#"+id);
+    try{ localStorage.setItem(PANE_KEY,id); }catch(e){}
+    railFollow(id);
+  }
+  paneEnter(id);
+}
+/* On a phone the rail is a sticky chip row: keep the chosen chip in view and start the
+   pane just under the rail instead of wherever the last pane was scrolled to. */
+function railFollow(id){
+  const rail=document.getElementById("tabbar"); if(!rail) return;
+  const b=rail.querySelector(`button[data-tab="${id}"]`);
+  if(b&&rail.scrollWidth>rail.clientWidth){
+    const l=b.offsetLeft-rail.offsetLeft, r=l+b.offsetWidth;
+    if(l<rail.scrollLeft+16) rail.scrollLeft=Math.max(0,l-16);
+    else if(r>rail.scrollLeft+rail.clientWidth-16) rail.scrollLeft=r-rail.clientWidth+16;
+  }
+  if(getComputedStyle(rail).position==="sticky"){
+    const pane=document.getElementById("tab-"+id); if(!pane) return;
+    const target=pane.getBoundingClientRect().top+window.scrollY-rail.offsetHeight-10;
+    if(window.scrollY>target) window.scrollTo(0,Math.max(0,target));
+  }
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("#tabbar button"); if(b) showTab(b.dataset.tab);
 });
+window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(PANES.includes(h)&&h!==PANE) showTab(h); });
+(function initPane(){
+  const h=location.hash.slice(1);
+  let id=PANES.includes(h)?h:null;
+  if(!id){ try{ const m=localStorage.getItem(PANE_KEY); if(PANES.includes(m)) id=m; }catch(e){} }
+  if(id) showTab(id,{init:true});
+})();
 
 /* ==================================================================
    WIND FACTOR — site/pro/cfb_wx.json
@@ -544,7 +652,7 @@ const WX_LIVE=["Windy","Blustery"];
 function wxCard(g){
   const pct = g.vPct==null ? `<b>—</b>no venue history`
     : g.vPct>=100 ? `<b>Windiest</b>on record here · ${g.vN} games`
-    : `<b>${g.vPct}<sup>th</sup> pct</b>wind here · ${g.vN} games`;
+    : `<b>${g.vPct}th pct</b>wind here · ${g.vN} games`;
   return `<div class="wx-g band-${esc(g.band)}">
     <div class="mph">${g.wind}<small>${esc(g.band)}</small></div>
     <div><div class="mu">${esc(g.away)} @ ${esc(g.home)}</div>
@@ -588,6 +696,36 @@ async function loadWind(){
    TRENCH VIEW — 3D line of scrimmage, blockers drawn to unit weight
 ================================================================== */
 let trench3D=null, T3D_SIDE="away";
+const THREE_SRC="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+let THREE_P=null;
+function loadThree(){
+  if(window.THREE) return Promise.resolve(window.THREE);
+  if(THREE_P) return THREE_P;
+  THREE_P=new Promise((res,rej)=>{
+    const s=document.createElement("script");
+    s.src=THREE_SRC; s.async=true;
+    const t=setTimeout(()=>rej(new Error("timeout")),12000);
+    s.onload=()=>{ clearTimeout(t); window.THREE?res(window.THREE):rej(new Error("no THREE")); };
+    s.onerror=()=>{ clearTimeout(t); rej(new Error("blocked")); };
+    document.head.appendChild(s);
+  });
+  THREE_P.catch(()=>{ THREE_P=null; });          // a later visit to the pane can try again
+  return THREE_P;
+}
+function t3dMsg(html){
+  const m=document.getElementById("t3d-msg"); if(!m) return;
+  if(!html){ m.hidden=true; m.innerHTML=""; return; }
+  m.innerHTML=html; m.hidden=false;
+}
+function drawTrench(){
+  if(window.THREE){ t3dMsg(""); initTrench3D(); return; }
+  t3dMsg('<span>Loading the 3D view…</span>');
+  loadThree().then(()=>{ t3dMsg(""); initTrench3D(); }).catch(()=>{
+    t3dMsg('<span>The 3D view couldn\u2019t load — its graphics library (from cdnjs.cloudflare.com) was blocked or didn\u2019t answer. '+
+      'The same weights and edges are on the <a href="#slate">Full Slate</a>.</span><button type="button" id="t3d-retry">Try again</button>');
+    const b=document.getElementById("t3d-retry"); if(b) b.addEventListener("click",drawTrench);
+  });
+}
 function destroyTrench3D(){
   if(!trench3D) return;
   cancelAnimationFrame(trench3D.raf);
@@ -612,6 +750,7 @@ function wtLabel(txt,sub){
 function initTrench3D(){
   const canvas=document.getElementById("trench3d");
   if(!canvas||!CFB||typeof THREE==="undefined") return;
+  document.getElementById("t3d-when").textContent=`Line of scrimmage · Week ${CFB.week}`+(BOARD&&(BOARD.mode==="final"||BOARD.mode==="paused")?" (final)":"");
   const sel=document.getElementById("t3d-game");
   const g=(CFB.games||[]).find(x=>String(x.id)===sel.value)||(CFB.games||[])[0];
   if(!g) return;
@@ -717,104 +856,198 @@ function setupTrenchControls(){
   const sel=document.getElementById("t3d-game");
   if(!sel||!CFB||sel.dataset.ready) return;
   sel.dataset.ready="1";
-  sel.innerHTML=(CFB.games||[]).filter(g=>g.awayEdge&&g.homeEdge)
-    .map(g=>`<option value="${g.id}">${esc(g.away)} @ ${esc(g.home)} · ${esc(g.day)}</option>`).join("");
+  const tg=(CFB.games||[]).filter(g=>g.awayEdge&&g.homeEdge);
+  if(!tg.length){
+    document.querySelector(".t3d-ctrl").style.display="none";
+    t3dMsg('<span>No games on the board right now — the Trench View fills in when the next board posts.</span>');
+    return;
+  }
+  sel.innerHTML=tg.map(g=>`<option value="${g.id}">${esc(g.away)} @ ${esc(g.home)} · ${esc(g.day)}</option>`).join("");
   const sync=()=>{
     const g=(CFB.games||[]).find(x=>String(x.id)===sel.value)||(CFB.games||[])[0];
     if(!g) return;
     document.getElementById("t3d-away").textContent=`${g.away} offense`;
     document.getElementById("t3d-home").textContent=`${g.home} offense`;
-    initTrench3D();
+    drawTrench();
   };
   sel.addEventListener("change",sync);
   document.getElementById("t3d-away").addEventListener("click",()=>{
     T3D_SIDE="away";
     document.getElementById("t3d-away").classList.add("on");
     document.getElementById("t3d-home").classList.remove("on");
-    initTrench3D();
+    drawTrench();
   });
   document.getElementById("t3d-home").addEventListener("click",()=>{
     T3D_SIDE="home";
     document.getElementById("t3d-home").classList.add("on");
     document.getElementById("t3d-away").classList.remove("on");
-    initTrench3D();
+    drawTrench();
   });
   sync();
 }
 
-let CFB=null;
+let CFB=null, BOARD=null;
 const LEAN_ICON={"STACKED RUSH":"🏋️","RUSH EDGE":"🟢","RUSH FADE":"🔻"};
+const MINUS="−";
+function num(v){ const n=+v; return Number.isInteger(n)?String(n):String(n); }
+/* "2026-09-19 13:40 ET" -> "Sat 1:40 PM ET" inside any sentence a builder wrote. */
+function prettyTimes(t){
+  return String(t||"").replace(/\b(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2})(?::\d{2})?\s*ET\b/g,(m,x)=>{
+    if(!window.RadarFresh) return m;
+    const d=RadarFresh.parseET(x); return d?RadarFresh.fmt(d,true):m;
+  });
+}
+function cap(t){ t=String(t||"").trim(); return t?t.charAt(0).toUpperCase()+t.slice(1):""; }
+function whenFresh(fn){
+  if(window.RadarFresh||document.readyState!=="loading") fn();
+  else document.addEventListener("DOMContentLoaded",fn,{once:true});
+}
+/* Kickoff for "is this board finished?": ISO `kick` when the builder wrote it, else the
+   "Sat Sep 19" label + season at 11:59 PM ET — the same test the builder uses. */
+function kickT(g,season){
+  if(g.kick){ const t=Date.parse(g.kick); if(!isNaN(t)) return t; }
+  const m=/^[A-Za-z]{3} ([A-Za-z]{3}) (\d{1,2})$/.exec(g.day||"");
+  if(!m||!season) return null;
+  const mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(m[1]);
+  return mo<0?null:Date.UTC(+season,mo,+m[2],27,59);      // 11:59 PM EDT = 03:59 UTC next day
+}
+/* live · stale (not refreshed, games still ahead) · final (every game played) · paused
+   (source outage after a finished week: leans cleared by the builder) · off (no season) */
+function boardState(d){
+  const gs=d.games||[], st=(d.status&&typeof d.status==="object")?d.status:{};
+  const stale=!!(d.stale||st.ok===false);
+  let mode="live";
+  if(d.paused) mode="paused";
+  else if(d.week==null&&!gs.length) mode="off";
+  else if(gs.length&&gs.every(g=>{ const t=kickT(g,d.season); return t!=null&&t+5*36e5<Date.now(); })) mode="final";
+  else if(stale) mode="stale";
+  return {mode, stale, st, prices: mode==="live"};
+}
+function fav(g){
+  if(g.spread==null||g.spread==="") return null;
+  const v=+g.spread;
+  if(!isFinite(v)) return esc(g.spread);
+  if(v===0) return "Pick'em";
+  const who=v<0?(g.homeAb||g.home):(g.awayAb||g.away);  // CFBD spreads are from the home side
+  return `${esc(who)} ${MINUS}${num(Math.abs(v))}`;
+}
 function leanCard(l){
-  const price=l.line!=null?`<div style="margin-left:auto;font-size:18px;font-weight:800;color:var(--gold-deep);white-space:nowrap;padding-left:8px">${l.side==="FADE"?"U":"O"} ${l.line}${l.price!=null?` <span style="font-size:11px;color:var(--muted)">${l.price>0?"+":""}${l.price}</span>`:""}<div style="font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--faint);text-align:right">RUSH YDS${l.books?` · ${l.books} BOOKS`:""}</div></div>`:"";
+  const showLine=BOARD&&BOARD.prices;
+  const price=(showLine&&l.line!=null)?`<div style="margin-left:auto;font-size:18px;font-weight:800;color:var(--gold-deep);white-space:nowrap;padding-left:8px;text-align:right">${l.side==="FADE"?"U":"O"} ${l.line}${l.price!=null?` <span style="font-size:11.5px;color:var(--muted)">${l.price>0?"+":""}${l.price}</span>`:""}<div style="font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--faint)">books' rush-yds line${l.books?` · ${l.books} books`:""}</div></div>`:"";
   return `<div class="intel-card"><div class="ic">${LEAN_ICON[l.k]||"📌"}</div>
-    <div style="flex:1"><span class="tag ${l.side==="FADE"?"fade":""}">${esc(l.k)} · ${esc(l.side)}</span>
+    <div style="flex:1;min-width:0"><span class="tag ${l.side==="FADE"?"fade":""}">${esc(l.k)} · ${esc(l.side)}</span>
     <h4>${esc(l.who)} <span style="color:var(--muted);font-weight:700">· ${esc(l.game)}</span></h4>
     <p>${esc(l.why)}</p>
     ${l.rush?`<p style="margin-top:5px"><b style="color:var(--body2)">${l.side==="FADE"?"They lean on it":"They use it"}:</b> ${l.rush.att} rush att/gm · ${Math.round(l.rush.rate*100)}% run rate last season</p>`:""}
     ${l.rb?`<p style="margin-top:3px"><b style="color:var(--body2)">${l.side==="FADE"?"The back to fade":"The back"}:</b> ${esc(l.rb.name)} — ${l.rb.yds.toLocaleString()} yds on ${l.rb.car} carries (${l.rb.ypc} YPC) last year</p>`:""}
-    ${l.rb&&l.line==null?`<p style="margin-top:3px;color:var(--faint);font-size:10.5px">No rushing-prop line posted yet for this game — books price the bigger slates first.</p>`:""}
+    ${showLine&&l.rb&&l.line==null?`<p style="margin-top:3px;color:var(--faint);font-size:11.5px">No rushing-prop line posted yet for this game — books price the bigger slates first.</p>`:""}
     </div>${price}</div>`;
 }
-function edgeCell(e){
+function edgeCell(e,ab){
   if(!e) return '<span class="imp">roster data pending</span>';
   const s=e.cdiff>0?"+":"";
-  return `<span class="qb q${e.q}">Q${e.q} · ${s}${e.cdiff} lbs</span>
-    <div class="qsub">OL ${e.ol} vs DL ${e.oppDl}</div>`;
+  return `<span class="qb q${e.q}"><span class="m-only">${esc(ab||"")} · </span>Q${e.q} · ${s}${e.cdiff} lbs</span>
+    <div class="qsub d-only">OL ${e.ol} vs DL ${e.oppDl}</div>`;
+}
+function banner(title,body){
+  const el=document.getElementById("cfb-banner");
+  if(!title){ el.hidden=true; el.innerHTML=""; return; }
+  if(window.RadarFresh) RadarFresh.banner(el,title,body);
+  else { el.hidden=false; el.textContent=title+(body?" "+body:""); }
 }
 function renderCFB(){
   if(!CFB) return;
-  if(0) void 0;  // live bar removed
-    void`🎓 <span><b>Live</b> — built ${esc(CFB.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
-  document.getElementById("desk-wk").textContent=CFB.week?`${CFB.season} · Week ${CFB.week} · ${(CFB.games||[]).length} game${(CFB.games||[]).length===1?"":"s"}`:"Off-season";
-  document.getElementById("cfb-note").textContent=CFB.note||"";
-  document.getElementById("cnt-leans").textContent=(CFB.leans||[]).length||"";
-  document.getElementById("cnt-slate").textContent=(CFB.games||[]).length||"";
+  const B=BOARD=boardState(CFB), w=CFB.week, gs=CFB.games||[], leans=CFB.leans||[];
+  const built=()=>{ const t=window.RadarFresh&&RadarFresh.parseET((B.st&&B.st.lastGood)||CFB.updated); return t?RadarFresh.fmt(t,true):(CFB.updated||"—"); };
+  whenFresh(()=>{
+    const el=document.getElementById("desk-fresh");
+    if(window.RadarFresh) RadarFresh.render(el,{built:CFB.updated,stale:CFB.stale,status:CFB.status,maxAgeH:36});
+    /* the banner says what the chip can't: which week, and why */
+    if(B.mode==="final") banner(`Week ${w} is final — the Week ${w+1} board is delayed.`,
+      `Last built ${built()}.${B.st.reason?` ${cap(B.st.reason)}.`:""} Week ${w}'s leans are graded on the Record tab; lines and prices are hidden until the new board posts.`);
+    else if(B.mode==="paused") banner(`Week ${w} is final — the Week ${w+1} board is paused.`,
+      cap(prettyTimes(String(CFB.note||"").replace(/^⚠\s*/,"").replace(/^Board paused\s*[—-]\s*/i,""))));
+    else if(B.mode==="stale") banner(`Not refreshed since ${built()}.`,
+      `${B.st.reason?cap(B.st.reason)+". ":""}The Week ${w} leans below are from that build; lines and prices are hidden until it rebuilds.`);
+    else banner("");
+    const noteEl=document.getElementById("cfb-note");
+    noteEl.textContent = B.mode==="live" ? prettyTimes(CFB.note||"") : (B.mode==="stale" ? prettyTimes(B.st.orig||"") : "");
+  });
+  const wk=document.getElementById("desk-wk");
+  wk.textContent = B.mode==="off" ? "Off-season"
+    : B.mode==="final" ? `${CFB.season} · Week ${w} · final`
+    : B.mode==="paused" ? `${CFB.season} · Week ${w} · final · paused`
+    : `${CFB.season} · Week ${w} · ${gs.length} game${gs.length===1?"":"s"}`;
+  const current=B.mode==="live"||B.mode==="stale";
+  document.getElementById("cnt-leans").textContent=current&&leans.length?leans.length:"";
+  document.getElementById("cnt-slate").textContent=current&&gs.length?gs.length:"";
+  document.getElementById("leans-h").textContent = current ? `Week ${w} rushing-prop leans` : (B.mode==="off" ? "Rushing-prop leans" : `Week ${w} leans — final`);
   const lw=document.getElementById("cfb-leans");
-  lw.innerHTML=(CFB.leans||[]).length?(CFB.leans||[]).map(leanCard).join(""):
-    `<div class="split-note">No leans on the board yet — they post when the week's slate and rosters load.</div>`;
+  if(current){
+    lw.className="gamestrip";
+    lw.innerHTML=leans.length?leans.map(leanCard).join(""):
+      `<div class="split-note">No leans on the board yet — they post when the week's slate and rosters load.</div>`;
+  }else{
+    lw.className="";
+    lw.innerHTML = B.mode==="off"
+      ? `<div class="final-card">${esc(CFB.note||"No FBS games on the schedule — the board returns for Week 1.")}</div>`
+      : `<div class="final-card">Week ${w}'s leans are final — every one was archived before kickoff and is graded on the <a href="#record">Record tab</a>. The Week ${w+1} Trench Board posts here as soon as it's built.</div>`;
+  }
+  /* Full Slate. Spread / total are the books' median line — context, never a call — and
+     they drop off once the board is final or stale. */
+  document.getElementById("slate-h").textContent = B.mode==="final" ? `Week ${w} slate — final` : "The slate — every game's trench edge, both ways";
+  const lines=B.prices;
   let lastDay=null;
-  const rows=(CFB.games||[]).map(g=>{
-    const dayHdr=g.day!==lastDay?`<tr><td colspan="6" style="background:#2A303D;font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:8px 14px">${esc(g.day)}</td></tr>`:"";
+  const cols=lines?6:4;
+  const rows=gs.map(g=>{
+    const dayHdr=g.day!==lastDay?`<tr class="day"><td colspan="${cols}" style="background:#2A303D;font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);padding:8px 14px">${esc(g.day)}</td></tr>`:"";
     lastDay=g.day;
     const wx=g.wx?(g.wx.dome?"🏟 dome":`${g.wx.temp}° · ${g.wx.wind} mph${(g.wx.wind||0)>=15?" 💨":""}`):`<span class="imp">—</span>`;
-    return `${dayHdr}<tr>
-      <td><div class="pname">${esc(g.away)} @ ${esc(g.home)}</div><div class="psub">${esc(g.day)} ${esc(g.time)}</div></td>
-      <td>${g.spread!=null?esc(g.spread):'<span class="imp">—</span>'}</td>
-      <td class="hide-m">${g.total!=null?g.total:'<span class="imp">—</span>'}</td>
-      <td>${edgeCell(g.awayEdge)}</td>
-      <td>${edgeCell(g.homeEdge)}</td>
+    const f=fav(g);
+    const line=lines?`<td class="c-line">${f?`<b>${f}</b>`:'<span class="imp">—</span>'}${g.total!=null?`<span class="m-only line-lab">O/U ${num(g.total)}</span>`:""}${f?`<span class="line-lab d-only">median line</span>`:""}</td>
+      <td class="hide-m">${g.total!=null?num(g.total):'<span class="imp">—</span>'}</td>`:"";
+    return `${dayHdr}<tr class="sl">
+      <td class="c-game"><div class="pname">${esc(g.away)} @ ${esc(g.home)}</div><div class="psub">${esc(g.time)}${g.wx?`<span class="m-only"> · ${wx}</span>`:""}</div></td>
+      ${line}
+      <td class="c-away">${edgeCell(g.awayEdge,g.awayAb||g.away)}</td>
+      <td class="c-home">${edgeCell(g.homeEdge,g.homeAb||g.home)}</td>
       <td class="hide-m">${wx}</td>
     </tr>`;
   }).join("");
   document.getElementById("cfb-board").innerHTML=`<table><thead><tr>
-    <th>Game</th><th>Spread</th><th class="hide-m">Total</th><th>Away trench edge</th><th>Home trench edge</th><th class="hide-m">Forecast</th>
-    </tr></thead><tbody>${rows}</tbody></table>`;
+    <th>Game</th>${lines?"<th>Spread <span style=\"font-weight:400;text-transform:none;letter-spacing:0\">(books' median)</span></th><th class=\"hide-m\">Total</th>":""}<th>Away trench edge</th><th>Home trench edge</th><th class="hide-m">Forecast</th>
+    </tr></thead><tbody>${rows||`<tr class="empty-row"><td colspan="${cols}">${B.mode==="paused"?"The slate is cleared while the board is paused — the next week's games post with the new board.":"No games on the board right now."}</td></tr>`}</tbody></table>`;
   const bt=CFB.backtest;
   if(bt&&bt.ladder&&bt.ladder.length){
-    document.getElementById("bt-line").innerHTML=`Every FBS offense-game from <b>${esc(bt.seasons||"4 seasons")}</b> (${bt.n?bt.n.toLocaleString():"5,916"} games), bucketed by its OL-vs-opposing-DL weight edge (centered against that season's league norm):`;
+    const seasons=Array.isArray(bt.seasons)&&bt.seasons.length
+      ? (bt.seasons.length>1?`${Math.min(...bt.seasons)}–${Math.max(...bt.seasons)}`:String(bt.seasons[0]))
+      : (bt.seasons||"four seasons");
+    document.getElementById("bt-line").innerHTML=`Every FBS offense-game from <b>${esc(seasons)}</b> (${bt.n?bt.n.toLocaleString():"5,916"} offense-games), bucketed by its OL-vs-opposing-DL weight edge (centered against that season's league norm):`;
     const min=Math.min(...bt.ladder.map(r=>r.ypc)), max=Math.max(...bt.ladder.map(r=>r.ypc));
     const lrows=bt.ladder.map((r,i)=>{
-      const w=20+80*((r.ypc-min)/(max-min||1));
+      const w2=20+80*((r.ypc-min)/(max-min||1));
+      const rush=r.rushYds!=null?r.rushYds:r.rush;
       return `<tr><td><span class="qb q${r.q||i+1}">Q${r.q||i+1}</span> <span class="imp">${i===0?"lightest edge":i===bt.ladder.length-1?"heaviest edge":""}</span></td>
         <td><b>${r.ypc.toFixed(2)}</b> YPC</td>
-        <td>${r.rush!=null?`<b>${Math.round(r.rush)}</b> rush yds/gm`:""}</td>
-        <td class="hide-m" style="width:180px"><div class="lbar" style="width:${w.toFixed(0)}%"></div></td></tr>`;
+        <td>${rush!=null?`<b>${Math.round(rush)}</b> rush yds/gm`:"—"}</td>
+        <td class="hide-m" style="width:180px"><div class="lbar" style="width:${w2.toFixed(0)}%"></div></td></tr>`;
     }).join("");
     document.getElementById("cfb-ladder").innerHTML=`<table class="ladder"><thead><tr>
       <th>Trench quintile</th><th>Yards / carry</th><th>Rushing yds / game</th><th class="hide-m"></th>
       </tr></thead><tbody>${lrows}</tbody></table>`;
   }
 }
+function weekLabel(w){ const m=/^(\d{4})-w(\d+)$/.exec(String(w||"")); return m?`Week ${m[2]}`:String(w||""); }
 function renderRecord(R){
   if(!R||!R.summary||!R.summary.overall||!R.summary.overall.n) return;
   const S=R.summary;
-  const chip=(lab,r)=>r&&r.n?`<div class="stat" style="padding:14px 18px"><div class="v" style="font-size:30px">${r.w}–${r.n-r.w}</div><div class="k">${lab}</div></div>`:"";
+  const chip=(lab,r)=>r&&r.n?`<div class="stat" style="padding:14px 18px"><div class="v" style="font-size:30px;font-weight:800">${r.w}–${r.n-r.w}</div><div class="k" style="font-size:12px;color:var(--muted)">${lab}</div></div>`:"";
   const weeks=(R.recent||[]).map(w=>{
     const rows=w.leans.map(l=>`<tr><td><span class="qb ${l.hit?"q5":"q1"}">${l.hit?"HIT":"MISS"}</span></td>
       <td><b>${esc(l.k)}</b> ${esc(l.who)}<div class="qsub">${esc(l.game)}</div></td>
       <td>${l.act?`${l.act.yds} yds on ${l.act.att} att · <b>${l.act.ypc}</b> YPC`:"—"}</td></tr>`).join("");
-    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(w.week)}</b> · week median ${w.medYpc} YPC — a TARGET hits above it, a FADE hits below it</div>
-      <table><tbody>${rows}</tbody></table>`;
+    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(weekLabel(w.week))}</b> · week median ${w.medYpc} YPC — a TARGET hits above it, a FADE hits below it</div>
+      <table><tbody>${rows||`<tr class="empty-row"><td colspan="3">No leans graded this week.</td></tr>`}</tbody></table>`;
   }).join("");
   document.getElementById("cfb-record").innerHTML=
     `<div class="stats" style="display:flex;gap:14px;flex-wrap:wrap">${chip("all graded leans",S.overall)}${chip("targets",S.targets)}${chip("fades",S.fades)}${chip("stacked rush",S.stacked)}</div>${weeks}`;
@@ -822,96 +1055,27 @@ function renderRecord(R){
 async function loadCFB(){
   try{
     const r=await fetch("/pro/cfb.json?_="+Date.now());
-    if(!r.ok) return;
-    CFB=await r.json();
+    if(!r.ok) throw new Error(r.status);
+    const d=await r.json();
+    if(!d||typeof d!=="object") throw new Error("bad json");
+    CFB=d;
     renderCFB();
-  }catch(e){}
+  }catch(e){
+    document.getElementById("desk-wk").textContent="Board unavailable";
+    document.getElementById("cfb-leans").innerHTML=`<div class="final-card">The Trench Board didn't load — <a href="${esc(location.pathname)}">reload the page</a> to try again.</div>`;
+    document.getElementById("cfb-board").innerHTML=`<div class="final-card">The slate didn't load — <a href="${esc(location.pathname)}">reload the page</a> to try again.</div>`;
+  }
+  READY=true;
+  paneEnter(PANE);
   try{
     const rr=await fetch("/pro/cfb_record.json?_="+Date.now());
     if(rr.ok) renderRecord(await rr.json());
   }catch(e){}
 }
-/* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
-const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null, LOADED=false;
-function msReady(timeout=6000){
-  return new Promise(res=>{
-    const t0=Date.now();
-    (function poll(){
-      if(window.$memberstackDom) return res(window.$memberstackDom);
-      if(Date.now()-t0>timeout) return res(null);
-      setTimeout(poll,150);
-    })();
-  });
-}
-async function gate(){
-  let member=null, ok=false;
-  try{
-    const ms=await msReady();
-    if(ms){
-      const r=await ms.getCurrentMember();
-      member=r&&r.data;
-      ok=!!(member&&(member.planConnections||[]).some(pc=>
-        MS_PLANS.includes(pc.planId)&&["ACTIVE","TRIALING"].includes(String(pc.status||"").toUpperCase())));
-    }
-  }catch(e){}
-  GATED=ok;
-  /* PRO data is fetched only once the gate says this visitor is a member —
-     never before it resolves, and never for a logged-out visitor. */
-  if(ok&&!LOADED){ LOADED=true; loadCFB(); }
-  document.getElementById("pro-app").style.display=ok?"block":"none";
-  document.getElementById("paywall").style.display=ok?"none":"block";
-  const bar=document.getElementById("member-bar");
-  if(ok&&member){bar.style.display="flex";document.getElementById("member-email").textContent=(member.auth&&member.auth.email)||"";}
-  else bar.style.display="none";
-  return ok;
-}
-(async()=>{
-  await gate();
-  const ms=window.$memberstackDom;
-  if(ms&&ms.onAuthChange) ms.onAuthChange(()=>gate());
-  if(location.hash==="#login"&&!GATED&&ms){ try{ await ms.openModal("LOGIN"); gate(); }catch(e){} }
-})();
-document.addEventListener("visibilitychange",()=>{ if(!document.hidden) gate(); });
-/* ---- checkout wiring: the data-ms attributes don't fire for logged-out
-   visitors, so Subscribe/Login/Account/Logout are driven explicitly. ---- */
-const PRO_PRICE="prc_pro-monthly-rdvp0vis";
-async function buyPro(){
-  const ms=await msReady();
-  if(!ms){ alert("Checkout couldn't load — please refresh the page (and disable ad blockers if you use one)."); return; }
-  let member=null;
-  try{ member=(await ms.getCurrentMember()).data; }catch(e){}
-  if(!member){
-    try{ const r=await ms.openModal("SIGNUP"); member=r&&r.data; }catch(e){ return; }
-    try{ ms.hideModal(); }catch(e){}
-  }
-  if(!member) return;
-  if(await gate()) return;   // Kitchen All-Access / existing PRO — already unlocked
-  try{
-    await ms.purchasePlansWithCheckout({ priceId: PRO_PRICE,
-      successUrl: location.origin+location.pathname,
-      cancelUrl: location.origin+location.pathname });
-  }catch(e){
-    console.error("checkout", e);
-    alert("Couldn't open checkout — please try again, or log in first if you already have an account.");
-  }
-}
-document.querySelectorAll(".pay-cta").forEach(b=>b.addEventListener("click", e=>{ e.preventDefault(); buyPro(); }));
-document.querySelectorAll(".pay-login").forEach(b=>b.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(!ms) return;
-  try{ await ms.openModal("LOGIN"); ms.hideModal(); }catch(err){}
-  gate();
-}));
-document.querySelectorAll('.ms-logout').forEach(a=>a.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(ms){ try{ await ms.logout(); }catch(err){} }
-  gate();
-}));
-document.querySelectorAll('.ms-account').forEach(a=>a.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(ms){ try{ await ms.openModal("PROFILE"); }catch(err){} }
-}));
+/* ---- membership: /pro/gate.js decides who sees the desk (PRO or All-Access,
+   ACTIVE or TRIALING). The desk's data is fetched only once it confirms a member. ---- */
+if(window.ProGate) ProGate.start({ load: () => { loadCFB(); } });
+else document.getElementById("gate-status").textContent = "The membership check didn't load — please refresh the page.";
 
 </script>
 </body>
