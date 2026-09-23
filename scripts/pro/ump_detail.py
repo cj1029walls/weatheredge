@@ -37,7 +37,8 @@ RETRO_CACHE = os.path.join(ROOT, "data", "pro", "ump_games_retro.json")
 S2026_CACHE = os.path.join(ROOT, "data", "pro", "ump_games_2026.json")
 OUT = os.path.join(ROOT, "site", "pro", "umps.json")
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 RETRO_SEASONS = list(range(2017, 2026))          # 2017-2025 inclusive
 SEASON_2026_START = date(2026, 3, 20)
 
@@ -182,6 +183,17 @@ def main():
         d = dstr.replace("-", "")
         for home, away, ump, hr, runs, _pk in games:
             rows.append((d, home, away, ump, hr, runs))
+
+    # One umpire, one row: statsapi spells "Alfonso Márquez", Retrosheet
+    # "Alfonso Marquez" — unfolded he was two umps (253 + 30 games), and the
+    # live slate's spelling found only the 30-game sample. Keep the newest
+    # spelling, which is the one the slate carries.
+    import unicodedata
+    fold = lambda s: "".join(c for c in unicodedata.normalize("NFD", s) if c.isalpha()).lower()
+    canon = {}
+    for r in sorted(rows, key=lambda r: r[0], reverse=True):
+        canon.setdefault(fold(r[3]), r[3])
+    rows = [(d, h, a, canon[fold(u)], hr, rn) for d, h, a, u, hr, rn in rows]
 
     total_g = len(rows)
     total_hr = sum(r[4] for r in rows)
