@@ -3,35 +3,59 @@ name: PGA weekly build
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 10 * * *"    # daily ~6:00 AM ET — tee-time wave forecasts sharpen
+    - cron: "52 9 * * *"    # daily ~5:52 AM ET — tee-time wave forecasts sharpen
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   pga:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Build site/pga/data.json
+        id: free
+        continue-on-error: true
         run: python scripts/pga/weekly_build.py
+      - name: Mark free page stale
+        if: steps.free.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pga/data.json "the tee-time forecast refresh failed"
       - name: Refresh deep history (results + archive weather)
-        run: python scripts/pga/deep_history.py || echo "deep history refresh failed — keeping last dataset"
+        id: deep
+        continue-on-error: true
+        run: python scripts/pga/deep_history.py
       - name: Grade PRO leans (completed events)
-        run: python scripts/pro/pga_grade.py || echo "grading skipped"
+        id: grade
+        continue-on-error: true
+        run: python scripts/pro/pga_grade.py
       - name: Build PRO board (site/pro/pga.json)
+        id: pro
+        continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pro/pga_build.py
+      - name: Mark PRO board stale
+        if: steps.pro.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/pga.json "the PRO board rebuild failed"
       - name: Commit data
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add site/pga/data.json site/pro/pga.json site/pro/pga_record.json \
-                  data/pga data/pro/pga_predictions data/pro/pga_results.json
-          git commit -m "PGA refresh" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/commit_push.sh "PGA refresh"
+          site/pga/data.json site/pro/pga.json site/pro/pga_record.json
+          data/pga data/pro/pga_predictions data/pro/pga_results.json
+      - name: Report
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/gate.sh
+          "PGA free page=${{ steps.free.outcome }}"
+          "PGA PRO board=${{ steps.pro.outcome }}"
+          -- "PGA deep history=${{ steps.deep.outcome }}"
+          "PGA grading=${{ steps.grade.outcome }}"
