@@ -15,17 +15,22 @@ Outputs:
   data/pro/cfb_results.json     (committed — full graded history)
   site/pro/cfb_record.json      (deployed — summary + weekly detail for the page)
 
-Runs in the CFB weekly workflow before the board build. No third-party deps.
+Runs in the CFB weekly workflow before the board build. CFBD is only asked for
+a week's box scores once the cached schedule says every game of that week has
+finished (it used to be asked every day, Monday through Saturday, for a week
+that had not been played). No third-party deps.
 """
-import functools, json, os, re, statistics, time, urllib.request
+import functools, json, os, re, statistics, sys
+from datetime import datetime, timedelta, timezone
 
 print = functools.partial(print, flush=True)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+sys.path.insert(0, os.path.join(ROOT, "scripts", "cfb"))
+import cfbd_cache as cfbd       # noqa: E402
 ARCH = os.path.join(ROOT, "data", "pro", "cfb_predictions")
 RESULTS = os.path.join(ROOT, "data", "pro", "cfb_results.json")
 RECORD = os.path.join(ROOT, "site", "pro", "cfb_record.json")
-CFBD = "https://api.collegefootballdata.com"
 
 
 def gv(d, *names):
@@ -35,28 +40,37 @@ def gv(d, *names):
     return None
 
 
-def fetch(url, tries=3, timeout=90):
-    hdrs = {"User-Agent": "dfsradar-grade/1.0", "Accept": "application/json",
-            "Authorization": f"Bearer {os.environ.get('CFBD_API_KEY','')}"}
-    for i in range(tries):
+def week_final(season, week):
+    """True once every FBS game of the week kicked off 5+ hours ago, per the
+    schedule the slate build cached this run; None if that is unknown."""
+    games = cfbd.peek("/games", year=season, seasonType="regular")
+    starts = []
+    for g in games or []:
+        if gv(g, "week") != week:
+            continue
         try:
-            req = urllib.request.Request(url, headers=hdrs)
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                return json.loads(r.read())
-        except Exception as e:
-            if i == tries - 1:
-                raise
-            time.sleep(10 * (i + 1))
+            starts.append(datetime.fromisoformat(
+                (gv(g, "startDate", "start_date") or "").replace("Z", "+00:00")))
+        except ValueError:
+            continue
+    if not starts:
+        return None
+    return max(starts) <= datetime.now(timezone.utc) - timedelta(hours=5)
 
 
-def week_rushing(season, week):
-    """{team: {att, yds, ypc}} from the week's box scores; {} if not ready."""
+def week_rushing(season, week, final=None):
+    """{team: {att, yds, ypc}} from the week's box scores; {} if not ready,
+    None if CFBD could not be reached."""
     out = {}
     try:
-        rows = fetch(f"{CFBD}/games/teams?year={season}&week={week}&seasonType=regular")
-    except Exception as e:
+        # A finished week's box scores are final: cache them for days. If we
+        # cannot tell it is finished, never reuse a possibly partial copy.
+        rows = cfbd.get("/games/teams", ttl=(3 * cfbd.DAY if final else 0),
+                        year=season, week=week, seasonType="regular")
+    except cfbd.Unavailable as e:
         print(f"  box scores unavailable ({e})")
-        return out
+        print(f"::warning title=CFB grading skipped::{e.why}")
+        return None
     for g in rows:
         for t in (gv(g, "teams") or []):
             name = gv(t, "school", "team")
@@ -110,7 +124,13 @@ def main():
         season, week = pred.get("season"), pred.get("week")
         if not season or not week or not pred.get("leans"):
             continue
-        rush = week_rushing(season, week)
+        final = week_final(season, week)
+        if final is False:
+            print(f"  {key}: games still to be played — not asking CFBD yet")
+            continue
+        rush = week_rushing(season, week, final)
+        if rush is None:
+            continue                       # CFBD down: retry next run
         played = [l for l in pred["leans"] if l["who"] in rush]
         # grade only when most of the week's flagged teams have final boxes
         if len(rush) < 20 or len(played) < max(3, len(pred["leans"]) * 0.7):
@@ -150,4 +170,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        cfbd.report("cfb grading")
