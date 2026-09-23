@@ -21,6 +21,7 @@ No third-party dependencies.
 """
 import csv, functools, gzip, io, json, os, sys, time, urllib.request
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 sys.path.insert(0, os.path.dirname(__file__))
 from stadiums import STADIUMS
@@ -33,8 +34,12 @@ OUT = os.path.join(ROOT, "data", "nfl", "deep.json")
 GAMES_URL = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
 PBP_URL = ("https://github.com/nflverse/nflverse-data/releases/download/pbp/"
            "play_by_play_{y}.csv.gz")
-SEASONS = list(range(2015, 2026))
-ET = timezone(timedelta(hours=-5))
+# Through the CURRENT season (an NFL season runs into February). Stopping at
+# 2025 froze every QB/kicker/back on his 2025 team, so 2026 leans could name a
+# player for a club he no longer plays for — and the Tuesday refresh was a no-op.
+_TODAY = datetime.now()
+SEASONS = list(range(2015, (_TODAY.year if _TODAY.month >= 3 else _TODAY.year - 1) + 1))
+ET = ZoneInfo("America/New_York")
 
 TZ_OFF = {"America/New_York": -5, "America/Detroit": -5, "America/Chicago": -6,
           "America/Denver": -7, "America/Phoenix": -7, "America/Los_Angeles": -8}
