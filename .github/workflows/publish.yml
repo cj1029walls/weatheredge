@@ -33,17 +33,18 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read      # to see whether a daily build is running
 
-# Same group as daily.yml, so a publish and a daily build+deploy never overlap:
-# no two deploy-pages calls at once, and a publish can't fetch the live MLB
-# files and then deploy them over a NEWER daily deploy. cancel-in-progress is
-# false here: a publish waits for a running daily build and never cancels it
-# (the daily archive commit would be lost). daily.yml keeps `true`, so a daily
-# run may cancel an in-flight publish -- harmless, because that daily run
-# checks out a main that already contains the commit the publish was for.
-# Publishes queued behind one another collapse to the newest one.
+# Publishes queued behind one another collapse to the newest one. Deliberately
+# NOT the daily.yml group: there a queued publish would replace (cancel) a daily
+# run that is waiting for its turn. Instead the first step waits out any daily
+# run, so a publish never deploys while a daily build is running: no two
+# deploy-pages calls at once, and no publish carrying forward the live MLB
+# files and then deploying them over a NEWER daily deploy. (A daily run that
+# starts after that check needs 6+ minutes to reach its deploy; a publish
+# finishes in well under one.)
 concurrency:
-  group: pages
+  group: publish
   cancel-in-progress: false
 
 jobs:
@@ -56,11 +57,28 @@ jobs:
       github.event.workflow_run.conclusion == 'success' ||
       github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Wait for any daily build to finish
+        # Up to 50 min (a daily run is capped at 45). If the check itself
+        # fails, publish anyway rather than hold the update back.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 150); do
+            if ! n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow daily.yml --limit 10 \
+                       --json status --jq '[.[] | select(.status != "completed")] | length'); then
+              echo "::warning title=Could not check for a daily build::publishing now"
+              exit 0
+            fi
+            if [ "$n" = "0" ]; then exit 0; fi
+            if [ "$i" = "1" ]; then echo "A daily build is running; waiting for it to deploy first"; fi
+            sleep 20
+          done
+          echo "::warning title=Daily build still running::publishing anyway after 50 minutes"
       - uses: actions/checkout@v4
         with:
           ref: main          # the newest main when this (possibly queued) run starts
