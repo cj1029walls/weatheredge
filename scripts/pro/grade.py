@@ -23,7 +23,8 @@ PRED_DIR = os.path.join(ROOT, "data", "pro", "predictions")
 RESULTS = os.path.join(ROOT, "data", "pro", "results.json")
 RECORD = os.path.join(ROOT, "site", "pro", "record.json")
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 SCHED = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={d}"
 BOX = "https://statsapi.mlb.com/api/v1/game/{pk}/boxscore"
 
@@ -171,6 +172,8 @@ def main():
         if dstr >= today or dstr in results["days"]:
             continue
         pred = json.load(open(os.path.join(PRED_DIR, f)))
+        if not (pred.get("targets") or pred.get("games")):
+            continue                  # off-day card: nothing to grade, skip the API
         stats, game_hr = day_stats(dstr)
         if len(stats) < 50:
             print(f"  {dstr}: boxscores not ready ({len(stats)} players) — will retry")
