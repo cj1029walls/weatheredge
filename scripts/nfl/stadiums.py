@@ -44,6 +44,43 @@ STADIUMS = {
     "WAS": dict(name="Northwest Stadium",      lat=38.9078, lon=-76.8645,  tz="America/New_York",   bearing=340, roof="open",    since=2015, exclude=[]),
 }
 
+# Neutral-site venues (International Series etc.). nflverse flags these games
+# location="Neutral" and names the venue in `stadium`; `match` holds lowercase
+# fragments of that name. No history exists for them, so a card shows the real
+# kickoff forecast and says there's no venue history. bearing=None means the
+# field axis isn't on file: wind is shown without an along/cross label rather
+# than with a guessed one.
+NEUTRAL_VENUES = [
+    dict(match=("maracan",), name="Maracanã", city="Rio de Janeiro",
+         lat=-22.9122, lon=-43.2302, tz="America/Sao_Paulo", bearing=None, roof="open"),
+    dict(match=("wembley",), name="Wembley Stadium", city="London",
+         lat=51.5560, lon=-0.2796, tz="Europe/London", bearing=None, roof="open"),
+    dict(match=("tottenham",), name="Tottenham Hotspur Stadium", city="London",
+         lat=51.6043, lon=-0.0664, tz="Europe/London", bearing=None, roof="open"),
+    dict(match=("bernab",), name="Santiago Bernabéu", city="Madrid",
+         lat=40.4531, lon=-3.6883, tz="Europe/Madrid", bearing=None, roof="retract"),
+    dict(match=("croke",), name="Croke Park", city="Dublin",
+         lat=53.3607, lon=-6.2512, tz="Europe/Dublin", bearing=None, roof="open"),
+    dict(match=("melbourne cricket", "mcg"), name="Melbourne Cricket Ground", city="Melbourne",
+         lat=-37.8200, lon=144.9834, tz="Australia/Melbourne", bearing=None, roof="open"),
+    dict(match=("olympiastadion",), name="Olympiastadion", city="Berlin",
+         lat=52.5147, lon=13.2395, tz="Europe/Berlin", bearing=None, roof="open"),
+    dict(match=("allianz arena",), name="Allianz Arena", city="Munich",
+         lat=48.2188, lon=11.6247, tz="Europe/Berlin", bearing=None, roof="open"),
+    dict(match=("azteca", "banorte"), name="Estadio Azteca", city="Mexico City",
+         lat=19.3029, lon=-99.1505, tz="America/Mexico_City", bearing=None, roof="open"),
+]
+
+
+def neutral_venue(stadium_name):
+    """Venue metadata for a neutral-site stadium name, or None."""
+    key = (stadium_name or "").lower()
+    for v in NEUTRAL_VENUES:
+        if any(m in key for m in v["match"]):
+            return v
+    return None
+
+
 # nflverse team code quirks: LA = Rams, LAC = Chargers, OAK pre-2020, SD pre-2017, STL pre-2016
 OLD_CODES = {"OAK": None, "SD": None, "STL": None}   # dropped eras
 
