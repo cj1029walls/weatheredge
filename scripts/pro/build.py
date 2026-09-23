@@ -46,7 +46,8 @@ PROPS = os.path.join(ROOT, "site", "pro", "props.json")
 OUT = os.path.join(ROOT, "site", "pro", "data.json")
 PRED_DIR = os.path.join(ROOT, "data", "pro", "predictions")
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 
 import time, urllib.request
 SCHED_LINEUPS = ("https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={d}"
@@ -60,7 +61,7 @@ TEAM_STATS = ("https://statsapi.mlb.com/api/v1/teams/stats?sportId=1"
 SP_SEASON = ("https://statsapi.mlb.com/api/v1/people/{pid}/stats"
              "?stats=season&group=pitching&season={y}")
 
-SPLIT_SEASONS = [2022, 2023, 2024, 2025, 2026]
+SPLIT_SEASONS = list(range(datetime.now().year - 4, datetime.now().year + 1))
 
 def get_json(url, tries=3):
     for i in range(tries):
@@ -99,9 +100,12 @@ def fetch_lineups():
         print(f"lineups unavailable ({e}) — using flat 4.0 PA")
     return out, names
 
-# team abbreviation quirks between statsapi and our park codes
+# team abbreviation quirks between statsapi and our park codes. Lineups are
+# keyed by MLBID_TO_CODE since Aug 2026, so keys are already park codes — the
+# old "ATH"->"OAK" entry renamed the A's lineups to a code the slate never
+# uses, and every A's game silently fell back to a projected nine.
 ABBR_FIX = {"AZ": "ARI", "WSN": "WSH", "SDP": "SD", "SFG": "SF", "TBR": "TB",
-            "KCR": "KC", "CHW": "CWS", "ATH": "OAK", "A": "OAK"}
+            "KCR": "KC", "CHW": "CWS", "OAK": "ATH", "A": "ATH"}
 
 K_BVP = 60
 def bvp_mult(bid, pid):
@@ -169,6 +173,11 @@ def norm_name(s):
     s = unicodedata.normalize("NFD", s or "")
     s = "".join(c for c in s if not unicodedata.combining(c))
     return s.lower().replace(".", "").replace("jr", "").strip()
+
+def fold(s):
+    """Accent-insensitive name key ('Alfonso Márquez' == 'Alfonso Marquez')."""
+    s = unicodedata.normalize("NFD", s or "")
+    return "".join(c for c in s if c.isalpha()).lower()
 
 def batter_rate(games):
     ab = sum(g[2] for g in games)
@@ -258,10 +267,10 @@ def game_log(pid, grp):
     return rows
 
 def match_ump(rows, ump, by_dh, by_pk):
-    out = []
+    out, key = [], fold(ump)
     for r in rows:
         u = by_pk.get(r["pk"]) or (by_dh.get(f"{r['d']}|{r['home']}") if r["home"] else None)
-        if u == ump:
+        if u and fold(u) == key:          # retro cache spells names without accents
             out.append(r)
     return out
 
@@ -298,6 +307,17 @@ def main():
     umps_all = json.load(open(UMPS))
     umps_pro = json.load(open(UMPS_PRO)) if os.path.exists(UMPS_PRO) else None
     props = json.load(open(PROPS)) if os.path.exists(PROPS) else {"games": []}
+    # Price today's card only from today's games. When the odds step fails,
+    # props.json is the last committed feed -- often yesterday's slate -- and
+    # the name-only join below would attach yesterday's prices (and value
+    # flags) to today's targets.
+    today = datetime.now(ET).strftime("%Y-%m-%d")
+    todays_props = [pg for pg in props.get("games", [])
+                    if str(pg.get("commence", "")).startswith(today)]
+    if len(todays_props) < len(props.get("games", [])):
+        print(f"props: ignoring {len(props['games']) - len(todays_props)} game(s) "
+              f"not on today's slate (feed generated {props.get('generated')})")
+    props["games"] = todays_props
     by_dh, by_pk = load_ump_maps()
     print(f"ump maps: {len(by_dh)} date-home keys, {len(by_pk)} gamePks")
 
@@ -632,6 +652,10 @@ def main():
     if len(top) < 8:
         top = targets[:8]     # cold-slate guard: never an empty card
     top = top[:40]
+    n_hr_props = sum(len(pg.get("hr", [])) for pg in props.get("games", []))
+    if n_hr_props >= 30 and top and not any(t["price"] is not None for t in top):
+        print(f"::warning::props join: {n_hr_props} HR props on file but none of the "
+              f"{len(top)} targets matched a price — check props date / name normalisation")
 
     # ---- intel feed ----
     intel = []
@@ -716,7 +740,9 @@ def main():
                           stat=f"{r['diff']:+.1f}"))
 
     parts = []
-    if top:
+    if not slate.get("games"):
+        parts.append(slate.get("note") or "No MLB games today — the PRO card returns with the next slate.")
+    elif top:
         b = top[0]
         parts.append(f"{b['player']} ({b['team']}) leads the board — {b['prob']}% HR chance"
                      + (f", priced {b['price']:+d} (implied {b['implied']}%)." if b["price"] else "."))
@@ -725,7 +751,7 @@ def main():
         parts.append(f"Best value: {v['player']} {v['price']:+d} — our number says "
                      f"{v['prob']}% vs {v['fair']}% fair implied (+{v['edge']} pts). "
                      f"{len(flagged)} value flag{'s' if len(flagged)>1 else ''} tonight.")
-    else:
+    elif slate.get("games"):
         parts.append("No value flags tonight — the books are priced tight to our numbers.")
     kleans = [k for k in kprops if k["lean"]]
     if kleans:
@@ -772,6 +798,9 @@ def main():
         json.dump(teaser, f, separators=(",", ":"))
     print(f"Wrote site/teaser.json (#1: {t1['player'] if t1 else '—'})")
 
+    if not slate.get("games"):
+        print("no games on the slate — nothing to archive")
+        return
     # archive tonight's card for future grading
     os.makedirs(PRED_DIR, exist_ok=True)
     dstr = datetime.now(ET).strftime("%Y%m%d")
