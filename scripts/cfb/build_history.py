@@ -60,9 +60,11 @@ ARCHIVE_URL = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&lon
                "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=UTC")
 
 FIRST_SEASON = 2010
-LAST_SEASON = 2025      # complete seasons only — an in-progress season has too
-                        # few games to derive a trustworthy era factor from
-ERA_REF = 2025          # normalize every season's scoring to this one
+# Complete seasons only — an in-progress season has too few games to derive a
+# trustworthy era factor from. Rolling, so the Feb 20 run really does fold in
+# the season that just ended (a literal 2025 made every future run a no-op).
+LAST_SEASON = date.today().year - (1 if date.today().month >= 2 else 2)
+ERA_REF = LAST_SEASON   # normalize every season's scoring to the latest one
 MAX_WEEK = 17           # regular-season weeks to sweep for box scores
 P4 = {"SEC", "Big Ten", "Big 12", "ACC"}
 
