@@ -3,14 +3,19 @@ name: Build hitter history
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * 1"   # Mondays — refresh rosters + latest game logs
+    - cron: "17 8 * * 1"  # Mondays — refresh rosters + latest game logs
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   hitters:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,10 +24,4 @@ jobs:
       - name: Build hitters_history.json (rosters + game logs + weather join)
         run: python scripts/build_hitters.py
       - name: Commit dataset
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add data/hitters_history.json
-          git commit -m "Rebuild hitter history" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        run: bash scripts/ci/commit_push.sh "Rebuild hitter history" data/hitters_history.json
