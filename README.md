@@ -27,7 +27,9 @@ the leagues' public schedules and box scores), grade the calls whose games are f
   deployed but not committed.
 - **`nfl-weekly.yml`, `cfb-weekly.yml`, `pga-weekly.yml`, `nascar-weekly.yml`** — daily: the free
   slate, the PRO board and its grader (`site/pro/<sport>_record.json`).
-- **`publish.yml`** — redeploys after a sport workflow commits, carrying the live MLB files forward.
+- **`publish.yml`** — redeploys after a sport workflow commits (and when a page edit is pushed),
+  carrying the live MLB files forward. It has its own queue and waits for a running daily build
+  rather than sharing one with it, so it can never cancel an MLB run.
 
 Needs two repository secrets: `ODDS_API_KEY` and `CFBD_API_KEY`.
 
@@ -41,8 +43,9 @@ Needs two repository secrets: `ODDS_API_KEY` and `CFBD_API_KEY`.
    on the tightest pass; the window widens until at least 12 games match.
 
 O/U rates come from real final scores (era-adjusted) against today's total. Totals come from the
-odds feed; pin one in `data/lines.json` (`{"WSH@CHC": 9.0}`) to override it. A game with no line
-uses the matched-sample median, flagged as an estimate.
+odds feed, pre-game only; pin one in `data/lines.json` (`{"WSH@CHC": 9.0}`) to override it. A game
+with no line uses the matched-sample median, flagged as an estimate. Each call is final at first
+pitch: a run after that keeps the archived call and the line it carried (`data/predictions/`).
 
 ## Setup (one time)
 
