@@ -16,11 +16,14 @@ permissions:
   pages: write
   id-token: write
 
-# Shared with publish.yml. A daily run cancels an in-flight publish (harmless:
-# it deploys a newer main anyway); a publish never cancels a daily run.
+# Its own group: a newer daily run waits for an older one instead of cutting
+# its archive commit short. NOT shared with publish.yml -- in a shared group a
+# publish queued behind a waiting daily run replaces it (GitHub keeps only the
+# newest pending run) and the MLB refresh is lost. publish.yml instead waits
+# for any daily run to finish, so the two never deploy at the same time.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: daily
+  cancel-in-progress: false
 
 jobs:
   build:
