@@ -237,12 +237,17 @@ def main():
     pro_path = os.path.join(ROOT, "site", "pro", "cfb.json")
     if os.path.exists(pro_path):
         pro = json.load(open(pro_path))
-        season, week = pro.get("season"), pro.get("week")
+        season = pro.get("season")
+        # the PRO board can be stale or paused (source outage) — its week is
+        # only a fallback; the slate's own games say which week this is
+        week = None if (pro.get("stale") or pro.get("paused")) else pro.get("week")
     if os.path.exists(FREE):
         free = json.load(open(FREE))
         updated = free.get("generated")
+        wks = [g.get("week") for g in free.get("games") or [] if g.get("week") is not None]
+        if wks:
+            week = max(set(wks), key=wks.count)
         for g in free.get("games") or []:
-            week = week or g.get("week")
             if g.get("dome"):
                 continue
             w = g.get("wind")
