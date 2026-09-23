@@ -131,6 +131,16 @@ def load_upcoming(window_days=8):
             continue                       # already played
         out.append(r)
     print(f"upcoming games in window: {len(out)}")
+    # One NFL week at a time, like the PRO board: from Wednesday on, the 8-day
+    # window also reaches NEXT Thursday's game, which put an 8-day-out forecast
+    # into this week's slate (and often into the brief's coldest/windiest line).
+    if out:
+        first = min(out, key=lambda r: (r.get("gameday") or "", r.get("gametime") or ""))
+        wk = (first.get("season"), first.get("week"))
+        kept = [r for r in out if (r.get("season"), r.get("week")) == wk]
+        if len(kept) != len(out):
+            print(f"locked to season {wk[0]} week {wk[1]}: {len(kept)} of {len(out)} games")
+        out = kept
     return out
 
 
