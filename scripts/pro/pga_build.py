@@ -38,7 +38,8 @@ FREE = os.path.join(ROOT, "site", "pga", "data.json")
 OUT = os.path.join(ROOT, "site", "pro", "pga.json")
 ARCH = os.path.join(ROOT, "data", "pro", "pga_predictions")
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 SHRINK_K = 4          # starts of shrinkage toward field median
 WINDY_FC = 12         # forecast round avg wind ≥ this -> wind week
 
@@ -55,32 +56,69 @@ def shrunk_avg(pcts, k=SHRINK_K, prior=50.0):
 
 
 def current_event():
+    # Team match-play weeks (Presidents/Ryder Cup) are skipped: stroke-play
+    # course-horse and field-percentile wind leans mean nothing there, and a
+    # 24-man "top-20 finish" grade would inflate the public record.
     today = datetime.now(ET).date()
     for ev in EVENTS:
+        if ev.get("team"):
+            continue
         r1 = datetime.strptime(ev["r1"], "%Y-%m-%d").date()
         end = datetime.strptime(ev["end"], "%Y-%m-%d").date()
         if r1 - timedelta(days=8) <= today <= end + timedelta(days=1):
             return ev
-    future = [e for e in EVENTS
-              if datetime.strptime(e["r1"], "%Y-%m-%d").date() > today]
+    future = [e for e in EVENTS if not e.get("team")
+              and datetime.strptime(e["r1"], "%Y-%m-%d").date() > today]
     return min(future, key=lambda e: e["r1"]) if future else None
 
 
-def fetch_field(ev_key, year):
+def team_week():
+    """The team match-play event (Presidents/Ryder Cup) being played this week, if any."""
+    today = datetime.now(ET).date()
+    for e in EVENTS:
+        if not e.get("team"):
+            continue
+        r1 = datetime.strptime(e["r1"], "%Y-%m-%d").date()
+        end = datetime.strptime(e["end"], "%Y-%m-%d").date()
+        if r1 - timedelta(days=4) <= today <= end:
+            return e
+    return None
+
+
+def _days_apart(a, b):
+    try:
+        return abs((datetime.strptime(a, "%Y-%m-%d") - datetime.strptime(b, "%Y-%m-%d")).days)
+    except ValueError:
+        return 99
+
+
+def fetch_field(ev_key, year, r1=None):
     """This week's field from ESPN's current-season scoreboard, if posted."""
     try:
         sb = get_json(SB_URL.format(y=year), tries=2)
     except Exception as e:
         print(f"field: espn unavailable ({e})")
         return []
-    for e in (sb.get("events") or []):
-        if canon_key(e.get("name") or "") != ev_key:
-            continue
-        comps = e.get("competitions") or []
-        rows = comps[0].get("competitors") if comps else []
-        return [norm_player((c.get("athlete") or {}).get("displayName") or "")
-                for c in (rows or []) if (c.get("athlete") or {}).get("displayName")]
-    return []
+    evs = sb.get("events") or []
+    hit = next((e for e in evs if canon_key(e.get("name") or "") == ev_key), None)
+    if hit is None and r1:
+        # Name drift must not silently zero the field (Sept 2026: ESPN's
+        # "Biltmore Championship Asheville" keyed differently from ours and the
+        # board said the field wasn't posted). Fall back to the single ESPN
+        # event starting within a day of our round 1 — and say so loudly.
+        near = [e for e in evs if _days_apart((e.get("date") or "")[:10], r1) <= 1]
+        if len(near) == 1:
+            hit = near[0]
+        if near:
+            print(f"::warning::PGA field: no ESPN event keys to '{ev_key}'"
+                  + (f"; using '{hit.get('name')}' (same start date) — add a CANON anchor" if hit
+                     else f"; same-week candidates: {[e.get('name') for e in near]}"))
+    if hit is None:
+        return []
+    comps = hit.get("competitions") or []
+    rows = comps[0].get("competitors") if comps else []
+    return [norm_player((c.get("athlete") or {}).get("displayName") or "")
+            for c in (rows or []) if (c.get("athlete") or {}).get("displayName")]
 
 
 def main():
@@ -92,7 +130,9 @@ def main():
     ev = current_event()
     if not ev:
         json.dump(dict(updated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
-                       event=None, note="No upcoming tournament on the schedule."),
+                       event=None, seasonComplete=True,
+                       note=f"Season complete — the PRO board returns with the first "
+                            f"{int(EVENTS[-1]['end'][:4]) + 1} event in January."),
                   open(OUT, "w"))
         print("no event — wrote empty board")
         return
@@ -110,13 +150,17 @@ def main():
             free = json.load(open(FREE))
         except Exception:
             free = {}
-    rounds = free.get("rounds") or []
+    # The free radar's rounds belong to ITS current event. In a team-event week
+    # this board is already on the next stroke-play event, so the free rounds
+    # (the Presidents Cup's forecast) must not be read as this event's.
+    same_event = ((free.get("event") or {}).get("name") == ev["name"])
+    rounds = (free.get("rounds") or []) if same_event else []
     fc_winds = [r.get("wind") for r in rounds if r.get("inWindow") and r.get("wind") is not None]
     wind_week = any(w >= WINDY_FC for w in fc_winds)
     waves = [dict(name=r.get("name"), am=r.get("am"), pm=r.get("pm"))
              for r in rounds if r.get("inWindow") and r.get("am")]
 
-    field = fetch_field(key, year)
+    field = fetch_field(key, year, ev["r1"])
     field_set = set(field)
     print(f"field: {len(field)} players posted · wind week: {wind_week}")
 
@@ -205,6 +249,13 @@ def main():
                     why=f"finishes {abs(w['delta'])} pts worse in windy editions · {w['windStarts']} windy starts"))
 
     notes = []
+    tw = team_week()
+    if tw and tw is not ev:
+        notes.append(f"{tw['name']} week is team match play — no stroke-play board. This is "
+                     f"next week's {ev['name']} board, posted early; its tee-time forecast "
+                     f"joins once round 1 is inside the radar's window.")
+    elif not same_event:
+        notes.append("Tee-time forecast joins once round 1 is inside the radar's window.")
     if not field:
         notes.append("ESPN hasn't posted this week's field yet — boards show the "
                      "full player pool; they filter to the field when it posts.")
