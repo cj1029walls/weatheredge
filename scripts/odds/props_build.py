@@ -10,17 +10,22 @@ Games are ranked by the radar's HR edge (fetched from dfsradar.com/data.json)
 so if GAMES_CAP trims the slate, the most bettable games survive.
 
 Env:
-  ODDS_API_KEY  required
-  GAMES_CAP     max games to pull props for (default 16 = full slate)
-  MARKETS       comma list (default batter_home_runs,pitcher_strikeouts)
+  ODDS_API_KEY     required
+  GAMES_CAP        max games to pull props for (default 16 = full slate)
+  MARKETS          comma list (default batter_home_runs,batter_home_runs_alternate,
+                   pitcher_strikeouts)
+  PROPS_REUSE_MIN  if props.json was refreshed less than this many minutes ago
+                   (odds-props.yml lands just before daily.yml), reuse it: 0 credits
 
-Credits: one request per event costs (markets x regions). Full slate at
-2 markets x 1 region = ~30/day; the /events listing is free.
+Credits: one request per event costs (markets returned x regions) -- ~3 per
+game here, ~45 per full-slate refresh; the /events listing is free. Only games
+not yet under way are bought: in-play lines are not pre-game prices, so a game
+that has started keeps the last pre-game prices from the previous feed.
 
 No third-party dependencies.
 """
 import functools, json, os, statistics, sys, time, urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, time as dtime
 
 print = functools.partial(print, flush=True)
 
@@ -29,7 +34,8 @@ OUT = os.path.join(ROOT, "site", "pro", "props.json")
 
 API = "https://api.the-odds-api.com/v4/sports/baseball_mlb"
 RADAR = "https://dfsradar.com/data.json"
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 
 TEAM_NAMES = {
     "Arizona Diamondbacks":"ARI","Atlanta Braves":"ATL","Baltimore Orioles":"BAL",
@@ -38,7 +44,7 @@ TEAM_NAMES = {
     "Detroit Tigers":"DET","Houston Astros":"HOU","Kansas City Royals":"KC",
     "Los Angeles Angels":"LAA","Los Angeles Dodgers":"LAD","Miami Marlins":"MIA",
     "Milwaukee Brewers":"MIL","Minnesota Twins":"MIN","New York Mets":"NYM",
-    "New York Yankees":"NYY","Oakland Athletics":"OAK","Athletics":"OAK",
+    "New York Yankees":"NYY","Oakland Athletics":"ATH","Athletics":"ATH",
     "Philadelphia Phillies":"PHI","Pittsburgh Pirates":"PIT","San Diego Padres":"SD",
     "San Francisco Giants":"SF","Seattle Mariners":"SEA","St. Louis Cardinals":"STL",
     "Tampa Bay Rays":"TB","Texas Rangers":"TEX","Toronto Blue Jays":"TOR",
@@ -79,6 +85,20 @@ def main():
         sys.exit("ODDS_API_KEY not set")
     cap = int(os.environ.get("GAMES_CAP", "16"))
     markets = os.environ.get("MARKETS", "batter_home_runs,batter_home_runs_alternate,pitcher_strikeouts")
+    try:
+        prev = json.load(open(OUT)) if os.path.exists(OUT) else None
+    except Exception:
+        prev = None
+    reuse = int(os.environ.get("PROPS_REUSE_MIN") or 0)
+    if reuse and prev and not prev.get("stale"):
+        try:
+            gen = datetime.strptime(prev["generated"], "%Y-%m-%d %H:%M ET").replace(tzinfo=ET)
+            age = (datetime.now(ET) - gen).total_seconds() / 60
+        except (KeyError, TypeError, ValueError):
+            age = None
+        if age is not None and 0 <= age < reuse:
+            print(f"props.json refreshed {age:.0f} min ago (< {reuse}) — reusing it, 0 credits")
+            return
 
     # today's radar slate, for edge-ranking (best-effort) — prefer the local
     # file when running inside the daily workflow (it was built moments ago)
@@ -94,19 +114,24 @@ def main():
     # events listing is free (no credit cost)
     events = get_json(f"{API}/events?apiKey={key}")
     now = datetime.now(timezone.utc)
-    todays = []
+    # Today's slate only (first pitches before 6 AM ET tomorrow): the old +26h
+    # window bought tomorrow's games on every evening run.
+    slate_end = datetime.combine(now.astimezone(ET).date() + timedelta(days=1),
+                                 dtime(6, 0), tzinfo=ET)
+    todays, started = [], []
     for ev in events:
         try:
             t = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
         except (KeyError, ValueError):
             continue
-        if not (now - timedelta(hours=5) <= t <= now + timedelta(hours=26)):
+        if not (now - timedelta(hours=5) <= t <= slate_end):
             continue
         a, h = TEAM_NAMES.get(ev.get("away_team")), TEAM_NAMES.get(ev.get("home_team"))
         if not a or not h:
             continue
-        todays.append(dict(id=ev["id"], away=a, home=h, t=t,
-                           rank=edge.get(f"{a}@{h}", 0)))
+        rec = dict(id=ev["id"], away=a, home=h, t=t, rank=edge.get(f"{a}@{h}", 0))
+        # under way: never buy in-play lines — carry the pre-game prices below
+        (started if t <= now + timedelta(minutes=5) else todays).append(rec)
     todays.sort(key=lambda x: -x["rank"])
     picked = todays[:cap]
     print(f"slate: {len(todays)} games, pulling props for {len(picked)} "
@@ -165,6 +190,12 @@ def main():
                           hr=hr, ks=ks))
         print(f"  {ev['away']}@{ev['home']}: {len(hr)} HR props, {len(ks)} K props")
         time.sleep(0.6)
+
+    prev_games = {g.get("id"): g for g in (prev or {}).get("games", [])}
+    kept = [dict(prev_games[ev["id"]], pregame=True) for ev in started if ev["id"] in prev_games]
+    if started:
+        print(f"{len(started)} game(s) under way: kept last pre-game prices for {len(kept)}, 0 credits")
+    games = sorted(games + kept, key=lambda g: g.get("commence") or "")
 
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    source="The Odds API · median across US books",
