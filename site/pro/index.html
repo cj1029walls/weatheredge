@@ -387,8 +387,9 @@ async function loadRecords(){
       const j = await getJSON(d.rec);
       const s = (j.summary)||{}, o = s.overall||{};
       if(o.n){
-        const pct = Math.round(o.w / o.n * 100);
-        recEl.innerHTML = `<b>${o.w}–${o.n - o.w}</b> graded · ${pct}%` +
+        /* same rule as the Record page: a rate only once there are 10 graded calls */
+        const pct = o.n >= 10 ? ` · ${Math.round(o.w / o.n * 100)}%` : "";
+        recEl.innerHTML = `<b>${o.w}–${o.n - o.w}</b> graded${pct}` +
           (s.bar ? ` <span class="bar">vs ${esc(s.bar)}</span>` : "");
       }else if(s.graded){
         /* MLB grades probabilities rather than calls, so it reports volume and
