@@ -17,6 +17,7 @@ Outputs:
 Runs in the NFL weekly workflow before the board build. No third-party deps.
 """
 import csv, functools, gzip, io, json, os, re, unicodedata, urllib.request
+from datetime import date, timedelta
 
 print = functools.partial(print, flush=True)
 
@@ -47,7 +48,9 @@ def read_csv_gz(raw):
 def norm_name(s):
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode()
     s = re.sub(r"[^A-Za-z. ]", "", s).strip()
-    parts = re.split(r"[. ]+", s)
+    # suffixes dropped: "Marvin Harrison Jr." used to key as "" (row discarded)
+    parts = [p for p in re.split(r"[. ]+", s)
+             if p and p.lower() not in ("jr", "sr", "ii", "iii", "iv")]
     return parts[-1].lower() if parts else ""
 
 
@@ -213,6 +216,20 @@ def grade_week(pred, stats, scores):
     return graded
 
 
+def stats_cover(stats, leans):
+    """True when the weekly player feed has rows for every team a priced
+    player-prop lean names. Scores post hours before nflverse's player stats,
+    so a final score alone doesn't mean the prop can be graded yet."""
+    if not stats:
+        return False
+    teams = {k.split("|")[0] for k in stats if k != "_last"}
+    for ln in leans:
+        m = re.search(r"\(([A-Za-z]{2,4})\)\s*$", (ln.get("who") or "").strip())
+        if m and m.group(1).upper() not in teams:
+            return False
+    return True
+
+
 def week_order(key):
     """Sort archive keys by real week number: '2026-w10' must outrank '2026-w9'."""
     m = re.match(r"(\d+)\D+(\d+)$", key or "")
@@ -229,19 +246,43 @@ def main():
         if not f.endswith(".json"):
             continue
         key = f[:-5]
-        if key in results["weeks"]:
-            continue
         pred = json.load(open(os.path.join(ARCH, f)))
         season, week = pred.get("season"), pred.get("week")
         if not season or not week or not pred.get("leans"):
             continue
+        if key in results["weeks"]:
+            # Heal weeks sealed before their data was complete (the old 90%
+            # rule graded 2026-w1 with MNF unplayed): while a priced lean is
+            # still ungraded and the week is under 14 days old, grade it again
+            # from the archive — the whole week is rebuilt, never appended.
+            open_ = [x for x in results["weeks"][key].get("leans", [])
+                     if x.get("hit") is None and x.get("line") is not None]
+            last = max((g.get("date") or "" for g in pred.get("games", [])), default="")
+            fresh = bool(last) and date.today() <= date.fromisoformat(last) + timedelta(days=14)
+            if not open_ or not fresh:
+                continue
+            print(f"  {key}: {len(open_)} priced lean(s) still ungraded — re-grading")
         scores = week_scores(season, week)
         need = {f"{g['away']}@{g['home']}" for g in pred.get("games", [])}
-        if not need or len(scores.keys() & need) < len(need) * 0.9:
-            print(f"  {key}: week not final ({len(scores.keys() & need)}/{len(need)} "
-                  f"scores) — will retry")
+        # A week is sealed exactly once, so every game that carries a lean must
+        # be final first. The old ">= 90% of scores" rule sealed 2026-w1 on
+        # Monday morning with DEN@KC (MNF) unplayed, and its four leans stay
+        # ungraded for good. A game that never finishes can't block the week
+        # forever: four days after the last archived game we grade what we have.
+        pending = sorted({ln["game"] for ln in pred["leans"]} - scores.keys())
+        last_day = max((g.get("date") or "" for g in pred.get("games", [])), default="")
+        overdue = bool(last_day) and date.today() > (
+            date.fromisoformat(last_day) + timedelta(days=4))
+        if not need or len(scores.keys() & need) < len(need) * 0.9 or (pending and not overdue):
+            print(f"  {key}: week not final ({len(scores.keys() & need)}/{len(need)} scores"
+                  f"{'; waiting on ' + ', '.join(pending) if pending else ''}) — will retry")
             continue
         stats = week_stats(season, week)
+        priced = [ln for ln in pred["leans"] if ln.get("line") is not None
+                  and PLAYER_PROPS.get(ln.get("prop") or "")]
+        if priced and not stats_cover(stats, priced) and not overdue:
+            print(f"  {key}: player stats for week {week} not published yet — will retry")
+            continue
         graded = grade_week(pred, stats, scores)
         done = [x for x in graded if x["hit"] is not None]
         results["weeks"][key] = dict(leans=graded)
