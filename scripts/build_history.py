@@ -161,6 +161,9 @@ def main():
             continue
         for code, d, dn, runs, hr, so in games:
             by_park.setdefault(code, []).append((d, dn, runs, hr, so))
+    if SEASONS[-1] not in seasons_used:
+        print(f"::warning::Retrosheet {SEASONS[-1]} game logs not published yet — "
+              "history stays a season behind until this workflow reruns")
 
     print("Joining historical weather per park…")
     history = {}
