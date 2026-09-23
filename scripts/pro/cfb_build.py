@@ -9,7 +9,12 @@ is the board: per-game trench edges quintile-ranked, RUSH EDGE / RUSH FADE
 flags, and STACKED flags when a big trench edge meets a windy (run-script)
 forecast. No ATS or totals claims — the backtest said no, so we don't.
 
-Data: CollegeFootballData.com (CFBD_API_KEY — already a repo secret).
+Data: CollegeFootballData.com (CFBD_API_KEY — already a repo secret), read
+through scripts/cfb/cfbd_cache.py. Almost everything the board needs is
+season-static (FBS list, rosters, last season's stats, the season schedule), so
+when CFBD is down the board is still built for the right week from cache and its
+note says which data is not fresh; with no cache at all, the last board is kept
+and labelled "not refreshed" instead of silently showing last week.
 Weather joined from the free radar's site/cfb/data.json (same game ids).
 Backtest receipts embedded from data/cfb/trench_backtest.json.
 
@@ -18,12 +23,15 @@ actual rushing box scores once games complete.
 
 No third-party dependencies.
 """
-import functools, json, os, statistics, sys, time, urllib.request
+import functools, json, os, statistics, sys, urllib.request
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 print = functools.partial(print, flush=True)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+sys.path.insert(0, os.path.join(ROOT, "scripts", "cfb"))
+import cfbd_cache as cfbd       # noqa: E402 — every CFBD call goes through the cache
 OUT = os.path.join(ROOT, "site", "pro", "cfb.json")
 FREE = os.path.join(ROOT, "site", "cfb", "data.json")
 BACKTEST = os.path.join(ROOT, "data", "cfb", "trench_backtest.json")
@@ -31,13 +39,12 @@ ARCH = os.path.join(ROOT, "data", "pro", "cfb_predictions")
 TEASER = os.path.join(ROOT, "site", "cfb", "teaser.json")
 PASS_FIRST = 0.44   # run rate below this = pass-first; no rushing-prop TARGET
 
-CFBD = "https://api.collegefootballdata.com"
 ODDS_EVENTS = ("https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/"
                "events?apiKey={key}")
 ODDS_EVENT = ("https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf/"
               "events/{eid}/odds?apiKey={key}&regions=us&markets=player_rush_yds"
               "&oddsFormat=american")
-ET = timezone(timedelta(hours=-4))
+ET = ZoneInfo("America/New_York")   # a fixed -4 mislabels kickoffs after DST ends
 OL_POS = {"OL", "OT", "OG", "C", "G", "T"}
 DL_POS = {"DL", "DT", "DE", "NT", "EDGE"}
 RB_POS = {"RB", "FB", "HB", "TB"}       # a rush-prop lean must name an actual back
@@ -52,29 +59,12 @@ def gv(d, *names):
     return None
 
 
-def fetch(url, tries=4, timeout=90):
-    hdrs = {"User-Agent": "dfsradar-build/1.0", "Accept": "application/json",
-            "Authorization": f"Bearer {os.environ.get('CFBD_API_KEY','')}"}
-    for i in range(tries):
-        try:
-            req = urllib.request.Request(url, headers=hdrs)
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                return json.loads(r.read())
-        except Exception as e:
-            code = getattr(e, "code", None)
-            if i == tries - 1:
-                raise
-            wait = 45 if code == 429 else 8 * (i + 1)
-            print(f"    retry {i+1}/{tries} in {wait}s: {e}")
-            time.sleep(wait)
-
-
 def rush_identity(prior):
     """Last-season team rushing identity: attempts/gm and run rate.
     From CFBD season stats; returns {team: {att, rate}} (empty on any failure)."""
     out = {}
     try:
-        rows = fetch(f"{CFBD}/stats/season?year={prior}", tries=2)
+        rows = cfbd.get("/stats/season", year=prior)
         agg = {}
         for r in rows:
             t, name = gv(r, "team"), gv(r, "statName", "stat_name")
@@ -105,7 +95,7 @@ def top_rushers(prior, current_rosters, current_backs):
     to play — with a live rushing-yards line attached to him."""
     out, skipped_qb = {}, 0
     try:
-        rows = fetch(f"{CFBD}/stats/player/season?year={prior}&category=rushing", tries=2)
+        rows = cfbd.get("/stats/player/season", year=prior, category="rushing")
         players = {}
         for r in rows:
             t, nm = gv(r, "team"), gv(r, "player")
@@ -139,13 +129,13 @@ def top_rushers(prior, current_rosters, current_backs):
 
 
 def build_trench(year):
-    teams_raw = fetch(f"{CFBD}/teams/fbs?year={year}")
+    teams_raw = cfbd.get("/teams/fbs", year=year)
     fbs = {gv(t, "school") for t in teams_raw}
     global BRAND
     BRAND = {gv(t, "school"): dict(color=gv(t, "color"),
                                    ab=gv(t, "abbreviation") or (gv(t, "school") or "")[:4].upper())
              for t in teams_raw}
-    roster = fetch(f"{CFBD}/roster?year={year}")
+    roster = cfbd.get("/roster", year=year)
     tw, names, backs = {}, {}, {}
     for p in roster:
         team, w = gv(p, "team"), gv(p, "weight")
@@ -180,18 +170,32 @@ def attach_rush_props(leans):
         return
     import unicodedata as _ud, re as _re
     def last(nm):
+        # "Telly Johnson Jr." used to reduce to "" (trailing dot), and "" then
+        # matched every other "Jr." in the event — a stranger's line on our back
         nm = _ud.normalize("NFKD", nm or "").encode("ascii", "ignore").decode()
-        parts = _re.split(r"[. ]+", _re.sub(r"[^A-Za-z. ]", "", nm).strip())
+        parts = [p for p in _re.split(r"[. ]+", _re.sub(r"[^A-Za-z. ]", "", nm).strip())
+                 if p and p.lower() not in ("jr", "sr", "ii", "iii", "iv")]
         return parts[-1].lower() if parts else ""
     def odds_get(url):
         req = urllib.request.Request(url, headers={"User-Agent": "dfsradar-build/1.0"})
         with urllib.request.urlopen(req, timeout=45) as r:
             return json.loads(r.read())
     try:
-        events = odds_get(ODDS_EVENTS.format(key=key))
+        events = odds_get(ODDS_EVENTS.format(key=key))      # free: no credits
     except Exception as e:
         print(f"rush props: events unavailable ({e})")
         return
+    # Credits are spent per event call. Never price a game already under way
+    # (in-play lines are not what the lean was made against) and don't buy
+    # prop markets days before books post them.
+    utc_now = datetime.now(timezone.utc)
+    def pregame(ev):
+        try:
+            t = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
+        except (KeyError, TypeError, ValueError):
+            return False
+        return utc_now + timedelta(minutes=5) < t <= utc_now + timedelta(hours=72)
+    events = [ev for ev in events if pregame(ev)]
     # match Odds API team names ("Oklahoma Sooners") to CFBD schools ("Oklahoma")
     def match_event(game):
         away, home = [x.strip() for x in game.split("@")]
@@ -214,7 +218,7 @@ def attach_rush_props(leans):
             print(f"rush props: {l['game']} skipped ({e})")
             continue
         want = last(l["rb"]["name"])
-        pts, prices = [], []
+        pts, prices, who = [], [], set()
         side = "Over" if l["side"] == "TARGET" else "Under"
         for bk in data.get("bookmakers", []):
             for mk in bk.get("markets", []):
@@ -226,14 +230,21 @@ def attach_rush_props(leans):
                     if oc.get("name") != side:
                         continue
                     pts.append(oc["point"])
+                    who.add(oc.get("description"))
                     if oc.get("price") is not None:
                         prices.append(oc["price"])
+        if len(who) > 1 or not want:
+            print(f"rush props: {l['game']} — '{want}' matches {sorted(map(str, who))}; left unpriced")
+            continue
         if pts:
             l["line"] = statistics.median(pts)
             if prices:
                 l["price"] = int(statistics.median(prices))
             l["books"] = len(pts)
             priced += 1
+    if events and named and not used:
+        print(f"::warning::rush props: none of {len(named)} named backs' games matched an Odds "
+              "API event — check CFBD vs Odds API school names")
     print(f"rush props: priced {priced}/{len(named)} named backs from {used} event calls")
 
 
@@ -245,7 +256,7 @@ def main():
     identity = rush_identity(season - 1)
     rbs = top_rushers(season - 1, roster_names, roster_backs)
 
-    games = fetch(f"{CFBD}/games?year={season}&seasonType=regular")
+    games = cfbd.get("/games", year=season, seasonType="regular")
     fbs_games = []
     for g in games:
         hc = (gv(g, "homeClassification", "home_division") or "").lower()
@@ -288,7 +299,10 @@ def main():
     if not pool:
         json.dump(dict(updated=now.strftime("%Y-%m-%d %H:%M ET"), season=season,
                        week=None, games=[], leans=[],
-                       note="No upcoming FBS games on the schedule."),
+                       note=("Regular season complete — the Trench Edge board covers regular-season "
+                             "weeks only. Bowl and playoff weather is on the free CFB radar; the "
+                             "board returns for Week 1." if now.month in (12, 1) else
+                             "No upcoming FBS games on the schedule.")),
                   open(OUT, "w"))
         print("no upcoming games — wrote empty board")
         return
@@ -297,10 +311,13 @@ def main():
                       key=lambda g: gv(g, "startDate", "start_date") or "")
     print(f"target: {season} week {week} — {len(wk_games)} FBS games")
 
-    # lines for the week (median across books)
+    # lines for the week (median across books) — filtered from the season-wide
+    # response the free slate build already cached this run (no extra call)
     lines = {}
     try:
-        for L in fetch(f"{CFBD}/lines?year={season}&seasonType=regular&week={week}", tries=2):
+        for L in cfbd.get("/lines", year=season, seasonType="regular"):
+            if gv(L, "week") not in (None, week):
+                continue
             gid = gv(L, "id", "gameId")
             sp = [gv(x, "spread") for x in (L.get("lines") or []) if gv(x, "spread") is not None]
             tt = [gv(x, "overUnder", "over_under") for x in (L.get("lines") or [])
@@ -341,6 +358,8 @@ def main():
             id=gid, away=a, home=h, week=week,
             day=(et_dt.strftime("%a %b %-d") if et_dt else "TBD"),
             time=(et_dt.strftime("%-I:%M %p ET") if et_dt else "TBD"),
+            # ISO kickoff so the desk can tell a finished board from this week's
+            kick=(d.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") if d else None),
             spread=ln.get("spread"), total=ln.get("total"),
             awayEdge=ae, homeEdge=he,
             awayColor=(BRAND.get(a) or {}).get("color"),
@@ -406,6 +425,10 @@ def main():
 
     fc_missing = sum(1 for g2 in out_games if g2["wx"] is None)
     notes = []
+    st = cfbd.status()
+    if st:
+        notes.append(f"⚠ {cfbd.stale_note('schedule, rosters & lines')} "
+                     f"Board rebuilt from that cached data {now.strftime('%a %-I:%M %p ET')}.")
     if fc_missing:
         notes.append(f"Forecasts join as kickoffs enter the free radar's window "
                      f"({fc_missing} of {len(out_games)} games still outside it).")
@@ -413,6 +436,8 @@ def main():
                lg=dict(ol=lg_ol, dl=lg_dl), cuts=qs,
                games=out_games, leans=leans, backtest=backtest,
                note=" ".join(notes))
+    if st:
+        out.update(stale=True, status=st)
     json.dump(out, open(OUT, "w"), separators=(",", ":"))
     print(f"wrote {OUT}: {len(out_games)} games · {len(leans)} leans")
 
@@ -427,15 +452,96 @@ def main():
     except Exception as e:
         print(f"teaser skipped ({e})")
 
+    # A lean is final once its game kicks off (or leaves the board after it is
+    # played): keep the version archived before kickoff. Rewriting the whole
+    # file meant Saturday's post-kickoff refresh replaced graded leans, and
+    # Thursday/Friday leans vanished once those games finished.
     os.makedirs(ARCH, exist_ok=True)
-    json.dump(dict(built=out["updated"], season=season, week=week, leans=leans,
-                   games=[dict(id=g2["id"], away=g2["away"], home=g2["home"],
-                               awayEdge=g2["awayEdge"], homeEdge=g2["homeEdge"])
-                          for g2 in out_games]),
-              open(os.path.join(ARCH, f"{season}-w{week}.json"), "w"),
-              separators=(",", ":"))
+    arch_path = os.path.join(ARCH, f"{season}-w{week}.json")
+    utc_now = now.astimezone(timezone.utc)
+    open_games = {f"{g2['away']} @ {g2['home']}" for g2, g in zip(out_games, wk_games)
+                  if (d := gdate(g)) and d > utc_now}
+    arch_leans, arch_games = leans, [dict(id=g2["id"], away=g2["away"], home=g2["home"],
+                                          awayEdge=g2["awayEdge"], homeEdge=g2["homeEdge"])
+                                     for g2 in out_games]
+    try:
+        prev = json.load(open(arch_path)) if os.path.exists(arch_path) else None
+    except Exception:
+        prev = None
+    if prev and prev.get("week") == week:
+        frozen = [l for l in prev.get("leans") or [] if l.get("game") not in open_games]
+        arch_leans = frozen + [l for l in leans if l.get("game") in open_games]
+        seen = {g2["id"] for g2 in arch_games}
+        arch_games += [g2 for g2 in prev.get("games") or [] if g2.get("id") not in seen]
+        print(f"archive: {len(frozen)} lean(s) frozen at kickoff, "
+              f"{len(arch_leans) - len(frozen)} still open")
+    json.dump(dict(built=out["updated"], season=season, week=week, leans=arch_leans,
+                   games=arch_games),
+              open(arch_path, "w"), separators=(",", ":"))
     print("archived predictions")
 
 
+def _board_over(board, grace_hours=5):
+    """True when every game on a kept board has been played. Uses the ISO
+    `kick` when present, else the 'Sat Sep 19' day label + season year."""
+    games = board.get("games") or []
+    if not games:
+        return False
+    now = datetime.now(timezone.utc)
+    for g in games:
+        k = g.get("kick")
+        try:
+            if k:
+                t = datetime.fromisoformat(k.replace("Z", "+00:00"))
+            else:
+                t = datetime.strptime(f"{g.get('day')} {board.get('season')}", "%a %b %d %Y")
+                t = t.replace(hour=23, minute=59, tzinfo=ET)
+        except (TypeError, ValueError):
+            return False
+        if t + timedelta(hours=grace_hours) > now:
+            return False
+    return True
+
+
+def pause_finished_board(why):
+    """Outage + a board whose games are all final: clear its leans rather than
+    let last week's calls read as this week's. Graded weeks stay on Record."""
+    try:
+        board = json.load(open(OUT))
+    except Exception:
+        return
+    if not _board_over(board):
+        return
+    last = (board.get("status") or {}).get("lastGood") or board.get("updated")
+    wk = board.get("week")
+    board.update(games=[], leans=[], stale=True, paused=True,
+                 note=(f"Board paused — our college data source stopped answering after the "
+                       f"{last} build. Week {wk} is final and grades on the Record tab; the next "
+                       f"Trench Edge board posts as soon as the source is back."))
+    json.dump(board, open(OUT, "w"), separators=(",", ":"))
+    try:
+        json.dump(dict(updated=board.get("updated"), week=None, targets=0, fades=0,
+                       stacked=0, stale=True, paused=True), open(TEASER, "w"),
+                  separators=(",", ":"))
+    except Exception:
+        pass
+    print(f"::warning title=CFB PRO board paused::Week {wk} board is final and the source is down — leans cleared")
+
+
+def run():
+    try:
+        main()
+    except cfbd.Unavailable as e:
+        # Nothing cached to build from: keep the last board, but make it say
+        # so on the page (the desk renders `note`) instead of passing it off
+        # as this week's — and clear it entirely once its games are final.
+        cfbd.mark_stale(OUT, f"{e.why}. This is the last board that could be built", field="note")
+        cfbd.mark_stale(TEASER, e.why, field="note")
+        pause_finished_board(e.why)
+        print(f"::warning title=CFB PRO board not refreshed::{e}")
+    finally:
+        cfbd.report("cfb pro board")
+
+
 if __name__ == "__main__":
-    main()
+    run()
