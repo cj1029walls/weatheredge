@@ -2,7 +2,9 @@
 """CFB weekly slate build: upcoming FBS games + kickoff forecasts + similar-
 weather venue history -> site/cfb/data.json (consumed by site/cfb/index.html).
 
-Schedule + betting totals from CollegeFootballData.com (CFBD_API_KEY).
+Schedule + betting totals from CollegeFootballData.com (CFBD_API_KEY), read
+through scripts/cfb/cfbd_cache.py: cached per endpoint, and when CFBD is down
+the cached schedule is used and the page says so -- forecasts still refresh.
 Weather from Open-Meteo (16-day horizon). History from
 data/cfb/venues_history.json (Power 4 home venues, real closing totals).
 
@@ -20,12 +22,13 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 print = functools.partial(print, flush=True)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cfbd_cache as cfbd       # every CFBD call goes through the shared cache
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 HISTORY = os.path.join(ROOT, "data", "cfb", "venues_history.json")
 OUT = os.path.join(ROOT, "site", "cfb", "data.json")
 
-CFBD = "https://api.collegefootballdata.com"
 FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
           "&hourly=temperature_2m,dew_point_2m,wind_speed_10m,wind_direction_10m,"
           "cloud_cover,precipitation_probability,relative_humidity_2m,surface_pressure"
@@ -56,13 +59,9 @@ def gv(d, *names):
     return None
 
 
-def get_json(url, tries=5, auth=False):
+def get_json(url, tries=5):
+    """Open-Meteo fetch with retries (CFBD goes through cfbd_cache, never here)."""
     hdrs = {"User-Agent": "dfsradar-build/1.0", "Accept": "application/json"}
-    if auth:
-        key = os.environ.get("CFBD_API_KEY")
-        if not key:
-            raise SystemExit("CFBD_API_KEY not set")
-        hdrs["Authorization"] = f"Bearer {key}"
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers=hdrs)
@@ -82,13 +81,16 @@ def season_year(now):
 
 def load_upcoming(window_days=8):
     now = datetime.now(timezone.utc)
-    yr = season_year(datetime.now(ET))
+    et_now = datetime.now(ET)
+    yr = season_year(et_now)
     end = now + timedelta(days=window_days)
     out = []
-    for st in ("regular", "postseason"):
+    # Bowls/CFP (seasonType=postseason) are only scheduled in December; asking
+    # the rest of the year spent a CFBD call on every run for an empty list.
+    for st in (("regular", "postseason") if et_now.month in (12, 1) else ("regular",)):
         try:
-            games = get_json(f"{CFBD}/games?year={yr}&seasonType={st}", auth=True)
-        except Exception as e:
+            games = cfbd.get("/games", year=yr, seasonType=st)
+        except cfbd.Unavailable:
             if st == "postseason":
                 continue           # not published until December
             raise
@@ -123,8 +125,8 @@ def fetch_totals(yr, season_types):
     out = {}
     for st in season_types:
         try:
-            recs = get_json(f"{CFBD}/lines?year={yr}&seasonType={st}", auth=True)
-        except Exception as e:
+            recs = cfbd.get("/lines", year=yr, seasonType=st)
+        except cfbd.Unavailable as e:
             print(f"lines {st} unavailable ({e})")
             continue
         for rec in recs:
@@ -145,7 +147,7 @@ def team_info(yr):
     if _TEAM_INFO is None:
         _TEAM_INFO = {}
         try:
-            for t in get_json(f"{CFBD}/teams/fbs?year={yr}", auth=True):
+            for t in cfbd.get("/teams/fbs", year=yr):
                 loc = gv(t, "location") or {}
                 logos = gv(t, "logos") or []
                 _TEAM_INFO[gv(t, "school")] = dict(
@@ -182,7 +184,7 @@ _VENUES = None
 def venue_meta(vid):
     global _VENUES
     if _VENUES is None:
-        _VENUES = {v["id"]: v for v in get_json(f"{CFBD}/venues", auth=True)}
+        _VENUES = {v["id"]: v for v in cfbd.get("/venues")}
     return _VENUES.get(vid)
 
 
@@ -388,7 +390,7 @@ def main():
 
     upcoming, yr = ([], season_year(datetime.now(ET))) if args.offline else load_upcoming()
     sts = sorted({g["_season_type"] for g in upcoming}) or ["regular"]
-    totals = {} if args.offline else fetch_totals(yr, sts)
+    totals = {} if (args.offline or not upcoming) else fetch_totals(yr, sts)
 
     games, skipped = [], 0
     for g in upcoming:
@@ -556,11 +558,61 @@ def main():
                    counts=counts,
                    brief=" ".join(parts),
                    games=sorted(games, key=lambda x: x["sortTime"]))
+    st = cfbd.status()
+    if st:
+        # Built from cached CFBD data: forecasts are fresh, schedule/lines are
+        # not. Say so where the page already renders text (the brief).
+        payload["stale"] = True
+        payload["status"] = st
+        payload["brief"] = (f"⚠ {cfbd.stale_note()} Kickoff forecasts refreshed "
+                            f"{payload['generated']}. " + payload["brief"]).strip()
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
     print(f"Wrote {OUT}: {len(games)} games")
 
 
+def drop_played(path=OUT, grace_hours=4):
+    """Last-good slate kept during an outage: remove games that have already
+    been played (kickoff + grace in the past) so they can't read as upcoming,
+    and recount the summary chips from what is left."""
+    try:
+        with open(path) as f:
+            d = json.load(f)
+    except Exception:
+        return
+    cut = datetime.now(timezone.utc) - timedelta(hours=grace_hours)
+    def upcoming(g):
+        try:
+            return datetime.fromisoformat(str(g.get("sortTime"))) >= cut
+        except ValueError:
+            return True
+    games = d.get("games") or []
+    kept = [g for g in games if upcoming(g)]
+    if len(kept) == len(games):
+        return
+    counts = {k: 0 for k in ("severe", "elevated", "watch", "none", "indoor")}
+    for g in kept:                       # same rule main() uses
+        lvl = (g.get("edge") or {}).get("level", "none")
+        counts[lvl if lvl in counts else "none"] += 1
+    d.update(games=kept, counts=counts)
+    with open(path, "w") as f:
+        json.dump(d, f, separators=(",", ":"))
+    print(f"outage: removed {len(games) - len(kept)} played game(s) from the kept slate")
+
+
+def run():
+    try:
+        main()
+    except cfbd.Unavailable as e:
+        # No cached schedule to fall back on: keep last build, but label it
+        # and drop games that have since been played.
+        cfbd.mark_stale(OUT, e.why, field="brief")
+        drop_played()
+        print(f"::warning title=CFB free slate not refreshed::{e}")
+    finally:
+        cfbd.report("cfb free slate")
+
+
 if __name__ == "__main__":
-    main()
+    run()
