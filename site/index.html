@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
 <style>
   /* Tokens are the DFS Kitchen family's, verbatim, so this page sits beside
      dfskitchen.com, dfsprep.com and dfsbooks.com as a sibling rather than a
@@ -61,6 +62,9 @@
     padding:10px 18px;border-radius:9px;background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 22px rgba(240,138,60,.28);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
   .nav-cta:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 12px 28px rgba(240,138,60,.38)}
+  /* Log in sits apart from the page anchors: it leaves the page, and it is
+     the one link a returning member looks for, so it survives on phones. */
+  .nav-links .nav-login{margin-left:6px;border:1px solid rgba(255,255,255,.12)}
 
   /* ---------- buttons ---------- */
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 28px;border-radius:10px;
@@ -106,6 +110,16 @@
   .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
   .hero .fine{margin-top:16px;color:var(--dim);font-size:12.5px}
   .hero .fine b{color:var(--muted);font-weight:700}
+  .hero .sub a{color:var(--radar-soft);text-decoration:underline;text-decoration-color:rgba(103,232,249,.4);text-underline-offset:3px}
+  .hero .sub a:hover{text-decoration-color:var(--radar-soft)}
+  /* The five free radars, one tap from the hero. The nav's sport anchors
+     are hidden on phones and the sports grid is far down the page. */
+  .sport-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .sport-row .l{font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#A7B0C4;margin-right:4px}
+  .sport-row a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 15px;border-radius:999px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);font-size:13px;font-weight:700;letter-spacing:.02em;
+    transition:border-color .2s,background .2s,color .2s}
+  .sport-row a:hover{border-color:rgba(34,211,238,.55);background:var(--radar-bg);color:var(--radar-soft)}
 
   /* The radar scene: a mock panel the way the family frames every product,
      with a canvas sweep inside it and tonight's real edge on the HUD. */
@@ -129,6 +143,16 @@
   .pill{position:absolute;right:14px;bottom:14px;z-index:4;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;
     background:rgba(46,50,64,.9);border:1px solid var(--border);border-radius:999px;font-size:12.5px;font-weight:700;backdrop-filter:blur(6px);color:var(--text)}
   .pill .live-dot{width:7px;height:7px;border-radius:50%;background:var(--radar);box-shadow:0 0 10px var(--radar);animation:pulse 2s ease-in-out infinite}
+  /* not a live board (last slate, off day, example): the dot stops claiming it is */
+  .pill .live-dot.off{background:var(--dim);box-shadow:none;animation:none}
+  /* The HUD wraps inside the card; beside the weather pill the script narrows
+     it to the room left, so a long matchup never runs underneath the pill. */
+  .hud{max-width:calc(100% - 36px)}
+  .wxline{white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis}
+  .hud .ex{color:#A7B0C4}
+  .hud .ex:empty{display:none}
+  .hud .ex.live{color:#4ade80}
+  .hud .ex.warn{color:#fcd34d}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
   .cover{position:absolute;inset:0;z-index:2}
   .mock:hover .pill{border-color:var(--radar)}
@@ -159,6 +183,7 @@
   .loop-card.grade .loop-step{color:#4ade80}
   .loop-card h3{font-size:21px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em}
   .loop-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+  .loop-card p a,.mk-foot a,.price-card .checks a{color:var(--radar-soft);font-weight:700}
   .loop-arrow{align-self:center;color:var(--radar);font-size:22px;font-weight:900;opacity:.85;text-shadow:0 0 14px rgba(34,211,238,.5)}
   .loop-close{text-align:center;color:var(--muted);font-size:15px;margin:34px auto 0;max-width:760px}
   .loop-close .u{color:var(--radar-soft);font-weight:800}
@@ -217,7 +242,10 @@
   .park-tag{position:absolute;left:18px;top:16px;z-index:3}
   .park-tag .e{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--radar-soft)}
   .park-tag .m{font-family:var(--display);font-weight:800;font-size:20px;margin-top:4px;letter-spacing:-.3px}
-  .park-tag .m small{display:block;font-family:var(--font);font-weight:500;font-size:12px;color:var(--muted);margin-top:3px}
+  .park-tag .m small{display:block;font-family:var(--font);font-weight:500;font-size:12px;color:var(--muted);margin-top:3px;text-shadow:0 1px 3px rgba(20,24,32,.85)}
+  .park-tag{right:18px}
+  .park-tag .note{display:inline-block;margin-top:10px;max-width:360px;font-family:var(--font);font-weight:500;font-size:12px;line-height:1.45;letter-spacing:0;
+    color:var(--text);background:rgba(37,42,53,.86);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 11px;backdrop-filter:blur(6px)}
 
   /* --- mock: the record --- */
   .rec-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
@@ -323,7 +351,7 @@
   footer a{color:var(--muted)}
   footer a:hover{color:var(--radar-soft)}
   .fnav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
-  .fnav a{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);font-size:13px}
+  .fnav a{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);font-size:13px;min-height:40px;display:inline-flex;align-items:center}
   footer .tagline{color:var(--radar-soft);font-style:italic;margin-top:12px}
   .disc{max-width:620px;margin:18px auto 0;font-size:12.5px}
 
@@ -335,6 +363,11 @@
   .px-rv.px-in{opacity:1;transform:none}
 
   /* ---------- responsive ---------- */
+  /* Between phone and desktop the nav keeps the links that leave the page
+     (Record, Log in) and the two anchors people scroll for. */
+  @media (max-width:1080px){
+    .nav-links .opt{display:none}
+  }
   @media (max-width:1000px){
     .hero-grid{grid-template-columns:1fr;gap:36px}
     .loop-grid{grid-template-columns:1fr 1fr;gap:14px}
@@ -350,21 +383,37 @@
     .wrap,.nav-in,section,.proof,.cta-band{padding-left:20px;padding-right:20px}
     section{padding-top:68px;padding-bottom:68px}
     .hero{padding:56px 0 30px}
-    .nav-links a:not(.nav-cta){display:none}
+    .nav-links a:not(.nav-cta):not(.nav-login){display:none}
+    .nav-in{gap:12px}
+    .nav-links a{white-space:nowrap}
+    .nav-links .nav-login{margin-left:0;padding:8px 10px}
+    .nav-cta{margin-left:6px;padding:10px 14px}
     .brand .t{display:none}
+    /* five chips on one row: equal columns, each a full 40px tap target */
+    .sport-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+    .sport-row .l{grid-column:1 / -1;margin:0 0 2px}
+    .sport-row a{padding:0 4px;font-size:12.5px;letter-spacing:0}
     .loop-grid,.sports,.pricing-grid,.rail,.mk-wx{grid-template-columns:1fr 1fr}
     .rec-tiles{grid-template-columns:repeat(3,1fr)}
     .sports{grid-template-columns:1fr 1fr}
     .sp.pro-card{grid-column:1 / -1}
+    /* two price cards side by side left one word per line at phone width */
+    .pricing-grid{grid-template-columns:1fr;gap:26px}
+    .sports .sp:last-child:nth-child(odd){grid-column:1 / -1}
     .cta-in{padding:44px 22px}
     .hud .m{font-size:18px}
     /* On a phone the weather line collides with the matchup; the chips below
        already carry the read, so it steps aside. */
     .wxline{display:none}
   }
+  @media (max-width:349px){
+    .nav-links .nav-login{display:none}
+  }
+  /* Pseudo-elements carry the button shimmer, so they are named here too; the
+     canvas sweep and the 3D park stop in script (see the reduce checks). */
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
-    *{animation:none!important;transition:none!important}
+    *,*::before,*::after{animation:none!important;transition:none!important}
     .px-rv{opacity:1;transform:none}
   }
   :focus-visible{outline:2px solid var(--radar);outline-offset:3px;border-radius:4px}
@@ -387,11 +436,13 @@
       <span><span class="n">DFS<b>RADAR</b></span><span class="t">Scan · Match · Measure · Grade</span></span>
     </a>
     <div class="nav-links">
-      <a href="#loop">How it works</a>
-      <a href="#suite">The radar</a>
+      <a class="opt" href="#loop">How it works</a>
+      <a class="opt" href="#suite">The radar</a>
       <a href="#sports">Sports</a>
       <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
+      <a class="opt" href="#faq">FAQ</a>
+      <a href="/record/">Record</a>
+      <a class="nav-login" href="/pro/#login">Log in</a>
       <a class="nav-cta" href="#pricing">Get PRO</a>
     </div>
   </div>
@@ -405,25 +456,29 @@
       <p class="sub">DFSRADAR reads the kickoff or first-pitch forecast at every venue on the slate, then
         measures it against what actually happened at <em>that</em> venue in similar conditions —
         against the real closing totals that were on the board those days. Every call it makes is
-        graded in public afterward.</p>
+        <a href="/record/">graded in public</a> afterward.</p>
       <div class="hero-cta">
         <a class="btn btn-radar" href="/mlb/">Open today's radar →</a>
         <a class="btn btn-ghost" href="#loop">See how it works</a>
       </div>
+      <nav class="sport-row" aria-label="Free radars by sport">
+        <span class="l">Pick a radar</span>
+        <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
+      </nav>
       <p class="fine"><b>The radars are free.</b> No account, no email. PRO adds the player-level boards.</p>
     </div>
 
     <div class="mock radar-scene" id="radarShowcase">
       <canvas id="radarCanvas"></canvas>
       <div class="hud">
-        <div class="e">Edge of the day · DFSRADAR</div>
-        <div class="m" id="hud-m">Scanning the slate<small id="hud-s">Loading tonight's board…</small></div>
+        <div class="e" id="hud-e">Edge of the day · DFSRADAR</div>
+        <div class="m" id="hud-m">Scanning the slate<small id="hud-s">Loading the latest board…</small></div>
         <div class="ex" id="hud-ex"></div>
       </div>
       <div class="wxline" id="hud-wx">— · —° · — mph</div>
       <div class="rchips" id="hud-chips"></div>
       <a class="cover" href="/mlb/" aria-label="Open today's radar"></a>
-      <span class="pill"><span class="live-dot"></span>Open the radar ↗</span>
+      <span class="pill"><span class="live-dot off" id="hud-dot"></span>Open the radar ↗</span>
     </div>
   </div>
 </header>
@@ -449,7 +504,7 @@
     <div class="loop-arrow px-rv">→</div>
     <div class="loop-card px-rv" style="--d:160ms"><div class="loop-step">03 · Measure</div><h3>Measure the impact</h3><p>Compare scoring and the underlying box-score signals against both the league baseline and the venue's own average.</p></div>
     <div class="loop-arrow px-rv">→</div>
-    <div class="loop-card grade px-rv" style="--d:240ms"><div class="loop-step">04 · Grade</div><h3>Grade it in public</h3><p>Every PRO call settles from the final box score and goes into a running record — losing stretches included.</p></div>
+    <div class="loop-card grade px-rv" style="--d:240ms"><div class="loop-step">04 · Grade</div><h3>Grade it in public</h3><p>Every PRO call settles from the final box score and goes into a <a href="/record/">running record</a> — losing stretches included.</p></div>
   </div>
   <p class="loop-close px-rv">Anyone can tell you it'll be 38° and windy. The useful question is what 38° and windy has
     historically done to scoring at <span class="u">that specific stadium</span> — and whether the number on the board already accounts for it.</p>
@@ -525,7 +580,7 @@
           <div class="park-wrap"><canvas id="parkCanvas"></canvas></div>
           <div class="park-tag"><div class="e" id="park-e">Wind · 13 mph out to CF</div><div class="m" id="park-m">Wrigley Field<small>Sunny · 84° · example scene</small></div></div>
           <a class="cover" href="/mlb/" aria-label="Open the MLB radar"></a>
-          <span class="pill"><span class="live-dot"></span>Every park, live — open the radar ↗</span>
+          <span class="pill"><span class="live-dot off" id="park-dot"></span><span id="park-pill">Every park — open the radar ↗</span></span>
         </div>
       </div>
     </div>
@@ -542,7 +597,7 @@
           <li><span class="ck">✓</span>Nothing gets quietly dropped: a target that didn't play is excluded, a target that missed is a miss</li>
           <li><span class="ck">✓</span>The same receipts feed the model — when a signal stops holding, it gets shrunk</li>
         </ul>
-        <a class="product-btn radar" href="/pro/mlb/#record">See the MLB record →</a>
+        <a class="product-btn radar" href="/record/#mlb">See the MLB record →</a>
       </div>
       <div class="px-rv" style="--d:120ms">
         <div class="mock mk">
@@ -559,7 +614,7 @@
             <div class="cal-row"><span class="rg">25%+</span><div class="bar"><i style="width:52%"></i><em style="left:68%"></em></div><span class="nums"><b>20.7%</b> hit · 111</span></div>
           </div>
           <div class="cal-key"><span><i></i>Actual hit rate</span><span><em></em>What we called</span></div>
-          <p class="mk-foot" id="rec-foot">Live from the public record. The top bucket runs hot — it says so on the board, not just here.</p>
+          <p class="mk-foot" id="rec-foot">Illustrative figures until the live record loads — every graded night is on <a href="/record/#mlb">the record page</a>.</p>
         </div>
       </div>
     </div>
@@ -644,10 +699,10 @@
         <li><span class="ck">✓</span>Every free radar, all five sports</li>
         <li><span class="ck">✓</span>PRO desks for MLB, NFL, CFB, PGA and NASCAR</li>
         <li><span class="ck">✓</span>Player props and the CFB trench board</li>
-        <li><span class="ck">✓</span>The graded public record behind every call</li>
+        <li><span class="ck">✓</span><span>The <a href="/record/">graded public record</a> behind every call</span></li>
         <li><span class="ck">✓</span>Rebuilt every morning as forecasts sharpen</li>
       </ul>
-      <a class="btn btn-radar" href="/pro/">Get DFSRADAR PRO</a>
+      <a class="btn btn-pro" href="/pro/">Get DFSRADAR PRO</a>
       <span class="prev"><a href="/pro/">Preview the desks →</a></span>
     </div>
     <div class="price-card best px-rv" style="--d:80ms">
@@ -688,7 +743,7 @@
     <details class="px-rv" style="--d:0ms"><summary>Is the radar actually free?</summary><div class="a">Yes. Every sport's weather radar — the slate, the venue history, the 3D scenes, the hourly forecast strips — is open to anyone, with no account. PRO is the paid layer on top: player-level boards and their graded records.</div></details>
     <details class="px-rv" style="--d:60ms"><summary>What makes this different from checking the forecast myself?</summary><div class="a">The forecast is the input, not the answer. DFSRADAR reads it at the venue's own coordinates at the kickoff hour, then finds every past game at <em>that</em> venue in similar conditions and reports what happened to scoring, against the closing totals that were on the board those days. The useful number is not "15 mph" — it's what 15 mph has historically done at that stadium.</div></details>
     <details class="px-rv" style="--d:120ms"><summary>How often does it update?</summary><div class="a">The board rebuilds four times a day for MLB and daily for the weekly sports, with an extra pre-kick pass on game day. Forecasts sharpen as kickoff nears, so the morning read and the 5 PM read are not the same read.</div></details>
-    <details class="px-rv" style="--d:180ms"><summary>What happens when a call is wrong?</summary><div class="a">It goes in the record. Every PRO call is archived the moment it posts and graded the next morning from the real box score. The record and the calibration table are public, and losing stretches stay in them. When a signal stops holding up, it gets shrunk in the model — the receipts are the feedback loop, not decoration.</div></details>
+    <details class="px-rv" style="--d:180ms"><summary>What happens when a call is wrong?</summary><div class="a">It goes in the record. Every PRO call is archived the moment it posts and graded the next morning from the real box score. <a href="/record/">The record and the calibration table are public</a>, and losing stretches stay in them. When a signal stops holding up, it gets shrunk in the model — the receipts are the feedback loop, not decoration.</div></details>
     <details class="px-rv" style="--d:240ms"><summary>Is this betting advice?</summary><div class="a">No. Weather-adjusted insights are informational. Historical tendencies are tendencies, not guarantees, and sample sizes are shown on every number so you can judge them yourself. If gambling is a problem for you, call 1-800-GAMBLER.</div></details>
     <details class="px-rv" style="--d:300ms"><summary>I'm already a DFS Kitchen All-Access member — do I pay again?</summary><div class="a">No. All-Access includes DFSRADAR PRO. <a href="/pro/#login">Log in</a> with your Kitchen account and the desks open.</div></details>
   </div>
@@ -696,13 +751,13 @@
 
 <footer>
   <div class="fnav">
-    <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a href="/pro/">PRO</a>
+    <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a href="/pro/">PRO</a><a href="/record/">Record</a><a href="/pro/#login">Log in</a>
   </div>
   <div>DFSRADAR · part of <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=footer&utm_campaign=landing" target="_blank" rel="noopener">The DFS Kitchen</a> family —
     <a href="https://dfsprep.com" target="_blank" rel="noopener">DFSPREP</a> · <a href="https://dfsbooks.com" target="_blank" rel="noopener">DFS Books</a> · <a href="https://dfskitchen.com/optimizer" target="_blank" rel="noopener">The Optimizer</a></div>
   <div class="tagline">Scan the slate. Find the edge.</div>
   <p class="disc">Weather-adjusted insights are informational and are not betting advice. Nothing here is a guarantee of any outcome.
-    21+. If gambling is a problem for you, call 1-800-GAMBLER.</p>
+    21+. If gambling is a problem for you, call <span style="white-space:nowrap">1-800-GAMBLER</span>.</p>
 </footer>
 
 <script>
@@ -724,15 +779,19 @@
 /* ---------- the radar sweep ----------
    Concentric rings, a rotating beam with a fading wake, and blips — one per
    sport — that flare as the beam passes them. Drawn to the device pixel
-   ratio, paused when off-screen. */
+   ratio, paused when off-screen. With reduced motion it is one still frame,
+   the beam parked just past the MLB blip, redrawn only on resize. */
 (function(){
   var cv=document.getElementById('radarCanvas'); if(!cv) return;
-  var ctx=cv.getContext('2d'), W=0,H=0,dpr=1, ang=0, last=0, running=true;
+  var ctx=cv.getContext('2d'), W=0,H=0,dpr=1, ang=0, last=0, running=true, looping=false;
   var blips=[ {a:0.55,r:0.78,l:'MLB'},{a:1.9,r:0.52,l:'NFL'},{a:2.9,r:0.86,l:'CFB'},{a:4.1,r:0.40,l:'PGA'},{a:5.3,r:0.66,l:'NASCAR'} ];
+  var mq=matchMedia('(prefers-reduced-motion: reduce)'), reduce=mq.matches;
   function size(){ dpr=Math.min(devicePixelRatio||1,2); var r=cv.getBoundingClientRect(); W=r.width;H=r.height; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
-  size(); addEventListener('resize',size);
-  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  size(); addEventListener('resize',function(){ size(); if(reduce) draw(0); });
   if('IntersectionObserver' in window){ new IntersectionObserver(function(e){running=e[0].isIntersecting;},{threshold:.05}).observe(cv); }
+  function loop(t){ if(reduce){ looping=false; return; } draw(t); requestAnimationFrame(loop); }
+  function start(){ if(!looping){ looping=true; last=0; requestAnimationFrame(loop); } }
+  if(mq.addEventListener) mq.addEventListener('change',function(e){ reduce=e.matches; if(reduce){ ang=0.95; draw(0); } else start(); });
   function draw(t){
     if(running||t===0){
       var dt=last?Math.min((t-last)/1000,.05):0; last=t; if(!reduce) ang+=dt*0.9;
@@ -761,74 +820,129 @@
       });
       // centre + the orange edge-of-the-day blip
       ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2); ctx.fillStyle='#EFF1F7'; ctx.fill();
-      var ea=0.55, ex=cx+Math.cos(ea)*R*0.78, ey=cy+Math.sin(ea)*R*0.78, pf=0.5+0.5*Math.sin(t/500);
+      var ea=0.55, ex=cx+Math.cos(ea)*R*0.78, ey=cy+Math.sin(ea)*R*0.78, pf=reduce?0.6:0.5+0.5*Math.sin(t/500);
       ctx.beginPath(); ctx.arc(ex,ey,5+pf*4,0,Math.PI*2); ctx.fillStyle='rgba(240,138,60,'+(.18+pf*.18)+')'; ctx.fill();
       ctx.beginPath(); ctx.arc(ex,ey,3.2,0,Math.PI*2); ctx.fillStyle='#F08A3C'; ctx.fill();
     }
-    requestAnimationFrame(draw);
   }
+  if(reduce) ang=0.95;
   draw(0); /* one frame now, so the card is never blank before it scrolls into view */
-  requestAnimationFrame(draw);
+  if(!reduce) start();
 })();
 
-/* ---------- tonight's edge, live ----------
-   The HUD reads the same JSON the MLB radar reads. If tonight's board isn't
-   posted (off-season, early morning), it falls back to CFB, then to a labelled
-   example — never to a made-up matchup dressed as live. */
+/* ---------- the edge of the day, labelled honestly ----------
+   The HUD reads the same JSON the MLB radar reads, and says "Live" only when
+   that board is today's (in ET) and has games. Otherwise, in order:
+     - an older MLB board is shown as what it is: "Last slate · Mon Sep 21"
+       (or "Not refreshed since …" when its builder marked it stale);
+     - an MLB off day falls back to this week's CFB board if it still has
+       games to play, else shows the build's own off-day note;
+     - with nothing at all, a labelled example — never a made-up matchup
+       dressed as live.
+   RadarFresh (assets/fresh.js) is loaded with defer, so this waits for
+   DOMContentLoaded, by which point deferred scripts have run. */
 (function(){
-  var m=document.getElementById('hud-m'), s=document.getElementById('hud-s'), ex=document.getElementById('hud-ex'),
-      wx=document.getElementById('hud-wx'), ch=document.getElementById('hud-chips'), cover=document.querySelector('#radarShowcase .cover');
+  var m=document.getElementById('hud-m'), ex=document.getElementById('hud-ex'), eb=document.getElementById('hud-e'),
+      wx=document.getElementById('hud-wx'), ch=document.getElementById('hud-chips'), dot=document.getElementById('hud-dot'),
+      box=document.getElementById('radarShowcase'), cover=document.querySelector('#radarShowcase .cover');
   function esc(x){return String(x==null?'':x).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
   function chip(cls,txt){return '<span class="'+cls+'">'+esc(txt)+'</span>'}
-  function setExample(){
-    m.innerHTML='WSH @ CHC<small>Wrigley Field · 2:20 PM ET</small>'; ex.textContent='Example slate — see today\'s live board';
-    wx.textContent='Sunny · 84° · 13 mph out to CF'; ch.innerHTML=chip('hot','HR +24% in 49 similar games')+chip('lean','Runs +14%');
+  function get(u){return fetch(u+'?_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()})}
+  var domReady=new Promise(function(r){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',r); else r(); });
+  function RF(){ return window.RadarFresh || null; }
+  function state(eyebrow, caption, level){
+    eb.textContent=eyebrow; ex.textContent=caption||''; ex.className='ex'+(level?' '+level:'');
+    dot.classList.toggle('off', level!=='live');
   }
-  function fromMLB(d){
+  var hud=box.querySelector('.hud');
+  function fitHud(){
+    if(wx.hidden || getComputedStyle(wx).display==='none'){ hud.style.maxWidth=''; return; }
+    hud.style.maxWidth=Math.max(150, box.clientWidth - wx.offsetWidth - 50)+'px';
+  }
+  addEventListener('resize', fitHud);
+  function setWx(txt){ wx.textContent=txt||''; wx.hidden=!txt; fitHud(); }
+
+  function setExample(){
+    state('Edge of the day · example', 'Example slate · not a live read', '');
+    m.innerHTML='WSH @ CHC<small>Wrigley Field · 2:20 PM ET</small>';
+    setWx('Sunny · 84° · 13 mph out to CF'); ch.innerHTML=chip('hot','HR +24% in 49 similar games')+chip('lean','Runs +14%');
+    cover.href='/mlb/';
+  }
+  function showMLB(d, caption, live){
     /* Same rule the MLB radar uses for its own "edge of the day": the open-air
        game with the largest HR impact either way. hr and runs are % impacts. */
-    var live=(d.games||[]).filter(function(x){return !x.dome && x.hr!=null});
-    var g=live.sort(function(a,b){return Math.abs(b.hr)-Math.abs(a.hr)})[0] || (d.games||[])[0];
-    if(!g) return false;
+    var open=(d.games||[]).filter(function(x){return !x.dome && x.hr!=null});
+    var g=open.sort(function(a,b){return Math.abs(b.hr)-Math.abs(a.hr)})[0] || d.games[0];
+    state('Edge of the day · MLB', caption, live?'live':'warn');
     m.innerHTML=esc(g.away)+' @ '+esc(g.home)+'<small>'+esc(g.park||'')+(g.time?' · '+esc(g.time):'')+'</small>';
-    ex.textContent='Live · tonight\'s board';
     var wl=g.windLabel?String(g.windLabel).toLowerCase():'';
-    wx.textContent=[g.sky, g.temp!=null?g.temp+'°':null, g.wind!=null?g.wind+' mph'+(wl?' '+wl:''):null].filter(Boolean).join(' · ');
+    setWx([g.sky, g.temp!=null?g.temp+'°':null, g.wind!=null?g.wind+' mph'+(wl?' '+wl:''):null].filter(Boolean).join(' · '));
     var c='';
     if(g.hr!=null) c+=chip(g.hr>=0?'hot':'cool','HR '+(g.hr>0?'+':'')+Math.round(g.hr)+'%'+(g.sample?' in '+g.sample+' similar games':''));
     if(g.runs!=null) c+=chip('lean','Runs '+(g.runs>0?'+':'')+Math.round(g.runs)+'%');
     ch.innerHTML=c||chip('lean','Open the board'); cover.href='/mlb/';
-    window.LIVE_EDGE_GAME=g; return true;
+    /* the park panel below draws this same game, under the same label */
+    window.LIVE_EDGE_GAME=g; window.LIVE_EDGE_LIVE=live;
+    window.LIVE_EDGE_TAG=live?'today\'s edge of the day':caption;
   }
-  function fromCFB(d){
-    var g=(d.games||[]).filter(function(x){return !x.dome && x.edge && x.edge.level!=='none'}).sort(function(a,b){return (b.edge.score||0)-(a.edge.score||0)})[0]
-        || (d.games||[])[0];
-    if(!g) return false;
+  function showCFB(d){
+    /* Only games still to be played (kickoff within the last 4 hours or later):
+       a board kept through an outage must not present Saturday's games as this week's. */
+    var cut=Date.now()-4*36e5;
+    var up=(d.games||[]).filter(function(x){ var t=Date.parse(x.sortTime); return isNaN(t) || t>=cut; });
+    if(!up.length) return false;
+    var g=up.filter(function(x){return !x.dome && x.edge && x.edge.level!=='none'}).sort(function(a,b){return (b.edge.score||0)-(a.edge.score||0)})[0] || up[0];
+    var rf=RF(), a=rf ? rf.assess({built:d.generated, stale:d.stale, status:d.status, maxAgeH:30}) : null;
+    if(a && a.level==='ok') state('Edge of the week · CFB', 'Live · this week\'s board', 'live');
+    else state('Edge of the week · CFB', a && a.text ? a.text : 'This week\'s board', a && a.level==='warn' ? 'warn' : '');
     m.innerHTML=esc(g.away)+' @ '+esc(g.home)+'<small>'+esc(g.stadium||'')+(g.day?' · '+esc(g.day):'')+(g.time?' '+esc(g.time):'')+'</small>';
-    ex.textContent='Live · this week\'s board';
-    wx.textContent=[g.sky, g.temp!=null?g.temp+'°':null, g.wind!=null?g.wind+' mph':null].filter(Boolean).join(' · ');
+    setWx([g.sky, g.temp!=null?g.temp+'°':null, g.wind!=null?g.wind+' mph':null].filter(Boolean).join(' · '));
     var c=''; if(g.pts!=null&&g.sample>=12) c+=chip(g.pts>=0?'hot':'cool','Scoring '+(g.pts>0?'+':'')+g.pts+'% in '+g.sample+' similar games');
     if(g.edge&&g.edge.level&&g.edge.level!=='none') c+=chip('lean',g.edge.level.charAt(0).toUpperCase()+g.edge.level.slice(1)+' weather edge');
     if(g.rain!=null&&g.rain>=45) c+=chip('cool','Rain '+g.rain+'%');
     ch.innerHTML=c||chip('lean','Open the board'); cover.href='/cfb/'; return true;
   }
-  function get(u){return fetch(u+'?_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()})}
-  window.LIVE_EDGE_READY = get('/data.json').then(function(d){ if(!fromMLB(d)) throw 0; })
-    .catch(function(){ return get('/cfb/data.json').then(function(d){ if(!fromCFB(d)) throw 0; }); })
-    .catch(setExample);
+  function showOffDay(note){
+    /* "No MLB games today — the board returns Tuesday, September 29." */
+    var i=note.indexOf(' — '), head=(i>0?note.slice(0,i):note).replace(/\.$/,''), rest=i>0?note.slice(i+3):'';
+    if(rest) rest=rest.charAt(0).toUpperCase()+rest.slice(1);
+    state('MLB radar', '', '');
+    m.innerHTML=esc(head)+(rest?'<small>'+esc(rest)+'</small>':'');
+    setWx(''); ch.innerHTML=''; cover.href='/mlb/';
+  }
+
+  window.LIVE_EDGE_READY = Promise.all([get('/data.json').catch(function(){return null}), domReady]).then(function(res){
+    var d=res[0], rf=RF();
+    var games=d && Array.isArray(d.games) ? d.games : null;
+    if(games && games.length){
+      var stale=!!(d.stale || (d.status && d.status.ok===false));
+      if(rf && d.date===rf.todayET() && !stale){ showMLB(d, 'Live · today\'s board', true); return; }
+      var a=rf ? rf.assess({built:d.generated, stale:d.stale, status:d.status, forDate:d.date}) : null;
+      showMLB(d, a && a.text ? a.text : 'Board for '+(d.dateLabel||d.date||'an earlier day'), false);
+      return;
+    }
+    /* MLB is off (or its file is missing). The off-day note the build writes is
+       kept for the park panel, which only ever shows MLB parks. */
+    var note=games ? (d.note || 'No MLB games today.') : null;
+    window.MLB_OFF_NOTE=note;
+    return get('/cfb/data.json').then(function(c){ if(!showCFB(c)) throw 0; })
+      .catch(function(){ if(note) showOffDay(note); else setExample(); });
+  }).catch(setExample);
 
   /* the record tiles read the public record too */
-  get('/pro/record.json').then(function(r){
-    var s=r.summary||{}; if(!s.graded) return;
+  function rangeLabel(r){ var mm=/^(\d+)\s*[–-]\s*\+$/.exec(r||''); return mm ? mm[1]+'%+' : esc(r)+'%'; }
+  Promise.all([get('/pro/record.json'), domReady]).then(function(res){
+    var r=res[0], s=r.summary||{}; if(!s.graded) return;
     document.getElementById('rec-n').textContent=s.graded.toLocaleString();
     document.getElementById('rec-nights').textContent=s.nights;
     if(s.top1&&s.top1.n) document.getElementById('rec-top').textContent=Math.round(100*s.top1.w/s.top1.n)+'%';
     var cal=(s.cal||[]).filter(function(c){return c.n}); if(!cal.length) return;
     var mx=Math.max.apply(null,cal.map(function(c){return Math.max(c.exp,c.act)}))*1.25;
     document.getElementById('cal-rows').innerHTML=cal.map(function(c){
-      return '<div class="cal-row"><span class="rg">'+esc(c.range)+'%</span><div class="bar"><i style="width:'+(100*c.act/mx).toFixed(1)+'%"></i><em style="left:'+(100*c.exp/mx).toFixed(1)+'%"></em></div><span class="nums"><b>'+c.act+'%</b> hit · '+c.n+'</span></div>';
+      return '<div class="cal-row"><span class="rg">'+rangeLabel(c.range)+'</span><div class="bar"><i style="width:'+(100*c.act/mx).toFixed(1)+'%"></i><em style="left:'+(100*c.exp/mx).toFixed(1)+'%"></em></div><span class="nums"><b>'+Number(c.act).toFixed(1)+'%</b> hit · '+c.n+'</span></div>';
     }).join('');
-    document.getElementById('rec-foot').textContent='Live from the public record, updated '+(r.updated||'nightly')+'.';
+    var rf=RF(), t=rf && rf.parseET(r.updated), when=t ? ' · updated '+rf.fmt(t, true) : '';
+    document.getElementById('rec-foot').innerHTML='From the public record'+esc(when)+'. <a href="/record/#mlb">Every graded night →</a>';
   }).catch(function(){});
 })();
 
@@ -1090,6 +1204,7 @@ function initPark3D(g, canvas, slot="modal"){
         logo.rotation.x=-Math.PI/2;
         logo.position.set(0, 0.3, -262);
         scene.add(logo);
+        if(inst.redraw) inst.redraw();   /* reduced motion: no loop to pick it up */
       },
       undefined, ()=>{} /* CORS/load failure → just skip the logo */);
   }
@@ -1169,24 +1284,39 @@ function initPark3D(g, canvas, slot="modal"){
     cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r, target.y+Math.sin(el)*r, target.z+Math.cos(theta)*Math.cos(el)*r);
     cam.lookAt(target);
   }
+  /* Reduced motion (landing only): no auto-orbit and no drifting wind or rain.
+     The scene is drawn once with the streamlines settled, and redrawn only
+     when the visitor drags it or the team logo arrives. */
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
   canvas.addEventListener("pointerdown", e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(e.pointerId); });
   canvas.addEventListener("pointermove", e=>{
     if(!dragging) return;
     theta -= (e.clientX-lastX)*0.006;
     el = Math.min(1.15, Math.max(0.22, el + (e.clientY-lastY)*0.004));
     lastX=e.clientX; lastY=e.clientY; idleT=0;
+    if(still) frame();
   });
   canvas.addEventListener("pointerup", ()=>dragging=false);
   canvas.addEventListener("pointercancel", ()=>dragging=false);
 
   const clock = new THREE.Clock();
-  const inst = {renderer, scene, raf:0};
+  const inst = {renderer, scene, raf:0, redraw:null};
   if(slot==="hero") hero3D = inst; else modal3D = inst;
+  function frame(){ place(); renderer.render(scene, cam); }
+  if(still){
+    for(let i=0;i<45;i++) step(1/30);
+    frame(); inst.redraw = frame;
+    return;
+  }
   (function tick(){
     inst.raf = requestAnimationFrame(tick);
     const dt = Math.min(clock.getDelta(), 0.05);
     idleT += dt;
     if(!dragging && idleT>2.5) theta += dt*0.07;
+    step(dt);
+    frame();
+  })();
+  function step(dt){
     if(wind){
       wind.t += dt;
       const pos = wind.mesh.geometry.attributes.position.array;
@@ -1241,9 +1371,7 @@ function initPark3D(g, canvas, slot="modal"){
       });
       rain.mesh.geometry.attributes.position.needsUpdate = true;
     }
-    place();
-    renderer.render(scene, cam);
-  })();
+  }
 }
 
 /* ---------- the real park model, on demand ----------
@@ -1261,8 +1389,15 @@ function initPark3D(g, canvas, slot="modal"){
     var e=document.getElementById('park-e'), m=document.getElementById('park-m'); if(!e||!m) return;
     var wl=(g.windLabel||'').toString().toLowerCase();
     e.textContent = g.dome ? 'Roof closed' : ('Wind · '+g.wind+' mph'+(wl?' '+wl:''));
-    var name=(g.park||'').split('·')[0].trim() || ((PARKS[g.home]||{}).name) || 'Tonight\'s park';
-    m.innerHTML = esc(name)+'<small>'+esc(g.sky||'')+' · '+esc(g.temp)+'° · '+(g.example?'example scene':'tonight\'s edge of the day')+'</small>';
+    var name=(g.park||'').split('·')[0].trim() || ((PARKS[g.home]||{}).name) || 'Today\'s park';
+    /* the same label the hero HUD earned: live only when the board is today's */
+    var what = g.example ? 'example scene' : (window.LIVE_EDGE_TAG || 'edge of the day');
+    m.innerHTML = esc(name)+'<small>'+esc(g.sky||'')+' · '+esc(g.temp)+'° · '+esc(what)+'</small>'+
+      (g.example && window.MLB_OFF_NOTE ? '<span class="note">'+esc(window.MLB_OFF_NOTE)+'</span>' : '');
+    var live=!g.example && window.LIVE_EDGE_LIVE===true;
+    var dot=document.getElementById('park-dot'), pill=document.getElementById('park-pill');
+    if(dot) dot.classList.toggle('off', !live);
+    if(pill) pill.textContent = live ? 'Every park, live — open the radar ↗' : 'Every park — open the radar ↗';
   }
   function go(){
     if(started) return; started=true;
