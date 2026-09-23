@@ -37,7 +37,7 @@ No third-party dependencies.
 import functools, json, os, re, statistics, sys, unicodedata
 from archive import save_merged
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 print = functools.partial(print, flush=True)
 
@@ -97,7 +97,9 @@ def norm_name(s):
     """'S.Darnold' / 'Sam Darnold' -> 'darnold' (last name, ascii, lower)."""
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode()
     s = re.sub(r"[^A-Za-z. ]", "", s).strip()
-    parts = re.split(r"[. ]+", s)
+    # suffixes dropped: "Marvin Harrison Jr." used to key as "" and never price
+    parts = [p for p in re.split(r"[. ]+", s)
+             if p and p.lower() not in ("jr", "sr", "ii", "iii", "iv")]
     return parts[-1].lower() if parts else ""
 
 
@@ -223,14 +225,42 @@ def build_leans(g, edge, wx):
 
 
 # ---------------------------------------------------------------- odds props
-def fetch_props(week_rows):
+MKT = {"pass yds": "player_pass_yds", "kicking pts": "player_kicking_points",
+       "rush yds": "player_rush_yds", "receptions": "player_receptions"}
+
+
+def props_needed(leans):
+    """{"AWAY@HOME": {market, ...}}: only the markets attach_prices() can use."""
+    need = {}
+    for ln in leans:
+        if not ln.get("who"):
+            continue
+        if MKT.get(ln.get("prop")):
+            need.setdefault(ln["game"], set()).add(MKT[ln["prop"]])
+        if ln.get("k") in ("RB WIND", "RB COLD"):
+            need.setdefault(ln["game"], set()).add("player_anytime_td")
+    return need
+
+
+def fetch_props(week_rows, leans):
     """Live prop lines keyed by (game, market, last-name). Fully guarded —
-    prop market keys drift; failure just means leans post without prices."""
+    prop market keys drift; failure just means leans post without prices.
+
+    Credits are charged per market returned per event call, so buy only the
+    markets a lean on the board will actually show, only for games that have
+    such a lean, only before kickoff and only once books post (<= 4 days out).
+    It used to buy all five markets for every game every run (~30-80 credits
+    a run) while almost every board had no priceable lean at all."""
     key = os.environ.get("ODDS_API_KEY")
     if not key:
         print("props: no ODDS_API_KEY — leans post without live prices")
         return {}
-    codes = {(g["away"], g["home"]) for g in week_rows}
+    allowed = {m.strip() for m in PROP_MARKETS.split(",") if m.strip()}
+    need = {g: m & allowed for g, m in props_needed(leans).items() if m & allowed}
+    if not need:
+        print("props: no lean on the board takes a player-prop price — 0 credits")
+        return {}
+    now = datetime.now(timezone.utc)
     out = {}
     try:
         events = WB.get_json(EVENTS_URL.format(key=key), tries=2)
@@ -241,13 +271,20 @@ def fetch_props(week_rows):
     for ev in events:
         a = WB.ODDS_TEAM_NAMES.get(ev.get("away_team"))
         h = WB.ODDS_TEAM_NAMES.get(ev.get("home_team"))
-        if not a or not h or (a, h) not in codes:
+        mkts = need.get(f"{a}@{h}")
+        if not a or not h or not mkts:
             continue
+        try:
+            t = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
+        except (KeyError, TypeError, ValueError):
+            continue
+        if not (now + timedelta(minutes=5) < t <= now + timedelta(days=4)):
+            continue     # under way (in-play lines) or props not posted yet
         if used >= 16:   # credit guard — one call per game max
             break
         try:
             data = WB.get_json(EVENT_ODDS_URL.format(
-                eid=ev["id"], key=key, mkts=PROP_MARKETS), tries=1)
+                eid=ev["id"], key=key, mkts=",".join(sorted(mkts))), tries=1)
             used += 1
         except Exception as e:
             print(f"props: {a}@{h} skipped ({e})")
@@ -261,14 +298,13 @@ def fetch_props(week_rows):
                         continue
                     kk = (f"{a}@{h}", mk.get("key"), norm_name(oc.get("description") or ""))
                     out.setdefault(kk, []).append(
-                        dict(side=oc.get("name"), point=oc.get("point"), price=oc.get("price")))
+                        dict(side=oc.get("name"), point=oc.get("point"), price=oc.get("price"),
+                             who=oc.get("description")))
     print(f"props: priced {len(out)} (game, market, player) combos from {used} events")
     return out
 
 
 def attach_prices(leans, props):
-    MKT = {"pass yds": "player_pass_yds", "kicking pts": "player_kicking_points",
-           "rush yds": "player_rush_yds", "receptions": "player_receptions"}
     for ln in leans:
         m = MKT.get(ln.get("prop"))
         if not m or not ln.get("who"):
@@ -277,6 +313,9 @@ def attach_prices(leans, props):
         rows = props.get((ln["game"], m, nm))
         if not rows:
             continue
+        if len({r.get("who") for r in rows}) > 1:
+            continue    # two players share this surname in this game (A.J. Brown /
+                        # Amon-Ra St. Brown) — never post a blend of their lines
         side = "Under" if ln["side"] == "UNDER" else "Over"
         pick = [r for r in rows if r["side"] == side] or rows
         pts = [r["point"] for r in pick]
@@ -331,7 +370,8 @@ def main():
         g = dict(
             away=away, home=home, date=r.get("gameday"), time=fmt_time(r),
             day=datetime.strptime(r["gameday"], "%Y-%m-%d").strftime("%a"),
-            stadium=(STADIUMS.get(home) or {}).get("name", r.get("stadium", "")),
+            stadium=((r.get("stadium") or "") if (r.get("location") or "Home") != "Home"
+                     else (STADIUMS.get(home) or {}).get("name", r.get("stadium", ""))),
             spread=spread_txt(r, away, home),
             total=(float(r["total_line"]) if (r.get("total_line") or "").strip() else None),
             roof=r.get("roof"), edge=edge,
@@ -342,7 +382,7 @@ def main():
         all_leans.extend(leans)
         games.append(g)
 
-    props = fetch_props(games)
+    props = fetch_props(games, all_leans)
     attach_prices(all_leans, props)
 
     fc_missing = sum(1 for g in games if g["wx"] is None)
