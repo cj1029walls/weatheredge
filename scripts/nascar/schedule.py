@@ -41,7 +41,7 @@ RACES = [
          name="Bank of America 400", track="Charlotte Motor Speedway", city="Concord, NC",
          date="2026-10-11", et="15:00", lat=35.352, lon=-80.683, tz="America/New_York", playoff=True),
     dict(shape=dict(kind="dogleg", mi=1.0, bank=11),
-         name="Phoenix Fall Race", track="Phoenix Raceway", city="Avondale, AZ",
+         name="Freeway Insurance 500", track="Phoenix Raceway", city="Avondale, AZ",
          date="2026-10-18", et="15:00", lat=33.375, lon=-112.311, tz="America/Phoenix", playoff=True),
     dict(shape=dict(kind="trioval", mi=2.66, bank=33),
          name="YellaWood 500", track="Talladega Superspeedway", city="Talladega, AL",
