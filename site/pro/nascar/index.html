@@ -19,7 +19,10 @@
 <meta name="twitter:description" content="Track history, Next Gen form by track type, and the heat edge — every lean archived and graded against the finishing order. $15/mo.">
 <meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
 
-<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript"></script>
+<script src="/assets/fresh.js" defer></script>
+<!-- deferred: a slow or blocked login script must never hold up the page — the gate
+     shows "Checking your membership…" meanwhile and says so if it never arrives -->
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" defer></script>
 <script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%23F08A3C" opacity="0.6"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23F08A3C" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +48,7 @@
   .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
   .brand h1 .pro{margin-left:12px;background:#F08A3C;color:#1B1206;border-radius:10px;padding:3px 12px;font-size:14px;letter-spacing:2px;font-weight:800}
   .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5}
-  .brand .tagline b{color:#F08A3C;font-weight:700}
+  .brand .tagline b{color:var(--gold-deep);font-weight:700}
   .pro-nav{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
   .pro-nav a{font-size:12px;font-weight:800;letter-spacing:.6px;color:#aeb9cf;text-decoration:none;border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:6px 15px}
   .pro-nav a:hover{color:#fff}
@@ -58,13 +61,13 @@
   .gamestrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
   .intel-card{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:12px 15px;display:flex;gap:11px;align-items:flex-start}
   .intel-card .ic{font-size:22px;line-height:1.2}
-  .intel-card .tag{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:2px 7px;display:inline-block}
+  .intel-card .tag{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border-radius:8px;padding:2px 7px;display:inline-block}
   .intel-card .tag.g{color:var(--muted);background:var(--gray-bg)}
   .intel-card h4{font-size:13px;font-weight:800;margin:5px 0 3px;line-height:1.35}
   .intel-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:0}
   .intel-card .stat{margin-left:auto;font-size:15px;font-weight:800;color:var(--gold-deep);white-space:nowrap;padding-left:8px}
   table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;font-size:13px}
-  th{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--line)}
+  th{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:800;text-align:left;padding:11px 14px;border-bottom:1.5px solid var(--line)}
   td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
   tr:last-child td{border-bottom:0}
   tr.g-row{cursor:pointer}
@@ -73,13 +76,15 @@
   .psub{font-size:11px;color:var(--muted);margin-top:2px}
   .imp{font-size:11px;color:var(--faint)}
   .chips{display:flex;flex-wrap:wrap;gap:5px}
-  .chip{font-size:10px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:14px;background:var(--gray-bg);color:var(--body2);white-space:nowrap}
+  .chip{font-size:11px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:14px;background:var(--gray-bg);color:var(--body2);white-space:nowrap}
   .chip.hot{background:#3a2f24;color:#fbbf24}
-  .chip.ref{background:#2b2836;color:#5b4a9e}
+  .chip.ref{background:rgba(167,139,250,.14);color:#c4b5fd}
+  .chip.hit{background:var(--green-bg);color:var(--green-deep)}
+  .chip.miss{background:var(--red-bg);color:var(--red-deep)}
   tr.d-row td{background:#2b313d;padding:14px 16px}
   .crew-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .crew-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-  .crew-box .cb-k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
+  .crew-box .cb-k{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:7px}
   .crew-box .cb-line{font-size:12.5px;color:var(--body2);margin:3px 0;line-height:1.45}
   .crew-box .cb-line b{color:#EFF1F7}
   .crew-box .cb-hi{color:#fbbf24;font-weight:700}
@@ -225,10 +230,58 @@
   /* ===== v5: home =====
      The wordmark is the link people reach for; the nav item is the one they
      can see. Both go to the landing page. ===== */
-  .home-link{color:inherit;text-decoration:none;border-radius:4px}
+  .home-link{color:inherit;text-decoration:none;border-radius:4px;display:inline-flex;align-items:center;min-height:40px}
   .home-link:hover{opacity:.82}
   .hometab{white-space:nowrap}
+
+  /* ===== v6: honest state, phones, tap targets =====
+     Build time beside the desk name; a finished or stale board says so in an
+     amber banner and hides books' prices. On a phone the section rail is one
+     sticky row of chips and the track table becomes two-line cards. ===== */
+  .pro-nav a{display:inline-flex;align-items:center;min-height:40px;padding:0 15px}
+  .desk-back{min-height:40px}
+  .desk-head{align-items:center}
+  #desk-fresh[hidden],#nas-banner[hidden]{display:none}
+  #nas-banner{margin:14px 0 2px}
+  .m-only{display:none!important}
+  .empty-row td{padding:18px 16px;color:var(--muted);font-size:13px;white-space:normal}
+  .note-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px 20px;font-size:14px;line-height:1.65;color:var(--body2);max-width:820px}
+  .note-card b{color:var(--ink)}
+  @media(max-width:640px){
+    main{padding-left:2px;padding-right:2px}
+    header{padding:18px 16px 16px}
+    .pro-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:12px -16px 0;padding:0 16px 2px;gap:6px;
+      -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+    .pro-nav::-webkit-scrollbar{display:none}
+    .pro-nav a{flex:0 0 auto;white-space:nowrap}
+    .pro-nav a[style]{margin-left:0!important}
+    .toolrail{display:flex!important;flex-wrap:nowrap;overflow-x:auto;position:sticky!important;top:0;z-index:40;
+      background:var(--surface);margin:10px -16px 16px!important;padding:8px 16px!important;gap:6px!important;scrollbar-width:none;
+      box-shadow:0 10px 14px -12px rgba(0,0,0,.7)}
+    .toolrail::-webkit-scrollbar{display:none}
+    .toolrail a{flex:0 0 auto!important;flex-direction:row!important;align-items:center!important;
+      min-height:40px;padding:0 14px!important;border-radius:999px!important;white-space:nowrap}
+    .toolrail a .s{display:none}
+    .toolrail a .t{font-size:13px}
+    .sec-h[id]{scroll-margin-top:74px}
+    .m-only{display:inline!important}
+    #track-board table{display:block;overflow:visible;white-space:normal}
+    #track-board table>thead{display:none}
+    #track-board table>tbody{display:block}
+    #track-board tr.rt-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"rank name avg" "rank meta meta";
+      gap:4px 10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+    #track-board tr.rt-row>td{display:block;padding:0;border:0;min-width:0}
+    #track-board tr.rt-row>td.c-x{display:none}
+    #track-board td.c-rank{grid-area:rank;color:var(--faint);font-weight:700}
+    #track-board td.c-name{grid-area:name}
+    #track-board td.c-avg{grid-area:avg;text-align:right}
+    #track-board td.c-meta{grid-area:meta}
+    #track-board tr.empty-row,#track-board tr.empty-row>td{display:block}
+    #nascar-record table{display:table;white-space:normal}
+  }
 </style>
+<script src="/pro/gate.js"></script>
 
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"NASCAR Track History & Heat Edge Board","url":"https://dfsradar.com/pro/nascar/","description":"This week's NASCAR board: driver track history with the Next Gen era split out, track-type form, and the heat edge \u2014 who gains spots when the track runs hot. Graded against the finishing order. $15/mo, all sports included.","brand":{"@type":"Brand","name":"DFSRADAR"},"offers":{"@type":"Offer","price":"15.00","priceCurrency":"USD","url":"https://dfsradar.com/pro/nascar/","availability":"https://schema.org/InStock"}}</script>
 </head>
@@ -253,6 +306,8 @@
 </header>
 
 <main>
+  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a href="#" class="ms-account" role="button">Account</a> · <a href="#" class="ms-logout" role="button">Log out</a></div>
+  <div id="gate-status" class="gate-status" role="status" aria-live="polite"><div class="gate-box gate-checking"><span class="gate-spin" aria-hidden="true"></span><span><span class="gt">Checking your membership…</span><span class="gs">Your desks open as soon as your login is confirmed.</span></span></div></div>
   <div id="paywall">
     <div class="pay-hero">
       <div class="pay-badge">DFSRADAR PRO · NASCAR</div>
@@ -275,10 +330,10 @@
   </div>
 
   <div id="pro-app" style="display:none">
-  <div class="member-bar" id="member-bar"><span id="member-email"></span> · <a class="ms-account">Account</a> · <a class="ms-logout">Log out</a></div>
 
   <a class="desk-back" href="/pro/">← All desks</a>
-  <div class="desk-head"><h2>NASCAR Desk</h2><span class="wk" id="desk-wk">No race this week</span></div>
+  <div class="desk-head"><h2>NASCAR Desk</h2><span class="wk" id="desk-wk">Loading…</span><span id="desk-fresh" hidden></span></div>
+  <div id="nas-banner" hidden></div>
   <div class="split-note" id="ev-note" style="margin-bottom:2px"></div>
 
   <nav class="toolrail">
@@ -332,29 +387,81 @@
 })();
 
 const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
-let D=null;
+let D=null, BOARD=null;
 const ICON={"TRACK TARGET":"🎯","DOMINATOR":"👑","HEAT EDGE":"🌡"};
+const cap=t=>{ t=String(t||"").trim(); return t?t.charAt(0).toUpperCase()+t.slice(1):""; };
+function whenFresh(fn){
+  if(window.RadarFresh||document.readyState!=="loading") fn();
+  else document.addEventListener("DOMContentLoaded",fn,{once:true});
+}
+function prettyTimes(t){
+  return String(t||"").replace(/\b(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2})(?::\d{2})?\s*ET\b/g,(m,x)=>{
+    if(!window.RadarFresh) return m;
+    const d=RadarFresh.parseET(x); return d?RadarFresh.fmt(d,true):m;
+  });
+}
+function todayET(){ return window.RadarFresh?RadarFresh.todayET():new Date().toISOString().slice(0,10); }
+function greenFlag(r){                     // "2026-09-27" + "15:00" -> "Sun Sep 27, 3:00 PM ET"
+  const day=window.RadarFresh?RadarFresh.dayLabel(r.date):r.date;
+  const m=/^(\d{1,2}):(\d{2})/.exec(r.time||"");
+  if(!m) return day;
+  const h=+m[1];
+  return `${day}, ${h%12||12}:${m[2]} ${h<12?"AM":"PM"} ET`;
+}
+/* live · final (race day has passed and no new board) · stale · off (season complete) */
+function boardState(d){
+  const r=d.race, st=(d.status&&typeof d.status==="object")?d.status:{};
+  const stale=!!(d.stale||st.ok===false);
+  let mode="live";
+  if(d.seasonComplete||!r) mode="off";
+  else if(r.date&&r.date<todayET()) mode="final";
+  else if(stale) mode="stale";
+  return {mode, st, stale, prices: mode==="live"};
+}
+function banner(title,body){
+  const el=document.getElementById("nas-banner");
+  if(!title){ el.hidden=true; el.innerHTML=""; return; }
+  if(window.RadarFresh) RadarFresh.banner(el,title,body);
+  else { el.hidden=false; el.textContent=title+(body?" "+body:""); }
+}
 function leanCard(l){
+  const mk=BOARD&&BOARD.prices&&l.market;
   return `<div class="intel-card"><div class="ic">${ICON[l.k]||"📌"}</div>
-    <div style="flex:1"><span class="tag ${l.side==="FADE"?"g":""}">${esc(l.k)} · ${esc(l.side)}</span>
-    <h4>${esc(l.who)}</h4><p>${esc(l.why)}</p>${l.market?`<p style="margin-top:4px"><span style="font-size:10px;font-weight:800;background:var(--gold-bg);color:var(--gold-deep);border-radius:10px;padding:2px 8px">MARKET ${l.market.price>0?"+":""}${l.market.price} · implied ${l.market.implied}%</span> <span style="font-size:10.5px;color:var(--faint)">books' outright price — our ranking vs their number</span></p>`:""}</div></div>`;
+    <div style="flex:1;min-width:0"><span class="tag ${l.side==="FADE"?"g":""}">${esc(l.k)} · ${esc(l.side)}</span>
+    <h4>${esc(l.who)}</h4><p>${esc(l.why)}</p>${mk?`<p style="margin-top:4px"><span style="font-size:11px;font-weight:800;background:var(--gold-bg);color:var(--gold-deep);border-radius:10px;padding:2px 8px">BOOKS ${l.market.price>0?"+":""}${l.market.price} · implied ${l.market.implied}%</span> <span style="font-size:11px;color:var(--faint)">books' outright price — our ranking vs their number</span></p>`:""}</div></div>`;
 }
 function render(){
   if(!D) return;
-  if(0) void 0;  // live bar removed
-    void`🏁 <span><b>Live</b> — built ${esc(D.updated)} · one PRO subscription covers every DFSRADAR sport.</span>`;
-  const r=D.race;
-  document.getElementById("desk-wk").textContent=r?`${r.name} · ${r.track}${r.playoff?" · PLAYOFFS":""}`:"No race this week";
-  const delayTxt=D.delay&&D.delay.level&&D.delay.level!=="clear"?` Delay outlook: ${D.delay.level} (${D.delay.pct}% peak rain).`:"";
-  document.getElementById("ev-note").textContent=[(D.note||""),r&&r.date?`Green flag ${r.date} ${r.time||""} ET.`:"",delayTxt].filter(Boolean).join(" ");
-  document.getElementById("leans").innerHTML=(D.leans||[]).length?(D.leans||[]).map(leanCard).join(""):`<div class="split-note">Leans post as history and forecast line up.</div>`;
-  document.getElementById("track-board").innerHTML=`<table><thead><tr><th>#</th><th>Driver</th><th>Starts</th><th>Avg finish</th><th>Next Gen avg</th><th>Top-5s</th><th>Best</th><th class="hide-m">Recent</th></tr></thead><tbody>${(D.board||[]).map((b,i)=>`
-    <tr><td>${i+1}</td><td><div class="pname">${esc(b.driver)}</div></td><td>${b.starts}</td><td>${b.avgFin}</td>
-    <td>${b.ngAvg!=null?`<b>${b.ngAvg}</b> <span class="imp">(${b.ngStarts})</span>`:'<span class="imp">—</span>'}</td>
-    <td>${b.top5}</td><td>${b.best}</td>
-    <td class="hide-m"><span class="imp">${(b.last||[]).map(x=>`${x.y}: P${x.pos}`).join(" · ")}</span></td></tr>`).join("")}</tbody></table>`;
-  document.getElementById("type-board").innerHTML=`<table><thead><tr><th>#</th><th>Driver</th><th>Races</th><th>Avg finish</th><th>Top-5s</th></tr></thead><tbody>${(D.tform||[]).map((t,i)=>`
-    <tr><td>${i+1}</td><td><div class="pname">${esc(t.driver)}</div></td><td>${t.n}</td><td><b>${t.avgFin}</b></td><td>${t.top5}</td></tr>`).join("")}</tbody></table>`;
+  const B=BOARD=boardState(D), r=D.race;
+  const built=()=>{ const t=window.RadarFresh&&RadarFresh.parseET((B.st&&B.st.lastGood)||D.updated); return t?RadarFresh.fmt(t,true):(D.updated||"—"); };
+  whenFresh(()=>{
+    const fr=document.getElementById("desk-fresh");
+    if(window.RadarFresh) RadarFresh.render(fr,{built:D.updated,stale:D.stale,status:D.status,maxAgeH:36});
+    if(B.mode==="final") banner(`The ${r.name} is over — this week's board is delayed.`,
+      `Last built ${built()}.${B.st.reason?` ${cap(B.st.reason)}.`:""} Its leans are graded on the record below; the next race's board posts as soon as it's built.`);
+    else if(B.mode==="stale") banner(`Not refreshed since ${built()}.`,
+      `${B.st.reason?cap(B.st.reason)+". ":""}The board below is from that build; books' prices are hidden until it rebuilds.`);
+    else banner("");
+    const delayTxt=D.delay&&D.delay.level&&D.delay.level!=="clear"?`Delay outlook: ${D.delay.level} (${D.delay.pct}% peak rain).`:"";
+    const note=B.mode==="stale"&&B.st.orig!=null?B.st.orig:(D.note||"");
+    document.getElementById("ev-note").textContent=B.mode==="off"?"":[prettyTimes(note),r&&r.date&&B.mode!=="final"?`Green flag ${greenFlag(r)}.`:"",B.mode==="live"?delayTxt:""].filter(Boolean).join(" ");
+  });
+  document.getElementById("desk-wk").textContent=r?`${r.name} · ${r.track}${r.playoff?" · Playoffs":""}${B.mode==="final"?" · final":""}`:"Off-season";
+  const leansEl=document.getElementById("leans"), leans=D.leans||[];
+  if(!r){ leansEl.className=""; leansEl.innerHTML=`<div class="note-card">${esc(D.note||"Season complete — the PRO board returns for the Daytona 500.")}</div>`; }
+  else if(B.mode==="final"){ leansEl.className=""; leansEl.innerHTML=`<div class="note-card">The <b>${esc(r.name)}</b> is over — its leans are graded in the record below.</div>`; }
+  else if(leans.length){ leansEl.className="gamestrip"; leansEl.innerHTML=leans.map(leanCard).join(""); }
+  else { leansEl.className=""; leansEl.innerHTML=`<div class="note-card">No leans yet — they post as the track history and the race-day forecast line up.</div>`; }
+  const board=D.board||[];
+  document.getElementById("track-board").innerHTML=`<table><thead><tr><th>#</th><th>Driver</th><th>Starts</th><th>Avg finish</th><th>Next Gen avg</th><th>Top-5s</th><th>Best</th><th class="hide-m">Recent</th></tr></thead><tbody>${board.length?board.map((b,i)=>`
+    <tr class="rt-row"><td class="c-rank">${i+1}</td><td class="c-name"><div class="pname">${esc(b.driver)}</div></td><td class="c-x">${b.starts}</td><td class="c-avg">${b.avgFin}<span class="m-only imp"> avg</span></td>
+    <td class="c-x">${b.ngAvg!=null?`<b>${b.ngAvg}</b> <span class="imp">(${b.ngStarts})</span>`:'<span class="imp">—</span>'}</td>
+    <td class="c-x">${b.top5}</td><td class="c-x">${b.best}</td>
+    <td class="hide-m c-x"><span class="imp">${(b.last||[]).map(x=>`${x.y}: P${x.pos}`).join(" · ")}</span></td>
+    <td class="c-meta m-only"><span class="imp">${b.starts} starts${b.ngAvg!=null?` · Next Gen ${b.ngAvg} (${b.ngStarts})`:""} · ${b.top5} top-5s · best ${b.best}</span></td></tr>`).join(""):`<tr class="empty-row"><td colspan="8">No track history on file for this race yet.</td></tr>`}</tbody></table>`;
+  const tf=D.tform||[];
+  document.getElementById("type-board").innerHTML=`<table><thead><tr><th>#</th><th>Driver</th><th>Races</th><th>Avg finish</th><th>Top-5s</th></tr></thead><tbody>${tf.length?tf.map((t,i)=>`
+    <tr><td>${i+1}</td><td><div class="pname">${esc(t.driver)}</div></td><td>${t.n}</td><td><b>${t.avgFin}</b></td><td>${t.top5}</td></tr>`).join(""):`<tr class="empty-row"><td colspan="5">Track-type form fills in once the race's track type is on file.</td></tr>`}</tbody></table>`;
   document.getElementById("heat-flag").innerHTML=D.hotFc?`<span class="chip hot">HOT FORECAST — ${D.fcTemp}°</span>`:(D.fcTemp!=null?`<span class="chip">forecast ${D.fcTemp}° — reference only</span>`:"");
   const h=D.heat||{};
   document.getElementById("heat-board").innerHTML=`<div class="crew-grid">
@@ -365,104 +472,47 @@ function render(){
 function renderNascarRecord(R){
   if(!R||!R.summary||!R.summary.overall||!R.summary.overall.n) return;
   const S=R.summary;
-  const chip=(lab,r)=>r&&r.n?`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${r.w}–${r.n-r.w}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`:"";
-  const stat=(lab,v)=>v==null?"":`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${v}</b><div style="font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`;
+  const box=(v,lab)=>`<div style="display:inline-block;background:var(--gray-bg);border-radius:12px;padding:10px 18px;margin:0 10px 10px 0"><b style="font-size:22px">${v}</b><div style="font-size:11px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase">${lab}</div></div>`;
+  const chip=(lab,r)=>r&&r.n?box(`${r.w}–${r.n-r.w}`,lab):"";
+  const stat=(lab,v)=>v==null?"":box(v,lab);
   const races=(R.recent||[]).map(e=>{
-    const rows=e.leans.map(l=>`<tr><td><span class="chip ${l.hit?"hot":""}">${l.hit?"HIT":"MISS"}</span></td>
+    const rows=e.leans.map(l=>`<tr><td><span class="chip ${l.hit?"hit":"miss"}">${l.hit?"HIT":"MISS"}</span></td>
       <td><b>${esc(l.who)}</b><div class="imp">${esc(l.k)} · bar top-${l.bar}</div></td>
-      <td>finished <b>${l.pos}</b>${l.field?` of ${l.field}`:""}</td></tr>`).join("");
-    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(e.race)}</b>${e.date?` · ${esc(e.date)}`:""}</div><table><tbody>${rows}</tbody></table>`;
+      <td>finished <b>${esc(l.pos)}</b>${l.field?` of ${l.field}`:""}</td></tr>`).join("");
+    return `<div class="split-note" style="margin:12px 0 6px"><b>${esc(e.race)}</b>${e.date?` · ${esc(e.date)}`:""}</div><table><tbody>${rows||`<tr class="empty-row"><td colspan="3">No leans graded for this race.</td></tr>`}</tbody></table>`;
   }).join("");
   document.getElementById("nascar-record").innerHTML=
     `<div>${chip("all graded leans",S.overall)}${chip("track targets",S.trackTarget)}${chip("dominators",S.dominator)}${stat("avg finish",S.avgFinish)}${stat("wins",S.wins)}</div>
      <p class="split-note">Bar: <b>${esc(S.bar)}</b>. A driver who doesn't take the green is left ungraded rather than counted as a loss.</p>${races}`;
 }
+/* Section links (#s-track …) are hidden until the gate opens and the board renders:
+   jump to the one in the URL once there is something to land on. */
+function landOnHash(){
+  const id=location.hash.slice(1);
+  if(!/^s-/.test(id)) return;
+  const el=document.getElementById(id);
+  if(el) requestAnimationFrame(()=>el.scrollIntoView({block:"start"}));
+}
 async function load(){
-  try{const r=await fetch("/pro/nascar.json?_="+Date.now()); if(!r.ok) return; D=await r.json(); render();}catch(e){}
+  try{
+    const r=await fetch("/pro/nascar.json?_="+Date.now());
+    if(!r.ok) throw new Error(r.status);
+    const d=await r.json();
+    if(!d||typeof d!=="object") throw new Error("bad json");
+    D=d; render();
+  }catch(e){
+    document.getElementById("desk-wk").textContent="Board unavailable";
+    document.getElementById("leans").className="";
+    document.getElementById("leans").innerHTML=`<div class="note-card">The NASCAR board didn't load — <a href="${esc(location.pathname)}">reload the page</a> to try again.</div>`;
+  }
   try{const rr=await fetch("/pro/nascar_record.json?_="+Date.now()); if(rr.ok) renderNascarRecord(await rr.json());}catch(e){}
+  landOnHash();
 }
 
-/* ---- membership gate: DFSRADAR PRO ($15/mo) or DFS Kitchen All-Access ---- */
-const MS_PLANS=["pln_dfsradar-pro-mnvo0vbh","pln_all-access-bundle-5kpn0n3d"];
-let GATED=null, LOADED=false;
-function msReady(timeout=6000){
-  return new Promise(res=>{
-    const t0=Date.now();
-    (function poll(){
-      if(window.$memberstackDom) return res(window.$memberstackDom);
-      if(Date.now()-t0>timeout) return res(null);
-      setTimeout(poll,150);
-    })();
-  });
-}
-async function gate(){
-  let member=null, ok=false;
-  try{
-    const ms=await msReady();
-    if(ms){
-      const r=await ms.getCurrentMember();
-      member=r&&r.data;
-      ok=!!(member&&(member.planConnections||[]).some(pc=>
-        MS_PLANS.includes(pc.planId)&&["ACTIVE","TRIALING"].includes(String(pc.status||"").toUpperCase())));
-    }
-  }catch(e){}
-  GATED=ok;
-  /* PRO data is fetched only once the gate says this visitor is a member —
-     never before it resolves, and never for a logged-out visitor. */
-  if(ok&&!LOADED){ LOADED=true; load(); }
-  document.getElementById("pro-app").style.display=ok?"block":"none";
-  document.getElementById("paywall").style.display=ok?"none":"block";
-  const bar=document.getElementById("member-bar");
-  if(ok&&member){bar.style.display="flex";document.getElementById("member-email").textContent=(member.auth&&member.auth.email)||"";}
-  else bar.style.display="none";
-  return ok;
-}
-(async()=>{
-  await gate();
-  const ms=window.$memberstackDom;
-  if(ms&&ms.onAuthChange) ms.onAuthChange(()=>gate());
-  if(location.hash==="#login"&&!GATED&&ms){ try{ await ms.openModal("LOGIN"); gate(); }catch(e){} }
-})();
-document.addEventListener("visibilitychange",()=>{ if(!document.hidden) gate(); });
-/* ---- checkout wiring: the data-ms attributes don't fire for logged-out
-   visitors, so Subscribe/Login/Account/Logout are driven explicitly. ---- */
-const PRO_PRICE="prc_pro-monthly-rdvp0vis";
-async function buyPro(){
-  const ms=await msReady();
-  if(!ms){ alert("Checkout couldn't load — please refresh the page (and disable ad blockers if you use one)."); return; }
-  let member=null;
-  try{ member=(await ms.getCurrentMember()).data; }catch(e){}
-  if(!member){
-    try{ const r=await ms.openModal("SIGNUP"); member=r&&r.data; }catch(e){ return; }
-    try{ ms.hideModal(); }catch(e){}
-  }
-  if(!member) return;
-  if(await gate()) return;   // Kitchen All-Access / existing PRO — already unlocked
-  try{
-    await ms.purchasePlansWithCheckout({ priceId: PRO_PRICE,
-      successUrl: location.origin+location.pathname,
-      cancelUrl: location.origin+location.pathname });
-  }catch(e){
-    console.error("checkout", e);
-    alert("Couldn't open checkout — please try again, or log in first if you already have an account.");
-  }
-}
-document.querySelectorAll(".pay-cta").forEach(b=>b.addEventListener("click", e=>{ e.preventDefault(); buyPro(); }));
-document.querySelectorAll(".pay-login").forEach(b=>b.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(!ms) return;
-  try{ await ms.openModal("LOGIN"); ms.hideModal(); }catch(err){}
-  gate();
-}));
-document.querySelectorAll('.ms-logout').forEach(a=>a.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(ms){ try{ await ms.logout(); }catch(err){} }
-  gate();
-}));
-document.querySelectorAll('.ms-account').forEach(a=>a.addEventListener("click", async e=>{
-  e.preventDefault();
-  const ms=await msReady(); if(ms){ try{ await ms.openModal("PROFILE"); }catch(err){} }
-}));
+/* ---- membership: /pro/gate.js decides who sees the desk (PRO or All-Access,
+   ACTIVE or TRIALING). The desk's data is fetched only once it confirms a member. ---- */
+if(window.ProGate) ProGate.start({ load: () => { load(); } });
+else document.getElementById("gate-status").textContent = "The membership check didn't load — please refresh the page.";
 
 </script>
 </body>
