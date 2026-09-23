@@ -81,8 +81,14 @@ ODDS_TEAM_NAMES = {
 }
 
 def fetch_book_lines():
-    """One call → {"AWAY@HOME": consensus total}. Median across all US books.
-    Free tier budget: 3 runs/day ≈ 93 calls/month of the 500 allowed.
+    """One call → {"AWAY@HOME": [(first pitch UTC, consensus total), ...]}, the
+    median across all US books, PRE-GAME events only.
+
+    The odds endpoint also returns games already in play, priced LIVE: a run
+    delayed past first pitch published STL@PIT at a 4.5 "total" (runs still to
+    come) and graded the O/U lean against it. Started games are skipped here;
+    build_game keeps their pre-game line from today's earlier archive. A list
+    per matchup because doubleheaders share AWAY@HOME.
     Missing key or any failure → {} (build falls back to sample-median estimates)."""
     key = os.environ.get("ODDS_API_KEY")
     if not key:
@@ -93,11 +99,19 @@ def fetch_book_lines():
     except Exception as e:
         print(f"odds api unavailable ({e}) — using estimated totals")
         return {}
-    out = {}
+    now = datetime.now(timezone.utc)
+    out, live = {}, 0
     for ev in events:
         away = ODDS_TEAM_NAMES.get(ev.get("away_team"))
         home = ODDS_TEAM_NAMES.get(ev.get("home_team"))
         if not away or not home:
+            continue
+        try:
+            start = datetime.fromisoformat(str(ev.get("commence_time")).replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if start <= now:
+            live += 1
             continue
         points = []
         for bk in ev.get("bookmakers", []):
@@ -107,14 +121,24 @@ def fetch_book_lines():
                         if oc.get("name") == "Over" and oc.get("point") is not None:
                             points.append(oc["point"])
         if points:
-            out[f"{away}@{home}"] = statistics.median(points)
+            out.setdefault(f"{away}@{home}", []).append((start, statistics.median(points)))
     unmapped = sorted({n for ev in events for n in (ev.get("away_team"), ev.get("home_team"))
                        if n and n not in ODDS_TEAM_NAMES})
     if unmapped:
         print(f"::warning::odds api: unmapped MLB team names {unmapped} — those games "
               "silently fall back to estimated totals")
-    print(f"odds api: real totals for {len(out)} games")
+    print(f"odds api: pre-game totals for {sum(len(v) for v in out.values())} games"
+          + (f" ({live} already in play skipped)" if live else ""))
     return out
+
+
+def book_line(entry, start):
+    """A pinned total (data/lines.json), or the book total of the pre-game event
+    whose first pitch is closest to this game's (doubleheaders share a key)."""
+    if entry is None or isinstance(entry, (int, float)):
+        return entry
+    t, total = min(entry, key=lambda e: abs(e[0] - start))
+    return total if abs(t - start) <= timedelta(minutes=150) else None
 
 def get_json(url, tries=5):
     for i in range(tries):
@@ -411,7 +435,8 @@ def era_runs(x):
     """A matched game's total runs, scaled to the current run environment."""
     return x["r"] * ERA_FACTOR.get(int(str(x["d"])[:4]), 1.0)
 
-def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=None):
+def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=None,
+               prior=None, now=None):
     home_id = g["teams"]["home"]["team"]["id"]
     away_id = g["teams"]["away"]["team"]["id"]
     home = MLBID_TO_CODE.get(home_id)
@@ -515,7 +540,16 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
     m_so = statistics.mean(x["so"] for x in rows) if rows else 0
     avg = hist["avg"]
 
+    started = not offline and utc <= (now or datetime.now(timezone.utc))
     line = lines.get(f"{away}@{home}")
+    if not isinstance(line, (int, float)):          # book events, not a manual pin
+        line = None if started else book_line(line, utc)
+    if line is None and started:
+        # In play: the book line is the one this game carried before first
+        # pitch (today's earlier archive), never a live in-game number.
+        p = (prior or {}).get(g.get("gamePk")) or {}
+        if p.get("lineSource") == "book" and p.get("total"):
+            line = p["total"]
     line_source = "book" if line is not None else "est"
     if line is None and rows:
         # estimate: the half-point line that best balances the matched sample
@@ -579,10 +613,34 @@ def build_game(g, hist_all, league, lines, offline, hitters_all=None, umps_all=N
     out["tempFx"] = None if (dome or not hist) else heat_receptivity(hist)
     return out
 
-def archive_predictions(date_str, games):
+def load_prior(date_str):
+    """Today's archive as the previous run left it: {gamePk: archived call}."""
+    path = os.path.join(PREDS_DIR, f"{date_str}.json")
+    try:
+        return {g["gamePk"]: g for g in json.load(open(path)).get("games", [])
+                if g.get("gamePk")}
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        print(f"::warning::today's prediction archive unreadable ({e}) — rebuilding it")
+        return {}
+
+
+def archive_predictions(date_str, games, prior=None, started=frozenset()):
+    """Archive today's calls for grading. A call is final at first pitch: a game
+    that has started keeps the entry an earlier run archived (a run delayed
+    past first pitch used to replace it with one made mid-game), and a game
+    no run caught before first pitch isn't archived, so it isn't graded."""
     os.makedirs(PREDS_DIR, exist_ok=True)
-    live = [g for g in games if not g.get("dome")]
-    edge_pk = max(live, key=lambda g: abs(g["hr"]))["gamePk"] if live else None
+    prior = prior or {}
+    # kept even if this run couldn't rebuild the game
+    frozen = [p for pk, p in prior.items() if pk in started]
+    late = [g for g in games if g.get("gamePk") in started and g.get("gamePk") not in prior]
+    open_ = [g for g in games if g.get("gamePk") not in started]
+    # one edge of the day: once the flagged game starts, the flag stays with it
+    live = [g for g in open_ if not g.get("dome")]
+    edge_pk = None if any(p.get("edge") for p in frozen) else (
+        max(live, key=lambda g: abs(g["hr"]))["gamePk"] if live else None)
     slim = [dict(gamePk=g.get("gamePk"), away=g["away"], home=g["home"],
                  total=g.get("total"), lineSource=g.get("lineSource"),
                  ou=g["ou"], ouLean=g.get("ouLean"), ouMedian=g.get("ouMedian"),
@@ -590,9 +648,13 @@ def archive_predictions(date_str, games):
                  hrPark=g.get("hrPark"), soPark=g.get("soPark"),
                  edge=(g.get("gamePk") == edge_pk),
                  dome=g.get("dome", False), sample=g.get("sample"))
-            for g in games]
+            for g in open_]
+    if frozen or late:
+        print(f"archive: {len(frozen)} started game(s) kept as called before first pitch"
+              + (f"; {len(late)} started before any run could call them — not archived"
+                 if late else ""))
     with open(os.path.join(PREDS_DIR, f"{date_str}.json"), "w") as f:
-        json.dump(dict(date=date_str, games=slim), f, separators=(",", ":"))
+        json.dump(dict(date=date_str, games=frozen + slim), f, separators=(",", ":"))
 
 def grade_day(date_str, preds):
     """Grade one archived day against official MLB final scores + box scores."""
@@ -768,13 +830,23 @@ def main():
     else:
         sched = get_json(SCHED_PP_URL.format(date=date_str))
 
+    prior = {} if args.offline else load_prior(date_str)
+    now = datetime.now(timezone.utc)
+    started = set()
     games = []
     for day in sched.get("dates", []):
         for g in day.get("games", []):
             if not playable(g):
                 continue
             try:
-                built = build_game(g, hist_all, league, lines, args.offline, hitters_all, umps_all)
+                if not args.offline and datetime.fromisoformat(
+                        g["gameDate"].replace("Z", "+00:00")) <= now:
+                    started.add(g.get("gamePk"))
+            except (KeyError, ValueError):
+                pass
+            try:
+                built = build_game(g, hist_all, league, lines, args.offline, hitters_all,
+                                   umps_all, prior=prior, now=now)
                 if built: games.append(built)
             except Exception as e:
                 print(f"  skip {g.get('gamePk')}: {e}")
@@ -811,7 +883,7 @@ def main():
     print(f"Wrote {OUT}: {len(games)} games for {date_str}")
 
     if games:
-        archive_predictions(date_str, games)
+        archive_predictions(date_str, games, prior, started)
     if not args.offline:
         grade_pending(date_str)
     elif os.path.exists(ACCURACY):
