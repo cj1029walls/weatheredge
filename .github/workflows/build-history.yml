@@ -3,14 +3,21 @@ name: Build history dataset
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9 5 1 *"   # each January 5th, pick up the newly published Retrosheet season
+    - cron: "11 9 5 1 *"    # each January 5th, pick up the newly published Retrosheet season
+    - cron: "11 9 5 2,3 *"  # retries: Retrosheet's release date varies; a miss on Jan 5
+                            # otherwise leaves the dataset a full season behind for a year
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   history:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,11 +26,4 @@ jobs:
       - name: Build parks_history.json (Retrosheet + Open-Meteo archive)
         run: python scripts/build_history.py
       - name: Commit dataset
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add data/parks_history.json
-          git add data/umps_history.json || true
-          git commit -m "Rebuild historical dataset" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        run: bash scripts/ci/commit_push.sh "Rebuild historical dataset" data/parks_history.json "?data/umps_history.json"
