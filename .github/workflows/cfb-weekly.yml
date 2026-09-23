@@ -3,44 +3,72 @@ name: CFB weekly slate build
 on:
   workflow_dispatch:
   schedule:
-    - cron: "45 9 * * *"    # daily ~5:45 AM ET — forecasts sharpen as kickoff nears
-    - cron: "30 14 * * 6"   # Saturdays ~10:30 AM ET — final pre-kick refresh
+    - cron: "37 9 * * *"    # daily ~5:37 AM ET — forecasts sharpen as kickoff nears
+    - cron: "22 14 * * 6"   # Saturdays ~10:22 AM ET — final pre-kick refresh (GitHub
+                            # cron has landed after the noon kicks; use the dispatcher)
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   cfb-slate:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # Every CFBD call goes through scripts/cfb/cfbd_cache.py: responses cached
+      # in data/cfb/cache/ (committed below), no retries on 429, ~2 calls a day.
+      # When CFBD is down the builders fall back to the cache, say so in the
+      # page text, emit a ::warning:: and exit 0 -- a non-zero exit is a crash,
+      # handled like the other sports: page marked stale, run goes red.
       - name: Build site/cfb/data.json
-        env:
-          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        id: free
+        continue-on-error: true
         run: python scripts/cfb/weekly_build.py
+      - name: Mark free slate stale
+        if: steps.free.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/cfb/data.json "the schedule/forecast refresh failed"
       - name: Grade PRO Trench Edge leans (completed weeks)
-        env:
-          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
-        run: python scripts/pro/cfb_grade.py || echo "grading skipped"
+        id: grade
+        continue-on-error: true
+        run: python scripts/pro/cfb_grade.py
       - name: Build PRO Trench Edge board (site/pro/cfb.json)
+        id: pro
+        continue-on-error: true
         env:
-          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python scripts/pro/cfb_build.py || echo "trench board skipped — using last committed board"
+        run: python scripts/pro/cfb_build.py
+      - name: Mark PRO board stale
+        if: steps.pro.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/cfb.json "the Trench Edge board rebuild failed"
       - name: Build PRO Wind Factor (site/pro/cfb_wx.json)
         # Reads the history dataset and this week's forecasts already on disk —
         # no API keys, so it can only fail on a genuine data problem.
-        run: python scripts/pro/cfb_wx.py || echo "wind factor skipped — using last committed dataset"
+        id: wx
+        continue-on-error: true
+        run: python scripts/pro/cfb_wx.py
       - name: Commit slate data
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add site/cfb/data.json 2>/dev/null || true
-          git add site/pro/cfb.json site/pro/cfb_wx.json data/pro/cfb_predictions 2>/dev/null || true
-          git add site/cfb/teaser.json site/pro/cfb_record.json data/pro/cfb_results.json 2>/dev/null || true
-          git commit -m "CFB slate refresh" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/commit_push.sh "CFB slate refresh"
+          site/cfb/data.json site/cfb/teaser.json
+          site/pro/cfb.json site/pro/cfb_wx.json site/pro/cfb_record.json
+          data/pro/cfb_predictions data/pro/cfb_results.json
+          "?data/cfb/cache"
+      - name: Report
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/gate.sh
+          "CFB free slate=${{ steps.free.outcome }}"
+          "CFB PRO board=${{ steps.pro.outcome }}"
+          -- "CFB grading=${{ steps.grade.outcome }}"
+          "CFB Wind Factor=${{ steps.wx.outcome }}"
