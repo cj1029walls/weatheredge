@@ -3,36 +3,63 @@ name: NFL weekly slate build
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 9 * * *"    # daily ~5:30 AM ET — forecasts sharpen as kickoff nears
-    - cron: "0 15 * * 0"    # Sundays ~11 AM ET — final pre-kick refresh
+    - cron: "23 9 * * *"    # daily ~5:23 AM ET — forecasts sharpen as kickoff nears
+    - cron: "7 15 * * 0"    # Sundays ~11:07 AM ET — final pre-kick refresh (GitHub
+                            # cron has landed after the 1 PM kicks; the external
+                            # dispatcher is the reliable clock for this one)
 
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}     # never two NFL runs racing on the same files
+  cancel-in-progress: false
+
 jobs:
   nfl-slate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # Pattern (all sport workflows): every builder is continue-on-error; a
+      # failed page builder leaves its last good JSON marked "not refreshed"
+      # (the page shows it); the commit always runs; the final gate turns
+      # failures into annotations and a red run; publish.yml deploys the commit.
       - name: Build site/nfl/data.json
+        id: free
+        continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/nfl/weekly_build.py
+      - name: Mark free slate stale
+        if: steps.free.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/nfl/data.json "the schedule/forecast refresh failed"
       - name: Grade PRO leans (completed weeks)
-        run: python scripts/pro/nfl_grade.py || echo "grading skipped"
+        id: grade
+        continue-on-error: true
+        run: python scripts/pro/nfl_grade.py
       - name: Build site/pro/nfl.json (PRO weekly board)
+        id: pro
+        continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python scripts/pro/nfl_build.py
+      - name: Mark PRO board stale
+        if: steps.pro.outcome == 'failure'
+        run: python scripts/ci/mark_stale.py site/pro/nfl.json "the PRO board rebuild failed"
       - name: Commit slate data
-        run: |
-          git config user.name "weatheredge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add site/nfl/data.json site/pro/nfl.json data/pro/nfl_predictions 2>/dev/null || true
-          git add site/pro/nfl_record.json data/pro/nfl_results.json 2>/dev/null || true
-          git commit -m "NFL slate refresh" || echo "no changes"
-          git pull --rebase origin main
-          git push
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/commit_push.sh "NFL slate refresh"
+          site/nfl/data.json site/pro/nfl.json site/pro/nfl_record.json
+          data/pro/nfl_predictions data/pro/nfl_results.json
+      - name: Report
+        if: ${{ !cancelled() }}
+        run: >-
+          bash scripts/ci/gate.sh
+          "NFL free slate=${{ steps.free.outcome }}"
+          "NFL PRO board=${{ steps.pro.outcome }}"
+          -- "NFL grading=${{ steps.grade.outcome }}"
