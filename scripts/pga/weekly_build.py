@@ -26,7 +26,8 @@ FC_URL = ("https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}
           "precipitation_probability,relative_humidity_2m"
           "&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone={tz}&forecast_days=16")
 
-ET = timezone(timedelta(hours=-4))
+from zoneinfo import ZoneInfo
+ET = ZoneInfo("America/New_York")  # real Eastern time: a fixed UTC-4 is an hour off from Nov 1 (DST ends)
 
 
 def get_json(url, tries=5):
@@ -67,6 +68,9 @@ def main():
     upcoming = [e for e in EVENTS
                 if datetime.strptime(e["r1"], "%Y-%m-%d").date() > today
                 and e is not current][:3]
+    left = sum(1 for e in EVENTS if datetime.strptime(e["end"], "%Y-%m-%d").date() >= today)
+    if left < 3:
+        print(f"::warning::scripts/pga/schedule.py has {left} event(s) left — add next season's schedule")
 
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
                    event=None, rounds=[], waves=[], brief="",
@@ -124,7 +128,8 @@ def main():
                                      t=round(r[1]), w=round(r[2]),
                                      rain=None if r[4] is None else round(r[4]))
                                 for r in rows if 7 <= r[0] <= 18])
-                    if am and pm and ri < 2:      # wave edge matters Thu/Fri (split waves)
+                    # wave edge matters Thu/Fri (split waves) — not in team match play
+                    if am and pm and ri < 2 and not current.get("team"):
                         diff = pm["wind"] - am["wind"]
                         if abs(diff) >= 4:
                             rd["waveEdge"] = dict(
@@ -163,6 +168,11 @@ def main():
         else:
             payload["brief"] = ""
 
+    if not current:
+        yr = int(EVENTS[-1]["end"][:4]) if EVENTS else today.year
+        payload["seasonComplete"] = True
+        payload["brief"] = (f"The {yr} PGA TOUR season is complete — the radar returns "
+                            f"with the {yr + 1} schedule in January.")
     with open(OUT, "w") as f:
         json.dump(payload, f, separators=(",", ":"))
     ev = payload["event"]["name"] if payload["event"] else "no event"
