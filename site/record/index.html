@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DFSRADAR Record</title>
+<meta name="description" content="Every DFSRADAR call, graded in public: MLB home-run targets against the odds we stated, CFB trench leans, NFL spots, PGA and NASCAR finishes, and the free radar's own calls. Wins and losses both stay on the page.">
+<link rel="canonical" href="https://dfsradar.com/record/">
+<meta property="og:title" content="DFSRADAR Record">
+<meta property="og:description" content="Every call, graded in public — wins, losses, and the calibration table that shows how honest the numbers are.">
+<meta property="og:url" content="https://dfsradar.com/record/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-card.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<style>
+  /* The landing page's tokens, unchanged, so the record reads as the same site.
+     Cyan is DFSRADAR; orange is only ever PRO / All-Access; green, red and
+     amber only ever mean hit, miss and warning. --dim2 is the small-text grey
+     (4.5:1 on these surfaces; --dim is kept for rules and decoration). */
+  :root{
+    --bg:#2E3240; --panel:#323A4A; --panel2:#3C4455; --panel3:#2A303D; --inset:#252A35;
+    --border:#454E61; --text:#EFF1F7; --muted:#C7CEDC; --dim:#8E97AD; --dim2:#A7B0C4;
+    --accent:#F08A3C; --accent-soft:#FFA05A; --accent-bg:rgba(255,160,90,.13); --on-accent:#1B1206;
+    --radar:#22d3ee; --radar-soft:#67e8f9; --radar-bg:rgba(34,211,238,.11); --on-radar:#06232a;
+    --good:#22c55e; --good-t:#4ade80; --bad:#f87171; --bad-t:#fca5a5; --warn:#fbbf24; --warn-t:#fcd34d;
+    --font:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --display:Sora,Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --surface:linear-gradient(180deg,rgba(255,255,255,.045) 0%,rgba(255,255,255,0) 60%),var(--panel);
+    --elev:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.28);
+    --elev-hi:inset 0 1px 0 rgba(255,255,255,.1),0 2px 4px rgba(0,0,0,.35),0 26px 56px rgba(0,0,0,.36);
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--radar-soft);text-decoration:none}
+  h1,h2,h3{font-family:var(--display);margin:0}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+  .dim{color:var(--dim2)}
+  .nowrap{white-space:nowrap}
+
+  /* ---------- nav (the landing's) ---------- */
+  .nav{position:sticky;top:0;z-index:50;background:rgba(46,50,64,.86);backdrop-filter:blur(14px) saturate(150%);
+    border-bottom:1px solid rgba(255,255,255,.07)}
+  .nav-in{max-width:1200px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:22px}
+  .brand{display:flex;align-items:center;gap:11px;color:var(--text)}
+  .brand svg{width:34px;height:34px;flex-shrink:0}
+  .brand .n{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.4px;line-height:1.1}
+  .brand .n b{color:var(--radar);font-weight:800}
+  .brand .t{display:block;font-family:var(--font);font-size:9.5px;font-weight:700;letter-spacing:2.6px;
+    text-transform:uppercase;color:var(--dim);margin-top:3px}
+  .nav-links{display:flex;gap:2px;margin-left:auto;align-items:center}
+  .nav-links a:not(.nav-cta){color:var(--muted);font-size:13.5px;font-weight:500;padding:8px 12px;border-radius:8px;transition:color .2s,background .2s;white-space:nowrap}
+  .nav-links a:not(.nav-cta):hover{color:var(--text);background:rgba(255,255,255,.05)}
+  .nav-links a[aria-current]{color:var(--text);background:rgba(255,255,255,.06)}
+  .nav-links .nav-login{margin-left:6px;border:1px solid rgba(255,255,255,.12)}
+  .nav-cta{margin-left:10px;background:var(--accent);color:var(--on-accent)!important;font-weight:800;font-size:13.5px;white-space:nowrap;
+    padding:10px 18px;border-radius:9px;background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 22px rgba(240,138,60,.28);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 12px 28px rgba(240,138,60,.38)}
+
+  /* ---------- buttons, pills, badges (the landing's) ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 28px;border-radius:10px;
+    font-weight:700;font-size:16px;position:relative;overflow:hidden;
+    transition:transform .2s var(--ease),box-shadow .2s var(--ease),background .2s,border-color .2s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-pro{background:var(--accent);color:var(--on-accent);
+    background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 30px rgba(240,138,60,.32)}
+  .btn-pro:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 16px 38px rgba(240,138,60,.42)}
+  .btn-pro::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);
+    animation:shimmer 5.5s var(--ease) infinite}
+  @keyframes shimmer{0%{left:-60%}18%{left:130%}100%{left:130%}}
+  .btn-ghost{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);backdrop-filter:blur(6px)}
+  .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(34,211,238,.45)}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 12px;border-radius:999px;
+    background:var(--surface);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;margin:0 0 18px}
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--radar);box-shadow:0 0 10px rgba(34,211,238,.85)}
+  .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-size:11.5px;font-weight:800;
+    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+  .badge.radar{background:var(--radar-bg);color:var(--radar-soft);border:1px solid rgba(34,211,238,.35)}
+  .badge.pro{background:var(--accent-bg);color:var(--accent-soft);border:1px solid rgba(240,138,60,.35)}
+  .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1.6px;border-radius:7px;padding:3px 8px;line-height:1.5}
+  .tag.pro{background:var(--accent);color:var(--on-accent)}
+  .tag.free{background:var(--radar-bg);color:var(--radar-soft);box-shadow:inset 0 0 0 1px rgba(34,211,238,.35)}
+
+  /* freshness stamp: RadarFresh's chip where a file carries a build time,
+     this neutral twin ("Graded through Week 3") where it doesn't */
+  .stamp{display:inline-flex;align-items:center;gap:8px;font:600 11.5px/1.2 var(--font);letter-spacing:.2px;padding:6px 11px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .stamp::before{content:"";flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:var(--radar-soft);box-shadow:0 0 0 3px rgba(34,211,238,.14)}
+  .fresh:empty{display:none}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:84px 0 34px;overflow:hidden}
+  .hero::before{content:"";position:absolute;left:50%;top:-260px;width:1100px;height:640px;margin-left:-550px;
+    background:radial-gradient(closest-side,rgba(34,211,238,.16),transparent 70%);filter:blur(24px);pointer-events:none}
+  .hero .wrap{position:relative}
+  .hero h1{font-size:clamp(36px,5vw,58px);font-weight:800;line-height:1.04;letter-spacing:-.035em;margin:0 0 22px;text-wrap:balance;max-width:880px}
+  .hero h1 .accent{background:linear-gradient(92deg,#22d3ee 0%,#8ff0fb 55%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .sub{font-size:18px;line-height:1.72;color:var(--muted);margin:0;max-width:760px}
+  .method{list-style:none;margin:34px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1000px}
+  .method li{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 18px 15px;box-shadow:var(--elev)}
+  .method b{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .method b::before{content:"✓";display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;
+    background:var(--radar-bg);color:var(--radar-soft);font-size:11px;font-weight:900;box-shadow:inset 0 0 0 1px rgba(34,211,238,.35);flex-shrink:0}
+  .method span{display:block;margin-top:6px;color:var(--muted);font-size:13.5px;line-height:1.55}
+
+  /* ---------- summary tiles ---------- */
+  .summary{padding-top:30px;padding-bottom:10px}
+  .sum-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 14px}
+  .sum-h h2{font-size:13px;font-family:var(--font);font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--dim2)}
+  .sum-h p{margin:0;font-size:13px;color:var(--dim2)}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .tile{display:flex;flex-direction:column;background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:14px;
+    box-shadow:var(--elev);padding:20px 20px 16px;color:var(--text);min-height:188px;
+    transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
+  .tile:hover{transform:translateY(-3px);box-shadow:var(--elev-hi);border-color:rgba(34,211,238,.4)}
+  .tile.is-pro:hover{border-color:rgba(240,138,60,.5)}
+  .tile .top{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .tile .nm{font-family:var(--display);font-weight:700;font-size:14.5px;letter-spacing:-.01em;color:var(--text)}
+  .tile .nm span{color:var(--dim2);font-weight:600}
+  .tile .v{font-family:var(--display);font-weight:800;font-size:38px;letter-spacing:-.03em;line-height:1}
+  .tile .v small{font-family:var(--font);font-size:13px;font-weight:700;color:var(--dim2);margin-left:8px;letter-spacing:.02em}
+  .tile .s{margin-top:10px;font-size:13.5px;color:var(--muted);line-height:1.5}
+  .tile .f{margin-top:auto;padding-top:12px;font-size:12px;color:var(--dim2)}
+  .tile .f:empty{display:none}
+  .tile.is-empty .v{color:var(--dim)}
+
+  /* ---------- desk sections ---------- */
+  .desk{padding-top:84px;scroll-margin-top:70px}
+  .desk-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:18px 32px;flex-wrap:wrap;margin-bottom:22px}
+  .desk-id{max-width:760px;min-width:0}
+  .desk h2{font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin:0 0 12px;text-wrap:balance}
+  .desk .what{color:var(--muted);font-size:15.5px;line-height:1.72;margin:0}
+  .desk .what b{color:var(--text);font-weight:700}
+  .desk-meta{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+  .desk-link{font-size:13.5px;font-weight:800;color:var(--radar-soft);white-space:nowrap}
+  .desk-link.pro{color:var(--accent-soft)}
+  .desk-link:hover{text-decoration:underline;text-underline-offset:3px}
+  .panel{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:var(--elev);padding:24px 26px}
+  .panel + .panel{margin-top:14px}
+  .panel h3{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0}
+  .ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px 18px;flex-wrap:wrap;margin-bottom:16px}
+  .ph p{margin:0;color:var(--dim2);font-size:13px}
+  .loading{color:var(--dim2);font-size:14px;padding:26px;border:1px dashed rgba(255,255,255,.12);border-radius:14px}
+  .empty{display:flex;flex-direction:column;gap:4px;padding:24px 26px;border:1px dashed rgba(255,255,255,.16);border-radius:14px;background:rgba(37,42,53,.45)}
+  .empty b{font-family:var(--display);font-weight:700;font-size:16px}
+  .empty span{color:var(--muted);font-size:14.5px}
+  .note{margin:16px 0 0;color:var(--dim2);font-size:13px;line-height:1.6}
+  .note b{color:var(--muted)}
+
+  /* KPI row inside a desk */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+  .kpi{background:rgba(37,42,53,.75);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 16px 13px;min-width:0}
+  .kpi .kl{display:block;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim2)}
+  .kpi b{display:block;font-family:var(--display);font-weight:800;font-size:25px;letter-spacing:-.02em;line-height:1.1;margin-top:8px}
+  .kpi .ks{display:block;margin-top:6px;font-size:12.5px;color:var(--muted);line-height:1.45}
+
+  /* result pill: colour plus a word, never colour alone */
+  .res{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+    padding:4px 9px 4px 8px;border-radius:999px;border:1px solid;white-space:nowrap;line-height:1.2;vertical-align:middle}
+  .res.hit{background:rgba(34,197,94,.13);color:var(--good-t);border-color:rgba(34,197,94,.38)}
+  .res.miss{background:rgba(248,113,113,.12);color:var(--bad-t);border-color:rgba(248,113,113,.38)}
+  .res.void{background:rgba(255,255,255,.04);color:var(--dim2);border-color:rgba(255,255,255,.14)}
+  .res.hit::before{content:"✓"} .res.miss::before{content:"✕"} .res.void::before{content:"–"}
+
+  /* ---------- the calibration table (the centrepiece) ---------- */
+  .cal-panel{padding:26px 28px 22px;border-color:rgba(34,211,238,.28);box-shadow:var(--elev-hi),0 0 60px rgba(34,211,238,.06)}
+  .cal-t{width:100%;border-collapse:collapse}
+  .cal-t th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim2);
+    padding:0 14px 10px 0;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
+  .cal-t td,.cal-t tbody th,.cal-t tfoot th{padding:14px 14px 14px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:15px;color:var(--muted)}
+  .cal-t tbody th,.cal-t tfoot th{font-family:var(--display);font-weight:700;color:var(--text);font-size:15px;letter-spacing:-.01em;text-transform:none;white-space:nowrap}
+  .cal-t .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .cal-t td b{color:var(--text);font-weight:800}
+  .cal-t .gap.warn{color:var(--warn-t);font-weight:700}
+  .cal-t tfoot td,.cal-t tfoot th{border-bottom:none;border-top:1px solid rgba(255,255,255,.12)}
+  .cal-t .barc{width:36%;padding-right:0;padding-left:10px}
+  .cbar{position:relative;height:12px;background:rgba(255,255,255,.06);border-radius:999px}
+  .cbar i{position:absolute;left:0;top:0;height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(34,211,238,.55),var(--radar))}
+  .cbar em{position:absolute;top:-5px;width:3px;height:22px;margin-left:-1.5px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(50,58,74,.9),0 0 8px rgba(255,255,255,.5)}
+  .cal-key{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--dim2)}
+  .cal-key i{display:inline-block;width:14px;height:7px;border-radius:999px;background:var(--radar);vertical-align:middle;margin-right:7px}
+  .cal-key em{display:inline-block;width:3px;height:13px;background:#fff;vertical-align:middle;margin-right:7px;border-radius:2px}
+  .cal-read{margin:14px 0 0;padding:12px 14px;border-radius:10px;background:rgba(37,42,53,.7);border:1px solid rgba(255,255,255,.06);
+    color:var(--muted);font-size:14px;line-height:1.6}
+  .cal-read b{color:var(--text)}
+  .cal-read .w{color:var(--warn-t);font-weight:700}
+
+  /* ---------- result tables -> card rows on phones ---------- */
+  .rt{width:100%;border-collapse:collapse;font-size:14px}
+  .rt th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim2);
+    padding:0 14px 10px 0;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
+  .rt td{padding:12px 14px 12px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted);vertical-align:top;line-height:1.5}
+  .rt tr:last-child td{border-bottom:none}
+  .rt th:last-child,.rt td:last-child{padding-right:0}
+  .rt .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .rt .c-res{width:84px}
+  .rt td.who{color:var(--text);font-weight:700}
+  .rt td.who small{display:block;font-weight:500;font-size:12.5px;color:var(--dim2);margin-top:2px;line-height:1.45}
+  .rt .tab{font-variant-numeric:tabular-nums}
+  .rt .strong{color:var(--text);font-weight:700}
+  .rt .vf{display:block}
+  .rt .vf + .vf{margin-top:4px}
+  .rt .px{color:var(--dim2);font-variant-numeric:tabular-nums}
+  .rt .ph-only{display:none}
+
+  /* weeks / events / races */
+  .grp{border-top:1px solid rgba(255,255,255,.07)}
+  .grp:first-of-type{border-top:none}
+  .grp summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:15px 34px 15px 2px;min-height:52px;position:relative}
+  .grp summary::-webkit-details-marker{display:none}
+  .grp summary::after{content:"";position:absolute;right:8px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--radar-soft);
+    border-bottom:2px solid var(--radar-soft);transform:rotate(45deg);transition:transform .3s var(--ease)}
+  .grp[open] summary::after{transform:rotate(-135deg);margin-top:-2px}
+  .grp .gn{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:-.01em;color:var(--text)}
+  .grp .gm{color:var(--dim2);font-size:13px}
+  .grp .gr{margin-left:auto;display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;color:var(--text)}
+  .grp .gr .dim{font-weight:600}
+  .grp .gb{padding:0 0 16px}
+
+  /* ---------- closing CTA (the landing's band, orange for PRO) ---------- */
+  .cta-band{max-width:1136px;margin:96px auto 0;padding:0 32px}
+  .cta-in{position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(240,138,60,.34);background:linear-gradient(#3A4050,#2E3240);
+    box-shadow:var(--elev-hi),0 0 80px rgba(240,138,60,.08);padding:60px 40px 54px;text-align:center}
+  .cta-in::before{content:"";position:absolute;left:50%;top:-160px;width:700px;height:400px;margin-left:-350px;
+    background:radial-gradient(rgba(240,138,60,.20),transparent 65%);filter:blur(30px);pointer-events:none}
+  .cta-in h2{font-size:clamp(28px,3.4vw,40px);letter-spacing:-.03em;margin:0 0 12px;position:relative;text-wrap:balance}
+  .cta-in p{color:var(--muted);font-size:16.5px;max-width:600px;margin:0 auto 28px;position:relative}
+  .cta-in .row{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative}
+  .free-row{position:relative;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:30px}
+  .free-row .l{font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--dim2);margin-right:4px}
+  .free-row a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 15px;border-radius:999px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);font-size:13px;font-weight:700;
+    transition:border-color .2s,background .2s,color .2s}
+  .free-row a:hover{border-color:rgba(34,211,238,.55);background:var(--radar-bg);color:var(--radar-soft)}
+  .cta-in .fine{margin:22px auto 0;color:var(--dim2);font-size:13px;position:relative}
+  .cta-in .fine a{color:var(--radar-soft);font-weight:700}
+
+  /* ---------- footer (the landing's) ---------- */
+  footer{border-top:1px solid rgba(255,255,255,.07);margin-top:72px;padding:44px 32px 56px;text-align:center;color:var(--dim2);font-size:13.5px;line-height:1.8}
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--radar-soft)}
+  .fnav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+  .fnav a{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);font-size:13px;min-height:40px;display:inline-flex;align-items:center}
+  .fnav a[aria-current]{color:var(--text);border-color:rgba(34,211,238,.4)}
+  footer .tagline{color:var(--radar-soft);font-style:italic;margin-top:12px}
+  .disc{max-width:620px;margin:18px auto 0;font-size:12.5px}
+
+  :focus-visible{outline:2px solid var(--radar);outline-offset:3px;border-radius:4px}
+  ::selection{background:rgba(34,211,238,.32);color:var(--text)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1000px){
+    .tiles{grid-template-columns:repeat(2,1fr)}
+    .method{grid-template-columns:1fr}
+    .desk-meta{align-items:center;flex-direction:row;flex-wrap:wrap;gap:6px 18px;flex:1 1 100%;min-width:0}
+    .desk-link{display:inline-flex;align-items:center;min-height:40px}
+  }
+  @media (max-width:640px){
+    .wrap,.nav-in,.cta-band{padding-left:20px;padding-right:20px}
+    .nav-in{gap:12px}
+    .nav-links a:not(.nav-cta):not(.nav-login){display:none}
+    .nav-links .nav-login{margin-left:0;padding:8px 10px}
+    .nav-cta{margin-left:6px;padding:10px 14px}
+    .brand .t{display:none}
+    .hero{padding:52px 0 24px}
+    .hero .sub{font-size:16.5px}
+    .desk{padding-top:64px}
+    .panel{padding:18px 16px;border-radius:14px}
+    .cal-panel{padding:20px 16px 18px}
+    /* a tile becomes one row: name and detail on the left, the number on the right */
+    .tiles{grid-template-columns:1fr;gap:10px}
+    .tile{display:grid;grid-template-columns:1fr auto;grid-template-areas:"top v" "s v" "f f";column-gap:14px;min-height:0;padding:16px 16px 14px}
+    .tile .top{grid-area:top;margin-bottom:6px}
+    .tile .v{grid-area:v;align-self:center;font-size:30px;text-align:right}
+    .tile .v small{display:block;margin:6px 0 0;font-size:11.5px}
+    .tile .s{grid-area:s;margin-top:0;font-size:13px}
+    .tile .f{grid-area:f;padding-top:8px}
+    .kpis{grid-template-columns:1fr 1fr}
+    .kpi b{font-size:21px}
+    .cta-in{padding:44px 20px 40px}
+    .free-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+    .free-row .l{grid-column:1 / -1;margin:0 0 4px}
+    .free-row a{padding:0 4px;font-size:12.5px}
+    footer{padding-left:20px;padding-right:20px}
+
+    /* result tables: each row a card, the result pill top-right */
+    .rt thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    .rt,.rt tbody{display:block;width:100%}
+    .rt tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;padding:13px 14px;margin:0 0 8px;
+      background:rgba(37,42,53,.75);border:1px solid rgba(255,255,255,.06);border-radius:12px}
+    .rt td{display:block;padding:0;border:0;min-width:0;grid-column:1 / -1}
+    .rt td:last-child{padding:0}
+    .rt td.lead{grid-column:1 / span 3;grid-row:1}
+    .rt td.c-res,.rt td.c-side{grid-column:4;grid-row:1;justify-self:end;text-align:right;width:auto;white-space:nowrap}
+    .rt td.half{grid-column:span 2}
+    .rt td.qtr{grid-column:span 1}
+    .rt td.na{display:none}
+    .rt .num{text-align:left}
+    .rt .ph-only{display:inline}
+    .rt td[data-label]::before{content:attr(data-label);display:block;font-size:10px;font-weight:800;letter-spacing:1.2px;
+      text-transform:uppercase;color:var(--dim2);margin-bottom:1px}
+    .rt td.lead[data-label]::before,.rt td.c-res[data-label]::before,.rt td.c-side[data-label]::before{display:none}
+
+    /* calibration: range + numbers on one line, the bar full width beneath */
+    .cal-t thead{display:none}
+    .cal-t,.cal-t tbody,.cal-t tfoot{display:block}
+    .cal-t tr{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:4px 10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .cal-t tfoot tr{border-bottom:none;border-top:1px solid rgba(255,255,255,.12)}
+    .cal-t td,.cal-t tbody th,.cal-t tfoot th,.cal-t tfoot td{display:block;padding:0;border:0;font-size:14px}
+    .cal-t tbody th,.cal-t tfoot th{grid-column:1 / -1;font-size:15px}
+    .cal-t .num{text-align:left}
+    .cal-t td[data-label]::before{content:attr(data-label);display:block;font-size:9.5px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--dim2)}
+    .cal-t .barc{grid-column:1 / -1;width:auto;padding:8px 0 2px}
+  }
+  @media (max-width:349px){
+    .nav-links .nav-login{display:none}
+    .kpis{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="nav-in">
+    <a class="brand" href="/" aria-label="DFSRADAR home">
+      <svg viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#22d3ee" stroke-width="1.8"/>
+        <circle cx="22" cy="22" r="13.5" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".7"/>
+        <circle cx="22" cy="22" r="7" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".5"/>
+        <line x1="22" y1="22" x2="22" y2="2.6" stroke="#EFF1F7" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="29.5" cy="13.5" r="2.4" fill="#F08A3C"/>
+        <circle cx="22" cy="22" r="1.7" fill="#EFF1F7"/>
+      </svg>
+      <span><span class="n">DFS<b>RADAR</b></span><span class="t">Scan · Match · Measure · Grade</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="/#sports">Radars</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/record/" aria-current="page">Record</a>
+      <a class="nav-login" href="/pro/#login">Log in</a>
+      <a class="nav-cta" href="/pro/">Get PRO</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">The record</span>
+    <h1>Every call, <span class="accent">graded in public.</span></h1>
+    <p class="sub">Calls are archived when they post and graded from the official result — the box score,
+      the final leaderboard, the finishing order. MLB grades land the next morning; the weekly sports once
+      the week's games are final. A miss stays a miss, and losing stretches stay on this page. Each desk
+      below says exactly what it grades and against which bar.</p>
+    <ul class="method">
+      <li><b>Archived as posted</b><span>A PRO card can't be rewritten once its slate starts, so nothing is re-picked after the results are in.</span></li>
+      <li><b>Graded from the result</b><span>Box scores, final leaderboards and finishing orders, pulled once the games are final.</span></li>
+      <li><b>Wins and losses both stay</b><span>Each desk grades against a stated bar, and the misses are listed beside the hits.</span></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <section class="summary wrap" aria-labelledby="sum-h">
+    <div class="sum-h"><h2 id="sum-h">The record at a glance</h2><p>Rates show once a product has 10 graded calls.</p></div>
+    <div class="tiles">
+      <a class="tile is-pro" href="#mlb" data-k="mlb"><span class="top"><span class="tag pro">PRO</span><span class="nm">MLB <span>· HR targets</span></span></span><b class="v">—</b><span class="s">Loading…</span><span class="f"></span></a>
+      <a class="tile is-pro" href="#cfb" data-k="cfb"><span class="top"><span class="tag pro">PRO</span><span class="nm">CFB <span>· Trench leans</span></span></span><b class="v">—</b><span class="s">Loading…</span><span class="f"></span></a>
+      <a class="tile is-pro" href="#nfl" data-k="nfl"><span class="top"><span class="tag pro">PRO</span><span class="nm">NFL <span>· Spots &amp; props</span></span></span><b class="v">—</b><span class="s">Loading…</span><span class="f"></span></a>
+      <a class="tile is-pro" href="#pga" data-k="pga"><span class="top"><span class="tag pro">PRO</span><span class="nm">PGA <span>· Course horses</span></span></span><b class="v">—</b><span class="s">Loading…</span><span class="f"></span></a>
+      <a class="tile is-pro" href="#nascar" data-k="nascar"><span class="top"><span class="tag pro">PRO</span><span class="nm">NASCAR <span>· Track targets</span></span></span><b class="v">—</b><span class="s">Loading…</span><span class="f"></span></a>
+      <a class="tile" href="#free" data-k="free"><span class="top"><span class="tag free">FREE</span><span class="nm">MLB radar <span>· Daily calls</span></span></span><b class="v">—</b><span class="s">Loading…</span><span class="f"></span></a>
+    </div>
+    <noscript><p class="note">The record is drawn from the graded files the site publishes — turn on JavaScript to load it.</p></noscript>
+  </section>
+
+  <section class="desk wrap" id="mlb" aria-labelledby="mlb-h">
+    <div class="desk-hd">
+      <div class="desk-id">
+        <span class="badge pro">PRO · MLB desk</span>
+        <h2 id="mlb-h">Home-run targets, against the odds we stated</h2>
+        <p class="what">Each night's top 20 targets are archived before first pitch with the chance we stated.
+          It's a hit if he homers; a player who didn't bat is left out. The calibration table is the honesty check: when we say 25%, it should
+          happen about a quarter of the time.</p>
+      </div>
+      <div class="desk-meta"><span class="fresh" id="mlb-fresh"></span><a class="desk-link pro" href="/pro/mlb/">Open the MLB desk →</a></div>
+    </div>
+    <div id="mlb-body"><p class="loading">Loading the record…</p></div>
+  </section>
+
+  <section class="desk wrap" id="cfb" aria-labelledby="cfb-h">
+    <div class="desk-hd">
+      <div class="desk-id">
+        <span class="badge pro">PRO · CFB desk</span>
+        <h2 id="cfb-h">Trench leans, against the week's median</h2>
+        <p class="what">A <b>target</b> (Rush Edge or Stacked Rush) hits when the flagged team's yards per carry beat
+          that week's FBS median; a <b>fade</b> hits when they fall below it. Because the bar is the median,
+          a coin flip wins half — anything above that is the trench edge showing up.</p>
+      </div>
+      <div class="desk-meta"><span class="fresh" id="cfb-fresh"></span><a class="desk-link pro" href="/pro/cfb/">Open the CFB desk →</a></div>
+    </div>
+    <div id="cfb-body"><p class="loading">Loading the record…</p></div>
+  </section>
+
+  <section class="desk wrap" id="nfl" aria-labelledby="nfl-h">
+    <div class="desk-hd">
+      <div class="desk-id">
+        <span class="badge pro">PRO · NFL desk</span>
+        <h2 id="nfl-h">Spots and props, against the closing number</h2>
+        <p class="what">Game spots are graded against the archived closing total, cold team-total leans against the
+          implied team total, and priced props against the line we archived. A push isn't graded, and
+          <b>WATCH</b> spots — games flagged to watch, not to play — aren't graded at all.</p>
+      </div>
+      <div class="desk-meta"><span class="fresh" id="nfl-fresh"></span><a class="desk-link pro" href="/pro/nfl/">Open the NFL desk →</a></div>
+    </div>
+    <div id="nfl-body"><p class="loading">Loading the record…</p></div>
+  </section>
+
+  <section class="desk wrap" id="pga" aria-labelledby="pga-h">
+    <div class="desk-hd">
+      <div class="desk-id">
+        <span class="badge pro">PRO · PGA desk</span>
+        <h2 id="pga-h">Course horses, against a top-20 bar</h2>
+        <p class="what">A Course Horse target hits on a <b>top-20 finish</b>; a golfer who never tees off is left
+          ungraded. A top 20 is easier in a small field, so each event shows its field size and the
+          base rate — the share of that field a random pick would have hit.</p>
+      </div>
+      <div class="desk-meta"><span class="fresh" id="pga-fresh"></span><a class="desk-link pro" href="/pro/pga/">Open the PGA desk →</a></div>
+    </div>
+    <div id="pga-body"><p class="loading">Loading the record…</p></div>
+  </section>
+
+  <section class="desk wrap" id="nascar" aria-labelledby="nascar-h">
+    <div class="desk-hd">
+      <div class="desk-id">
+        <span class="badge pro">PRO · NASCAR desk</span>
+        <h2 id="nascar-h">Track targets, against a top-10 bar</h2>
+        <p class="what">A Track Target hits on a <b>top-10 finish</b>; a Dominator — the stronger claim — needs a
+          <b>top 5</b>; a fade hits when the driver finishes outside the bar. A driver who doesn't start is
+          left ungraded. The base rate is what a random driver would have hit against the same bars.</p>
+      </div>
+      <div class="desk-meta"><span class="fresh" id="nascar-fresh"></span><a class="desk-link pro" href="/pro/nascar/">Open the NASCAR desk →</a></div>
+    </div>
+    <div id="nascar-body"><p class="loading">Loading the record…</p></div>
+  </section>
+
+  <section class="desk wrap" id="free" aria-labelledby="free-h">
+    <div class="desk-hd">
+      <div class="desk-id">
+        <span class="badge radar">Free · MLB radar</span>
+        <h2 id="free-h">The free radar's own calls</h2>
+        <p class="what">The free MLB radar makes three kinds of call, each graded the next morning. An <b>O/U lean</b>
+          when similar-weather games at the park landed a full run off the day's total. An <b>HR call</b> when
+          those games moved home runs 15% or more against the park's average, graded against that average.
+          A <b>K call</b> the same way on strikeouts, at 6%. Early cards used an older, looser lean rule;
+          they're graded as they posted.</p>
+      </div>
+      <div class="desk-meta"><span class="fresh" id="free-fresh"></span><a class="desk-link" href="/mlb/">Open the MLB radar →</a></div>
+    </div>
+    <div id="free-body"><p class="loading">Loading the record…</p></div>
+  </section>
+</main>
+
+<div class="cta-band">
+  <div class="cta-in">
+    <h2>The receipts are public. The boards are PRO.</h2>
+    <p>Every PRO call on this page was on a desk before its game started. DFSRADAR PRO puts the next slate's
+      boards in front of you — $15 a month, or included with DFS Kitchen All-Access.</p>
+    <div class="row">
+      <a class="btn btn-pro" href="/pro/">Get DFSRADAR PRO →</a>
+      <a class="btn btn-ghost" href="/#pricing">Compare plans</a>
+    </div>
+    <nav class="free-row" aria-label="Free radars">
+      <span class="l">Or open a free radar</span>
+      <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
+    </nav>
+    <p class="fine">Already a member? <a href="/pro/#login">Log in</a></p>
+  </div>
+</div>
+
+<footer>
+  <div class="fnav">
+    <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a href="/pro/">PRO</a><a href="/record/" aria-current="page">Record</a><a href="/pro/#login">Log in</a>
+  </div>
+  <div>DFSRADAR · part of <a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=record" target="_blank" rel="noopener">The DFS Kitchen</a> family —
+    <a href="https://dfsprep.com" target="_blank" rel="noopener">DFSPREP</a> · <a href="https://dfsbooks.com" target="_blank" rel="noopener">DFS Books</a> · <a href="https://dfskitchen.com/optimizer" target="_blank" rel="noopener">The Optimizer</a></div>
+  <div class="tagline">Scan the slate. Find the edge.</div>
+  <p class="disc">Weather-adjusted insights are informational and are not betting advice. Past results don't guarantee
+    future ones. 21+. If gambling is a problem for you, call <span class="nowrap">1-800-GAMBLER</span>.</p>
+</footer>
+
+<script>
+/* DFSRADAR · the public record.
+   Reads only files the site already publishes, and only their graded results:
+     /pro/record.json          MLB PRO (summary + last 10 graded nights; scripts/pro/grade.py)
+     /pro/{cfb,nfl,pga,nascar}_record.json   the weekly desks (scripts/pro/*_grade.py)
+     /accuracy.json            the free radar's calls by day (scripts/daily_build.py)
+   Every number on the page comes from those files or is arithmetic on them
+   (a rate, a weighted average, a field base rate). A missing file (404) reads
+   as "nothing graded yet"; any other failure says it didn't load. */
+document.addEventListener('DOMContentLoaded', function(){
+  'use strict';
+  var RF = window.RadarFresh || null;          // assets/fresh.js (deferred; guarded)
+  var MIN_N = 10;                               // below this a W–L record shows, not a rate
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function rate(w,n){ return n ? Math.round(100*w/n)+'%' : '—'; }
+  function wl(r){ return r.w+'–'+(r.n-r.w); }
+  function wlc(w,l){ return (w+l) ? w+'–'+l : '<span class="dim">—</span>'; }
+  function isoDay(d){ d=String(d||''); return /^\d{8}$/.test(d) ? d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8) : d; }
+  function day(d){ var iso=isoDay(d); return RF ? RF.dayLabel(iso) : iso; }                 // "Mon Sep 21"
+  function mday(d){ return day(d).replace(/^[A-Z][a-z]{2} (?=[A-Z])/, ''); }               // "Sep 21"
+  function ord(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+  function week(k){ var m=/(\d{4})\D+(\d+)$/.exec(k||''); return m ? {season:+m[1], n:+m[2]} : null; }
+  function weekLabel(k, season){ var w=week(k); if(!w) return esc(k); return (season && w.season!==season ? w.season+' · ' : '')+'Week '+w.n; }
+  function cap(k){                                   // "RUSH EDGE" -> "Rush Edge", "QB WIND" -> "QB Wind"; escaped, it goes into HTML
+    return esc(String(k||'').toLowerCase().replace(/(^|[\s\-])[a-z]/g,function(c){return c.toUpperCase();})
+      .replace(/\b(Qb|Rb|Wr|Te|Hr)\b/g,function(c){return c.toUpperCase();}));
+  }
+  function signed(x, d){ var v=Number(x); return (v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(d==null?1:d); }
+  function price(p){ return p==null ? '' : (p>0?'+':'−')+Math.abs(p); }
+  function res(hit){
+    if(hit===true) return '<span class="res hit">Hit</span>';
+    if(hit===false) return '<span class="res miss">Miss</span>';
+    return '<span class="res void">Not graded</span>';
+  }
+  function rangeLabel(r){ var m=/^(\d+)\s*[–-]\s*\+$/.exec(r||''); return m ? m[1]+'%+' : esc(r)+'%'; }
+
+  function load(url){
+    return fetch(url+'?_='+Date.now(), {cache:'no-store'}).then(function(r){
+      if(r.status===404) return {state:'missing'};
+      if(!r.ok) return {state:'error'};
+      return r.json().then(function(j){ return (j && typeof j==='object') ? {state:'ok', data:j} : {state:'error'}; },
+                           function(){ return {state:'error'}; });
+    }, function(){ return {state:'error'}; });
+  }
+
+  /* ---- shared pieces ---- */
+  var EMPTY = {
+    mlb:    ['No graded nights yet', 'First grades land the morning after the first PRO card posts.'],
+    cfb:    ['No graded weeks yet', 'First grades land the morning after the first week\'s games are final.'],
+    nfl:    ['No graded weeks yet', 'First grades land the morning after the week\'s last game is final.'],
+    pga:    ['No graded events yet', 'First grades land the morning after the first event\'s final round.'],
+    nascar: ['No graded races yet', 'First grades land the morning after the first race.'],
+    free:   ['No graded days yet', 'First grades land the morning after the first slate.']
+  };
+  function emptyBox(t, b){ return '<div class="empty"><b>'+esc(t)+'</b><span>'+esc(b)+'</span></div>'; }
+  function tile(key, o){
+    var t=document.querySelector('.tile[data-k="'+key+'"]'); if(!t) return;
+    t.querySelector('.v').innerHTML=o.v; t.querySelector('.s').innerHTML=o.s; t.querySelector('.f').textContent=o.f||'';
+    t.classList.toggle('is-empty', !!o.empty);
+  }
+  function fail(key, state){
+    var e=EMPTY[key], err=state==='error';
+    $(key+'-body').innerHTML = err ? emptyBox('This record didn\'t load', 'Refresh the page to try again.') : emptyBox(e[0], e[1]);
+    tile(key, {v:'—', s:err ? 'The record didn\'t load.' : esc(e[0])+'.', empty:true});
+  }
+  function stamp(el, text){ el.innerHTML = text ? '<span class="stamp">'+esc(text)+'</span>' : ''; }
+  /* RadarFresh where the file carries a build time; otherwise say what was graded last */
+  function freshness(key, built, fallback){
+    var el=$(key+'-fresh');
+    if(RF && built && RF.parseET(built)) RF.render(el, {built:built, maxAgeH:30});
+    else stamp(el, fallback);
+  }
+  function kpi(label, value, sub){
+    return '<div class="kpi"><span class="kl">'+label+'</span><b>'+value+'</b>'+(sub?'<span class="ks">'+sub+'</span>':'')+'</div>';
+  }
+  function headline(r, what){      // big tile number: a rate from MIN_N graded calls, the W–L before that
+    if(!r || !r.n) return '—';
+    return r.n>=MIN_N ? rate(r.w,r.n)+'<small>'+what+'</small>' : wl(r)+'<small>W–L</small>';
+  }
+  function table(cols, rows){
+    var th=cols.map(function(c){ return '<th scope="col" role="columnheader"'+(c.c?' class="'+c.c+'"':'')+'>'+c.h+'</th>'; }).join('');
+    var tb=rows.map(function(r){
+      return '<tr role="row">'+r.map(function(v,i){ var c=cols[i], cls=c.c||'', html=v;
+        if(v && typeof v==='object'){ html=v.html; cls=(cls+' '+(v.cls||'')).trim(); }
+        return '<td role="cell"'+(cls?' class="'+cls+'"':'')+(c.h?' data-label="'+esc(c.h)+'"':'')+'>'+html+'</td>'; }).join('')+'</tr>';
+    }).join('');
+    return '<table class="rt" role="table"><thead role="rowgroup"><tr role="row">'+th+'</tr></thead><tbody role="rowgroup">'+tb+'</tbody></table>';
+  }
+  function na(html){ return {html:html, cls:'na'}; }
+  function group(open, name, meta, right, body){
+    return '<details class="grp"'+(open?' open':'')+'><summary><span class="gn">'+name+'</span>'+(meta?'<span class="gm">'+meta+'</span>':'')+
+      '<span class="gr">'+right+'</span></summary><div class="gb">'+body+'</div></details>';
+  }
+  function rateAt(w,n,after){ return n>=MIN_N ? rate(w,n)+(after||'') : ''; }
+  function tally(leans){ var n=leans.length, w=leans.filter(function(l){return l.hit;}).length; return {n:n, w:w}; }
+  function groupRight(t){ return t.n ? wl(t) : '<span class="dim">no graded calls</span>'; }
+
+  /* ================= MLB PRO: /pro/record.json ================= */
+  function renderMLB(x){
+    var r=x.data||{}, s=r.summary||{};
+    if(x.state!=='ok' || !s.graded){ fail('mlb', x.state); if(x.state==='ok') freshness('mlb', r.updated, ''); return; }
+    var recent=r.recent||[], last=recent[0] && recent[0].d;
+    freshness('mlb', r.updated, last ? 'Graded through '+day(last) : '');
+
+    // calibration: act is round(100*hits/n, 1), so n*act/100 recovers hits exactly while n < 1000
+    var cal=(s.cal||[]).filter(function(c){ return c.n; });
+    var n=0, hitsF=0, saidF=0, exact=true;
+    cal.forEach(function(c){ n+=c.n; hitsF+=c.n*c.act/100; saidF+=c.n*c.exp; if(c.n>=1000) exact=false; });
+    var hits=Math.round(hitsF), said=n ? saidF/n : 0, happened=n ? (exact ? 100*hits/n : 100*hitsF/n) : 0;
+
+    tile('mlb', {v: n ? happened.toFixed(1)+'%<small>homered</small>' : '—',
+      s: n ? (exact ? hits+' of '+n+' targets' : n+' targets')+' · we said '+said.toFixed(1)+'%' : s.graded+' targets graded',
+      f: (last ? 'Through '+day(last)+' · ' : '')+s.nights+' night'+(s.nights===1?'':'s')});
+
+    var html='';
+    if(cal.length){
+      var top=Math.max.apply(null, cal.map(function(c){ return Math.max(c.exp, c.act); }));
+      var scale=Math.max(10, Math.ceil((top+5)/5)*5);
+      var bar=function(e,a){ return '<div class="cbar" role="img" aria-label="Said '+e.toFixed(1)+'%, happened '+a.toFixed(1)+'%" title="Said '+e.toFixed(1)+'% · happened '+a.toFixed(1)+'%">'+
+        '<i style="width:'+Math.min(100,100*a/scale).toFixed(1)+'%"></i><em style="left:'+Math.min(100,100*e/scale).toFixed(1)+'%"></em></div>'; };
+      var gapCell=function(g){ var r1=Math.round(g*10)/10; return '<td class="num gap'+(Math.abs(r1)>=3?' warn':'')+'" data-label="Gap">'+(r1===0?'0.0':signed(r1))+' pts</td>'; };
+      var rows=cal.map(function(c){
+        return '<tr><th scope="row">'+rangeLabel(c.range)+'</th><td class="num" data-label="Targets">'+c.n+'</td>'+
+          '<td class="num" data-label="We said">'+c.exp.toFixed(1)+'%</td><td class="num" data-label="It happened"><b>'+c.act.toFixed(1)+'%</b></td>'+
+          gapCell(c.act-c.exp)+'<td class="barc">'+bar(c.exp,c.act)+'</td></tr>';
+      }).join('');
+      var foot='<tr><th scope="row">All targets</th><td class="num" data-label="Targets">'+n+'</td><td class="num" data-label="We said">'+said.toFixed(1)+'%</td>'+
+        '<td class="num" data-label="It happened"><b>'+happened.toFixed(1)+'%</b></td>'+gapCell(happened-said)+'<td class="barc">'+bar(said,happened)+'</td></tr>';
+      // one plain-language read of the table, from the table
+      var off=cal.filter(function(c){ return c.n>=30 && Math.abs(c.act-c.exp)>=3; });
+      var read = off.length
+        ? off.map(function(c){ return 'The <b>'+rangeLabel(c.range)+'</b> bucket has been <span class="w">'+(c.act<c.exp?'over-called':'under-called')+'</span>: we said '+
+            c.exp.toFixed(1)+'%, and '+c.act.toFixed(1)+'% homered across '+c.n+' targets.'; }).join(' ')+
+          ' Every other bucket with 30 or more targets has landed within 3 points of what we said.'
+        : 'Every bucket with 30 or more targets has landed within 3 points of what we said.';
+      html+='<div class="panel cal-panel"><div class="ph"><h3>Calibration · what we said vs. what happened</h3><p>'+n+' graded targets, bucketed by the chance we posted</p></div>'+
+        '<table class="cal-t"><thead><tr><th scope="col">Stated chance</th><th scope="col" class="num">Targets</th><th scope="col" class="num">We said</th>'+
+        '<th scope="col" class="num">It happened</th><th scope="col" class="num">Gap</th><th scope="col"><span class="dim">Said vs. happened</span></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody><tfoot>'+foot+'</tfoot></table>'+
+        '<div class="cal-key"><span><i></i>Share that homered</span><span><em></em>What we said, on average</span><span>Scale 0–'+scale+'%</span></div>'+
+        '<p class="cal-read">'+read+'</p></div>';
+    }
+
+    var k=[];
+    if(s.top1 && s.top1.n) k.push(kpi('#1 target homered', s.top1.n>=MIN_N ? rate(s.top1.w,s.top1.n) : wl(s.top1), s.top1.w+' of '+s.top1.n+' nights'));
+    if(s.value && s.value.n) k.push(kpi('VALUE flags', wl(s.value), signed(s.value.units, 1)+' units, 1 unit a flag at the posted price'));
+    if(s.kleans && s.kleans.n) k.push(kpi('K leans', wl(s.kleans), rateAt(s.kleans.w,s.kleans.n,' · ')+'against the posted line'));
+    if(s.gameProj && s.gameProj.n) k.push(kpi('Expected-HR error', '±'+s.gameProj.avgErr, 'HRs a game · '+s.gameProj.w1+'% within 1, '+s.gameProj.w2+'% within 2 · '+s.gameProj.n+' games'));
+    if(s.umpSignal && s.umpSignal.n) k.push(kpi('Umpire signal held', s.umpSignal.pct+'%', s.umpSignal.w+' of '+s.umpSignal.n+' games with a non-neutral plate ump'));
+    if(k.length) html+='<div class="panel"><div class="ph"><h3>The rest of the card</h3><p>'+s.nights+' graded night'+(s.nights===1?'':'s')+'</p></div><div class="kpis">'+k.join('')+'</div></div>';
+
+    if(recent.length){
+      var rows2=recent.map(function(d){
+        var t=d.top ? '<span class="strong">'+esc(d.top.player)+'</span> <span class="px">'+esc(d.top.prob)+'%</span> '+res(d.top.hit) : '<span class="dim">—</span>';
+        var v=(d.valueHits||[]).length ? d.valueHits.map(function(f){ return '<span class="vf">'+esc(f.player)+(f.price!=null?' <span class="px">'+price(f.price)+'</span>':'')+' '+res(f.hit)+'</span>'; }).join('')
+                                       : '<span class="dim">None flagged</span>';
+        return ['<span class="strong">'+esc(day(d.d))+'</span>', '<span class="tab">'+d.hits+' of '+d.n+'</span><span class="ph-only"> homered</span>', t, v,
+                d.kN ? d.kW+'–'+(d.kN-d.kW) : na('<span class="dim">—</span>')];
+      });
+      html+='<div class="panel"><div class="ph"><h3>Recent nights</h3><p>The last '+recent.length+' graded</p></div>'+
+        table([{h:'Night',c:'lead'},{h:'Homered',c:'c-side'},{h:'#1 target'},{h:'VALUE flags'},{h:'K leans',c:'half'}], rows2)+'</div>';
+    }
+    $('mlb-body').innerHTML=html;
+  }
+
+  /* ================= CFB PRO: /pro/cfb_record.json ================= */
+  function renderCFB(x){
+    var r=x.data||{}, s=r.summary||{}, o=s.overall||{};
+    var weeks=(r.recent||[]).filter(function(w){ return w && w.week; });
+    if(x.state!=='ok' || !o.n || !weeks.length){ fail('cfb', x.state); return; }
+    var lw=week(weeks[0].week), season=lw && lw.season;
+    freshness('cfb', r.updated, 'Graded through '+weekLabel(weeks[0].week));
+    tile('cfb', {v:headline(o,'of leans hit'), s:wl(o)+' across '+s.weeks+' week'+(s.weeks===1?'':'s')+' · bar: the week\'s median YPC', f:'Through '+weekLabel(weeks[0].week)});
+    var k=[kpi('All leans', wl(o), rateAt(o.w,o.n,' · ')+o.n+' graded')];
+    if(s.targets && s.targets.n) k.push(kpi('Targets', wl(s.targets), rateAt(s.targets.w,s.targets.n,' · ')+'hit when YPC beats the median'));
+    if(s.fades && s.fades.n) k.push(kpi('Fades', wl(s.fades), rateAt(s.fades.w,s.fades.n,' · ')+'hit when YPC falls short of it'));
+    if(s.stacked && s.stacked.n) k.push(kpi('Stacked Rush', wl(s.stacked), rateAt(s.stacked.w,s.stacked.n,' · ')+'a trench edge plus a windy forecast'));
+    var groups=weeks.map(function(w, i){
+      var rows=(w.leans||[]).map(function(l){
+        var a=l.act||{};
+        var call=cap(l.k)+(l.side==='FADE' && !/FADE/.test(l.k||'') ? ' · fade' : '')+(l.cd!=null ? ' <span class="px" title="Offensive line vs defensive line weight edge, against the league norm">'+signed(l.cd)+' lbs/man</span>' : '');
+        return ['<span>'+esc(l.who)+'<small>'+esc(l.game)+'</small></span>', res(l.hit), call,
+          a.att!=null ? '<span class="tab">'+a.att+' att · '+a.yds+' yds</span>' : '<span class="dim">—</span>',
+          a.ypc!=null ? '<span class="tab"><span class="strong">'+Number(a.ypc).toFixed(2)+'</span> vs '+(w.medYpc!=null?Number(w.medYpc).toFixed(2):'—')+'</span>' : '<span class="dim">—</span>'];
+      });
+      var t=tally(w.leans||[]);
+      return group(i===0, weekLabel(w.week, season), w.medYpc!=null ? 'median '+Number(w.medYpc).toFixed(2)+' YPC' : '', groupRight(t),
+        rows.length ? table([{h:'Team',c:'who lead'},{h:'Result',c:'c-res'},{h:'Call'},{h:'Rushing',c:'half'},{h:'YPC vs median',c:'half'}], rows) : emptyBox('No graded leans', 'Nothing on this week\'s board could be graded.'));
+    }).join('');
+    var more = s.weeks>weeks.length ? '<p class="note">Showing the last '+weeks.length+' of '+s.weeks+' graded weeks; the totals above cover all of them.</p>' : '';
+    $('cfb-body').innerHTML='<div class="panel"><div class="kpis">'+k.join('')+'</div></div><div class="panel"><div class="ph"><h3>Week by week</h3><p>Latest first</p></div>'+groups+more+'</div>';
+  }
+
+  /* ================= NFL PRO: /pro/nfl_record.json ================= */
+  function renderNFL(x){
+    var r=x.data||{}, s=r.summary||{}, o=s.overall||{};
+    var weeks=(r.recent||[]).filter(function(w){ return w && w.week; });
+    if(x.state!=='ok' || !weeks.length || (!o.n && !s.weeks)){ fail('nfl', x.state); return; }
+    var lw=week(weeks[0].week), season=lw && lw.season;
+    freshness('nfl', r.updated, 'Graded through '+weekLabel(weeks[0].week));
+    tile('nfl', {v:o.n ? headline(o,'hit') : '—', s:o.n ? (o.n>=MIN_N ? wl(o)+' · ' : '')+o.n+' graded call'+(o.n===1?'':'s')+(o.n<MIN_N?' so far':'')+' · WATCH spots aren\'t graded' : 'No gradeable calls yet', f:'Through '+weekLabel(weeks[0].week), empty:!o.n});
+    var k=[kpi('All graded', o.n ? wl(o) : '—', o.n ? rateAt(o.w,o.n,' · ')+o.n+' graded' : 'nothing gradeable yet')];
+    Object.keys(s.byKind||{}).sort().forEach(function(kind){ var b=s.byKind[kind]; if(b && b.n) k.push(kpi(cap(kind), wl(b), rateAt(b.w,b.n,' · ')+b.n+' graded')); });
+    k.push(kpi('Priced props', s.props && s.props.n ? wl(s.props) : '—', s.props && s.props.n ? rateAt(s.props.w,s.props.n,' · ')+'against the archived line' : 'none graded yet'));
+    var openAt=Math.max(0, weeks.findIndex(function(w){ return (w.leans||[]).length; }));
+    var groups=weeks.map(function(w, i){
+      var rows=(w.leans||[]).map(function(l){
+        var player=l.prop && l.prop!=='team total';
+        var whoLbl={'SPOT':'Spot team: ','REF TOTAL':'Referee: ','COLD':'Team: '}[l.k]||'';
+        var lead=player ? esc(l.who)+'<small>'+esc(String(l.game||'').replace('@',' @ '))+'</small>'
+                        : esc(String(l.game||'').replace('@',' @ '))+(l.who?'<small>'+esc(whoLbl+l.who)+'</small>':'');
+        var call=cap(l.k)+' · '+cap(l.side)+(l.line!=null?' '+esc(l.line):'')+(l.prop?' '+esc(l.prop):'')+(l.price!=null?' <span class="px">('+price(l.price)+')</span>':'');
+        var fin=l.act!=null ? '<span class="strong tab">'+esc(l.act)+'</span> '+(l.prop ? esc(l.prop==='team total'?'pts':l.prop) : 'total') : '<span class="dim">—</span>';
+        return ['<span>'+lead+'</span>', res(l.hit), call, fin];
+      });
+      var t=tally(w.leans||[]);
+      return group(i===openAt, weekLabel(w.week, season), '', groupRight(t),
+        rows.length ? table([{h:'Game',c:'who lead'},{h:'Result',c:'c-res'},{h:'Call'},{h:'Final',c:'half'}], rows)
+                    : emptyBox('No graded calls this week', 'Nothing gradeable: WATCH spots aren\'t graded, and a lean without a closing number or one that pushed is left out.'));
+    }).join('');
+    $('nfl-body').innerHTML='<div class="panel"><div class="kpis">'+k.join('')+'</div>'+
+      (o.n && o.n<MIN_N ? '<p class="note">'+o.n+' graded call'+(o.n===1?'':'s')+' so far — too few for a hit rate to mean anything, so the record shows as W–L until there are '+MIN_N+'.</p>' : '')+
+      '</div><div class="panel"><div class="ph"><h3>Week by week</h3><p>Latest first</p></div>'+groups+'</div>';
+  }
+
+  /* ================= PGA / NASCAR: finishing-position desks ================= */
+  function posRows(leans, withBar){
+    return leans.map(function(l){
+      var call=cap(l.k)+(l.side==='FADE' ? ' · fade' : '')+(withBar && l.bar ? ' <span class="px">'+(l.side==='FADE'?'outside ':'')+'top '+l.bar+'</span>' : '');
+      return ['<span>'+esc(l.who)+(l.why?'<small>'+esc(l.why)+'</small>':'')+'</span>', res(l.hit), call,
+        l.pos!=null ? '<span class="tab"><span class="strong">'+ord(l.pos)+'</span>'+(l.field?' of '+l.field:'')+'</span>' : '<span class="dim">—</span>'];
+    });
+  }
+  /* share of the field a random pick would clear: bar/field for a target, the rest for a fade */
+  function baseRate(leans, barOf){
+    var xs=leans.filter(function(l){ return l.field && barOf(l); });
+    if(!xs.length) return null;
+    var sum=xs.reduce(function(a,l){ var p=Math.min(1, barOf(l)/l.field); return a+(l.side==='FADE' ? 1-p : p); }, 0);
+    return sum/xs.length;
+  }
+  function renderPGA(x){
+    var r=x.data||{}, s=r.summary||{}, o=s.overall||{};
+    var evs=(r.recent||[]).filter(function(e){ return e && (e.leans||[]).length; });
+    if(x.state!=='ok' || !o.n || !evs.length){ fail('pga', x.state); return; }
+    var topN=+((/top-(\d+)/.exec(s.bar||'')||[])[1]) || null;
+    var all=[].concat.apply([], evs.map(function(e){ return e.leans; }));
+    var covers=all.length===o.n;                    // the listed events hold every graded lean
+    var base=topN ? baseRate(all, function(){ return topN; }) : null;
+    freshness('pga', r.updated, 'Last graded · '+evs[0].event);
+    tile('pga', {v:headline(o, topN ? 'top-'+topN : 'hit'),
+      s:wl(o)+(s.bar?' · bar: '+esc(s.bar):'')+(base!=null && covers ? ' · field base rate '+Math.round(100*base)+'%' : ''),
+      f:'Through '+evs[0].event});
+    var t=tally(all);
+    var k=[kpi('All leans', wl(o), rateAt(o.w,o.n,' · ')+o.n+' graded')];
+    if(base!=null) k.push(kpi('Field base rate', Math.round(100*base)+'%', covers ? 'a random golfer in the same fields' : 'in the '+evs.length+' events listed, which went '+wl(t)));
+    if(s.avgFinish!=null) k.push(kpi('Average finish', esc(s.avgFinish), 'across graded leans'));
+    if(s.wins!=null) k.push(kpi('Wins', esc(s.wins), (s.top5!=null ? s.top5+' top-5 finishes' : '')));
+    var groups=evs.map(function(e, i){
+      var tb=topN && e.field ? Math.round(100*Math.min(1, topN/e.field)) : null;
+      return group(i===0, esc(e.event), (e.date?esc(mday(e.date))+' · ':'')+(e.field?'field of '+e.field:'')+(tb!=null?' · top-'+topN+' base '+tb+'%':''),
+        groupRight(tally(e.leans)), table([{h:'Golfer',c:'who lead'},{h:'Result',c:'c-res'},{h:'Call',c:'half'},{h:'Finish',c:'half'}], posRows(e.leans, false)));
+    }).join('');
+    var more = s.events>evs.length ? '<p class="note">Showing the last '+evs.length+' of '+s.events+' graded events; the totals above cover all of them.</p>' : '';
+    $('pga-body').innerHTML='<div class="panel"><div class="kpis">'+k.join('')+'</div></div><div class="panel"><div class="ph"><h3>Event by event</h3><p>Latest first</p></div>'+groups+more+'</div>';
+  }
+  function renderNASCAR(x){
+    var r=x.data||{}, s=r.summary||{}, o=s.overall||{};
+    var races=(r.recent||[]).filter(function(e){ return e && (e.leans||[]).length; });
+    if(x.state!=='ok' || !o.n || !races.length){ fail('nascar', x.state); return; }
+    var name=function(e){ return String(e.race||'Race').replace(/^NASCAR Cup Series at /,''); };
+    var all=[].concat.apply([], races.map(function(e){ return e.leans; }));
+    var covers=all.length===o.n, t=tally(all);
+    var base=baseRate(all, function(l){ return l.bar; });
+    freshness('nascar', r.updated, 'Last graded · '+name(races[0])+(races[0].date?', '+mday(races[0].date):''));
+    tile('nascar', {v:headline(o,'hit'), s:wl(o)+(s.bar?' · bar: '+esc(s.bar):'')+(base!=null && covers ? ' · field base rate '+Math.round(100*base)+'%' : ''),
+      f:'Through '+name(races[0])+(races[0].date?' · '+day(races[0].date):'')});
+    var k=[kpi('All leans', wl(o), rateAt(o.w,o.n,' · ')+o.n+' graded')];
+    if(s.trackTarget && s.trackTarget.n) k.push(kpi('Track Targets', wl(s.trackTarget), rateAt(s.trackTarget.w,s.trackTarget.n,' · ')+'top-10 bar'));
+    if(s.dominator && s.dominator.n) k.push(kpi('Dominators', wl(s.dominator), rateAt(s.dominator.w,s.dominator.n,' · ')+'top-5 bar'));
+    if(base!=null) k.push(kpi('Field base rate', Math.round(100*base)+'%', covers ? 'a random driver against the same bars' : 'in the '+races.length+' races listed, which went '+wl(t)+(t.n>=MIN_N?' ('+rate(t.w,t.n)+')':'')));
+    if(s.avgFinish!=null) k.push(kpi('Average finish', esc(s.avgFinish), (s.wins!=null ? s.wins+' win'+(s.wins===1?'':'s')+' · ' : '')+(s.top5!=null ? s.top5+' top-5s' : '')));
+    var groups=races.map(function(e, i){
+      return group(i===0, esc(name(e)), (e.date?esc(day(e.date))+' · ':'')+(e.field?'field of '+e.field:''),
+        groupRight(tally(e.leans)), table([{h:'Driver',c:'who lead'},{h:'Result',c:'c-res'},{h:'Call',c:'half'},{h:'Finish',c:'half'}], posRows(e.leans, true)));
+    }).join('');
+    var more = s.races>races.length ? '<p class="note">Showing the last '+races.length+' of '+s.races+' graded races; the totals above cover all of them.</p>' : '';
+    $('nascar-body').innerHTML='<div class="panel"><div class="kpis">'+k.join('')+'</div></div><div class="panel"><div class="ph"><h3>Race by race</h3><p>Latest first</p></div>'+groups+more+'</div>';
+  }
+
+  /* ================= the free radar: /accuracy.json ================= */
+  function renderFree(x){
+    var a=x.data||{}, c=a.cumulative||{}, days=Object.keys(a.days||{}).sort();
+    if(x.state!=='ok' || !c.n || !days.length){ fail('free', x.state); return; }
+    var last=days[days.length-1];
+    stamp($('free-fresh'), 'Graded through '+day(last));
+    var ou={w:c.leanW||0, n:(c.leanW||0)+(c.leanL||0)}, hr={w:c.hrW||0, n:(c.hrW||0)+(c.hrL||0)},
+        kc={w:c.kW||0, n:(c.kW||0)+(c.kL||0)}, ed={w:c.edgeW||0, n:(c.edgeW||0)+(c.edgeL||0)};
+    var book={w:0,n:0}, est={w:0,n:0};
+    days.forEach(function(d){ ((a.days[d]||{}).games||[]).forEach(function(g){
+      if(g.leanOk===true || g.leanOk===false){ var b=g.src==='book'?book:est; b.n++; if(g.leanOk) b.w++; } }); });
+    tile('free', {v:headline(ou,'O/U leans'), s:(ou.n?wl(ou)+' O/U leans':'No O/U leans graded')+(hr.n?' · HR calls '+wl(hr):''), f:'Through '+day(last)+' · '+days.length+' days'});
+    var split=[book.n?'vs book totals '+wl(book):'', est.n?'vs our estimate '+wl(est):''].filter(Boolean).join(' · ');
+    var k=[];
+    k.push(kpi('O/U leans', ou.n?wl(ou):'—', ou.n ? rateAt(ou.w,ou.n)+(split?(ou.n>=MIN_N?' · ':'')+split:'') : 'none graded yet'));
+    k.push(kpi('HR calls', hr.n?wl(hr):'—', hr.n ? rateAt(hr.w,hr.n,' · ')+'against the park average' : 'none graded yet'));
+    if(ed.n) k.push(kpi('Edge of the day', wl(ed), rateAt(ed.w,ed.n,' · ')+'the HR call on the day\'s biggest mover'));
+    if(kc.n) k.push(kpi('K calls', wl(kc), rateAt(kc.w,kc.n,' · ')+'against the park average'));
+    var show=days.slice(-10).reverse();
+    var rows=show.map(function(d){
+      var dd=a.days[d]||{}, s=dd.summary||{}, g=(dd.games||[]).filter(function(x){ return x.edge; })[0];
+      var edge='<span class="dim">—</span>';
+      if(g){
+        var call=g.hrCall==='boost'?'More HRs':g.hrCall==='suppress'?'Fewer HRs':null;
+        edge='<span class="strong">'+esc(String(g.m||'').replace('@',' @ '))+'</span> '+(call ? '<span class="px">'+call+'</span> '+res(g.hrOk===true||g.hrOk===false ? g.hrOk : null)+
+          (g.hrAct!=null && g.hrPark!=null ? ' <span class="px">'+g.hrAct+' HR vs '+Number(g.hrPark).toFixed(2)+' avg</span>' : '') : '<span class="px">no HR call</span>');
+      }
+      return ['<span class="strong">'+esc(day(d))+'</span>', '<span class="tab">'+(s.n||0)+'</span><span class="ph-only"> games</span>', wlc(s.leanW||0,s.leanL||0), wlc(s.hrW||0,s.hrL||0), wlc(s.kW||0,s.kL||0), edge];
+    });
+    $('free-body').innerHTML='<div class="panel"><div class="kpis">'+k.join('')+'</div>'+
+      (est.n ? '<p class="note">When no book total was pinned for a game, the lean was graded against the radar\'s own estimated total — shown separately above.</p>' : '')+
+      '</div><div class="panel"><div class="ph"><h3>Recent days</h3><p>The last '+show.length+' graded · W–L per call type</p></div>'+
+      table([{h:'Day',c:'lead'},{h:'Games',c:'num c-side'},{h:'O/U leans',c:'num qtr'},{h:'HR calls',c:'num qtr'},{h:'K calls',c:'num qtr'},{h:'Edge of the day'}], rows)+'</div>';
+  }
+
+  /* each section stands alone: one file failing never blanks another */
+  function run(url, fn, key){
+    return load(url).then(function(x){
+      try{ fn(x); }catch(e){ fail(key, 'error'); if(window.console) console.error(key, e); }
+    });
+  }
+  run('/pro/record.json', renderMLB, 'mlb');
+  run('/pro/cfb_record.json', renderCFB, 'cfb');
+  run('/pro/nfl_record.json', renderNFL, 'nfl');
+  run('/pro/pga_record.json', renderPGA, 'pga');
+  run('/pro/nascar_record.json', renderNASCAR, 'nascar');
+  run('/accuracy.json', renderFree, 'free');
+});
+</script>
+</body>
+</html>
