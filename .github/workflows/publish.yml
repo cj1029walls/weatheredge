@@ -1,0 +1,73 @@
+name: Publish site
+
+# Redeploys main to GitHub Pages after a sport/odds workflow has committed new
+# JSON, WITHOUT re-running the MLB build and without spending any API credits.
+# The six MLB files daily.yml builds but never commits (site/data.json,
+# accuracy.json, teaser.json, pro/data.json, pro/record.json, pro/umps.json) are
+# carried forward from the live site; if any of them can't be fetched and
+# validated, nothing is deployed -- we never publish a site missing MLB data.
+#
+# Loop-safe: this workflow never commits or pushes, is not in its own
+# `workflows:` list, and pushes made with GITHUB_TOKEN never trigger `push`.
+
+on:
+  workflow_run:
+    # Must match each workflow's `name:` exactly, and only fires for workflow
+    # files on the default branch.
+    workflows:
+      - "NFL weekly slate build"
+      - "CFB weekly slate build"
+      - "PGA weekly build"
+      - "NASCAR weekly build"
+      - "PRO props odds feed"
+    types: [completed]
+    branches: [main]
+  push:
+    # Optional: page edits pushed by a person go live now instead of at the
+    # next daily build. Bot pushes (GITHUB_TOKEN) never trigger this.
+    branches: [main]
+    paths: ["site/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Same group as daily.yml, so a publish and a daily build+deploy never overlap:
+# no two deploy-pages calls at once, and a publish can't fetch the live MLB
+# files and then deploy them over a NEWER daily deploy. cancel-in-progress is
+# false here: a publish waits for a running daily build and never cancels it
+# (the daily archive commit would be lost). daily.yml keeps `true`, so a daily
+# run may cancel an in-flight publish -- harmless, because that daily run
+# checks out a main that already contains the commit the publish was for.
+# Publishes queued behind one another collapse to the newest one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # success: new JSON was committed. failure: the sport workflows still
+    # commit their "not refreshed" markers (and grading) before they go red,
+    # and those must reach the page too. cancelled/timed_out/skipped: skip.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success' ||
+      github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main          # the newest main when this (possibly queued) run starts
+      - name: Carry forward the live MLB files (built by daily.yml, never committed)
+        run: python3 scripts/ci/carry_forward.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
