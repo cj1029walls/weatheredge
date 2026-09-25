@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Golf Props — Course Horses &amp; Wind Players | DFSRADAR</title>
+<meta name="description" content="PGA TOUR targets ranked by course history, play in the wind and current form — graded on a top-20 finish. Free top pick weekly.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://dfsradar.com/props/pga/">
+<meta name="theme-color" content="#2E3240">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="Golf Props — Course Horses &amp; Wind Players | DFSRADAR">
+<meta property="og:description" content="PGA TOUR targets ranked by course history, play in the wind and current form — graded on a top-20 finish. Free top pick weekly.">
+<meta property="og:url" content="https://dfsradar.com/props/pga/">
+<meta property="og:image" content="https://dfsradar.com/og-pro.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../../assets/dr.css?v=67f5b7a3">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../../assets/dr.js?v=67f5b7a3" defer></script>
+<script src="../../assets/feeds.js?v=67f5b7a3" defer></script>
+<script src="../../assets/props.js?v=67f5b7a3" defer></script>
+</head>
+<body>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>Golf props</span><span class="faint">·</span><span id="ev">This week</span></div>
+    <h1 class="ph__title">Golf targets: course horses and wind players</h1>
+    <p class="ph__lede">Some players keep finishing near the top at the same course. Some hold their game together when it blows. We rank both — and grade every target on a top-20 finish.</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="note" class="mt24" hidden></div>
+
+  <section class="sec" id="top-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">This week's free pick</h2><p class="sec__sub">Our top target — free, graded on a top-20 finish.</p></div>
+      <a class="sec__more" href="../../record/#pga">See the record →</a></div>
+    <div class="grid g2" id="top-cards"></div>
+  </section>
+
+  <section class="sec" id="boards">
+    <div class="sec__h"><div><h2 class="sec__title">The boards</h2></div></div>
+    <div class="seg-scroll" style="margin-bottom:18px"><div class="seg" id="tabs" role="tablist" aria-label="Golf boards">
+      <button type="button" data-tab="t">Targets <span class="ct" id="ct-t"></span></button>
+      <button type="button" data-tab="c">Course history <span class="ct" id="ct-c"></span></button>
+      <button type="button" data-tab="w">Wind players <span class="ct" id="ct-w"></span></button>
+      <button type="button" data-tab="f">Form <span class="ct" id="ct-f"></span></button>
+    </div></div>
+    <div data-panel="t"><div id="b-t"></div><p class="small dim mt12">The price shown is the books' <b>outright</b> price to win the tournament — context for how the market rates each player. We grade targets on a top-20 finish, not a win.</p></div>
+    <div data-panel="c" hidden><div id="b-c"></div><p class="small dim mt12">Course score = average finishing percentile here, recent years weighted more. Lower is better.</p></div>
+    <div data-panel="w" hidden><div id="b-w"></div><div id="b-w2" class="mt24"></div></div>
+    <div data-panel="f" hidden><div id="b-f"></div></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">The golf record</h2><p class="sec__sub">Every target graded on a top-20 finish.</p></div><a class="sec__more" href="../../record/#pga">Full record →</a></div>
+    <div id="rec"></div><div id="rec-recent" class="mt16"></div>
+  </section>
+</main>
+<footer id="dr-foot" class="dr-foot"></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FP = F.pga, esc = D.esc, isNum = D.isNum;
+  D.shell({ section: "props", sport: "pga" });
+  var S = { pro: null, rec: null, member: false };
+  var last = function (arr) { return (arr || []).slice(0, 5).map(function (x) { return '<span class="chip chip--sm" title="' + esc((x.ev || "") + " " + (x.y || "")) + '">' + (x.pos === 1 ? "W" : "T" + x.pos) + "</span>"; }).join(" "); };
+
+  var T_COLS = [
+    { k: "p", label: "Player", html: function (p, i, free) { return '<div class="who">' + esc(p.player) + (free ? ' <span class="chip chip--free">FREE</span>' : "") + "<small>" + esc(F.cap(String(p.k).toLowerCase())) + "</small></div>"; } },
+    { k: "why", label: "Why", html: function (p) { return '<span class="why" style="display:block;font-size:13.5px">' + esc(p.why) + "</span>"; } },
+    { k: "price", label: "Books · to win", num: true, sort: function (p) { return D.validOdds(p.price) ? -p.price : null; }, html: function (p) { return D.validOdds(p.price) ? "<b>" + D.odds(p.price) + "</b>" : '<span class="dim">—</span>'; } }
+  ];
+  var C_COLS = [
+    { k: "player", label: "Player", html: function (r) { return '<div class="who">' + esc(r.player) + "<small>" + D.plural(r.starts, "start") + " here</small></div>"; } },
+    { k: "score", label: "Course score", num: true, sort: function (r) { return -r.score; }, html: function (r) { return '<b class="cyan">' + D.fixed(r.score, 1) + "</b>"; } },
+    { k: "avgFin", label: "Avg finish", num: true, sort: function (r) { return -r.avgFin; }, html: function (r) { return D.fixed(r.avgFin, 1); } },
+    { k: "best", label: "Best", num: true, html: function (r) { return r.best === 1 ? "Won" : "T" + r.best; } },
+    { k: "last", label: "Recent here", num: true, html: function (r) { return last((r.last || []).map(function (x) { return { pos: x.pos, y: x.y }; })); } }
+  ];
+  var W_COLS = [
+    { k: "player", label: "Player", html: function (r) { return '<div class="who">' + esc(r.player) + "<small>" + r.windStarts + " windy starts · " + r.calmStarts + " calm</small></div>"; } },
+    { k: "windScore", label: "In wind", num: true, sort: function (r) { return -r.windScore; }, html: function (r) { return "<b>" + D.fixed(r.windScore, 1) + "</b>"; } },
+    { k: "calmScore", label: "In calm", num: true, html: function (r) { return D.fixed(r.calmScore, 1); } },
+    { k: "delta", label: "Wind edge", num: true, sort: function (r) { return r.delta; }, html: function (r) { return '<b class="' + (r.delta > 0 ? "good" : "cool") + '">' + D.signed(r.delta, 1) + "</b>"; } }
+  ];
+  var F_COLS = [
+    { k: "player", label: "Player", html: function (r) { return '<div class="who">' + esc(r.player) + "<small>" + D.plural(r.starts, "recent start") + "</small></div>"; } },
+    { k: "score", label: "Form score", num: true, sort: function (r) { return -r.score; }, html: function (r) { return '<b class="cyan">' + D.fixed(r.score, 1) + "</b>"; } },
+    { k: "last", label: "Last starts", num: true, html: function (r) { return last(r.last); } }
+  ];
+
+  function render() {
+    var pro = S.pro, m = S.member;
+    var picks = FP.picks(pro);
+    document.getElementById("ct-t").textContent = picks.length;
+    P.board(document.getElementById("b-t"), { cols: T_COLS, rows: picks, key: function (p) { return p.player + p.k; }, member: m, free: 1, lock: { what: "target" }, emptyTitle: "No targets this week" });
+    var cb = (pro.course || []).slice();
+    document.getElementById("ct-c").textContent = cb.length;
+    P.board(document.getElementById("b-c"), { cols: C_COLS, rows: cb, key: function (r) { return r.player; }, member: m, free: 0, sort: { k: "score", dir: "desc" }, lock: { what: "player", title: "Course history for " + D.plural(cb.length, "player") + " — unlock with PRO" }, emptyTitle: "No course history on file" });
+    var wp = (pro.wind && pro.wind.proof) || [], wf = (pro.wind && pro.wind.fade) || [];
+    document.getElementById("ct-w").textContent = wp.length + wf.length;
+    P.board(document.getElementById("b-w"), { cols: W_COLS, rows: wp, key: function (r) { return r.player; }, member: m, free: 0, sort: { k: "delta", dir: "desc" },
+      lock: { what: "player", title: "Wind players — unlock with PRO", sub: "Who holds up when it blows, and who falls apart — scored across every windy round on file." }, emptyTitle: "No wind board" });
+    document.getElementById("b-w2").innerHTML = m && wf.length ? '<div class="label" style="margin-bottom:12px">Fade in wind</div>' : "";
+    if (m && wf.length) { var el = document.createElement("div"); document.getElementById("b-w2").appendChild(el); P.board(el, { cols: W_COLS, rows: wf, key: function (r) { return r.player; }, member: true, sort: { k: "delta", dir: "asc" } }); }
+    var fb = (pro.form || []).slice();
+    document.getElementById("ct-f").textContent = fb.length;
+    P.board(document.getElementById("b-f"), { cols: F_COLS, rows: fb, key: function (r) { return r.player; }, member: m, free: 0, sort: { k: "score", dir: "desc" }, lock: { what: "player", title: "Current form — unlock with PRO" } });
+    var top = document.getElementById("top-cards");
+    document.getElementById("top-sec").hidden = !picks.length;
+    if (picks.length) {
+      var mk = function (p, free) {
+        return P.topCard({ sportLabel: "Golf · top-20 · " + (pro.event ? pro.event.name : ""), player: p.player, side: "TARGET", sub: F.cap(String(p.k).toLowerCase()),
+          nums: [{ v: isNum(p.raw.score) ? p.raw.score.toFixed(1) : "—", l: "Course score", cls: "cyan" }, { v: D.validOdds(p.price) ? D.odds(p.price) : "—", l: "Books · to win" }],
+          why: esc(p.why) }, free ? {} : { tag: "PRO", pro: true, plain: true });
+      };
+      top.innerHTML = mk(picks[0], true) + (m && picks[1] ? mk(picks[1], false) : P.lockedCard("Golf · the rest of the board", picks.length - 1, "Every target, course history, wind players and form."));
+    }
+  }
+  function renderRecord() {
+    var r = S.rec && S.rec.summary, el = document.getElementById("rec");
+    if (!r) { el.innerHTML = '<div class="note">' + D.IC.info + "<div>No graded events yet.</div></div>"; return; }
+    el.innerHTML = P.recordStrip([
+      { v: r.overall.w + "–" + (r.overall.n - r.overall.w), l: "Targets · " + (r.bar || "top-20"), s: r.overall.n ? D.pct(r.overall.w / r.overall.n * 100, 0) + " over " + D.plural(r.events, "event") : "" },
+      { v: D.fixed(r.avgFinish, 1), l: "Average finish", s: "" }, { v: String(r.top5), l: "Top-5 finishes", s: "" }, { v: String(r.wins), l: "Wins", s: "" }]);
+    var list = [];
+    (S.rec.recent || []).slice(0, 3).forEach(function (e) { (e.leans || []).forEach(function (l) {
+      list.push({ res: l.hit ? "w" : "l", title: esc(l.who) + ' <span class="dim">finished ' + (l.pos === 1 ? "1st" : "T" + l.pos) + "</span>", sub: esc(e.event) + " · " + esc(e.date) + " · field of " + e.field });
+    }); });
+    document.getElementById("rec-recent").innerHTML = list.length ? '<div class="label" style="margin:22px 0 12px">Recent events</div>' + P.results(list.slice(0, 12)) : "";
+  }
+  Promise.all([D.get(FP.proUrl), D.get(FP.recUrl)]).then(function (r) {
+    S.pro = r[0] || {}; S.rec = r[1];
+    renderRecord();
+    var pro = S.pro;
+    document.getElementById("ev").textContent = pro.event ? pro.event.name : "This week";
+    D.fresh(document.getElementById("fresh"), { built: pro.updated, stale: pro.stale, status: pro.status, maxAgeH: 40 });
+    if (pro.note) { var n = document.getElementById("note"); n.hidden = false; n.className = "note mt24"; n.innerHTML = D.IC.info + "<div>" + esc(pro.note) + "</div>"; }
+    document.getElementById("meta-chips").innerHTML = pro.event ? '<span class="chip">' + esc(pro.event.course) + "</span>" + '<span class="chip">' + esc(pro.event.city) + "</span>" : "";
+    D.tabs(document.getElementById("tabs"), null, "pga-props-tab");
+    D.gate.on(function (st) { S.member = st === "member"; render(); });
+  });
+});
+</script>
+</body>
+</html>
