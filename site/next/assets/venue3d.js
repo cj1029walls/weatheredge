@@ -1263,7 +1263,7 @@ function mount(canvas, spec) {
   ctl.place();
   const still = RM.matches;
   if (still) for (let i = 0; i < 90; i++) anims.forEach(f => f(1 / 60, i / 60));
-  const inst = { renderer: st.renderer, scene, raf: 0, ctl, io: null, ro: null, dead: false,
+  const inst = { renderer: st.renderer, scene, cam, grp: v.grp, raf: 0, ctl, io: null, ro: null, dead: false,
     view(th, e, d) { ctl.set(th, e, d == null ? null : d * v.cam.dist); dirty = true; } };
   let visible = true, t = 0, dirty = true;
   if ("IntersectionObserver" in window) { inst.io = new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; }); inst.io.observe(canvas); }
@@ -1274,12 +1274,17 @@ function mount(canvas, spec) {
   }
   if ("ResizeObserver" in window) { inst.ro = new ResizeObserver(resize); inst.ro.observe(canvas); }
   const clock = new T.Clock();
+  /* phones draw at ~30 fps: the motion is slow, and it halves the battery cost */
+  const minDt = st.small ? 1 / 32 : 0;
+  let acc = 0;
   (function tick() {
     if (inst.dead) return;
     inst.raf = requestAnimationFrame(tick);
     if (!canvas.isConnected) { dispose(inst); return; }
-    const dt = Math.min(clock.getDelta(), 0.05);
-    if (!visible || document.hidden) return;
+    acc += Math.min(clock.getDelta(), 0.1);
+    if (!visible || document.hidden) { acc = 0; return; }
+    if (acc < minDt) return;
+    const dt = Math.min(acc, 0.06); acc = 0;
     t += dt;
     if (still) {
       if (!(ctl.dirty || dirty)) return;

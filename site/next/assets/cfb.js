@@ -99,7 +99,7 @@
     var btn = root.querySelector("[data-3d]"), box = root.querySelector("[data-3d-box]");
     if (!btn || !box) return;
     var calm = !isNum(g.wind) || g.wind < 3, stad = String(g.stadium || "").split("·")[0].trim();
-    v3 = D.view3d({ btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "cfb", g: g },
+    v3 = D.view3d({ auto: true, onLabel: "Show the diagram", btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "cfb", g: g },
       chips: ['<span class="chip' + (calm ? "" : " chip--cyan") + '">' + D.wx("wind") + (calm ? "Light wind" : g.wind + " mph" + (g.windDir != null ? " from the " + D.compass(g.windDir) : "")) + "</span>",
         '<span class="chip">' + (isNum(g.temp) ? g.temp + "°" : "") + " at kickoff</span>"],
       cap: "Field drawn north–south with wind by compass: we don't have each stadium's orientation, so this isn't the real field angle.",

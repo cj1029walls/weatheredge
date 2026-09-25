@@ -617,43 +617,100 @@
     return v3dP;
   }
   var COARSE = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
-  /* view3d({ btn, box, flat, spec, chips, cap, label, onLabel, hideBox })
-     wires a "View in 3D" button: the first press builds the 3D stage inside
-     `box` (hiding `flat`), the second puts the flat view back. */
+  var glOK = null;
+  function hasGL() {
+    if (glOK === null) {
+      try {
+        var c = document.createElement("canvas"), gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+        glOK = !!gl;
+        var lose = gl && gl.getExtension("WEBGL_lose_context"); if (lose) lose.loseContext();
+      } catch (e) { glOK = false; }
+    }
+    return glOK;
+  }
+  /* someone switching the 3D off holds for the rest of their visit */
+  function pref3d(v) { try { if (v === undefined) return sessionStorage.getItem("dr.v3d"); sessionStorage.setItem("dr.v3d", v); } catch (e) {} return null; }
+  /* open 3D without being asked? Not on data saver, slow links or low-power
+     devices, not without WebGL, and not once someone has switched it off. */
+  function auto3d() {
+    var c = navigator.connection;
+    if (c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ""))) return false;
+    if ((navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)) return false;
+    if (pref3d() === "off") return false;
+    return hasGL();
+  }
+  /* stage3d(box, { spec, chips, cap, label }): the 3D stage (a loading state
+     first), mounted into box. -> { el, ready: Promise<bool>, close() } */
+  function stage3d(box, o) {
+    var wrap = document.createElement("div"), inst = null, dead = false;
+    wrap.className = "v3d-wrap";
+    wrap.innerHTML = '<div class="v3d is-loading"><canvas role="img" aria-label="' + esc(o.label || "3D view") + '"></canvas>' +
+      '<div class="v3d__load" aria-hidden="true"><i></i>Loading the 3D view</div>' +
+      (o.chips && o.chips.length ? '<div class="v3d__hud">' + o.chips.join("") + "</div>" : "") +
+      (COARSE ? "" : '<div class="v3d__hint">Drag to turn · Ctrl + scroll to zoom · double-click to reset</div>') + "</div>" +
+      (o.cap ? '<p class="v3d__note">' + (COARSE ? "<b>Swipe sideways to turn, pinch to zoom.</b> " : "") + esc(o.cap) + "</p>" : "");
+    box.appendChild(wrap);
+    var ready = load3d().then(function () {
+      if (dead) return false;
+      inst = window.Venue3D.mount(wrap.querySelector("canvas"), o.spec);
+      if (!inst) return false;
+      wrap.querySelector(".v3d").classList.remove("is-loading");
+      return true;
+    }).catch(function () { return false; });
+    return {
+      el: wrap, ready: ready,
+      close: function () {
+        dead = true;
+        if (inst && window.Venue3D) window.Venue3D.dispose(inst);
+        inst = null;
+        if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      }
+    };
+  }
+  /* view3d({ btn, box, flat, spec, chips, cap, label, onLabel, hideBox, auto })
+     wires a 3D toggle: the 3D stage goes inside `box` and hides `flat`; the
+     button flips between the two. With auto, it opens by itself as it
+     scrolls into view (see auto3d); switching it off holds for the visit. */
   function view3d(o) {
-    var inst = null, stage = null, offHtml = o.btn.innerHTML;
+    var st = null, offHtml = o.btn.innerHTML;
     o.btn.setAttribute("aria-pressed", "false");
-    function close() {
-      if (inst && window.Venue3D) window.Venue3D.dispose(inst);
-      inst = null;
-      if (stage && stage.parentNode) stage.parentNode.removeChild(stage);
-      stage = null;
+    function close(byUser) {
+      if (st) st.close();
+      st = null;
       if (o.flat) o.flat.hidden = false;
       o.box.classList.remove("is-3d");
       if (o.hideBox) o.box.hidden = true;
-      o.btn.innerHTML = offHtml; o.btn.setAttribute("aria-pressed", "false");
+      o.btn.innerHTML = offHtml; o.btn.setAttribute("aria-pressed", "false"); o.btn.disabled = false;
+      if (byUser) pref3d("off");
     }
-    o.btn.addEventListener("click", function () {
-      if (stage) { close(); return; }
-      o.btn.disabled = true; o.btn.textContent = "Loading 3D…";
-      load3d().then(function () {
-        stage = document.createElement("div");
-        stage.className = "v3d-wrap";
-        stage.innerHTML = '<div class="v3d"><canvas role="img" aria-label="' + esc(o.label || "3D view") + '"></canvas>' +
-          (o.chips && o.chips.length ? '<div class="v3d__hud">' + o.chips.join("") + "</div>" : "") +
-          (COARSE ? "" : '<div class="v3d__hint">Drag to turn · Ctrl + scroll to zoom · double-click to reset</div>') + "</div>" +
-          '<p class="v3d__note">' + (COARSE ? "<b>Swipe sideways to turn, pinch to zoom.</b> " : "") + esc(o.cap || "") + "</p>";
-        if (o.hideBox) o.box.hidden = false;
-        o.box.classList.add("is-3d");
-        if (o.flat) o.flat.hidden = true;
-        o.box.appendChild(stage);
-        inst = window.Venue3D.mount(stage.querySelector("canvas"), o.spec);
-        o.btn.disabled = false;
-        if (!inst) { close(); o.btn.textContent = "3D isn't available on this device"; o.btn.disabled = true; return; }
-        o.btn.textContent = o.onLabel || "Back to diagram"; o.btn.setAttribute("aria-pressed", "true");
-      }).catch(function () { o.btn.disabled = false; o.btn.textContent = "3D didn't load — try again"; });
-    });
-    return { close: close };
+    function open(byUser) {
+      if (st) return;
+      if (byUser) pref3d("on");
+      if (o.hideBox) o.box.hidden = false;
+      o.box.classList.add("is-3d");
+      if (o.flat) o.flat.hidden = true;
+      var mine = st = stage3d(o.box, o);
+      o.btn.textContent = o.onLabel || "Show the diagram"; o.btn.setAttribute("aria-pressed", "true");
+      mine.ready.then(function (ok) {
+        if (ok || st !== mine) return;
+        close(false);
+        if (hasGL()) o.btn.textContent = "3D didn't load — try again";
+        else { o.btn.textContent = "3D isn't available on this device"; o.btn.disabled = true; }
+      });
+    }
+    o.btn.addEventListener("click", function () { if (st) close(true); else open(true); });
+    if (o.auto && auto3d()) {
+      var target = o.anchor || o.box;
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (es) {
+          if (!es.some(function (e) { return e.isIntersecting; })) return;
+          io.disconnect();
+          if (target.isConnected && !st) open(false);
+        }, { rootMargin: "240px 0px" });
+        io.observe(target);
+      } else open(false);
+    }
+    return { open: open, close: close };
   }
   function btn3d(label, attr) { return '<button class="btn btn--sm btn--ghost btn--3d" type="button" ' + (attr || "data-3d") + ">" + IC.cube + esc(label || "View in 3D") + "</button>"; }
 
@@ -665,6 +722,7 @@
     get: get, IC: IC, wx: wx, emo: emo, sky: sky, SPORTS: SPORTS, sport: sport, shell: shell, gate: gate, lockbar: lockbar, fakeRows: fakeRows,
     fresh: fresh, banner: banner, sheet: { open: openSheet, close: closeSheet }, hashParam: hashParam, setHash: setHash,
     hourly: hourly, rainCls: rainCls, compass: compass, parkWind: parkWind, parkWindBig: parkWindBig, fieldWindBig: fieldWindBig, fieldWind: fieldWind, compassWind: compassWind,
-    impact: impact, tabs: tabs, longDate: longDate, todayET: todayET, etParts: etParts, view3d: view3d, btn3d: btn3d
+    impact: impact, tabs: tabs, longDate: longDate, todayET: todayET, etParts: etParts,
+    view3d: view3d, stage3d: stage3d, btn3d: btn3d, auto3d: auto3d, hasGL: hasGL, load3d: load3d
   };
 })();

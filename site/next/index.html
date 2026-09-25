@@ -20,28 +20,38 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
-<link rel="stylesheet" href="assets/dr.css?v=9f91068e">
+<link rel="stylesheet" href="assets/dr.css?v=4bdeb498">
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
 <script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
 <script src="/pro/gate.js" defer></script>
-<script src="assets/dr.js?v=9f91068e" defer></script>
-<script src="assets/feeds.js?v=9f91068e" defer></script>
-<script src="assets/props.js?v=9f91068e" defer></script>
-<script src="assets/hub.js?v=9f91068e" defer></script>
+<script src="assets/dr.js?v=4bdeb498" defer></script>
+<script src="assets/feeds.js?v=4bdeb498" defer></script>
+<script src="assets/props.js?v=4bdeb498" defer></script>
+<script src="assets/hub.js?v=4bdeb498" defer></script>
 </head>
 <body>
 <header id="dr-top" class="dr-top"></header>
 <main>
-  <section class="wrap" style="padding-top:64px;padding-bottom:8px">
-    <div class="ph__eyebrow">Weather · Props · The record</div>
-    <h1 style="font-size:clamp(34px,5.2vw,60px);line-height:1.04;letter-spacing:-.03em;max-width:17ch">Weather edges, priced as props, graded in public.</h1>
-    <p class="ph__lede" style="font-size:clamp(17px,1.6vw,19px);max-width:60ch">DFSRADAR reads the forecast at every ballpark, stadium, course and track, measures it against what actually happened there in weather like it — then puts our number beside the books'.</p>
-    <div class="row row--wrap mt24" style="gap:12px">
-      <a class="btn btn--cyan" href="weather/">Today's weather</a>
-      <a class="btn btn--ghost" href="props/">Today's props</a>
+  <section class="wrap hero" id="hero">
+    <div>
+      <div class="ph__eyebrow">Weather · Props · The record</div>
+      <h1 style="font-size:clamp(34px,4.6vw,56px);line-height:1.04;letter-spacing:-.03em;max-width:17ch">Weather edges, priced as props, graded in public.</h1>
+      <p class="ph__lede" style="font-size:clamp(17px,1.6vw,19px);max-width:60ch">DFSRADAR reads the forecast at every ballpark, stadium, course and track, measures it against what actually happened there in weather like it — then puts our number beside the books'.</p>
+      <div class="row row--wrap mt24" style="gap:12px">
+        <a class="btn btn--cyan" href="weather/">Today's weather</a>
+        <a class="btn btn--ghost" href="props/">Today's props</a>
+      </div>
+      <div class="chips mt24" id="rec-chips"></div>
     </div>
-    <div class="chips mt24" id="rec-chips"></div>
+    <div id="feat" hidden>
+      <div class="card feat">
+        <div class="feat__head"><div style="min-width:0"><div class="label" style="color:var(--cyan2)">On the radar</div><div class="feat__t" id="feat-t"></div><div class="feat__s" id="feat-s"></div></div>
+          <a class="sec__more" id="feat-go" href="weather/">Full forecast →</a></div>
+        <div class="feat__stage" id="feat-stage"></div>
+        <div class="feat__foot"><div class="seg-scroll"><div class="seg" id="feat-tabs" role="tablist" aria-label="Featured venue by sport"></div></div><p class="feat__cap" id="feat-cap"></p></div>
+      </div>
+    </div>
   </section>
 
   <section class="wrap sec">
@@ -79,7 +89,52 @@ document.addEventListener("DOMContentLoaded", function () {
   var D = DR, esc = D.esc;
   D.shell({ section: "home" });
   var ORDER = ["mlb", "nfl", "cfb", "pga", "nascar"];
+  var AUTO = D.auto3d();
+  if (AUTO) D.load3d().catch(function () {});            // fetch the 3D engine alongside the feeds
+
+  /* the featured venue: today's most interesting weather, live in 3D */
+  var featStage = null;
+  function feature(list, k) {
+    var f = list.filter(function (x) { return x.k === k; })[0] || list[0];
+    document.getElementById("feat-t").textContent = f.venue;
+    document.getElementById("feat-s").textContent = f.match;
+    document.getElementById("feat-go").href = f.href;
+    document.getElementById("feat-cap").textContent = f.cap;
+    D.$$("#feat-tabs button").forEach(function (b) { var on = b.getAttribute("data-k") === f.k; b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+    if (featStage) featStage.close();
+    var box = document.getElementById("feat-stage");
+    box.innerHTML = "";
+    featStage = D.stage3d(box, { spec: f.spec, chips: f.chips, label: f.label });
+    featStage.ready.then(function (ok) {
+      if (ok) return;
+      document.getElementById("feat").hidden = true;
+      document.getElementById("hero").classList.remove("hero--viz");
+    });
+  }
+  function featured(all) {
+    if (!D.hasGL()) return;
+    var list = H.featured(all);
+    if (!list.length) return;
+    document.getElementById("feat").hidden = false;
+    document.getElementById("hero").classList.add("hero--viz");
+    var tabs = ["mlb", "nfl", "cfb", "nascar", "pga"].filter(function (k) { return list.some(function (x) { return x.k === k; }); });
+    document.getElementById("feat-tabs").innerHTML = tabs.map(function (k) { return '<button type="button" role="tab" data-k="' + k + '">' + D.sport(k).name + "</button>"; }).join("");
+    D.$$("#feat-tabs button").forEach(function (b) { b.addEventListener("click", function () { feature(list, b.getAttribute("data-k")); }); });
+    if (AUTO) { feature(list, list[0].k); return; }
+    /* data saver, low power, or 3D switched off: offer it instead of loading it */
+    var f = list[0];
+    document.getElementById("feat-t").textContent = f.venue;
+    document.getElementById("feat-s").textContent = f.match;
+    document.getElementById("feat-go").href = f.href;
+    document.getElementById("feat-cap").textContent = f.cap;
+    D.$$("#feat-tabs button").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-k") === f.k ? "true" : "false"); });
+    document.getElementById("feat-stage").innerHTML = '<div class="v3d-launch"><div class="s">See ' + esc(f.venue) + " in 3D, with today's forecast wind.</div>" +
+      '<button class="btn btn--cyan btn--sm" type="button" id="feat-load" style="gap:8px">' + D.IC.cube + "View in 3D</button></div>";
+    document.getElementById("feat-load").addEventListener("click", function () { feature(list, f.k); });
+  }
+
   H.load(["wx", "pro", "rec"]).then(function (all) {
+    featured(all);
     var watch = [];
     document.getElementById("now").innerHTML = ORDER.map(function (k) {
       var st = H.status(k, all[k]); watch = watch.concat(st.watch);

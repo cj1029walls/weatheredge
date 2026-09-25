@@ -229,7 +229,7 @@
     var btn = root.querySelector("[data-3d]"), box = root.querySelector("[data-3d-box]");
     if (!btn || !box) return;
     var calm = !isNum(g.wind) || g.wind < 4;
-    v3 = D.view3d({ btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "nfl", g: g },
+    v3 = D.view3d({ auto: true, onLabel: "Show the diagram", btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "nfl", g: g },
       chips: ['<span class="chip' + (calm ? "" : " chip--cyan") + '">' + D.wx("wind") + (calm ? "Light wind" : g.wind + " mph · " + esc(FN.axis(g))) + "</span>",
         '<span class="chip">' + (isNum(g.temp) ? g.temp + "°" : "") + " at kickoff</span>"],
       cap: "Wind drawn at its forecast angle to the field. The forecast gives the angle, not which end it blows toward.",

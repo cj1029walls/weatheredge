@@ -275,7 +275,7 @@
     var btn = root.querySelector("[data-3d]"), box = root.querySelector("[data-3d-box]");
     if (!btn || !box) return;
     var k = FM.windKind(g), park = FM.park(g), w = FM.wind(g.windLabel);
-    v3 = D.view3d({ btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "mlb", g: g },
+    v3 = D.view3d({ auto: true, onLabel: "Show the diagram", btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "mlb", g: g },
       chips: ['<span class="chip' + (k === "calm" ? "" : " chip--cyan") + '">' + D.wx("wind") + (k === "calm" ? "Light wind" : g.wind + " mph " + esc(w)) + "</span>",
         '<span class="chip">' + (isNum(g.temp) ? g.temp + "°" : "") + " at first pitch</span>"],
       cap: "Wind drawn against " + park + "'s real field layout at the forecast angle. Walls shown 1.5× taller so they read.",
