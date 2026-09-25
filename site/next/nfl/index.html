@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NFL Weather This Week — Every Stadium, Game by Game | DFSRADAR</title>
+<meta name="description" content="This week&#x27;s NFL weather at every stadium: temperature, wind measured against the field, rain and the hours around kickoff — plus how games there have gone in weather like it.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://dfsradar.com/nfl/">
+<meta name="theme-color" content="#2E3240">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="NFL Weather This Week — Every Stadium, Game by Game | DFSRADAR">
+<meta property="og:description" content="This week&#x27;s NFL weather at every stadium: temperature, wind measured against the field, rain and the hours around kickoff — plus how games there have gone in weather like it.">
+<meta property="og:url" content="https://dfsradar.com/nfl/">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-card.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/dr.css?v=67f5b7a3">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../assets/dr.js?v=67f5b7a3" defer></script>
+<script src="../assets/feeds.js?v=67f5b7a3" defer></script>
+<script src="../assets/props.js?v=67f5b7a3" defer></script>
+<script src="../assets/nfl.js?v=67f5b7a3" defer></script>
+</head>
+<body>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>NFL weather</span><span class="faint">·</span><span id="wk">This week</span></div>
+    <h1 class="ph__title">Every stadium's forecast, game by game</h1>
+    <p class="ph__lede" id="lede">Loading this week's forecasts…</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="stale" class="mt24" hidden></div>
+
+  <section class="sec" id="watch-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">Weather watch</h2>
+      <p class="sec__sub">The games where wind, rain or temperature is strong enough to change how they're played.</p></div></div>
+    <div class="watch" id="watch"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">Every game</h2>
+      <p class="sec__sub">Conditions at kickoff, the hours around it, and how games at that stadium have gone in weather like this.</p></div></div>
+    <div class="toolbar"><div class="seg-scroll"><div class="seg" id="filters" role="group" aria-label="Filter games"></div></div></div>
+    <div id="slots"><div class="grid g2"><div class="skel"></div><div class="skel"></div></div></div>
+  </section>
+
+  <section class="band" id="props-band" hidden>
+    <div class="wrap" style="padding:0">
+      <div class="sec__h"><div><div class="ph__eyebrow" style="margin-bottom:8px">Weather → props</div>
+        <h2 class="sec__title">This week's weather leans</h2>
+        <p class="sec__sub">Quarterbacks, kickers, backs and receivers whose own history in this kind of weather says the line is off — with the books' line and price beside it.</p></div>
+        <a class="btn btn--cyan" href="../props/nfl/">Open NFL props</a></div>
+      <div class="grid g2" id="props-cards"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <details class="more"><summary>How to read this page</summary><div class="in">
+      <p><b>Wind is measured against the field.</b> A crosswind punishes kickers and deep passing far more than wind blowing straight down the field, where each team gets it at its back for half the game. The small diagram on each card shows the angle.</p>
+      <p><b>Similar weather</b> means games at the same stadium within a few degrees and a few mph of the kickoff forecast, since 2015. Over/under shares grade each of those games against its own closing total.</p>
+      <p>Forecasts refresh every morning and sharpen as kickoff gets closer. Domes and closed roofs are weather-neutral.</p>
+    </div></details>
+  </section>
+</main>
+<footer id="dr-foot" class="dr-foot"></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FN = F.nfl, esc = D.esc;
+  D.shell({ section: "weather", sport: "nfl" });
+  var S = { d: null, pro: null, filter: "all", member: false, freeKey: null };
+  var FILTERS = [["all", "All games"], ["watch", "Weather watch"], ["wind", "Wind"], ["rain", "Rain"], ["roof", "Roof"]];
+  function ctx() { return { d: S.d, pro: S.pro, member: S.member, freeKey: S.freeKey }; }
+
+  function summary(d) {
+    var g = d.games, open = g.filter(function (x) { return !x.dome; }), parts = [];
+    parts.push(D.plural(g.length, "game") + " this week" + (g.length - open.length ? ", " + (g.length - open.length) + " under a roof." : "."));
+    var windy = open.filter(function (x) { return x.wind >= 15; }).sort(function (a, b) { return b.wind - a.wind; }).slice(0, 2);
+    if (windy.length) parts.push("Wind is the story at " + windy.map(function (x) { return FN.venue(x) + " (" + x.wind + " mph, " + FN.axis(x) + ")"; }).join(" and ") + ".");
+    var wet = open.filter(function (x) { return (x.rain || 0) >= 40 || (x.delay && FN.delay[x.delay.level]); }).sort(function (a, b) { return b.rain - a.rain; });
+    parts.push(wet.length ? "Rain in the forecast for " + wet.map(function (x) { return x.away + " @ " + x.home + " (" + Math.max(x.rain, (x.delay && x.delay.pct) || 0) + "%)"; }).join(", ") + "." : "No serious rain in the forecast.");
+    var t = open.filter(function (x) { return D.isNum(x.temp); }).sort(function (a, b) { return a.temp - b.temp; });
+    if (t.length > 1) parts.push("Kickoff temperatures run from " + t[0].temp + "° to " + t[t.length - 1].temp + "°.");
+    return parts.join(" ");
+  }
+  function inFilter(g, f, ids) {
+    if (f === "all") return true;
+    if (f === "roof") return !!g.dome;
+    if (g.dome) return false;
+    if (f === "watch") return ids[g.id];
+    if (f === "wind") return g.wind >= 10;
+    if (f === "rain") return (g.rain || 0) >= 25 || (g.delay && FN.delay[g.delay.level]);
+    return true;
+  }
+  function slotName(g) {
+    var day = String(g.day || "").split(" ")[0], t = String(g.time || "");
+    var h = parseInt(t, 10) + (/PM/.test(t) && parseInt(t, 10) < 12 ? 12 : 0);
+    var full = { Sun: "Sunday", Mon: "Monday", Thu: "Thursday", Sat: "Saturday", Fri: "Friday" }[day] || day;
+    if (h >= 19) return full + " night · " + t;
+    if (day === "Sun" && h < 14) return "Sunday early · " + t;
+    if (day === "Sun" && h < 19) return "Sunday afternoon";
+    return full + " · " + t;
+  }
+  function renderGames() {
+    var d = S.d, c = ctx(), ids = {};
+    FN.watch(d).forEach(function (w) { ids[w.id] = true; });
+    var list = d.games.filter(function (g) { return inFilter(g, S.filter, ids); }).slice().sort(function (a, b) { return String(a.sortTime).localeCompare(String(b.sortTime)); });
+    var groups = [], by = {};
+    list.forEach(function (g) { var k = slotName(g); if (!by[k]) { by[k] = []; groups.push(k); } by[k].push(g); });
+    document.getElementById("slots").innerHTML = list.length ? groups.map(function (k) {
+      return '<div class="label" style="margin:28px 0 14px">' + esc(k) + " · " + D.plural(by[k].length, "game") + '</div><div class="grid g2">' + by[k].map(function (g) { return N.card(g, c); }).join("") + "</div>";
+    }).join("") : '<div class="empty card"><h3>No games match this filter</h3></div>';
+    document.getElementById("filters").innerHTML = FILTERS.map(function (f) {
+      var n = d.games.filter(function (g) { return inFilter(g, f[0], ids); }).length;
+      if (f[0] !== "all" && !n) return "";
+      return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + ' <span class="ct">' + n + "</span></button>";
+    }).join("");
+  }
+  function renderWatch() {
+    var w = FN.watch(S.d);
+    document.getElementById("watch-sec").hidden = !w.length;
+    document.getElementById("watch").innerHTML = w.slice(0, 8).map(function (x) {
+      return '<a href="#g-' + esc(x.id) + '" data-jump="' + esc(x.id) + '"><span class="ic ' + (x.tone || "") + '" aria-hidden="true">' + x.icon + "</span>" +
+        '<span><span class="w" style="display:block;margin:0 0 4px">' + esc(x.game + " · " + x.when) + '</span><span class="t" style="display:block">' + esc(x.title) + "</span>" +
+        '<span class="s" style="display:block">' + esc(x.sub) + (x.also && x.also.length ? " Also: " + esc(x.also.join(" · ")) + "." : "") + "</span></span></a>";
+    }).join("");
+  }
+  function renderProps() {
+    var band = document.getElementById("props-band"), picks = FN.picks(S.pro);
+    if (!picks.length) { band.hidden = true; return; }
+    band.hidden = false;
+    var p = picks[0];
+    S.freeKey = p.player + "|" + p.game + "|" + p.k;
+    var cards = [card(p, true)];
+    cards.push(S.member && picks[1] ? card(picks[1], false) : P.lockedCard("NFL · " + D.plural(picks.length - 1, "more lean"), picks.length - 1, "Every weather lean this week, with the split behind it and the books' price."));
+    document.getElementById("props-cards").innerHTML = cards.join("");
+  }
+  function card(p, free) {
+    return P.topCard({ sportLabel: "NFL · " + p.market.toLowerCase() + " · " + p.game.replace("@", " @ "), player: p.player, side: p.side, sub: (p.team ? p.team + " · " : "") + p.factor + " split",
+      nums: [{ v: D.isNum(p.line) ? String(p.line) : "—", l: "Books' line" }, { v: D.validOdds(p.price) ? D.odds(p.price) : "—", l: "Books' price" }, { v: D.isNum(p.delta) ? D.signed(p.delta, 0, "%") : "—", l: "In this weather", cls: p.delta <= -5 ? "cool" : p.delta >= 5 ? "good" : "" }],
+      why: esc(p.why), href: "../props/nfl/", hrefLabel: "All NFL leans" }, free ? {} : { tag: "PRO", pro: true, plain: true });
+  }
+  function openGame(id, push) {
+    var g = S.d && S.d.games.filter(function (x) { return x.id === id; })[0];
+    if (!g) return;
+    D.sheet.open(FN.name(g.away) + " at " + FN.name(g.home) + " · " + (g.day || "") + " " + g.time, N.detail(g, ctx()), function () { D.setHash("g", null); });
+    if (push) D.setHash("g", id);
+  }
+  function route() { var id = D.hashParam("g"); if (id) openGame(id, false); else D.sheet.close(true); }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("[data-open],[data-jump],[data-f]");
+    if (!t) return;
+    if (t.hasAttribute("data-open")) { e.preventDefault(); openGame(t.getAttribute("data-open"), true); }
+    else if (t.hasAttribute("data-jump")) {
+      e.preventDefault();
+      var id = t.getAttribute("data-jump"), el = document.getElementById("g-" + id);
+      if (!el) { S.filter = "all"; renderGames(); el = document.getElementById("g-" + id); }
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); el.classList.add("is-hl"); setTimeout(function () { el.classList.remove("is-hl"); }, 2200); }
+    } else { S.filter = t.getAttribute("data-f"); renderGames(); }
+  });
+  window.addEventListener("popstate", route);
+
+  Promise.all([D.get(FN.url), D.get(FN.proUrl)]).then(function (r) {
+    var d = r[0]; S.pro = r[1];
+    if (!d || !d.games) { document.getElementById("lede").textContent = "This week's forecasts couldn't be loaded — refresh in a minute."; document.getElementById("slots").innerHTML = ""; return; }
+    S.d = d;
+    var wk = d.games[0] && d.games[0].week;
+    document.getElementById("wk").textContent = wk ? "Week " + wk : "This week";
+    var f = D.fresh(document.getElementById("fresh"), { built: d.generated, stale: d.stale, status: d.status, maxAgeH: 30 });
+    if (f && f.level === "warn") { var st = document.getElementById("stale"); st.hidden = false; D.banner(st, f.text + ".", f.why); }
+    if (!d.games.length) {
+      document.getElementById("lede").textContent = "No NFL games inside the forecast window right now — the next slate appears as its forecasts come into range.";
+      document.getElementById("slots").innerHTML = ""; return;
+    }
+    document.getElementById("lede").textContent = summary(d);
+    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + D.plural(d.games.length, "game") + "</span>";
+    renderWatch(); renderProps(); renderGames(); route();
+    D.gate.on(function (st) {
+      var m = st === "member";
+      if (m !== S.member) { S.member = m; renderProps(); }
+      var gp = document.querySelector("[data-game-props]"), id = D.hashParam("g");
+      if (gp && id) { var g = S.d.games.filter(function (x) { return x.id === id; })[0]; if (g) gp.innerHTML = N.gameProps(g, ctx()); }
+    });
+  });
+});
+</script>
+</body>
+</html>
