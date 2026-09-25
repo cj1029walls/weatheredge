@@ -433,6 +433,10 @@ def main():
                     implied=o["implied"] if o else None,
                     books=o["books"] if o else 0,
                     fair=fair, edge=edge, value=False)
+                if o and o.get("best"):
+                    row["best"] = o["best"]          # best book price, the books' number
+                if o and o.get("open") and o["open"].get("price") not in (None, o["price"]):
+                    row["open"] = o["open"]          # today's first price, when it has moved
                 targets.append(row)
                 # Lineups tab: same dict object, so BvP/alt updates flow through
                 game_lineup.setdefault(team, []).append(row)
@@ -606,6 +610,10 @@ def main():
                                over=o["over"] if o else None,
                                under=o["under"] if o else None,
                                lean=lean, diff=diff))
+            if o and o.get("best"):
+                kprops[-1]["best"] = o["best"]
+            if o and o.get("open") and (o["open"].get("line"), o["open"].get("over")) != (o["line"], o["over"]):
+                kprops[-1]["open"] = o["open"]
     kprops.sort(key=lambda k: (k["line"] is None, -(abs(k["diff"]) if k["diff"] is not None else 0), -k["proj"]))
 
     targets.sort(key=lambda t: -t["prob"])

@@ -126,11 +126,16 @@ def summarize(days):
     v_w = sum(1 for t in vals if t["hit"])
     units = round(sum((t["price"] / 100 if t["hit"] else -1)
                       for t in vals if t.get("price")), 2)
-    top1 = []
+    top1, top1_px = [], []
     for dstr in sorted(days):
         graded = [t for t in days[dstr]["targets"] if t["hit"] is not None]
         if graded:
             top1.append(graded[0]["hit"])
+            px = graded[0].get("price")
+            if isinstance(px, (int, float)) and (px >= 100 or px <= -100):
+                top1_px.append((px, graded[0]["hit"]))
+    # the free pick at the price posted with it, 1 unit a night
+    top1_units = round(sum(((p / 100 if p > 0 else 100 / -p) if h else -1) for p, h in top1_px), 2)
     kleans = [k for d in days.values() for k in d["k"] if k.get("win") is not None]
     k_w = sum(1 for k in kleans if k["win"])
     # game-level projection accuracy (his "Within 1 / Within 2" module, ours)
@@ -153,7 +158,8 @@ def summarize(days):
         ump_signal = dict(n=len(sig), w=w, pct=round(100 * w / len(sig)))
     return dict(nights=len(days), graded=len(all_t), cal=cal,
                 value=dict(n=len(vals), w=v_w, units=units),
-                top1=dict(n=len(top1), w=sum(1 for h in top1 if h)),
+                top1=dict(n=len(top1), w=sum(1 for h in top1 if h),
+                          priced=len(top1_px), units=top1_units),
                 kleans=dict(n=len(kleans), w=k_w),
                 gameProj=game_proj, umpSignal=ump_signal)
 
@@ -197,7 +203,7 @@ def main():
         recent.append(dict(
             d=dstr, n=len(graded), hits=sum(1 for t in graded if t["hit"]),
             top=(dict(player=graded[0]["player"], prob=graded[0]["prob"],
-                      hit=graded[0]["hit"]) if graded else None),
+                      hit=graded[0]["hit"], price=graded[0].get("price")) if graded else None),
             valueHits=[dict(player=t["player"], price=t.get("price"), hit=t["hit"])
                        for t in d["targets"] if t["value"]],
             kW=sum(1 for k in d["k"] if k.get("win")),

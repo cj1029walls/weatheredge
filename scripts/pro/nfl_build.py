@@ -34,7 +34,7 @@ so the grader (built when Week 1 results exist) can score every lean publicly.
 
 No third-party dependencies.
 """
-import functools, json, os, re, statistics, sys, unicodedata
+import functools, json, os, re, sys, unicodedata
 from archive import save_merged
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -44,6 +44,8 @@ print = functools.partial(print, flush=True)
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 sys.path.insert(0, os.path.join(ROOT, "scripts", "nfl"))
 import weekly_build as WB                      # build_edge, GAMES_URL, get_json, ET
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "odds"))
+from prices import consensus_line, median_price, payout, valid   # noqa: E402
 from stadiums import STADIUMS
 
 DEEP = os.path.join(ROOT, "data", "nfl", "deep.json")
@@ -299,7 +301,7 @@ def fetch_props(week_rows, leans):
                     kk = (f"{a}@{h}", mk.get("key"), norm_name(oc.get("description") or ""))
                     out.setdefault(kk, []).append(
                         dict(side=oc.get("name"), point=oc.get("point"), price=oc.get("price"),
-                             who=oc.get("description")))
+                             who=oc.get("description"), book=bk.get("title") or bk.get("key")))
     print(f"props: priced {len(out)} (game, market, player) combos from {used} events")
     return out
 
@@ -318,12 +320,23 @@ def attach_prices(leans, props):
                         # Amon-Ra St. Brown) — never post a blend of their lines
         side = "Under" if ln["side"] == "UNDER" else "Over"
         pick = [r for r in rows if r["side"] == side] or rows
-        pts = [r["point"] for r in pick]
-        prices = [r["price"] for r in pick if r.get("price") is not None]
-        ln["line"] = statistics.median(pts)
-        if prices:
-            ln["price"] = int(statistics.median(prices))
-        ln["books"] = len(pick)
+        # the line most books hang, priced from those books only, in
+        # probability space — a raw median of American prices across -100/+100
+        # isn't a price (it posted a "0" receptions price)
+        line = consensus_line([r["point"] for r in pick])
+        at = [r for r in pick if r["point"] == line] or pick
+        ln["line"] = line
+        med = median_price([r.get("price") for r in at])
+        if med is not None:
+            ln["price"] = med
+        ln["books"] = len(at)
+        # the best number on the board for this side: the highest line for an
+        # under, the lowest for an over, then the best price at that line
+        cands = [r for r in pick if r.get("point") is not None and valid(r.get("price"))]
+        if len(cands) > 1:
+            sgn = 1 if side == "Under" else -1
+            b = max(cands, key=lambda r: (sgn * r["point"], payout(r["price"])))
+            ln["best"] = dict(line=b["point"], price=int(b["price"]), book=b.get("book"))
     # anytime-TD price shown as market context on RB run-script leans — the
     # books' number, never ours; we model the script, not TD probability
     for ln in leans:
@@ -331,9 +344,9 @@ def attach_prices(leans, props):
             nm = norm_name(ln["who"].split("(")[0])
             rows = props.get((ln["game"], "player_anytime_td", nm))
             if rows:
-                prices = [r["price"] for r in rows if r.get("price") is not None]
-                if prices:
-                    ln["atd"] = int(statistics.median(prices))
+                atd = median_price([r.get("price") for r in rows])
+                if atd is not None:
+                    ln["atd"] = atd
     return leans
 
 
