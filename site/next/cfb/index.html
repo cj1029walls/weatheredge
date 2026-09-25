@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>College Football Weather This Week — Every Game | DFSRADAR</title>
+<meta name="description" content="This week&#x27;s college football weather at every stadium: wind, rain and temperature at kickoff, the hours around it, and what similar weather has done there.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://dfsradar.com/cfb/">
+<meta name="theme-color" content="#2E3240">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="College Football Weather This Week — Every Game | DFSRADAR">
+<meta property="og:description" content="This week&#x27;s college football weather at every stadium: wind, rain and temperature at kickoff, the hours around it, and what similar weather has done there.">
+<meta property="og:url" content="https://dfsradar.com/cfb/">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-card.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/dr.css?v=67f5b7a3">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../assets/dr.js?v=67f5b7a3" defer></script>
+<script src="../assets/feeds.js?v=67f5b7a3" defer></script>
+<script src="../assets/cfb.js?v=67f5b7a3" defer></script>
+</head>
+<body>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>College football weather</span><span class="faint">·</span><span id="wk">This week</span></div>
+    <h1 class="ph__title" id="h1">Every stadium's forecast, every game</h1>
+    <p class="ph__lede" id="lede">Loading this week's forecasts…</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="stale" class="mt24" hidden></div>
+
+  <section class="sec" id="watch-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">Weather watch</h2>
+      <p class="sec__sub">Wind, rain and temperature strong enough to change how these games are played — Power 4 first.</p></div></div>
+    <div class="watch" id="watch"></div>
+  </section>
+
+  <section class="sec" id="feature-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">The games to watch</h2><p class="sec__sub">Full forecasts for the games the weather touches most.</p></div></div>
+    <div class="grid g2" id="feature"></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">All games</h2><p class="sec__sub">Tap a game for the hour-by-hour forecast and what similar weather has done at that stadium.</p></div></div>
+    <div class="toolbar">
+      <div class="seg-scroll"><div class="seg" id="filters" role="group" aria-label="Filter games"></div></div>
+      <span class="grow"></span>
+      <input class="search" id="q" type="search" placeholder="Find a team" aria-label="Find a team">
+    </div>
+    <div id="days"><div class="skel"></div></div>
+  </section>
+
+  <section class="band" id="props-band">
+    <div class="wrap" style="padding:0">
+      <div class="sec__h"><div><div class="ph__eyebrow" style="margin-bottom:8px">Weather → props</div>
+        <h2 class="sec__title">The trench board</h2>
+        <p class="sec__sub">College rushing props, built from each offensive line against the defensive front it faces — the signal almost nobody else is pricing.</p></div>
+        <a class="btn btn--cyan" href="../props/cfb/">Open CFB props</a></div>
+      <div id="props-note"></div>
+    </div>
+  </section>
+</main>
+<footer id="dr-foot" class="dr-foot"></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FC = F.cfb, esc = D.esc;
+  D.shell({ section: "weather", sport: "cfb" });
+  var S = { d: null, filter: "all", q: "" };
+  var FILTERS = [["all", "All games"], ["p4", "Power 4"], ["watch", "Weather watch"], ["wind", "Wind 12+"], ["rain", "Rain"]];
+
+  function inFilter(g, f, ids) {
+    if (S.q && (g.away + " " + g.home).toLowerCase().indexOf(S.q) < 0) return false;
+    if (f === "all") return true;
+    if (f === "p4") return !!g.p4;
+    if (g.dome) return false;
+    if (f === "watch") return ids[g.id];
+    if (f === "wind") return g.wind >= 12;
+    if (f === "rain") return (g.rain || 0) >= 30;
+    return true;
+  }
+  function renderAll() {
+    var d = S.d, ids = {};
+    FC.watch(d).forEach(function (w) { ids[w.id] = true; });
+    var list = d.games.filter(function (g) { return inFilter(g, S.filter, ids); }).sort(function (a, b) { return String(a.sortTime).localeCompare(String(b.sortTime)); });
+    var days = [], by = {};
+    list.forEach(function (g) { var k = g.day || ""; if (!by[k]) { by[k] = []; days.push(k); } by[k].push(g); });
+    document.getElementById("days").innerHTML = list.length ? days.map(function (k) {
+      return '<div class="label" style="margin:26px 0 12px">' + esc(k) + " · " + D.plural(by[k].length, "game") + '</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Game</th><th class="num">Kickoff</th><th class="num">Temp</th><th class="num">Wind</th><th class="num">Rain</th><th class="num">Weather</th></tr></thead><tbody>' +
+        by[k].map(C.row).join("") + "</tbody></table></div>";
+    }).join("") : '<div class="empty card"><h3>No games match</h3></div>';
+    document.getElementById("filters").innerHTML = FILTERS.map(function (f) {
+      var n = d.games.filter(function (g) { return inFilter(g, f[0], ids); }).length;
+      if (f[0] !== "all" && !n) return "";
+      return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + ' <span class="ct">' + n + "</span></button>";
+    }).join("");
+  }
+  function openGame(id, push) {
+    var g = S.d && S.d.games.filter(function (x) { return x.id === id; })[0];
+    if (!g) return;
+    D.sheet.open(g.away + " at " + g.home + " · " + g.day, C.detail(g, { d: S.d }), function () { D.setHash("g", null); });
+    if (push) D.setHash("g", id);
+  }
+  function route() { var id = D.hashParam("g"); if (id) openGame(id, false); else D.sheet.close(true); }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("[data-open],[data-f],[data-jump]");
+    if (!t) return;
+    if (t.hasAttribute("data-f")) { S.filter = t.getAttribute("data-f"); renderAll(); return; }
+    e.preventDefault();
+    openGame(t.getAttribute("data-open") || t.getAttribute("data-jump"), true);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.matches && e.target.matches("tr[data-open]")) openGame(e.target.getAttribute("data-open"), true); });
+  document.getElementById("q").addEventListener("input", function (e) { S.q = e.target.value.trim().toLowerCase(); renderAll(); });
+  window.addEventListener("popstate", route);
+
+  Promise.all([D.get(FC.url), D.get(FC.proUrl)]).then(function (r) {
+    var d = r[0], pro = r[1];
+    if (!d || !d.games) { document.getElementById("lede").textContent = "This week's forecasts couldn't be loaded — refresh in a minute."; document.getElementById("days").innerHTML = ""; return; }
+    S.d = d;
+    var wk = d.games[0] && d.games[0].week;
+    document.getElementById("wk").textContent = wk ? "Week " + wk : "This week";
+    document.getElementById("h1").textContent = "Every stadium's forecast, all " + d.games.length + " games";
+    var f = D.fresh(document.getElementById("fresh"), { built: d.generated, stale: d.stale, status: d.status, maxAgeH: 30 });
+    if (f && f.level === "warn") {
+      var st = document.getElementById("stale"); st.hidden = false;
+      D.banner(st, f.text + " — forecasts may have shifted since.", "Our college data source (CollegeFootballData) stopped answering, so this week's slate hasn't rebuilt. Forecasts older than a day or two can miss a change in the weather — check back after the next refresh.");
+    }
+    var c = d.counts || {};
+    var open = d.games.filter(function (g) { return !g.dome; });
+    var windy = open.filter(function (g) { return g.wind >= 16; }).length, wet = open.filter(function (g) { return g.rain >= 50; }).length;
+    document.getElementById("lede").textContent = D.plural(d.games.length, "game") + " inside the forecast window. " +
+      (windy ? D.plural(windy, "game") + " with 16+ mph wind" : "No big wind") + ", " + (wet ? wet + " with a better-than-even chance of rain" : "no serious rain threats") + "." +
+      (c.indoor ? " " + D.plural(c.indoor, "game") + " indoors." : "");
+    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + D.plural(d.games.length, "game") + "</span>" +
+      (c.severe ? '<span class="chip chip--bad">' + c.severe + " severe</span>" : "") + (c.elevated ? '<span class="chip chip--warn">' + c.elevated + " elevated</span>" : "");
+    var w = FC.watch(d);
+    document.getElementById("watch-sec").hidden = !w.length;
+    document.getElementById("watch").innerHTML = w.slice(0, 8).map(function (x) {
+      return '<a href="#g=' + esc(x.id) + '" data-jump="' + esc(x.id) + '"><span class="ic ' + (x.tone || "") + '" aria-hidden="true">' + x.icon + "</span>" +
+        '<span><span class="w" style="display:block;margin:0 0 4px">' + esc(x.game + " · " + x.when) + '</span><span class="t" style="display:block">' + esc(x.title) + "</span>" +
+        '<span class="s" style="display:block">' + esc(x.sub) + (x.also && x.also.length ? " Also: " + esc(x.also.join(" · ")) + "." : "") + "</span></span></a>";
+    }).join("");
+    var feat = w.slice(0, 4).map(function (x) { return d.games.filter(function (g) { return g.id === x.id; })[0]; }).filter(Boolean);
+    document.getElementById("feature-sec").hidden = !feat.length;
+    document.getElementById("feature").innerHTML = feat.map(C.card).join("");
+    var pn = document.getElementById("props-note");
+    if (pro && (pro.paused || pro.stale)) pn.innerHTML = '<div class="note note--warn">' + D.IC.warn + "<div><b>The trench board is paused this week.</b> " + esc((pro.status && pro.status.reason) || "Our college data source isn't answering.") + " The record and the wind study are still up.</div></div>";
+    else if (pro && pro.leans && pro.leans.length) pn.innerHTML = '<div class="note note--cyan">' + D.IC.info + "<div><b>" + D.plural(pro.leans.length, "rushing lean") + "</b> on the board this week — the top one is free.</div></div>";
+    renderAll(); route();
+  });
+});
+</script>
+</body>
+</html>
