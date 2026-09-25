@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NASCAR Props — Track History, Track Type &amp; Heat | DFSRADAR</title>
+<meta name="description" content="NASCAR race targets ranked by track history, track-type form and heat — graded on a top-10 finish. Free top pick weekly.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://dfsradar.com/props/nascar/">
+<meta name="theme-color" content="#2E3240">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="NASCAR Props — Track History, Track Type &amp; Heat | DFSRADAR">
+<meta property="og:description" content="NASCAR race targets ranked by track history, track-type form and heat — graded on a top-10 finish. Free top pick weekly.">
+<meta property="og:url" content="https://dfsradar.com/props/nascar/">
+<meta property="og:image" content="https://dfsradar.com/og-pro.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../../assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../../assets/dr.js?v=a7b89034" defer></script>
+<script src="../../assets/feeds.js?v=a7b89034" defer></script>
+<script src="../../assets/props.js?v=a7b89034" defer></script>
+</head>
+<body>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>NASCAR props</span><span class="faint">·</span><span id="ev">This week</span></div>
+    <h1 class="ph__title">Race targets: track history, track type and heat</h1>
+    <p class="ph__lede">The drivers who keep finishing up front at this track, at tracks like it, and when the track runs hot — ranked, and graded on a top-10 finish (top-5 for dominators).</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="note" class="mt24" hidden></div>
+
+  <section class="sec" id="top-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">This week's free pick</h2><p class="sec__sub">Our top target — free, and graded.</p></div>
+      <a class="sec__more" href="../../record/#nascar">See the record →</a></div>
+    <div class="grid g2" id="top-cards"></div>
+  </section>
+
+  <section class="sec" id="boards">
+    <div class="sec__h"><div><h2 class="sec__title">The boards</h2></div></div>
+    <div class="seg-scroll" style="margin-bottom:18px"><div class="seg" id="tabs" role="tablist" aria-label="NASCAR boards">
+      <button type="button" data-tab="t">Targets <span class="ct" id="ct-t"></span></button>
+      <button type="button" data-tab="h">Track history <span class="ct" id="ct-h"></span></button>
+      <button type="button" data-tab="y">Track-type form <span class="ct" id="ct-y"></span></button>
+      <button type="button" data-tab="x">Heat <span class="ct" id="ct-x"></span></button>
+    </div></div>
+    <div data-panel="t"><div id="b-t"></div></div>
+    <div data-panel="h" hidden><div id="b-h"></div><p class="small dim mt12">Next Gen = races in the current car (2022–). Last results here, newest first.</p></div>
+    <div data-panel="y" hidden><div id="b-y"></div><p class="small dim mt12" id="y-note"></p></div>
+    <div data-panel="x" hidden><div id="b-x"></div><p class="small dim mt12" id="x-note"></p></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">The NASCAR record</h2><p class="sec__sub">Every target graded against the finishing order.</p></div><a class="sec__more" href="../../record/#nascar">Full record →</a></div>
+    <div id="rec"></div><div id="rec-recent" class="mt16"></div>
+  </section>
+</main>
+<footer id="dr-foot" class="dr-foot"></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FN = F.nascar, esc = D.esc, isNum = D.isNum;
+  D.shell({ section: "props", sport: "nascar" });
+  var S = { pro: null, rec: null, member: false };
+  var TYPE = { INT: "intermediate", SHORT: "short-track", SS: "superspeedway", ROAD: "road-course", FLAT: "flat-track" };
+
+  var T_COLS = [
+    { k: "p", label: "Driver", html: function (p, i, free) { return '<div class="who">' + esc(p.player) + (free ? ' <span class="chip chip--free">FREE</span>' : "") + "<small>" + esc(p.market) + " · " + esc(F.cap(String(p.k).toLowerCase())) + "</small></div>"; } },
+    { k: "why", label: "Why", html: function (p) { return '<span class="why" style="display:block;font-size:13.5px">' + esc(p.why) + "</span>"; } }
+  ];
+  var H_COLS = [
+    { k: "driver", label: "Driver", html: function (r) { return '<div class="who">' + esc(r.driver) + "<small>" + D.plural(r.starts, "start") + " here · best " + (r.best === 1 ? "win" : r.best) + "</small></div>"; } },
+    { k: "avgFin", label: "Avg finish", num: true, sort: function (r) { return -r.avgFin; }, html: function (r) { return '<b class="cyan">' + D.fixed(r.avgFin, 1) + "</b>"; } },
+    { k: "top5", label: "Top 5s", num: true, sort: function (r) { return r.top5; }, html: function (r) { return String(r.top5); } },
+    { k: "ng", label: "Next Gen", num: true, sort: function (r) { return isNum(r.ngAvg) ? -r.ngAvg : null; }, html: function (r) { return isNum(r.ngAvg) ? D.fixed(r.ngAvg, 1) + ' <span class="dim">(' + r.ngStarts + ")</span>" : '<span class="dim">—</span>'; } },
+    { k: "last", label: "Last here", num: true, html: function (r) { return (r.last || []).slice(0, 4).map(function (x) { return '<span class="chip chip--sm' + (x.pos <= 5 ? " chip--good" : "") + '" title="' + x.y + '">' + x.pos + "</span>"; }).join(" "); } }
+  ];
+  var Y_COLS = [
+    { k: "driver", label: "Driver", html: function (r) { return '<div class="who">' + esc(r.driver) + "<small>last " + r.n + " races at this track type</small></div>"; } },
+    { k: "avgFin", label: "Avg finish", num: true, sort: function (r) { return -r.avgFin; }, html: function (r) { return '<b class="cyan">' + D.fixed(r.avgFin, 1) + "</b>"; } },
+    { k: "top5", label: "Top 5s", num: true, sort: function (r) { return r.top5; }, html: function (r) { return String(r.top5); } }
+  ];
+  var X_COLS = [
+    { k: "driver", label: "Driver", html: function (r) { return '<div class="who">' + esc(r.driver) + "<small>" + r.hotN + " hot races (88°+)</small></div>"; } },
+    { k: "hotAvg", label: "Hot", num: true, html: function (r) { return "<b>" + D.fixed(r.hotAvg, 1) + "</b>"; } },
+    { k: "coolAvg", label: "Cooler", num: true, html: function (r) { return D.fixed(r.coolAvg, 1); } },
+    { k: "delta", label: "Heat edge", num: true, sort: function (r) { return r.delta; }, html: function (r) { return '<b class="' + (r.delta > 0 ? "good" : "cool") + '">' + D.signed(r.delta, 1) + "</b>"; } }
+  ];
+
+  function render() {
+    var pro = S.pro, m = S.member, picks = FN.picks(pro);
+    document.getElementById("ct-t").textContent = picks.length;
+    P.board(document.getElementById("b-t"), { cols: T_COLS, rows: picks, key: function (p) { return p.player + p.k; }, member: m, free: 1, lock: { what: "target" }, emptyTitle: "No targets this week" });
+    var hb = (pro.board || []).slice();
+    document.getElementById("ct-h").textContent = hb.length;
+    P.board(document.getElementById("b-h"), { cols: H_COLS, rows: hb, key: function (r) { return r.driver; }, member: m, free: 0, sort: { k: "avgFin", dir: "desc" }, lock: { what: "driver", title: "Track history for " + D.plural(hb.length, "driver") + " — unlock with PRO" } });
+    var tf = (pro.tform || []).slice();
+    document.getElementById("ct-y").textContent = tf.length;
+    document.getElementById("y-note").textContent = pro.race && TYPE[pro.race.type] ? "Form across the last 10 " + TYPE[pro.race.type] + " races — tracks that drive like this one." : "";
+    P.board(document.getElementById("b-y"), { cols: Y_COLS, rows: tf, key: function (r) { return r.driver; }, member: m, free: 0, sort: { k: "avgFin", dir: "desc" }, lock: { what: "driver", title: "Track-type form — unlock with PRO" } });
+    var hu = ((pro.heat && pro.heat.up) || []).concat((pro.heat && pro.heat.down) || []);
+    document.getElementById("ct-x").textContent = hu.length;
+    document.getElementById("x-note").textContent = isNum(pro.fcTemp) ? "Forecast high " + pro.fcTemp + "° — heat leans switch on at 88°+" + (pro.hotFc ? ". It's a hot one: these matter this week." : ".") : "";
+    P.board(document.getElementById("b-x"), { cols: X_COLS, rows: hu, key: function (r) { return r.driver; }, member: m, free: 0, sort: { k: "delta", dir: "desc" }, lock: { what: "driver", title: "The heat board — unlock with PRO" } });
+    document.getElementById("top-sec").hidden = !picks.length;
+    if (picks.length) {
+      var mk = function (p, free) { return P.topCard({ sportLabel: "NASCAR · " + p.market.toLowerCase() + " · " + (pro.race ? pro.race.track : ""), player: p.player, side: "TARGET", sub: F.cap(String(p.k).toLowerCase()), why: esc(p.why) }, free ? {} : { tag: "PRO", pro: true, plain: true }); };
+      document.getElementById("top-cards").innerHTML = mk(picks[0], true) + (m && picks[1] ? mk(picks[1], false) : P.lockedCard("NASCAR · the rest of the board", picks.length - 1, "Every target plus track history, track-type form and the heat board."));
+    }
+  }
+  function renderRecord() {
+    var r = S.rec && S.rec.summary, el = document.getElementById("rec");
+    if (!r) { el.innerHTML = '<div class="note">' + D.IC.info + "<div>No graded races yet.</div></div>"; return; }
+    var t = function (x) { return x && x.n ? x.w + "–" + (x.n - x.w) : "—"; };
+    el.innerHTML = P.recordStrip([
+      { v: t(r.overall), l: "All targets", s: r.overall.n ? D.pct(r.overall.w / r.overall.n * 100, 0) + " over " + D.plural(r.races, "race") : "" },
+      { v: t(r.trackTarget), l: "Track targets · top-10", s: "" }, { v: t(r.dominator), l: "Dominators · top-5", s: "" },
+      { v: D.fixed(r.avgFinish, 1), l: "Average finish", s: r.wins + " wins · " + r.top5 + " top-5s" }]);
+    var list = [];
+    (S.rec.recent || []).slice(0, 3).forEach(function (e) { (e.leans || []).forEach(function (l) {
+      list.push({ res: l.hit ? "w" : "l", title: esc(l.who) + ' <span class="dim">finished ' + l.pos + " (needed top-" + l.bar + ")</span>", sub: esc(e.race) + " · " + esc(e.date) });
+    }); });
+    document.getElementById("rec-recent").innerHTML = list.length ? '<div class="label" style="margin:22px 0 12px">Recent races</div>' + P.results(list.slice(0, 12)) : "";
+  }
+  Promise.all([D.get(FN.proUrl), D.get(FN.recUrl)]).then(function (r) {
+    S.pro = r[0] || {}; S.rec = r[1];
+    renderRecord();
+    var pro = S.pro;
+    document.getElementById("ev").textContent = pro.race ? pro.race.name : "This week";
+    D.fresh(document.getElementById("fresh"), { built: pro.updated, stale: pro.stale, status: pro.status, maxAgeH: 40 });
+    if (pro.note) { var n = document.getElementById("note"); n.hidden = false; n.className = "note mt24"; n.innerHTML = D.IC.info + "<div>" + esc(pro.note) + "</div>"; }
+    document.getElementById("meta-chips").innerHTML = pro.race ? '<span class="chip">' + esc(pro.race.track) + "</span>" + (pro.race.playoff ? '<span class="chip chip--cyan">Playoff race</span>' : "") +
+      (pro.delay && pro.delay.level && pro.delay.level !== "clear" ? '<span class="chip chip--warn">Rain watch · ' + pro.delay.pct + "%</span>" : "") : "";
+    D.tabs(document.getElementById("tabs"), null, "nascar-props-tab");
+    D.gate.on(function (st) { S.member = st === "member"; render(); });
+  });
+});
+</script>
+</body>
+</html>

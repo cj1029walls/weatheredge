@@ -2,1423 +2,162 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DFSRADAR — Weather, Venue &amp; Umpire Edges for DFS</title>
-<meta name="description" content="DFSRADAR reads the forecast at every venue on the slate, compares it to what actually happened there in similar weather, and grades every call in public. MLB, NFL, CFB, PGA and NASCAR.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DFSRADAR — Weather Edges, Priced as Props, Graded in Public</title>
+<meta name="description" content="DFSRADAR reads the forecast at every ballpark, stadium, course and track, measures it against what happened there in weather like it, and puts our number beside the books&#x27; — every call graded in public.">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://dfsradar.com/">
-<meta property="og:title" content="DFSRADAR — Weather, Venue &amp; Umpire Edges for DFS">
-<meta property="og:description" content="The forecast at every venue, measured against that venue's own history, graded in public.">
-<meta property="og:url" content="https://dfsradar.com/">
+<meta name="theme-color" content="#2E3240">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="DFSRADAR — Weather Edges, Priced as Props, Graded in Public">
+<meta property="og:description" content="DFSRADAR reads the forecast at every ballpark, stadium, course and track, measures it against what happened there in weather like it, and puts our number beside the books&#x27; — every call graded in public.">
+<meta property="og:url" content="https://dfsradar.com/">
 <meta property="og:image" content="https://dfsradar.com/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
-<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
-<style>
-  /* Tokens are the DFS Kitchen family's, verbatim, so this page sits beside
-     dfskitchen.com, dfsprep.com and dfsbooks.com as a sibling rather than a
-     cousin. Cyan is DFSRADAR's colour in that family; orange is reserved for
-     the family currency — PRO, All-Access, The Optimizer. */
-  :root{
-    --bg:#2E3240; --panel:#323A4A; --panel2:#3C4455; --panel3:#2A303D; --inset:#252A35;
-    --border:#454E61; --text:#EFF1F7; --muted:#C7CEDC; --dim:#8E97AD;
-    --accent:#F08A3C; --accent-soft:#FFA05A; --accent-bg:rgba(255,160,90,.13); --on-accent:#1B1206;
-    --radar:#22d3ee; --radar-soft:#67e8f9; --radar-bg:rgba(34,211,238,.11); --on-radar:#06232a;
-    --good:#22c55e; --bad:#f87171; --warn:#fbbf24; --prep:#8b5cf6; --books:#22c55e;
-    --font:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --display:Sora,Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --surface:linear-gradient(180deg,rgba(255,255,255,.045) 0%,rgba(255,255,255,0) 60%),var(--panel);
-    --elev:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.28);
-    --elev-hi:inset 0 1px 0 rgba(255,255,255,.1),0 2px 4px rgba(0,0,0,.35),0 26px 56px rgba(0,0,0,.36);
-    --mock:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.42);
-    --ease:cubic-bezier(.22,1,.36,1);
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;
-    -webkit-font-smoothing:antialiased;overflow-x:hidden}
-  a{color:var(--radar-soft);text-decoration:none}
-  h1,h2,h3{font-family:var(--display);margin:0}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
-
-  /* ---------- nav ---------- */
-  .nav{position:sticky;top:0;z-index:50;background:rgba(46,50,64,.86);backdrop-filter:blur(14px) saturate(150%);
-    border-bottom:1px solid rgba(255,255,255,.07)}
-  .nav-in{max-width:1200px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:22px}
-  .brand{display:flex;align-items:center;gap:11px;color:var(--text)}
-  .brand svg{width:34px;height:34px;flex-shrink:0}
-  .brand .n{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.4px;line-height:1.1}
-  .brand .n b{color:var(--radar);font-weight:800}
-  .brand .t{display:block;font-family:var(--font);font-size:9.5px;font-weight:700;letter-spacing:2.6px;
-    text-transform:uppercase;color:var(--dim);margin-top:3px}
-  .nav-links{display:flex;gap:2px;margin-left:auto;align-items:center}
-  .nav-links a:not(.nav-cta){color:var(--muted);font-size:13.5px;font-weight:500;padding:8px 12px;border-radius:8px;transition:color .2s,background .2s}
-  .nav-links a:not(.nav-cta):hover{color:var(--text);background:rgba(255,255,255,.05)}
-  .nav-cta{margin-left:10px;background:var(--accent);color:var(--on-accent)!important;font-weight:800;font-size:13.5px;
-    padding:10px 18px;border-radius:9px;background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 22px rgba(240,138,60,.28);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
-  .nav-cta:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 12px 28px rgba(240,138,60,.38)}
-  /* Log in sits apart from the page anchors: it leaves the page, and it is
-     the one link a returning member looks for, so it survives on phones. */
-  .nav-links .nav-login{margin-left:6px;border:1px solid rgba(255,255,255,.12)}
-
-  /* ---------- buttons ---------- */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 28px;border-radius:10px;
-    font-weight:700;font-size:16px;position:relative;overflow:hidden;
-    transition:transform .2s var(--ease),box-shadow .2s var(--ease),background .2s,border-color .2s}
-  .btn:hover{transform:translateY(-2px)}
-  .btn-radar{background:var(--radar);color:var(--on-radar);
-    background-image:linear-gradient(rgba(255,255,255,.18),rgba(255,255,255,0));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 30px rgba(34,211,238,.28)}
-  .btn-radar:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 16px 38px rgba(34,211,238,.38)}
-  .btn-radar::after,.btn-pro::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
-    background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);
-    animation:shimmer 5.5s var(--ease) infinite}
-  @keyframes shimmer{0%{left:-60%}18%{left:130%}100%{left:130%}}
-  .btn-pro{background:var(--accent);color:var(--on-accent);
-    background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 30px rgba(240,138,60,.32)}
-  .btn-pro:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 16px 38px rgba(240,138,60,.42)}
-  .btn-ghost{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);backdrop-filter:blur(6px)}
-  .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(34,211,238,.45)}
-
-  /* ---------- eyebrow pill + badge ---------- */
-  .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 12px;border-radius:999px;
-    background:var(--surface);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-    color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;margin:0 0 18px}
-  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--radar);box-shadow:0 0 10px rgba(34,211,238,.85)}
-  .eyebrow.center{display:table;margin:0 auto 18px}
-  .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-size:11.5px;font-weight:800;
-    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px}
-  .badge.radar{background:var(--radar-bg);color:var(--radar-soft);border:1px solid rgba(34,211,238,.35)}
-  .badge.pro{background:var(--accent-bg);color:var(--accent-soft);border:1px solid rgba(240,138,60,.35)}
-  .badge.free{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
-
-  /* ---------- hero ---------- */
-  .hero{position:relative;padding:96px 0 44px;overflow:hidden}
-  .hero::before{content:"";position:absolute;left:50%;top:-260px;width:1100px;height:640px;margin-left:-550px;
-    background:radial-gradient(closest-side,rgba(34,211,238,.16),transparent 70%);filter:blur(24px);pointer-events:none}
-  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative}
-  .hero h1{font-size:clamp(36px,4.6vw,54px);font-weight:800;line-height:1.04;letter-spacing:-.035em;margin:0 0 22px;text-wrap:balance}
-  .hero h1 .accent{background:linear-gradient(92deg,#22d3ee 0%,#8ff0fb 55%,#22d3ee 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero .sub{font-size:18.5px;line-height:1.7;color:var(--muted);margin:0 0 30px;max-width:560px}
-  .hero .sub em{font-style:italic;color:var(--text)}
-  .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
-  .hero .fine{margin-top:16px;color:var(--dim);font-size:12.5px}
-  .hero .fine b{color:var(--muted);font-weight:700}
-  .hero .sub a{color:var(--radar-soft);text-decoration:underline;text-decoration-color:rgba(103,232,249,.4);text-underline-offset:3px}
-  .hero .sub a:hover{text-decoration-color:var(--radar-soft)}
-  /* The five free radars, one tap from the hero. The nav's sport anchors
-     are hidden on phones and the sports grid is far down the page. */
-  .sport-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:22px}
-  .sport-row .l{font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#A7B0C4;margin-right:4px}
-  .sport-row a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 15px;border-radius:999px;
-    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--text);font-size:13px;font-weight:700;letter-spacing:.02em;
-    transition:border-color .2s,background .2s,color .2s}
-  .sport-row a:hover{border-color:rgba(34,211,238,.55);background:var(--radar-bg);color:var(--radar-soft)}
-
-  /* The radar scene: a mock panel the way the family frames every product,
-     with a canvas sweep inside it and tonight's real edge on the HUD. */
-  .mock{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:var(--mock);position:relative;overflow:hidden}
-  /* width drives height through aspect-ratio; a min-height would win the
-     fight on a phone and push the width past the column. */
-  .radar-scene{aspect-ratio:1.15/1;width:100%}
-  .radar-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .hud{position:absolute;left:18px;top:16px;z-index:3}
-  .hud .e{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--radar-soft)}
-  .hud .m{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.3px;margin-top:4px;line-height:1.1}
-  .hud .m small{display:block;font-family:var(--font);font-weight:500;font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:0}
-  .hud .ex{margin-top:8px;font-size:9.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
-  .wxline{position:absolute;right:18px;top:18px;z-index:3;font-size:12px;font-weight:700;color:var(--muted);
-    background:rgba(37,42,53,.8);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:7px 12px;backdrop-filter:blur(6px)}
-  .rchips{position:absolute;left:18px;bottom:18px;z-index:3;display:flex;gap:8px;flex-wrap:wrap;max-width:56%}
-  .rchips span{font-size:11.5px;font-weight:800;padding:6px 11px;border-radius:999px;border:1px solid}
-  .rchips .hot{background:rgba(34,197,94,.14);color:#4ade80;border-color:rgba(34,197,94,.35)}
-  .rchips .cool{background:rgba(248,113,113,.14);color:#fca5a5;border-color:rgba(248,113,113,.35)}
-  .rchips .lean{background:var(--radar-bg);color:var(--radar-soft);border-color:rgba(34,211,238,.35)}
-  .pill{position:absolute;right:14px;bottom:14px;z-index:4;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;
-    background:rgba(46,50,64,.9);border:1px solid var(--border);border-radius:999px;font-size:12.5px;font-weight:700;backdrop-filter:blur(6px);color:var(--text)}
-  .pill .live-dot{width:7px;height:7px;border-radius:50%;background:var(--radar);box-shadow:0 0 10px var(--radar);animation:pulse 2s ease-in-out infinite}
-  /* not a live board (last slate, off day, example): the dot stops claiming it is */
-  .pill .live-dot.off{background:var(--dim);box-shadow:none;animation:none}
-  /* The HUD wraps inside the card; beside the weather pill the script narrows
-     it to the room left, so a long matchup never runs underneath the pill. */
-  .hud{max-width:calc(100% - 36px)}
-  .wxline{white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis}
-  .hud .ex{color:#A7B0C4}
-  .hud .ex:empty{display:none}
-  .hud .ex.live{color:#4ade80}
-  .hud .ex.warn{color:#fcd34d}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
-  .cover{position:absolute;inset:0;z-index:2}
-  .mock:hover .pill{border-color:var(--radar)}
-
-  /* ---------- proof strip ---------- */
-  .proof{max-width:1100px;margin:34px auto 0;padding:0 32px 10px}
-  .proof-in{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;box-shadow:var(--elev);overflow:hidden}
-  .pf{padding:22px 18px;text-align:center;border-left:1px solid rgba(255,255,255,.06)}
-  .pf:first-child{border-left:none}
-  .pf b{display:block;font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-  .pf b em{font-style:normal;color:var(--radar)}
-  .pf span{display:block;margin-top:8px;font-size:12.5px;color:var(--dim)}
-
-  /* ---------- sections ---------- */
-  section{padding:104px 32px;max-width:1200px;margin:0 auto}
-  section h2{font-size:clamp(30px,3.6vw,42px);font-weight:800;text-align:center;letter-spacing:-.03em;line-height:1.12;margin:0 0 14px;text-wrap:balance}
-  section .lead{text-align:center;color:var(--muted);max-width:660px;margin:0 auto 62px;font-size:17px;line-height:1.7}
-  section .lead em{font-style:italic;color:var(--text)}
-
-  /* ---------- the loop ---------- */
-  .loop-grid{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:14px;align-items:stretch}
-  .loop-card{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-top:3px solid var(--radar);border-radius:12px;
-    padding:26px;box-shadow:var(--elev);transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
-  .loop-card:hover{transform:translateY(-3px);box-shadow:var(--elev-hi);border-color:rgba(255,255,255,.14);border-top-color:var(--radar)}
-  .loop-card.grade{border-top-color:var(--good)}
-  .loop-step{font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--radar-soft);margin-bottom:8px}
-  .loop-card.grade .loop-step{color:#4ade80}
-  .loop-card h3{font-size:21px;font-weight:800;margin:0 0 8px;letter-spacing:-.02em}
-  .loop-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
-  .loop-card p a,.mk-foot a,.price-card .checks a{color:var(--radar-soft);font-weight:700}
-  .loop-arrow{align-self:center;color:var(--radar);font-size:22px;font-weight:900;opacity:.85;text-shadow:0 0 14px rgba(34,211,238,.5)}
-  .loop-close{text-align:center;color:var(--muted);font-size:15px;margin:34px auto 0;max-width:760px}
-  .loop-close .u{color:var(--radar-soft);font-weight:800}
-
-  /* ---------- product rows ---------- */
-  .suite-wrap{display:flex;flex-direction:column;gap:96px}
-  .product-row{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
-  .product-row.flip .product-copy{order:2}
-  /* grid items default to min-width:auto and refuse to shrink below their
-     content — a table or a tool rail then pushes the whole row past a phone. */
-  .product-row>*,.hero-grid>*{min-width:0}
-  .product-copy h3{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-.03em;line-height:1.12;margin:0 0 14px;text-wrap:balance}
-  .product-copy .desc{color:var(--muted);font-size:16px;line-height:1.7;margin:0 0 22px}
-  .product-copy .desc em{font-style:italic;color:var(--text)}
-  .checks{list-style:none;margin:0 0 28px;padding:0}
-  .checks li{display:flex;gap:11px;align-items:flex-start;margin-bottom:11px;font-size:15px;color:#dde2ec;line-height:1.55}
-  .checks .ck{font-weight:900;flex-shrink:0;margin-top:1px;color:var(--radar)}
-  .checks .ck.pro{color:var(--accent-soft)}
-  .product-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:10px;font-weight:800;font-size:15px;position:relative;overflow:hidden;
-    transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
-  .product-btn:hover{transform:translateY(-2px)}
-  .product-btn.radar{background:var(--radar);color:var(--on-radar);background-image:linear-gradient(rgba(255,255,255,.18),rgba(255,255,255,0));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 24px rgba(34,211,238,.26)}
-  .product-btn.pro{background:var(--accent);color:var(--on-accent);background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 24px rgba(240,138,60,.3)}
-  .btn-sub{display:block;margin-top:12px;color:var(--dim);font-size:13px}
-  .btn-sub a{color:var(--radar-soft);font-weight:700}
-
-  /* --- mock: the venue read --- */
-  .mk{padding:20px 20px 18px}
-  .mk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
-  .mk-top .mu{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.3px;line-height:1.1}
-  .mk-top .mu small{display:block;font-family:var(--font);font-weight:500;font-size:12px;color:var(--dim);margin-top:4px}
-  .sev{font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;padding:6px 11px;border-radius:999px;white-space:nowrap}
-  .sev.elev{background:rgba(251,191,36,.13);color:#fcd34d;border:1px solid rgba(251,191,36,.35)}
-  .mk-wx{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-  .mk-wx>div{background:rgba(37,42,53,.75);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:9px 10px}
-  .mk-wx .l{font-size:9.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim)}
-  .mk-wx .v{font-family:var(--display);font-weight:700;font-size:17px;margin-top:3px;font-variant-numeric:tabular-nums}
-  .mk-wx .v small{font-size:11px;color:var(--muted);font-weight:500;margin-left:3px}
-  .mk-lbl{font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin:0 0 8px}
-  .mk-lbl b{color:var(--radar-soft)}
-  table.mk-t{width:100%;border-collapse:collapse;font-size:12.5px}
-  .mk-t th{text-align:left;font-size:9.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim);padding:0 0 7px;border-bottom:1px solid rgba(255,255,255,.07)}
-  .mk-t th:not(:first-child),.mk-t td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
-  .mk-t td{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted)}
-  .mk-t tr:last-child td{border-bottom:none}
-  .mk-t td:first-child{color:var(--text);font-weight:700}
-  .mk-t .up{color:#4ade80;font-weight:800}.mk-t .dn{color:#fca5a5;font-weight:800}.mk-t .flat{color:var(--dim)}
-  .mk-foot{margin-top:12px;font-size:11.5px;color:var(--dim);line-height:1.5}
-
-  /* --- mock: the park (canvas) --- */
-  .park-scene{aspect-ratio:1.3/1;width:100%}
-  .park-wrap{position:absolute;inset:0}
-  .park-scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
-  .park-tag{position:absolute;left:18px;top:16px;z-index:3}
-  .park-tag .e{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--radar-soft)}
-  .park-tag .m{font-family:var(--display);font-weight:800;font-size:20px;margin-top:4px;letter-spacing:-.3px}
-  .park-tag .m small{display:block;font-family:var(--font);font-weight:500;font-size:12px;color:var(--muted);margin-top:3px;text-shadow:0 1px 3px rgba(20,24,32,.85)}
-  .park-tag{right:18px}
-  .park-tag .note{display:inline-block;margin-top:10px;max-width:360px;font-family:var(--font);font-weight:500;font-size:12px;line-height:1.45;letter-spacing:0;
-    color:var(--text);background:rgba(37,42,53,.86);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 11px;backdrop-filter:blur(6px)}
-
-  /* --- mock: the record --- */
-  .rec-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-  .rec-tiles div{background:rgba(37,42,53,.75);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 12px 11px}
-  .rec-tiles b{display:block;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
-  .rec-tiles b.g{color:#4ade80}
-  .rec-tiles span{display:block;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-top:7px}
-  .cal{display:flex;flex-direction:column;gap:9px}
-  .cal-row{display:grid;grid-template-columns:64px 1fr 88px;gap:12px;align-items:center;font-size:12px}
-  .cal-row .rg{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
-  .cal-row .bar{position:relative;height:10px;background:rgba(255,255,255,.06);border-radius:999px;overflow:visible}
-  .cal-row .bar i{position:absolute;left:0;top:0;height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(34,211,238,.55),var(--radar))}
-  .cal-row .bar em{position:absolute;top:-4px;width:3px;height:18px;border-radius:2px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.6)}
-  .cal-row .nums{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
-  .cal-row .nums b{color:var(--text)}
-  .cal-key{display:flex;gap:16px;margin-top:12px;font-size:11px;color:var(--dim)}
-  .cal-key i{display:inline-block;width:12px;height:6px;border-radius:999px;background:var(--radar);vertical-align:middle;margin-right:6px}
-  .cal-key em{display:inline-block;width:3px;height:12px;background:#fff;vertical-align:middle;margin-right:6px;border-radius:2px}
-
-  /* --- mock: the desks --- */
-  .desk-mk{padding:18px 18px 16px}
-  .desk-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .desk-head .pro{background:var(--accent);color:var(--on-accent);font-size:10px;font-weight:800;letter-spacing:2px;border-radius:7px;padding:3px 9px}
-  .desk-head .nm{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.3px}
-  .desk-head .wk{margin-left:auto;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--radar-soft);
-    background:var(--radar-bg);border:1px solid rgba(34,211,238,.3);border-radius:7px;padding:4px 9px}
-  .rail{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
-  .rail div{background:rgba(37,42,53,.75);border:1.5px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 11px 10px}
-  .rail div.on{background:linear-gradient(135deg,#252A35,#3A4356);box-shadow:inset 0 0 0 1px rgba(34,211,238,.34)}
-  .rail b{display:block;font-family:var(--display);font-weight:700;font-size:12.5px;letter-spacing:-.1px}
-  .rail span{display:block;font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.3}
-  .lean{display:flex;gap:12px;align-items:flex-start;background:rgba(37,42,53,.75);border:1px solid rgba(255,255,255,.06);border-left:3px solid #22c55e;border-radius:10px;padding:11px 13px}
-  .lean .tag{font-size:9.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:#4ade80;background:rgba(34,197,94,.12);border-radius:7px;padding:3px 8px;display:inline-block;margin-bottom:5px}
-  .lean .who{font-weight:800;font-size:13.5px}
-  .lean .why{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:3px}
-  .lean .px{margin-left:auto;text-align:right;flex-shrink:0}
-  .lean .px b{display:block;font-family:var(--display);font-weight:800;font-size:17px;color:var(--radar-soft);font-variant-numeric:tabular-nums}
-  .lean .px span{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
-
-  /* ---------- sports grid ---------- */
-  .sports{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-  .sp{display:block;background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:22px 20px 20px;color:var(--text);
-    box-shadow:var(--elev);transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
-  .sp:hover{transform:translateY(-3px);box-shadow:var(--elev-hi);border-color:rgba(34,211,238,.4)}
-  .sp .ic{width:40px;height:40px;border-radius:11px;background:var(--radar-bg);border:1px solid rgba(34,211,238,.3);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-  .sp .ic svg{width:21px;height:21px;fill:none;stroke:var(--radar-soft);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .sp h3{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
-  .sp p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.55}
-  .sp .go{display:inline-block;margin-top:14px;font-size:12.5px;font-weight:800;color:var(--radar-soft)}
-  .sp.pro-card{border-color:rgba(240,138,60,.35)}
-  .sp.pro-card .ic{background:var(--accent-bg);border-color:rgba(240,138,60,.35)}
-  .sp.pro-card .ic svg{stroke:var(--accent-soft)}
-  .sp.pro-card .go{color:var(--accent-soft)}
-  .sp.pro-card:hover{border-color:rgba(240,138,60,.6)}
-
-  /* ---------- pricing ---------- */
-  .pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:860px;margin:0 auto}
-  .price-card{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:30px 28px 26px;box-shadow:var(--elev);
-    position:relative;display:flex;flex-direction:column;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
-  .price-card:hover{transform:translateY(-3px);box-shadow:var(--elev-hi);border-color:rgba(255,255,255,.14)}
-  .price-card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:14px 14px 0 0;background:var(--radar)}
-  .price-card.best::before{background:var(--accent)}
-  .price-card.best{border-color:rgba(240,138,60,.4)}
-  .best-tag{position:absolute;top:-11px;right:18px;background:var(--accent);color:var(--on-accent);font-size:9.5px;font-weight:800;letter-spacing:1.8px;
-    text-transform:uppercase;border-radius:999px;padding:5px 11px;box-shadow:0 6px 16px rgba(240,138,60,.35)}
-  .price-card h3{font-size:19px;font-weight:800;margin:0 0 14px;letter-spacing:-.02em}
-  .price-card .price{font-family:var(--display);font-weight:800;font-size:46px;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
-  .price-card .price small{font-size:14px;color:var(--dim);font-weight:500;letter-spacing:0;margin-left:2px}
-  .price-card .who{color:var(--dim);font-size:13.5px;margin:10px 0 20px;line-height:1.5}
-  .price-card .checks{flex:1;margin-bottom:24px}
-  .price-card .checks li{font-size:14.5px}
-  .price-card .btn{width:100%;padding:13px;border-radius:9px;font-size:14.5px;box-shadow:0 6px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.15)}
-  .price-card .prev{display:block;text-align:center;margin-top:12px;font-size:12.5px;color:var(--dim)}
-  .price-card .prev a{color:var(--radar-soft);font-weight:700}
-  .price-card.best .prev a{color:var(--accent-soft)}
-
-  /* ---------- CTA band ---------- */
-  .cta-band{max-width:1100px;margin:20px auto 0;padding:0 32px}
-  .cta-in{position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(34,211,238,.32);background:linear-gradient(#3A4050,#2E3240);
-    box-shadow:var(--elev-hi),0 0 80px rgba(34,211,238,.10);padding:64px 40px;text-align:center}
-  .cta-in::before{content:"";position:absolute;left:50%;top:-160px;width:700px;height:400px;margin-left:-350px;
-    background:radial-gradient(rgba(34,211,238,.26),transparent 65%);filter:blur(30px);pointer-events:none}
-  .cta-in h2{font-size:clamp(28px,3.4vw,40px);letter-spacing:-.03em;margin:0 0 12px;position:relative}
-  .cta-in p{color:var(--muted);font-size:16.5px;max-width:560px;margin:0 auto 28px;position:relative}
-  .cta-in .row{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative}
-  .cta-in .fine{margin-top:18px;color:var(--dim);font-size:12.5px;position:relative}
-  .cta-in .fine a{color:var(--radar-soft);font-weight:700}
-
-  /* ---------- FAQ ---------- */
-  .faq{display:flex;flex-direction:column;gap:10px;max-width:820px;margin:0 auto}
-  .faq details{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:12px;box-shadow:var(--elev);transition:border-color .3s var(--ease)}
-  .faq details[open]{border-color:rgba(34,211,238,.4)}
-  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 22px;font-weight:700;font-size:15.5px}
-  .faq summary::-webkit-details-marker{display:none}
-  .faq summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--radar-soft);border-bottom:2px solid var(--radar-soft);transform:rotate(45deg);
-    transition:transform .3s var(--ease);flex-shrink:0;margin-right:4px}
-  .faq details[open] summary::after{transform:rotate(-135deg)}
-  .faq .a{padding:0 22px 20px;color:var(--muted);font-size:14.5px;line-height:1.7}
-  .faq .a a{color:var(--radar-soft);font-weight:700}
-
-  /* ---------- footer ---------- */
-  footer{border-top:1px solid rgba(255,255,255,.07);padding:44px 32px 56px;text-align:center;color:var(--dim);font-size:13.5px;line-height:1.8}
-  footer a{color:var(--muted)}
-  footer a:hover{color:var(--radar-soft)}
-  .fnav{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
-  .fnav a{padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);font-size:13px;min-height:40px;display:inline-flex;align-items:center}
-  footer .tagline{color:var(--radar-soft);font-style:italic;margin-top:12px}
-  .disc{max-width:620px;margin:18px auto 0;font-size:12.5px}
-
-  /* ---------- reveal ---------- */
-  /* Elements start visible; the observer adds .px-rv only to things below the
-     fold at load, so the first frame is complete without JS and nothing is
-     parked invisible waiting on a scroll. */
-  .px-rv{opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:var(--d,0ms)}
-  .px-rv.px-in{opacity:1;transform:none}
-
-  /* ---------- responsive ---------- */
-  /* Between phone and desktop the nav keeps the links that leave the page
-     (Record, Log in) and the two anchors people scroll for. */
-  @media (max-width:1080px){
-    .nav-links .opt{display:none}
-  }
-  @media (max-width:1000px){
-    .hero-grid{grid-template-columns:1fr;gap:36px}
-    .loop-grid{grid-template-columns:1fr 1fr;gap:14px}
-    .loop-arrow{display:none}
-    .product-row,.product-row.flip{grid-template-columns:1fr;gap:28px}
-    .product-row.flip .product-copy{order:0}
-    .sports{grid-template-columns:repeat(3,1fr)}
-    .proof-in{grid-template-columns:repeat(2,1fr)}
-    .pf:nth-child(3){border-left:none}
-    .pf:nth-child(n+3){border-top:1px solid rgba(255,255,255,.06)}
-  }
-  @media (max-width:640px){
-    .wrap,.nav-in,section,.proof,.cta-band{padding-left:20px;padding-right:20px}
-    section{padding-top:68px;padding-bottom:68px}
-    .hero{padding:56px 0 30px}
-    .nav-links a:not(.nav-cta):not(.nav-login){display:none}
-    .nav-in{gap:12px}
-    .nav-links a{white-space:nowrap}
-    .nav-links .nav-login{margin-left:0;padding:8px 10px}
-    .nav-cta{margin-left:6px;padding:10px 14px}
-    .brand .t{display:none}
-    /* five chips on one row: equal columns, each a full 40px tap target */
-    .sport-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-    .sport-row .l{grid-column:1 / -1;margin:0 0 2px}
-    .sport-row a{padding:0 4px;font-size:12.5px;letter-spacing:0}
-    .loop-grid,.sports,.pricing-grid,.rail,.mk-wx{grid-template-columns:1fr 1fr}
-    .rec-tiles{grid-template-columns:repeat(3,1fr)}
-    .sports{grid-template-columns:1fr 1fr}
-    .sp.pro-card{grid-column:1 / -1}
-    /* two price cards side by side left one word per line at phone width */
-    .pricing-grid{grid-template-columns:1fr;gap:26px}
-    .sports .sp:last-child:nth-child(odd){grid-column:1 / -1}
-    .cta-in{padding:44px 22px}
-    .hud .m{font-size:18px}
-    /* On a phone the weather line collides with the matchup; the chips below
-       already carry the read, so it steps aside. */
-    .wxline{display:none}
-  }
-  @media (max-width:349px){
-    .nav-links .nav-login{display:none}
-  }
-  /* Pseudo-elements carry the button shimmer, so they are named here too; the
-     canvas sweep and the 3D park stop in script (see the reduce checks). */
-  @media (prefers-reduced-motion:reduce){
-    html{scroll-behavior:auto}
-    *,*::before,*::after{animation:none!important;transition:none!important}
-    .px-rv{opacity:1;transform:none}
-  }
-  :focus-visible{outline:2px solid var(--radar);outline-offset:3px;border-radius:4px}
-  ::selection{background:rgba(34,211,238,.32);color:var(--text)}
-</style>
+<script src="/pro/gate.js" defer></script>
+<script src="assets/dr.js?v=a7b89034" defer></script>
+<script src="assets/feeds.js?v=a7b89034" defer></script>
+<script src="assets/props.js?v=a7b89034" defer></script>
+<script src="assets/hub.js?v=a7b89034" defer></script>
 </head>
 <body>
-
-<nav class="nav">
-  <div class="nav-in">
-    <a class="brand" href="/" aria-label="DFSRADAR home">
-      <svg viewBox="0 0 44 44" aria-hidden="true">
-        <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#22d3ee" stroke-width="1.8"/>
-        <circle cx="22" cy="22" r="13.5" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".7"/>
-        <circle cx="22" cy="22" r="7" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".5"/>
-        <line x1="22" y1="22" x2="22" y2="2.6" stroke="#EFF1F7" stroke-width="1.8" stroke-linecap="round"/>
-        <circle cx="29.5" cy="13.5" r="2.4" fill="#F08A3C"/>
-        <circle cx="22" cy="22" r="1.7" fill="#EFF1F7"/>
-      </svg>
-      <span><span class="n">DFS<b>RADAR</b></span><span class="t">Scan · Match · Measure · Grade</span></span>
-    </a>
-    <div class="nav-links">
-      <a class="opt" href="#loop">How it works</a>
-      <a class="opt" href="#suite">The radar</a>
-      <a href="#sports">Sports</a>
-      <a href="#pricing">Pricing</a>
-      <a class="opt" href="#faq">FAQ</a>
-      <a href="/record/">Record</a>
-      <a class="nav-login" href="/pro/#login">Log in</a>
-      <a class="nav-cta" href="#pricing">Get PRO</a>
-    </div>
-  </div>
-</nav>
-
-<header class="hero">
-  <div class="wrap hero-grid">
+<header id="dr-top" class="dr-top"></header>
+<main>
+  <section class="wrap hero" id="hero">
     <div>
-      <span class="eyebrow">Weather · Venue · Umpire</span>
-      <h1>The forecast is public.<br><span class="accent">What it does to a venue isn't.</span></h1>
-      <p class="sub">DFSRADAR reads the kickoff or first-pitch forecast at every venue on the slate, then
-        measures it against what actually happened at <em>that</em> venue in similar conditions —
-        against the real closing totals that were on the board those days. Every call it makes is
-        <a href="/record/">graded in public</a> afterward.</p>
-      <div class="hero-cta">
-        <a class="btn btn-radar" href="/mlb/">Open today's radar →</a>
-        <a class="btn btn-ghost" href="#loop">See how it works</a>
+      <div class="ph__eyebrow">Weather · Props · The record</div>
+      <h1 style="font-size:clamp(34px,4.6vw,56px);line-height:1.04;letter-spacing:-.03em;max-width:17ch">Weather edges, priced as props, graded in public.</h1>
+      <p class="ph__lede" style="font-size:clamp(17px,1.6vw,19px);max-width:60ch">DFSRADAR reads the forecast at every ballpark, stadium, course and track, measures it against what actually happened there in weather like it — then puts our number beside the books'.</p>
+      <div class="row row--wrap mt24" style="gap:12px">
+        <a class="btn btn--cyan" href="weather/">Today's weather</a>
+        <a class="btn btn--ghost" href="props/">Today's props</a>
       </div>
-      <nav class="sport-row" aria-label="Free radars by sport">
-        <span class="l">Pick a radar</span>
-        <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a>
-      </nav>
-      <p class="fine"><b>The radars are free.</b> No account, no email. PRO adds the player-level boards.</p>
+      <div class="chips mt24" id="rec-chips"></div>
     </div>
-
-    <div class="mock radar-scene" id="radarShowcase">
-      <canvas id="radarCanvas"></canvas>
-      <div class="hud">
-        <div class="e" id="hud-e">Edge of the day · DFSRADAR</div>
-        <div class="m" id="hud-m">Scanning the slate<small id="hud-s">Loading the latest board…</small></div>
-        <div class="ex" id="hud-ex"></div>
-      </div>
-      <div class="wxline" id="hud-wx">— · —° · — mph</div>
-      <div class="rchips" id="hud-chips"></div>
-      <a class="cover" href="/mlb/" aria-label="Open today's radar"></a>
-      <span class="pill"><span class="live-dot off" id="hud-dot"></span>Open the radar ↗</span>
-    </div>
-  </div>
-</header>
-
-<div class="proof">
-  <div class="proof-in">
-    <div class="pf px-rv" style="--d:0ms"><b>33,253</b><span>venue-games of history matched</span></div>
-    <div class="pf px-rv" style="--d:60ms"><b>5</b><span>sports, one radar</span></div>
-    <div class="pf px-rv" style="--d:120ms"><b>4<em>×</em></b><span>rebuilt every day as forecasts sharpen</span></div>
-    <div class="pf px-rv" style="--d:180ms"><b>2010<em>→</em></b><span>every Power 4 home game, era-adjusted</span></div>
-  </div>
-</div>
-
-<section id="loop">
-  <span class="eyebrow center px-rv">The loop</span>
-  <h2 class="px-rv">Four steps, rebuilt every morning</h2>
-  <p class="lead px-rv">The whole board regenerates on a schedule as forecasts sharpen toward kickoff, so what
-    you see in the morning is not what you saw two days ago.</p>
-  <div class="loop-grid">
-    <div class="loop-card px-rv" style="--d:0ms"><div class="loop-step">01 · Scan</div><h3>Read the slate</h3><p>Pull every game inside the forecast window, with its venue, start time and the current market total.</p></div>
-    <div class="loop-arrow px-rv">→</div>
-    <div class="loop-card px-rv" style="--d:80ms"><div class="loop-step">02 · Match</div><h3>Match the conditions</h3><p>Find past games at that venue inside a stated temperature and wind window, and report how many matched.</p></div>
-    <div class="loop-arrow px-rv">→</div>
-    <div class="loop-card px-rv" style="--d:160ms"><div class="loop-step">03 · Measure</div><h3>Measure the impact</h3><p>Compare scoring and the underlying box-score signals against both the league baseline and the venue's own average.</p></div>
-    <div class="loop-arrow px-rv">→</div>
-    <div class="loop-card grade px-rv" style="--d:240ms"><div class="loop-step">04 · Grade</div><h3>Grade it in public</h3><p>Every PRO call settles from the final box score and goes into a <a href="/record/">running record</a> — losing stretches included.</p></div>
-  </div>
-  <p class="loop-close px-rv">Anyone can tell you it'll be 38° and windy. The useful question is what 38° and windy has
-    historically done to scoring at <span class="u">that specific stadium</span> — and whether the number on the board already accounts for it.</p>
-</section>
-
-<section id="suite">
-  <span class="eyebrow center px-rv">The radar</span>
-  <h2 class="px-rv">Not a weather app. A venue-history engine.</h2>
-  <p class="lead px-rv">Every piece below is live on the site today, built from the same data, and open to
-    anyone — the player-level boards on top of them are what PRO adds.</p>
-
-  <div class="suite-wrap">
-
-    <div class="product-row">
-      <div class="product-copy px-rv" style="--d:0ms">
-        <span class="badge radar">The venue read</span>
-        <h3>Forecast at the venue, against that venue's own past.</h3>
-        <p class="desc">Hour-by-hour temperature, wind, rain and humidity pulled for each venue's own coordinates and read at the exact
-          kickoff or first-pitch hour — in local time, not a city-level average. Then every past game at the same venue in
-          similar conditions, era-adjusted so an older scoring environment doesn't read as a weather effect.</p>
-        <ul class="checks">
-          <li><span class="ck">✓</span>Matched games counted and shown — if the sample is too thin, the page says so instead of printing a percentage</li>
-          <li><span class="ck">✓</span>Six box-score signals per game: scoring, passing, rushing, completions, turnovers, fumbles</li>
-          <li><span class="ck">✓</span>Over/under rates measured against the closing total that was actually on the board that day</li>
-          <li><span class="ck">✓</span>Severity chips so the slate sorts itself: severe, elevated, watch, indoor</li>
-        </ul>
-        <a class="product-btn radar" href="/cfb/">Open the CFB radar →</a>
-      </div>
-      <div class="px-rv" style="--d:120ms">
-        <div class="mock mk">
-          <div class="mk-top">
-            <div class="mu">Oregon @ Oklahoma State<small>Boone Pickens Stadium · Sat 12:00 PM ET</small></div>
-            <span class="sev elev">Elevated</span>
-          </div>
-          <div class="mk-wx">
-            <div><div class="l">Temp</div><div class="v">84°</div></div>
-            <div><div class="l">Wind</div><div class="v">15<small>mph</small></div></div>
-            <div><div class="l">Rain</div><div class="v">8<small>%</small></div></div>
-            <div><div class="l">Matched</div><div class="v">31<small>games</small></div></div>
-          </div>
-          <p class="mk-lbl">Similar-weather history at this venue · <b>vs venue average</b></p>
-          <table class="mk-t">
-            <thead><tr><th>Signal</th><th>Here</th><th>League</th><th>Venue</th></tr></thead>
-            <tbody>
-              <tr><td>Scoring</td><td>54.0</td><td class="up">+2%</td><td class="up">+1%</td></tr>
-              <tr><td>Passing yds</td><td>421</td><td class="dn">−6%</td><td class="dn">−4%</td></tr>
-              <tr><td>Rushing yds</td><td>301</td><td class="up">+3%</td><td class="up">+2%</td></tr>
-              <tr><td>Completion %</td><td>60.9</td><td class="dn">−3%</td><td class="dn">−2%</td></tr>
-              <tr><td>Turnovers</td><td>2.5</td><td class="flat">+0%</td><td class="flat">+1%</td></tr>
-            </tbody>
-          </table>
-          <p class="mk-foot">Example card. Wind at 15 mph is the 93rd percentile of kickoff wind at this stadium across 104 recorded games.</p>
-        </div>
+    <div id="feat" hidden>
+      <div class="card feat">
+        <div class="feat__head"><div style="min-width:0"><div class="label" style="color:var(--cyan2)">On the radar</div><div class="feat__t" id="feat-t"></div><div class="feat__s" id="feat-s"></div></div>
+          <a class="sec__more" id="feat-go" href="weather/">Full forecast →</a></div>
+        <div class="feat__stage" id="feat-stage"></div>
+        <div class="feat__foot"><div class="seg-scroll"><div class="seg" id="feat-tabs" role="tablist" aria-label="Featured venue by sport"></div></div><p class="feat__cap" id="feat-cap"></p></div>
       </div>
     </div>
+  </section>
 
-    <div class="product-row flip">
-      <div class="product-copy px-rv" style="--d:0ms">
-        <span class="badge radar">The conditions, drawn</span>
-        <h3>See what the ball is flying into.</h3>
-        <p class="desc">A live 3D view of each park or stadium, oriented to the compass and lit to the forecast — day or night,
-          clear or overcast — with wind streamlines showing which way the ball is actually going to move. Every MLB park,
-          a signature hole for each PGA venue, and the track itself for NASCAR.</p>
-        <ul class="checks">
-          <li><span class="ck">✓</span>Real field dimensions and orientation, so "wind out to left" means what it says</li>
-          <li><span class="ck">✓</span>Rain and roof state shown, not implied — a retractable roof closes in the model when the forecast says it will</li>
-          <li><span class="ck">✓</span>Per-park wind receptivity: how much an outward wind has historically moved home runs at that yard</li>
-        </ul>
-        <a class="product-btn radar" href="/mlb/">Open the MLB radar →</a>
-      </div>
-      <div class="px-rv" style="--d:120ms">
-        <div class="mock park-scene" id="parkShowcase">
-          <div class="park-wrap"><canvas id="parkCanvas"></canvas></div>
-          <div class="park-tag"><div class="e" id="park-e">Wind · 13 mph out to CF</div><div class="m" id="park-m">Wrigley Field<small>Sunny · 84° · example scene</small></div></div>
-          <a class="cover" href="/mlb/" aria-label="Open the MLB radar"></a>
-          <span class="pill"><span class="live-dot off" id="park-dot"></span><span id="park-pill">Every park — open the radar ↗</span></span>
-        </div>
-      </div>
-    </div>
+  <section class="wrap sec">
+    <div class="sec__h"><div><h2 class="sec__title">Right now</h2><p class="sec__sub">What's on the board in each sport.</p></div></div>
+    <div class="grid g5" id="now"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  </section>
 
-    <div class="product-row">
-      <div class="product-copy px-rv" style="--d:0ms">
-        <span class="badge free">Graded in public</span>
-        <h3>Every call settles against the box score. Losing stretches included.</h3>
-        <p class="desc">A call is archived the moment it posts and graded the morning after from the real result — a home run
-          that happened or didn't, a rushing line beaten or not, a finish inside the bar or outside it. The record is
-          published, and so is the calibration: what we said would happen 25% of the time, and how often it actually did.</p>
-        <ul class="checks">
-          <li><span class="ck">✓</span>Stated probability vs. actual hit rate, bucket by bucket — the table that tells you how much to trust the number</li>
-          <li><span class="ck">✓</span>Nothing gets quietly dropped: a target that didn't play is excluded, a target that missed is a miss</li>
-          <li><span class="ck">✓</span>The same receipts feed the model — when a signal stops holding, it gets shrunk</li>
-        </ul>
-        <a class="product-btn radar" href="/record/#mlb">See the MLB record →</a>
-      </div>
-      <div class="px-rv" style="--d:120ms">
-        <div class="mock mk">
-          <p class="mk-lbl">MLB home-run targets · <b>graded to date</b></p>
-          <div class="rec-tiles">
-            <div><b id="rec-n">565</b><span>Calls graded</span></div>
-            <div><b id="rec-nights">33</b><span>Nights</span></div>
-            <div><b class="g" id="rec-top">24%</b><span>#1 target hit</span></div>
-          </div>
-          <p class="mk-lbl">Calibration · <b>what we said vs. what happened</b></p>
-          <div class="cal" id="cal-rows">
-            <div class="cal-row"><span class="rg">15–20%</span><div class="bar"><i style="width:41%"></i><em style="left:47%"></em></div><span class="nums"><b>16.3%</b> hit · 43</span></div>
-            <div class="cal-row"><span class="rg">20–25%</span><div class="bar"><i style="width:54%"></i><em style="left:55%"></em></div><span class="nums"><b>21.7%</b> hit · 411</span></div>
-            <div class="cal-row"><span class="rg">25%+</span><div class="bar"><i style="width:52%"></i><em style="left:68%"></em></div><span class="nums"><b>20.7%</b> hit · 111</span></div>
-          </div>
-          <div class="cal-key"><span><i></i>Actual hit rate</span><span><em></em>What we called</span></div>
-          <p class="mk-foot" id="rec-foot">Illustrative figures until the live record loads — every graded night is on <a href="/record/#mlb">the record page</a>.</p>
-        </div>
+  <section class="wrap sec">
+    <div class="sec__h"><div><h2 class="sec__title">Weather watch</h2><p class="sec__sub">Where the forecast matters most today.</p></div><a class="sec__more" href="weather/">All weather →</a></div>
+    <div class="watch" id="watch"></div>
+  </section>
+
+  <section class="wrap sec">
+    <div class="sec__h"><div><h2 class="sec__title">Today's free picks</h2><p class="sec__sub">The top of each props desk — free every day. The rest of every board is PRO.</p></div><a class="sec__more" href="props/">All props →</a></div>
+    <div class="grid g3" id="picks"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="grid g2" style="align-items:center">
+        <div><div class="ph__eyebrow" style="margin-bottom:8px;color:var(--pro2)">DFSRADAR PRO</div>
+          <h2 class="sec__title" style="font-size:clamp(24px,3vw,32px)">The whole board, every sport</h2>
+          <p class="muted mt12" style="max-width:52ch">Every priced prop with our number beside it, the research behind each board, and the full record — for MLB, NFL, college football, golf and NASCAR.</p>
+          <div class="row row--wrap mt24"><a class="btn btn--pro pay-cta" href="pro/">Get PRO — $15/mo</a><a class="btn btn--ghost" href="record/">See the record first</a></div></div>
+        <div class="stats" id="rec-stats" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
       </div>
     </div>
-
-    <div class="product-row flip">
-      <div class="product-copy px-rv" style="--d:0ms">
-        <span class="badge pro">DFSRADAR PRO · The desks</span>
-        <h3>The radars are free. PRO is the edge board.</h3>
-        <p class="desc">Every sport's weather radar stays open to everyone. PRO adds the player-level boards on top — one desk per sport,
-          each with named tools and its own graded record — priced where the books have posted, with our number beside theirs.</p>
-        <ul class="checks">
-          <li><span class="ck pro">✓</span>MLB — tonight's home-run targets, confirmed lineups, umpire board, park factors</li>
-          <li><span class="ck pro">✓</span>CFB — the trench board (OL vs DL by the pound) and Wind Factor, sixteen seasons of what wind actually does</li>
-          <li><span class="ck pro">✓</span>NFL, PGA and NASCAR desks, plus one cross-sport props feed</li>
-          <li><span class="ck pro">✓</span>Included with DFS Kitchen All-Access — one login covers the whole kitchen</li>
-        </ul>
-        <a class="product-btn pro" href="/pro/">Open the desks →</a>
-        <span class="btn-sub">Already a member? <a href="/pro/#login">Log in</a></span>
-      </div>
-      <div class="px-rv" style="--d:120ms">
-        <div class="mock desk-mk">
-          <div class="desk-head"><span class="pro">PRO</span><span class="nm">CFB Desk</span><span class="wk">Week 1 · Live</span></div>
-          <div class="rail">
-            <div class="on"><b>Trench Board</b><span>This week's rushing-prop leans</span></div>
-            <div><b>Full Slate</b><span>Every game's edge, both ways</span></div>
-            <div><b>Trench View</b><span>The mismatch drawn to scale</span></div>
-            <div><b>Wind Factor</b><span>What wind does to a game</span></div>
-            <div><b>Record</b><span>Graded every week</span></div>
-            <div><b>Method</b><span>The backtest and receipts</span></div>
-          </div>
-          <div class="lean">
-            <div><span class="tag">Rush Edge · Target</span><div class="who">Florida State · vs SMU</div>
-              <div class="why">+12.8 lbs/man trench edge vs league norm — top-quintile edges rushed for +0.4 YPC across 5,916 games.</div></div>
-            <div class="px"><b>O 58.5</b><span>Rush yds · −114</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section id="sports">
-  <span class="eyebrow center px-rv">Five sports</span>
-  <h2 class="px-rv">One radar. Every slate.</h2>
-  <p class="lead px-rv">Each sport gets the read that matters for it — the weather layer is shared, the edge is not.</p>
-  <div class="sports">
-    <a class="sp px-rv" style="--d:0ms" href="/mlb/">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z"/><path d="M6.5 5.5c3 2 4 5 4 6.5s-1 4.5-4 6.5M17.5 5.5c-3 2-4 5-4 6.5s1 4.5 4 6.5"/></svg></div>
-      <h3>MLB</h3><p>Weather, park and umpire — every game against every comparable night that park has played.</p><span class="go">Open →</span>
-    </a>
-    <a class="sp px-rv" style="--d:60ms" href="/nfl/">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8Z"/><path d="M9 9l6 6M15 9l-6 6M12 4v3M12 17v3M4 12h3M17 12h3"/></svg></div>
-      <h3>NFL</h3><p>Wind and cold at the stadiums where it actually moves a total; kicking game and referee tendencies.</p><span class="go">Open →</span>
-    </a>
-    <a class="sp px-rv" style="--d:120ms" href="/cfb/">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 18V9l9-5 9 5v9"/><path d="M3 18h18M7 18v-5h4v5M13 18v-5h4v5"/></svg></div>
-      <h3>CFB</h3><p>Power 4 venue history back to 2010, era-adjusted, and the trench board on the PRO desk.</p><span class="go">Open →</span>
-    </a>
-    <a class="sp px-rv" style="--d:180ms" href="/pga/">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M7 21V4l10 4-10 4"/><path d="M4 21h9"/></svg></div>
-      <h3>PGA</h3><p>The wind each tee-time wave actually plays into, and who holds up when it blows.</p><span class="go">Open →</span>
-    </a>
-    <a class="sp px-rv" style="--d:240ms" href="/nascar/">
-      <div class="ic"><svg viewBox="0 0 24 24"><path d="M5 21V4h14l-3 4 3 4H5"/><path d="M8 4v8M11 4v8M14 6v4"/></svg></div>
-      <h3>NASCAR</h3><p>Track profile and conditions against every comparable race run there; rain first, grip second.</p><span class="go">Open →</span>
-    </a>
-  </div>
-</section>
-
-<section id="pricing">
-  <span class="eyebrow center px-rv">Pricing</span>
-  <h2 class="px-rv">The radars are free. PRO is $15.</h2>
-  <p class="lead px-rv">Every sport's weather radar stays open to everyone. PRO adds the player-level boards, the
-    trench and props models, and the graded record behind them.</p>
-  <div class="pricing-grid">
-    <div class="price-card px-rv" style="--d:0ms">
-      <h3>DFSRADAR PRO</h3>
-      <div class="price">$15<small>/mo</small></div>
-      <p class="who">For players who live on one or two sports.</p>
-      <ul class="checks">
-        <li><span class="ck">✓</span>Every free radar, all five sports</li>
-        <li><span class="ck">✓</span>PRO desks for MLB, NFL, CFB, PGA and NASCAR</li>
-        <li><span class="ck">✓</span>Player props and the CFB trench board</li>
-        <li><span class="ck">✓</span><span>The <a href="/record/">graded public record</a> behind every call</span></li>
-        <li><span class="ck">✓</span>Rebuilt every morning as forecasts sharpen</li>
-      </ul>
-      <a class="btn btn-pro" href="/pro/">Get DFSRADAR PRO</a>
-      <span class="prev"><a href="/pro/">Preview the desks →</a></span>
-    </div>
-    <div class="price-card best px-rv" style="--d:80ms">
-      <span class="best-tag">Best value</span>
-      <h3>DFS Kitchen All-Access</h3>
-      <div class="price">$60<small>/mo</small></div>
-      <p class="who">The whole kitchen — DFSRADAR is one of four tools.</p>
-      <ul class="checks">
-        <li><span class="ck pro">✓</span>Everything in DFSRADAR PRO</li>
-        <li><span class="ck pro">✓</span>The Optimizer — simulation-grade lineup builder</li>
-        <li><span class="ck pro">✓</span>DFSPREP — the strategy school</li>
-        <li><span class="ck pro">✓</span>DFS Books — real bankroll tracking</li>
-        <li><span class="ck pro">✓</span>Chef's Lineups — daily on X</li>
-      </ul>
-      <a class="btn btn-pro" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=pricing&utm_campaign=landing" target="_blank" rel="noopener">Get All-Access</a>
-      <span class="prev"><a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=pricing-preview&utm_campaign=landing" target="_blank" rel="noopener">See the whole kitchen →</a></span>
-    </div>
-  </div>
-</section>
-
-<div class="cta-band px-rv">
-  <div class="cta-in">
-    <h2>Scan the slate. Find the edge.</h2>
-    <p>Today's board is already built. Open a radar, pick a game, and see what the forecast has done at that venue before.</p>
-    <div class="row">
-      <a class="btn btn-radar" href="/mlb/">Open today's radar →</a>
-      <a class="btn btn-ghost" href="/pro/">See the PRO desks</a>
-    </div>
-    <p class="fine">Free. No account. Rebuilt four times a day. <a href="#faq">Questions?</a></p>
-  </div>
-</div>
-
-<section id="faq">
-  <span class="eyebrow center px-rv">Questions</span>
-  <h2 class="px-rv">Before you open it</h2>
-  <p class="lead px-rv">Short answers. The method pages on each radar go deeper.</p>
-  <div class="faq">
-    <details class="px-rv" style="--d:0ms"><summary>Is the radar actually free?</summary><div class="a">Yes. Every sport's weather radar — the slate, the venue history, the 3D scenes, the hourly forecast strips — is open to anyone, with no account. PRO is the paid layer on top: player-level boards and their graded records.</div></details>
-    <details class="px-rv" style="--d:60ms"><summary>What makes this different from checking the forecast myself?</summary><div class="a">The forecast is the input, not the answer. DFSRADAR reads it at the venue's own coordinates at the kickoff hour, then finds every past game at <em>that</em> venue in similar conditions and reports what happened to scoring, against the closing totals that were on the board those days. The useful number is not "15 mph" — it's what 15 mph has historically done at that stadium.</div></details>
-    <details class="px-rv" style="--d:120ms"><summary>How often does it update?</summary><div class="a">The board rebuilds four times a day for MLB and daily for the weekly sports, with an extra pre-kick pass on game day. Forecasts sharpen as kickoff nears, so the morning read and the 5 PM read are not the same read.</div></details>
-    <details class="px-rv" style="--d:180ms"><summary>What happens when a call is wrong?</summary><div class="a">It goes in the record. Every PRO call is archived the moment it posts and graded the next morning from the real box score. <a href="/record/">The record and the calibration table are public</a>, and losing stretches stay in them. When a signal stops holding up, it gets shrunk in the model — the receipts are the feedback loop, not decoration.</div></details>
-    <details class="px-rv" style="--d:240ms"><summary>Is this betting advice?</summary><div class="a">No. Weather-adjusted insights are informational. Historical tendencies are tendencies, not guarantees, and sample sizes are shown on every number so you can judge them yourself. If gambling is a problem for you, call 1-800-GAMBLER.</div></details>
-    <details class="px-rv" style="--d:300ms"><summary>I'm already a DFS Kitchen All-Access member — do I pay again?</summary><div class="a">No. All-Access includes DFSRADAR PRO. <a href="/pro/#login">Log in</a> with your Kitchen account and the desks open.</div></details>
-  </div>
-</section>
-
-<footer>
-  <div class="fnav">
-    <a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a href="/pro/">PRO</a><a href="/record/">Record</a><a href="/pro/#login">Log in</a>
-  </div>
-  <div>DFSRADAR · part of <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=footer&utm_campaign=landing" target="_blank" rel="noopener">The DFS Kitchen</a> family —
-    <a href="https://dfsprep.com" target="_blank" rel="noopener">DFSPREP</a> · <a href="https://dfsbooks.com" target="_blank" rel="noopener">DFS Books</a> · <a href="https://dfskitchen.com/optimizer" target="_blank" rel="noopener">The Optimizer</a></div>
-  <div class="tagline">Scan the slate. Find the edge.</div>
-  <p class="disc">Weather-adjusted insights are informational and are not betting advice. Nothing here is a guarantee of any outcome.
-    21+. If gambling is a problem for you, call <span style="white-space:nowrap">1-800-GAMBLER</span>.</p>
-</footer>
+  </section>
+</main>
+<footer id="dr-foot" class="dr-foot"></footer>
 
 <script>
-/* ---------- reveal on scroll ----------
-   Anything already in the first viewport is revealed on the spot, so the page
-   is complete on its first frame; only content below the fold waits. */
-(function(){
-  var els=[].slice.call(document.querySelectorAll('.px-rv'));
-  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce||!('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('px-in')}); return; }
-  var vh=innerHeight;
-  els.forEach(function(e){ if(e.getBoundingClientRect().top<vh*0.98) e.classList.add('px-in'); });
-  var io=new IntersectionObserver(function(en){
-    en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('px-in'); io.unobserve(x.target); } });
-  },{rootMargin:'0px 0px -8% 0px',threshold:.08});
-  els.forEach(function(e){ if(!e.classList.contains('px-in')) io.observe(e); });
-})();
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, esc = D.esc;
+  D.shell({ section: "home" });
+  var ORDER = ["mlb", "nfl", "cfb", "pga", "nascar"];
+  var AUTO = D.auto3d();
+  if (AUTO) D.load3d().catch(function () {});            // fetch the 3D engine alongside the feeds
 
-/* ---------- the radar sweep ----------
-   Concentric rings, a rotating beam with a fading wake, and blips — one per
-   sport — that flare as the beam passes them. Drawn to the device pixel
-   ratio, paused when off-screen. With reduced motion it is one still frame,
-   the beam parked just past the MLB blip, redrawn only on resize. */
-(function(){
-  var cv=document.getElementById('radarCanvas'); if(!cv) return;
-  var ctx=cv.getContext('2d'), W=0,H=0,dpr=1, ang=0, last=0, running=true, looping=false;
-  var blips=[ {a:0.55,r:0.78,l:'MLB'},{a:1.9,r:0.52,l:'NFL'},{a:2.9,r:0.86,l:'CFB'},{a:4.1,r:0.40,l:'PGA'},{a:5.3,r:0.66,l:'NASCAR'} ];
-  var mq=matchMedia('(prefers-reduced-motion: reduce)'), reduce=mq.matches;
-  function size(){ dpr=Math.min(devicePixelRatio||1,2); var r=cv.getBoundingClientRect(); W=r.width;H=r.height; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
-  size(); addEventListener('resize',function(){ size(); if(reduce) draw(0); });
-  if('IntersectionObserver' in window){ new IntersectionObserver(function(e){running=e[0].isIntersecting;},{threshold:.05}).observe(cv); }
-  function loop(t){ if(reduce){ looping=false; return; } draw(t); requestAnimationFrame(loop); }
-  function start(){ if(!looping){ looping=true; last=0; requestAnimationFrame(loop); } }
-  if(mq.addEventListener) mq.addEventListener('change',function(e){ reduce=e.matches; if(reduce){ ang=0.95; draw(0); } else start(); });
-  function draw(t){
-    if(running||t===0){
-      var dt=last?Math.min((t-last)/1000,.05):0; last=t; if(!reduce) ang+=dt*0.9;
-      var cx=W*0.5, cy=H*0.56, R=Math.min(W,H)*0.44;
-      ctx.clearRect(0,0,W,H);
-      // ground glow
-      var g=ctx.createRadialGradient(cx,cy,0,cx,cy,R*1.25); g.addColorStop(0,'rgba(34,211,238,.10)'); g.addColorStop(.7,'rgba(34,211,238,.03)'); g.addColorStop(1,'rgba(34,211,238,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-      // rings + crosshair
-      ctx.lineWidth=1;
-      for(var i=1;i<=4;i++){ ctx.beginPath(); ctx.arc(cx,cy,R*i/4,0,Math.PI*2); ctx.strokeStyle='rgba(103,232,249,'+(i===4?.34:.16)+')'; ctx.stroke(); }
-      ctx.strokeStyle='rgba(103,232,249,.10)'; ctx.beginPath(); ctx.moveTo(cx-R,cy); ctx.lineTo(cx+R,cy); ctx.moveTo(cx,cy-R); ctx.lineTo(cx,cy+R); ctx.stroke();
-      // beam wake
-      var wake=1.25;
-      for(var k=0;k<24;k++){ var a0=ang-wake*k/24, a1=ang-wake*(k+1)/24; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,a1,a0); ctx.closePath(); ctx.fillStyle='rgba(34,211,238,'+(0.16*(1-k/24))+')'; ctx.fill(); }
-      // beam edge
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(ang)*R, cy+Math.sin(ang)*R); ctx.strokeStyle='rgba(239,241,247,.9)'; ctx.lineWidth=1.6; ctx.stroke();
-      // blips
-      ctx.font='700 10px Ubuntu, sans-serif'; ctx.textBaseline='middle';
-      blips.forEach(function(b){
-        var d=((ang-b.a)%(Math.PI*2)+Math.PI*2)%(Math.PI*2); var f=Math.max(0,1-d/2.2);
-        var x=cx+Math.cos(b.a)*R*b.r, y=cy+Math.sin(b.a)*R*b.r;
-        ctx.beginPath(); ctx.arc(x,y,3+f*6,0,Math.PI*2); ctx.fillStyle='rgba(34,211,238,'+(.10+f*.25)+')'; ctx.fill();
-        ctx.beginPath(); ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fillStyle='rgba(239,241,247,'+(.55+f*.45)+')'; ctx.fill();
-        ctx.fillStyle='rgba(199,206,220,'+(.45+f*.55)+')'; ctx.fillText(b.l, x+9, y);
-      });
-      // centre + the orange edge-of-the-day blip
-      ctx.beginPath(); ctx.arc(cx,cy,2.2,0,Math.PI*2); ctx.fillStyle='#EFF1F7'; ctx.fill();
-      var ea=0.55, ex=cx+Math.cos(ea)*R*0.78, ey=cy+Math.sin(ea)*R*0.78, pf=reduce?0.6:0.5+0.5*Math.sin(t/500);
-      ctx.beginPath(); ctx.arc(ex,ey,5+pf*4,0,Math.PI*2); ctx.fillStyle='rgba(240,138,60,'+(.18+pf*.18)+')'; ctx.fill();
-      ctx.beginPath(); ctx.arc(ex,ey,3.2,0,Math.PI*2); ctx.fillStyle='#F08A3C'; ctx.fill();
-    }
+  /* the featured venue: today's most interesting weather, live in 3D */
+  var featStage = null;
+  function feature(list, k) {
+    var f = list.filter(function (x) { return x.k === k; })[0] || list[0];
+    document.getElementById("feat-t").textContent = f.venue;
+    document.getElementById("feat-s").textContent = f.match;
+    document.getElementById("feat-go").href = f.href;
+    document.getElementById("feat-cap").textContent = f.cap;
+    D.$$("#feat-tabs button").forEach(function (b) { var on = b.getAttribute("data-k") === f.k; b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1; });
+    if (featStage) featStage.close();
+    var box = document.getElementById("feat-stage");
+    box.innerHTML = "";
+    featStage = D.stage3d(box, { spec: f.spec, chips: f.chips, label: f.label });
+    featStage.ready.then(function (ok) {
+      if (ok) return;
+      document.getElementById("feat").hidden = true;
+      document.getElementById("hero").classList.remove("hero--viz");
+    });
   }
-  if(reduce) ang=0.95;
-  draw(0); /* one frame now, so the card is never blank before it scrolls into view */
-  if(!reduce) start();
-})();
-
-/* ---------- the edge of the day, labelled honestly ----------
-   The HUD reads the same JSON the MLB radar reads, and says "Live" only when
-   that board is today's (in ET) and has games. Otherwise, in order:
-     - an older MLB board is shown as what it is: "Last slate · Mon Sep 21"
-       (or "Not refreshed since …" when its builder marked it stale);
-     - an MLB off day falls back to this week's CFB board if it still has
-       games to play, else shows the build's own off-day note;
-     - with nothing at all, a labelled example — never a made-up matchup
-       dressed as live.
-   RadarFresh (assets/fresh.js) is loaded with defer, so this waits for
-   DOMContentLoaded, by which point deferred scripts have run. */
-(function(){
-  var m=document.getElementById('hud-m'), ex=document.getElementById('hud-ex'), eb=document.getElementById('hud-e'),
-      wx=document.getElementById('hud-wx'), ch=document.getElementById('hud-chips'), dot=document.getElementById('hud-dot'),
-      box=document.getElementById('radarShowcase'), cover=document.querySelector('#radarShowcase .cover');
-  function esc(x){return String(x==null?'':x).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
-  function chip(cls,txt){return '<span class="'+cls+'">'+esc(txt)+'</span>'}
-  function get(u){return fetch(u+'?_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()})}
-  var domReady=new Promise(function(r){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',r); else r(); });
-  function RF(){ return window.RadarFresh || null; }
-  function state(eyebrow, caption, level){
-    eb.textContent=eyebrow; ex.textContent=caption||''; ex.className='ex'+(level?' '+level:'');
-    dot.classList.toggle('off', level!=='live');
-  }
-  var hud=box.querySelector('.hud');
-  function fitHud(){
-    if(wx.hidden || getComputedStyle(wx).display==='none'){ hud.style.maxWidth=''; return; }
-    hud.style.maxWidth=Math.max(150, box.clientWidth - wx.offsetWidth - 50)+'px';
-  }
-  addEventListener('resize', fitHud);
-  function setWx(txt){ wx.textContent=txt||''; wx.hidden=!txt; fitHud(); }
-
-  function setExample(){
-    state('Edge of the day · example', 'Example slate · not a live read', '');
-    m.innerHTML='WSH @ CHC<small>Wrigley Field · 2:20 PM ET</small>';
-    setWx('Sunny · 84° · 13 mph out to CF'); ch.innerHTML=chip('hot','HR +24% in 49 similar games')+chip('lean','Runs +14%');
-    cover.href='/mlb/';
-  }
-  function showMLB(d, caption, live){
-    /* Same rule the MLB radar uses for its own "edge of the day": the open-air
-       game with the largest HR impact either way. hr and runs are % impacts. */
-    var open=(d.games||[]).filter(function(x){return !x.dome && x.hr!=null});
-    var g=open.sort(function(a,b){return Math.abs(b.hr)-Math.abs(a.hr)})[0] || d.games[0];
-    state('Edge of the day · MLB', caption, live?'live':'warn');
-    m.innerHTML=esc(g.away)+' @ '+esc(g.home)+'<small>'+esc(g.park||'')+(g.time?' · '+esc(g.time):'')+'</small>';
-    var wl=g.windLabel?String(g.windLabel).toLowerCase():'';
-    setWx([g.sky, g.temp!=null?g.temp+'°':null, g.wind!=null?g.wind+' mph'+(wl?' '+wl:''):null].filter(Boolean).join(' · '));
-    var c='';
-    if(g.hr!=null) c+=chip(g.hr>=0?'hot':'cool','HR '+(g.hr>0?'+':'')+Math.round(g.hr)+'%'+(g.sample?' in '+g.sample+' similar games':''));
-    if(g.runs!=null) c+=chip('lean','Runs '+(g.runs>0?'+':'')+Math.round(g.runs)+'%');
-    ch.innerHTML=c||chip('lean','Open the board'); cover.href='/mlb/';
-    /* the park panel below draws this same game, under the same label */
-    window.LIVE_EDGE_GAME=g; window.LIVE_EDGE_LIVE=live;
-    window.LIVE_EDGE_TAG=live?'today\'s edge of the day':caption;
-  }
-  function showCFB(d){
-    /* Only games still to be played (kickoff within the last 4 hours or later):
-       a board kept through an outage must not present Saturday's games as this week's. */
-    var cut=Date.now()-4*36e5;
-    var up=(d.games||[]).filter(function(x){ var t=Date.parse(x.sortTime); return isNaN(t) || t>=cut; });
-    if(!up.length) return false;
-    var g=up.filter(function(x){return !x.dome && x.edge && x.edge.level!=='none'}).sort(function(a,b){return (b.edge.score||0)-(a.edge.score||0)})[0] || up[0];
-    var rf=RF(), a=rf ? rf.assess({built:d.generated, stale:d.stale, status:d.status, maxAgeH:30}) : null;
-    if(a && a.level==='ok') state('Edge of the week · CFB', 'Live · this week\'s board', 'live');
-    else state('Edge of the week · CFB', a && a.text ? a.text : 'This week\'s board', a && a.level==='warn' ? 'warn' : '');
-    m.innerHTML=esc(g.away)+' @ '+esc(g.home)+'<small>'+esc(g.stadium||'')+(g.day?' · '+esc(g.day):'')+(g.time?' '+esc(g.time):'')+'</small>';
-    setWx([g.sky, g.temp!=null?g.temp+'°':null, g.wind!=null?g.wind+' mph':null].filter(Boolean).join(' · '));
-    var c=''; if(g.pts!=null&&g.sample>=12) c+=chip(g.pts>=0?'hot':'cool','Scoring '+(g.pts>0?'+':'')+g.pts+'% in '+g.sample+' similar games');
-    if(g.edge&&g.edge.level&&g.edge.level!=='none') c+=chip('lean',g.edge.level.charAt(0).toUpperCase()+g.edge.level.slice(1)+' weather edge');
-    if(g.rain!=null&&g.rain>=45) c+=chip('cool','Rain '+g.rain+'%');
-    ch.innerHTML=c||chip('lean','Open the board'); cover.href='/cfb/'; return true;
-  }
-  function showOffDay(note){
-    /* "No MLB games today — the board returns Tuesday, September 29." */
-    var i=note.indexOf(' — '), head=(i>0?note.slice(0,i):note).replace(/\.$/,''), rest=i>0?note.slice(i+3):'';
-    if(rest) rest=rest.charAt(0).toUpperCase()+rest.slice(1);
-    state('MLB radar', '', '');
-    m.innerHTML=esc(head)+(rest?'<small>'+esc(rest)+'</small>':'');
-    setWx(''); ch.innerHTML=''; cover.href='/mlb/';
+  function featured(all) {
+    if (!D.hasGL()) return;
+    var list = H.featured(all);
+    if (!list.length) return;
+    document.getElementById("feat").hidden = false;
+    document.getElementById("hero").classList.add("hero--viz");
+    var tabs = ["mlb", "nfl", "cfb", "nascar", "pga"].filter(function (k) { return list.some(function (x) { return x.k === k; }); });
+    document.getElementById("feat-tabs").innerHTML = tabs.map(function (k) { return '<button type="button" role="tab" data-k="' + k + '">' + D.sport(k).name + "</button>"; }).join("");
+    D.$$("#feat-tabs button").forEach(function (b) { b.addEventListener("click", function () { feature(list, b.getAttribute("data-k")); }); });
+    if (AUTO) { feature(list, list[0].k); return; }
+    /* data saver, low power, or 3D switched off: offer it instead of loading it */
+    var f = list[0];
+    document.getElementById("feat-t").textContent = f.venue;
+    document.getElementById("feat-s").textContent = f.match;
+    document.getElementById("feat-go").href = f.href;
+    document.getElementById("feat-cap").textContent = f.cap;
+    D.$$("#feat-tabs button").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-k") === f.k ? "true" : "false"); });
+    document.getElementById("feat-stage").innerHTML = '<div class="v3d-launch"><div class="s">See ' + esc(f.venue) + " in 3D, with today's forecast wind.</div>" +
+      '<button class="btn btn--cyan btn--sm" type="button" id="feat-load" style="gap:8px">' + D.IC.cube + "View in 3D</button></div>";
+    document.getElementById("feat-load").addEventListener("click", function () { feature(list, f.k); });
   }
 
-  window.LIVE_EDGE_READY = Promise.all([get('/data.json').catch(function(){return null}), domReady]).then(function(res){
-    var d=res[0], rf=RF();
-    var games=d && Array.isArray(d.games) ? d.games : null;
-    if(games && games.length){
-      var stale=!!(d.stale || (d.status && d.status.ok===false));
-      if(rf && d.date===rf.todayET() && !stale){ showMLB(d, 'Live · today\'s board', true); return; }
-      var a=rf ? rf.assess({built:d.generated, stale:d.stale, status:d.status, forDate:d.date}) : null;
-      showMLB(d, a && a.text ? a.text : 'Board for '+(d.dateLabel||d.date||'an earlier day'), false);
-      return;
-    }
-    /* MLB is off (or its file is missing). The off-day note the build writes is
-       kept for the park panel, which only ever shows MLB parks. */
-    var note=games ? (d.note || 'No MLB games today.') : null;
-    window.MLB_OFF_NOTE=note;
-    return get('/cfb/data.json').then(function(c){ if(!showCFB(c)) throw 0; })
-      .catch(function(){ if(note) showOffDay(note); else setExample(); });
-  }).catch(setExample);
-
-  /* the record tiles read the public record too */
-  function rangeLabel(r){ var mm=/^(\d+)\s*[–-]\s*\+$/.exec(r||''); return mm ? mm[1]+'%+' : esc(r)+'%'; }
-  Promise.all([get('/pro/record.json'), domReady]).then(function(res){
-    var r=res[0], s=r.summary||{}; if(!s.graded) return;
-    document.getElementById('rec-n').textContent=s.graded.toLocaleString();
-    document.getElementById('rec-nights').textContent=s.nights;
-    if(s.top1&&s.top1.n) document.getElementById('rec-top').textContent=Math.round(100*s.top1.w/s.top1.n)+'%';
-    var cal=(s.cal||[]).filter(function(c){return c.n}); if(!cal.length) return;
-    var mx=Math.max.apply(null,cal.map(function(c){return Math.max(c.exp,c.act)}))*1.25;
-    document.getElementById('cal-rows').innerHTML=cal.map(function(c){
-      return '<div class="cal-row"><span class="rg">'+rangeLabel(c.range)+'</span><div class="bar"><i style="width:'+(100*c.act/mx).toFixed(1)+'%"></i><em style="left:'+(100*c.exp/mx).toFixed(1)+'%"></em></div><span class="nums"><b>'+Number(c.act).toFixed(1)+'%</b> hit · '+c.n+'</span></div>';
-    }).join('');
-    var rf=RF(), t=rf && rf.parseET(r.updated), when=t ? ' · updated '+rf.fmt(t, true) : '';
-    document.getElementById('rec-foot').innerHTML='From the public record'+esc(when)+'. <a href="/record/#mlb">Every graded night →</a>';
-  }).catch(function(){});
-})();
-
-/* ===== The real park model, lifted verbatim from the MLB radar so the
-   landing page shows the same scene the sport page does. ===== */
-const WIND_COLORS = {out:"#22c55e", in:"#9bb6d6"};
-const PARKS = {
-  ARI:{name:"Chase Field",              dims:[330,374,407,374,334], walls:[8,8,25,8,9],    roof:true},
-  ATH:{name:"Sutter Health Park",       dims:[330,396,403,386,325], walls:[8,8,8,8,8]},
-  ATL:{name:"Truist Park",              dims:[335,385,400,375,325], walls:[8,8,8,8,16]},
-  BAL:{name:"Camden Yards",             dims:[333,364,410,373,318], walls:[7,7,7,8,21]},
-  BOS:{name:"Fenway Park",              dims:[310,379,390,380,302], walls:[37,37,17,5,3]},
-  CHC:{name:"Wrigley Field",            dims:[355,368,400,368,353], walls:[15,11,11,11,15]},
-  CIN:{name:"Great American Ball Park", dims:[328,379,404,370,325], walls:[12,8,8,8,8]},
-  CLE:{name:"Progressive Field",        dims:[325,370,405,375,325], walls:[19,19,9,9,9]},
-  COL:{name:"Coors Field",              dims:[347,390,415,375,350], walls:[8,8,8,13,14]},
-  CWS:{name:"Rate Field",               dims:[330,375,400,375,335], walls:[8,8,8,8,8]},
-  DET:{name:"Comerica Park",            dims:[345,370,412,365,330], walls:[8,8,9,9,8]},
-  HOU:{name:"Daikin Park",              dims:[315,362,409,373,326], walls:[19,19,9,9,7],   roof:true},
-  KC: {name:"Kauffman Stadium",         dims:[330,387,410,387,330], walls:[8,8,8,8,8]},
-  LAA:{name:"Angel Stadium",            dims:[330,387,396,370,330], walls:[8,8,8,18,18]},
-  LAD:{name:"Dodger Stadium",           dims:[330,385,395,385,330], walls:[8,8,8,8,8]},
-  MIA:{name:"loanDepot park",           dims:[344,386,400,387,335], walls:[10,10,10,10,10],roof:true},
-  MIL:{name:"American Family Field",    dims:[344,371,400,374,345], walls:[8,8,8,8,8],     retract:true},
-  MIN:{name:"Target Field",             dims:[339,377,404,367,328], walls:[8,8,8,23,23]},
-  NYM:{name:"Citi Field",               dims:[335,370,408,380,330], walls:[8,8,8,8,8]},
-  NYY:{name:"Yankee Stadium",           dims:[318,399,408,385,314], walls:[8,8,8,8,8]},
-  PHI:{name:"Citizens Bank Park",       dims:[329,374,401,369,330], walls:[12,12,6,12,12]},
-  PIT:{name:"PNC Park",                 dims:[325,389,399,375,320], walls:[6,10,10,21,21]},
-  SD: {name:"Petco Park",               dims:[336,390,396,391,322], walls:[4,8,8,8,10]},
-  SEA:{name:"T-Mobile Park",            dims:[331,378,401,381,326], walls:[8,8,8,8,8],     retract:true},
-  SF: {name:"Oracle Park",              dims:[339,364,391,415,309], walls:[8,8,8,8,25]},
-  STL:{name:"Busch Stadium",            dims:[336,375,400,375,335], walls:[8,8,8,8,8]},
-  TB: {name:"Tropicana Field",          dims:[315,370,404,370,322], walls:[10,10,10,10,10],roof:true},
-  TEX:{name:"Globe Life Field",         dims:[329,372,407,374,326], walls:[8,8,8,8,8],     roof:true},
-  TOR:{name:"Rogers Centre",            dims:[328,375,400,375,328], walls:[10,10,10,10,10],retract:true},
-  WSH:{name:"Nationals Park",           dims:[336,377,402,370,335], walls:[8,8,8,8,8]},
-};
-function parkSVG(g, size){
-  const s = size, c = s/2;
-  if(g.dome){
-    return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
-      <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#3C4455" stroke="#4a5468"/>
-      <g transform="translate(${c},${c*1.12}) scale(${s/86})">
-        <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#454E61" stroke="#556074" stroke-width="2"/>
-        <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#3C4455" stroke="#556074" stroke-width="1.6"/>
-      </g>
-      <text x="${c}" y="${s*0.22}" text-anchor="middle" font-size="${s*0.14}" font-weight="800" fill="#8E97AD">🏟️</text>
-    </svg>`;
-  }
-  const ang = (g.windAngle-90)*Math.PI/180; // 0 => up
-  const len = s*0.30;
-  const x1 = c - Math.cos(ang)*len*0.55, y1 = c*1.08 - Math.sin(ang)*len*0.55;
-  const x2 = c + Math.cos(ang)*len,      y2 = c*1.08 + Math.sin(ang)*len;
-  const blowingIn = g.windAngle>120 && g.windAngle<240;
-  const arrColor = blowingIn ? WIND_COLORS.in : WIND_COLORS.out;
-  const mid = `arr-${g.id}-${size}`;
-  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
-    <defs><marker id="${mid}" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
-      <path d="M0,0 L7,3.5 L0,7 Z" fill="${arrColor}"/></marker></defs>
-    <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#2b3a33" stroke="#3d5545"/>
-    <g transform="translate(${c},${c*1.12}) scale(${s/86})">
-      <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#2f4438" stroke="#4a6b55" stroke-width="2"/>
-      <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#eff1f7" stroke="#4a6b55" stroke-width="1.6"/>
-      <circle cx="0" cy="0" r="2.6" fill="#4a6b55"/>
-    </g>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${arrColor}" stroke-width="${Math.max(2,s*0.045)}" stroke-linecap="round" marker-end="url(#${mid})"/>
-  </svg>`;
-}
-let modal3D = null, hero3D = null;
-function disposeP3D(inst){
-  if(!inst) return;
-  cancelAnimationFrame(inst.raf);
-  inst.scene.traverse(o=>{
-    if(o.geometry) o.geometry.dispose();
-    const mats = Array.isArray(o.material)?o.material:(o.material?[o.material]:[]);
-    mats.forEach(m=>{ if(m.map) m.map.dispose(); m.dispose(); });
+  H.load(["wx", "pro", "rec"]).then(function (all) {
+    featured(all);
+    var watch = [];
+    document.getElementById("now").innerHTML = ORDER.map(function (k) {
+      var st = H.status(k, all[k]); watch = watch.concat(st.watch);
+      return '<a class="card card--pad" href="' + st.href + '" style="display:flex;flex-direction:column;gap:8px;padding:18px"><span class="label" style="color:var(--cyan2)">' + D.sport(k).name + "</span>" +
+        '<span style="font:700 16.5px/1.3 var(--display)">' + esc(st.head) + '</span><span class="small dim">' + esc(st.sub) + "</span>" +
+        (function () {
+          var a = st.fresh && window.RadarFresh ? RadarFresh.assess(st.fresh) : null;
+          if (a && a.level === "warn") return '<span class="small" style="margin-top:auto;color:var(--warn2)">' + esc(a.text) + "</span>";
+          return '<span class="small" style="margin-top:auto;color:' + (st.watch.length ? "var(--warn2)" : "var(--dim)") + '">' + (st.watch.length ? D.plural(st.watch.length, "weather watch", "weather watches") : "No weather concerns") + "</span>";
+        })() + "</a>";
+    }).join("");
+    watch.sort(function (a, b) { return b.sev - a.sev; });
+    document.getElementById("watch").innerHTML = watch.length ? watch.slice(0, 4).map(H.watchItem).join("") : '<div class="empty card" style="grid-column:1/-1"><p>A quiet day — nothing on the watch list.</p></div>';
+    var withPick = ORDER.filter(function (k) { var c = H.pickCard(k, all[k]); return c.indexOf("pc--free") >= 0; });
+    document.getElementById("picks").innerHTML = (withPick.length ? withPick : ORDER).slice(0, 3).map(function (k) { return H.pickCard(k, all[k]); }).join("");
+    var recs = ORDER.map(function (k) { return { k: k, r: H.recordLine(k, all[k]) }; }).filter(function (x) { return x.r.v !== "—"; });
+    document.getElementById("rec-chips").innerHTML = recs.map(function (x) { return '<span class="chip">' + D.sport(x.k).name + " <b style=\"color:var(--text)\">" + x.r.v + "</b></span>"; }).join("") +
+      '<a class="chip chip--cyan" href="record/">Every call, graded →</a>';
+    document.getElementById("rec-stats").innerHTML = recs.slice(0, 4).map(function (x) {
+      return '<div class="stat"><div class="stat__v ' + (x.r.cls || "") + '">' + x.r.v + '</div><div class="stat__l">' + D.sport(x.k).name + '</div><div class="stat__s">' + esc(x.r.s) + "</div></div>";
+    }).join("");
   });
-  inst.renderer.dispose();
-}
-function destroyPark3D(){ disposeP3D(modal3D); modal3D = null; }
-function makeWallLabel(txt){
-  const cv=document.createElement("canvas"); cv.width=128; cv.height=64;
-  const cx=cv.getContext("2d");
-  cx.font="700 40px -apple-system,Segoe UI,Arial"; cx.textAlign="center"; cx.textBaseline="middle";
-  cx.fillStyle="rgba(20,28,44,0.92)"; cx.fillText(txt,64,34);
-  const tex=new THREE.CanvasTexture(cv);
-  return new THREE.Mesh(new THREE.PlaneGeometry(26,13),
-    new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false}));
-}
-function initPark3D(g, canvas, slot="modal"){
-  if(typeof THREE === "undefined"){
-    canvas.parentElement.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%">${parkSVG(g,140)}</div>`;
-    return;
-  }
-  if(slot==="hero"){ disposeP3D(hero3D); hero3D = null; } else destroyPark3D();
-  const park = PARKS[g.home] || {dims:[335,375,400,375,335], walls:[8,8,8,8,8]};
-  const W = canvas.clientWidth || 780, H = canvas.clientHeight || 330;
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-  } catch(e) {
-    /* WebGL context unavailable (blocked, unsupported, or GPU exhausted) —
-       fall back to the flat park diagram instead of leaving the page dead. */
-    canvas.parentElement.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%">${parkSVG(g,140)}</div>`;
-    return;
-  }
-  renderer.setSize(W, H, false);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
-  const scene = new THREE.Scene();
-
-  const night = g.sortTime >= 1900;
-  const foggy = /fog|marine/i.test(g.sky);
-  const dome = !!g.dome;
-
-  /* ---- weather-tinted monochrome palette (Home Run Report style) ----
-     the whole scene lives in ONE hue; conditions pick it:
-     hot = ember/crimson · mild = deep navy · cool = steel · fog = misty slate · dome = graphite */
-  let hue, sat;
-  /* Anchored to the DFS Kitchen surfaces (#2E3240 is hue .625 / sat .16) so the
-     canvas sits inside its card instead of fighting it. Weather still moves the
-     hue, but toward the palette's own accents -- warm to the accent orange,
-     cold to the radar cyan -- and at a fraction of the old saturation. */
-  if(dome){ hue=0.625; sat=0.07; }
-  else if(foggy){ hue=0.58; sat=0.10; }
-  else if(g.temp>=88){ hue=0.075; sat=0.26; }
-  else if(g.temp<=72){ hue=0.525; sat=0.24; }
-  else { hue=0.625; sat=0.17; }
-  /* day games get an airy, brighter scene; night games go deep and floodlit —
-     the white wall and streamlines pop against the dark. Domes keep graphite. */
-  /* backgrounds lifted off near-black: at 0.055 the canvas read as a hole
-     punched in the card. These sit around the --inset surface instead. */
-  const LT = dome ? {bg:0.145, apron:0.235, grass:0.30, track:0.205, dirt:0.225, diamond:0.27, mound:0.19}
-           : night ? {bg:0.135, apron:0.215, grass:0.275, track:0.185, dirt:0.20, diamond:0.245, mound:0.17}
-                   : {bg:0.175, apron:0.285, grass:0.355, track:0.245, dirt:0.265, diamond:0.315, mound:0.23};
-  const L = (l)=> new THREE.Color().setHSL(hue, sat, Math.max(0.04, l));
-  const COL = {
-    bg:      L(LT.bg),
-    apron:   L(LT.apron),
-    grass:   L(LT.grass),
-    track:   L(LT.track),
-    dirt:    L(LT.dirt),
-    diamond: L(LT.diamond),
-    mound:   L(LT.mound),
-  };
-  /* The frame is always the radar cyan-slate; only the field carries weather. */
-  const SKY = new THREE.Color().setHSL(0.545, 0.30, dome ? 0.115 : (night ? 0.105 : 0.145));
-  scene.background = SKY;
-  scene.fog = foggy ? new THREE.Fog(SKY, 260, 900) : new THREE.Fog(SKY, 900, 1900);
-  const M = c => new THREE.MeshBasicMaterial({color:c});
-
-  /* geometry: 2D layout has +y toward CF; mapped to 3D as (x, 0, -y) */
-  const angles = [-45,-22.5,0,22.5,45].map(a=>a*Math.PI/180);
-  const pts2 = park.dims.map((r,i)=>new THREE.Vector2(Math.sin(angles[i])*r, Math.cos(angles[i])*r));
-  const curve = new THREE.SplineCurve(pts2);
-  const samples = curve.getPoints(72);
-
-  /* foul-territory apron — rounded pad the field sits on */
-  const apron = new THREE.Mesh(new THREE.CircleGeometry(148, 48), M(COL.apron));
-  apron.rotation.x = -Math.PI/2; apron.position.set(0,-0.15,-30); scene.add(apron);
-
-  /* outfield grass fan */
-  const shape = new THREE.Shape();
-  shape.moveTo(0,0);
-  samples.forEach(p=>shape.lineTo(p.x,p.y));
-  shape.lineTo(0,0);
-  const grass = new THREE.Mesh(new THREE.ShapeGeometry(shape), M(COL.grass));
-  grass.rotation.x = -Math.PI/2; grass.position.y = 0.05; scene.add(grass);
-
-  /* warning track — darker band hugging the wall */
-  const inner = samples.map(p=>{ const r=Math.hypot(p.x,p.y), s=(r-17)/r; return new THREE.Vector2(p.x*s,p.y*s); });
-  const ringPts = [...samples, ...inner.slice().reverse()];
-  const track = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(ringPts)), M(COL.track));
-  track.rotation.x = -Math.PI/2; track.position.y = 0.12; scene.add(track);
-
-  /* infield dirt arc + inner diamond + mound */
-  const dirt = new THREE.Mesh(new THREE.CircleGeometry(95, 44), M(COL.dirt));
-  dirt.rotation.x = -Math.PI/2; dirt.position.set(0, 0.18, -60.5); scene.add(dirt);
-  const dShape = new THREE.Shape();
-  dShape.moveTo(0,10); dShape.lineTo(53.6,63.6); dShape.lineTo(0,117.3); dShape.lineTo(-53.6,63.6); dShape.lineTo(0,10);
-  const diamond = new THREE.Mesh(new THREE.ShapeGeometry(dShape), M(COL.diamond));
-  diamond.rotation.x = -Math.PI/2; diamond.position.y = 0.26; scene.add(diamond);
-  const mound = new THREE.Mesh(new THREE.CircleGeometry(9.5, 24), M(COL.mound));
-  mound.rotation.x = -Math.PI/2; mound.position.set(0, 0.34, -60.5); scene.add(mound);
-  const rubber = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.3,0.7), M(0xf4f6fa));
-  rubber.position.set(0, 0.6, -60.5); scene.add(rubber);
-
-  /* home plate circle + plate */
-  const homeC = new THREE.Mesh(new THREE.CircleGeometry(13, 24), M(COL.mound));
-  homeC.rotation.x = -Math.PI/2; homeC.position.set(0, 0.34, 0); scene.add(homeC);
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(1.9,0.3,1.9), M(0xf4f6fa));
-  plate.position.set(0, 0.6, 0); scene.add(plate);
-
-  /* bases — white pads rotated 45° */
-  [[63.64,-63.64],[0,-127.28],[-63.64,-63.64]].forEach(([x,z])=>{
-    const b = new THREE.Mesh(new THREE.BoxGeometry(3.6,0.7,3.6), M(0xf4f6fa));
-    b.rotation.y = Math.PI/4; b.position.set(x, 0.6, z); scene.add(b);
-  });
-
-  /* foul lines — crisp white chalk to each pole */
-  [[park.dims[0], 1],[park.dims[4], -1]].forEach(([len, side])=>{
-    const line = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.15, len), M(0xf4f6fa));
-    line.rotation.y = side * Math.PI/4;
-    line.position.set(-side*0.3536*len, 0.4, -0.3536*len);
-    scene.add(line);
-  });
-
-  /* outfield wall — glowing white ribbon with real per-section heights */
-  const hAt = t => { const f=t*4, i=Math.min(3,Math.floor(f)), u=f-i; return park.walls[i]*(1-u)+park.walls[i+1]*u; };
-  const wv=[], wi=[];
-  const HSCALE = 1.7;
-  samples.forEach((p,i)=>{ const h=hAt(i/(samples.length-1))*HSCALE; wv.push(p.x,0,-p.y, p.x,h,-p.y); });
-  for(let i=0;i<samples.length-1;i++){ const a=i*2; wi.push(a,a+2,a+1, a+1,a+2,a+3); }
-  const wallGeo = new THREE.BufferGeometry();
-  wallGeo.setAttribute("position", new THREE.Float32BufferAttribute(wv,3));
-  wallGeo.setIndex(wi); wallGeo.computeVertexNormals();
-  scene.add(new THREE.Mesh(wallGeo, new THREE.MeshBasicMaterial({color:0xf4f6fa, side:THREE.DoubleSide})));
-  /* wall cap — thin top edge catches the eye like the reference renders */
-  const capPts = samples.map((p,i)=>new THREE.Vector3(p.x, hAt(i/(samples.length-1))*HSCALE+0.25, -p.y));
-  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(capPts),
-    new THREE.LineBasicMaterial({color:0xffffff})));
-
-  /* wall shadow skirt — soft dark base line grounding the wall */
-  const skv=[], ski=[];
-  samples.forEach(p=>{ const r=Math.hypot(p.x,p.y), s=(r+7)/r; skv.push(p.x,0.02,-p.y, p.x*s,0.02,-p.y*s); });
-  for(let i=0;i<samples.length-1;i++){ const a=i*2; ski.push(a,a+2,a+1, a+1,a+2,a+3); }
-  const skirtGeo = new THREE.BufferGeometry();
-  skirtGeo.setAttribute("position", new THREE.Float32BufferAttribute(skv,3));
-  skirtGeo.setIndex(ski);
-  scene.add(new THREE.Mesh(skirtGeo, new THREE.MeshBasicMaterial({color:L(0.14), side:THREE.DoubleSide})));
-
-  /* foul poles — tall bright yellow */
-  [[0,1],[4,-1]].forEach(([di, side])=>{
-    const d = park.dims[di];
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.9,0.9,46,8), M(0xffd94a));
-    pole.position.set(-side*0.707*d, 23, -0.707*d); scene.add(pole);
-  });
-
-  /* wall distance markers — real numbers on the wall face */
-  [0,1,2,3,4].forEach(i=>{
-    const p = pts2[i], r = Math.hypot(p.x,p.y), s=(r-2.5)/r;
-    const lbl = makeWallLabel(String(park.dims[i]));
-    const h = park.walls[i]*HSCALE;
-    lbl.position.set(p.x*s, Math.min(h*0.55, h-3)+3.5, -p.y*s);
-    lbl.lookAt(0, lbl.position.y, 0);
-    scene.add(lbl);
-  });
-
-  /* team logo laid flat on the outfield grass */
-  const MLBID = {ARI:109,ATH:133,ATL:144,BAL:110,BOS:111,CHC:112,CIN:113,CLE:114,COL:115,
-    CWS:145,DET:116,HOU:117,KC:118,LAA:108,LAD:119,MIA:146,MIL:158,MIN:142,NYM:121,NYY:147,
-    PHI:143,PIT:134,SD:135,SEA:136,SF:137,STL:138,TB:139,TEX:140,TOR:141,WSH:120};
-  if(MLBID[g.home]){
-    new THREE.TextureLoader().load(
-      `https://midfield.mlbstatic.com/v1/team/${MLBID[g.home]}/spots/256`,
-      tex=>{
-        const logo=new THREE.Mesh(new THREE.PlaneGeometry(78,78),
-          new THREE.MeshBasicMaterial({map:tex, transparent:true, opacity:0.9, depthWrite:false}));
-        logo.rotation.x=-Math.PI/2;
-        logo.position.set(0, 0.3, -262);
-        scene.add(logo);
-        if(inst.redraw) inst.redraw();   /* reduced motion: no loop to pick it up */
-      },
-      undefined, ()=>{} /* CORS/load failure → just skip the logo */);
-  }
-
-  /* dome roof shell */
-  if(dome){
-    const roof = new THREE.Mesh(new THREE.SphereGeometry(400,36,18,0,Math.PI*2,0,Math.PI/2),
-      new THREE.MeshBasicMaterial({color:0xe8ecf2, transparent:true, opacity:0.10, side:THREE.DoubleSide}));
-    roof.scale.y = 0.45; roof.position.set(0,2,-140); scene.add(roof);
-  }
-
-  /* wind — nullschool-style particle flow: hundreds of thin streaks
-     drifting along the wind field with organic curl, trails fading behind */
-  let wind = null;
-  if(!dome && g.wind>2){
-    const N=130, TAIL=22;
-    const base=g.windAngle*Math.PI/180;
-    const spawn=()=>new THREE.Vector3((Math.random()-0.5)*700, 8+Math.random()*135, 115-Math.random()*660);
-    const parts=[];
-    for(let i=0;i<N;i++){
-      const p=spawn();
-      parts.push({p, age:Math.random()*3, life:3+Math.random()*2.6,
-                  hist:Array.from({length:TAIL},()=>p.clone())});
-    }
-    /* single solid ribbon per streak: each trail is a thin quad strip
-       (real geometric width — no stacked-line doubling) */
-    const RIBBON_W = 2.8;
-    const vCount=N*TAIL*2;
-    const geo=new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vCount*3),3));
-    /* RGBA vertex colors: constant wind-grey, alpha-only fades — the streak
-       never blends toward the background, so no dark tail */
-    const colArr=new Float32Array(vCount*4);
-    const GREY=new THREE.Color(0xa8b2c1);
-    for(let i=0;i<vCount;i++){ colArr[i*4]=GREY.r; colArr[i*4+1]=GREY.g; colArr[i*4+2]=GREY.b; colArr[i*4+3]=0; }
-    geo.setAttribute("color", new THREE.BufferAttribute(colArr,4));
-    const idx=[];
-    for(let p=0;p<N;p++){
-      const o=p*TAIL*2;
-      for(let i=0;i<TAIL-1;i++){
-        const a=o+i*2, b=o+i*2+1, c=o+i*2+2, d=o+i*2+3;
-        idx.push(a,b,c, b,d,c);
-      }
-    }
-    geo.setIndex(idx);
-    const mat=new THREE.MeshBasicMaterial({vertexColors:true, transparent:true,
-      opacity: foggy?0.5:0.7, side:THREE.DoubleSide, depthWrite:false});
-    wind={mesh:new THREE.Mesh(geo,mat), parts, tail:TAIL, base, spawn, t:0,
-          speed:46 + g.wind*6.5, w:RIBBON_W};
-    scene.add(wind.mesh);
-  }
-
-  /* rain — falling streaks, tilted with the wind, when rain risk is real */
-  let rain = null;
-  if(!dome && (g.rain||0) >= 45){
-    const RN = Math.round(90 + Math.min(1,(g.rain-45)/45)*130);
-    const a=g.windAngle*Math.PI/180;
-    const tilt = Math.min(0.45, (g.wind||0)*0.03);
-    const vel = new THREE.Vector3(Math.sin(a)*tilt, -1, -Math.cos(a)*tilt).normalize();
-    const drops=[];
-    for(let i=0;i<RN;i++)
-      drops.push(new THREE.Vector3((Math.random()-0.5)*680, Math.random()*185, 110-Math.random()*640));
-    const rgeo=new THREE.BufferGeometry();
-    rgeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(RN*6),3));
-    const rcol = new THREE.Color().setHSL(hue, Math.min(0.25,sat), night?0.55:0.72);
-    rain={mesh:new THREE.LineSegments(rgeo, new THREE.LineBasicMaterial({color:rcol, transparent:true, opacity:0.38})),
-          drops, vel, len:9, speed:330};
-    scene.add(rain.mesh);
-  }
-
-  /* camera + drag orbit — high angle behind home, like the reference */
-  const cam = new THREE.PerspectiveCamera(36, W/H, 1, 3200);
-  const target = new THREE.Vector3(0, 6, -150);
-  let theta=0, el=0.62, dragging=false, lastX=0, lastY=0, idleT=0;
-  function place(){
-    const r=545;
-    cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r, target.y+Math.sin(el)*r, target.z+Math.cos(theta)*Math.cos(el)*r);
-    cam.lookAt(target);
-  }
-  /* Reduced motion (landing only): no auto-orbit and no drifting wind or rain.
-     The scene is drawn once with the streamlines settled, and redrawn only
-     when the visitor drags it or the team logo arrives. */
-  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  canvas.addEventListener("pointerdown", e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(e.pointerId); });
-  canvas.addEventListener("pointermove", e=>{
-    if(!dragging) return;
-    theta -= (e.clientX-lastX)*0.006;
-    el = Math.min(1.15, Math.max(0.22, el + (e.clientY-lastY)*0.004));
-    lastX=e.clientX; lastY=e.clientY; idleT=0;
-    if(still) frame();
-  });
-  canvas.addEventListener("pointerup", ()=>dragging=false);
-  canvas.addEventListener("pointercancel", ()=>dragging=false);
-
-  const clock = new THREE.Clock();
-  const inst = {renderer, scene, raf:0, redraw:null};
-  if(slot==="hero") hero3D = inst; else modal3D = inst;
-  function frame(){ place(); renderer.render(scene, cam); }
-  if(still){
-    for(let i=0;i<45;i++) step(1/30);
-    frame(); inst.redraw = frame;
-    return;
-  }
-  (function tick(){
-    inst.raf = requestAnimationFrame(tick);
-    const dt = Math.min(clock.getDelta(), 0.05);
-    idleT += dt;
-    if(!dragging && idleT>2.5) theta += dt*0.07;
-    step(dt);
-    frame();
-  })();
-  function step(dt){
-    if(wind){
-      wind.t += dt;
-      const pos = wind.mesh.geometry.attributes.position.array;
-      const col = wind.mesh.geometry.attributes.color.array;
-      const fbPerpX = Math.cos(wind.base), fbPerpZ = Math.sin(wind.base);
-      wind.parts.forEach((pt, pi)=>{
-        pt.age += dt;
-        /* flow field: base wind direction + smooth positional curl so
-           neighbouring particles bend together like a fluid */
-        const curl = 0.42*Math.sin(pt.p.x*0.010 + wind.t*0.5)
-                   + 0.30*Math.sin(pt.p.z*0.0065 - wind.t*0.33);
-        const a = wind.base + curl;
-        pt.p.x += Math.sin(a)*wind.speed*dt;
-        pt.p.z += -Math.cos(a)*wind.speed*dt;
-        const out = Math.abs(pt.p.x)>390 || pt.p.z<-640 || pt.p.z>170;
-        if(pt.age>pt.life || out){
-          pt.p.copy(wind.spawn()); pt.age=0; pt.life=2.2+Math.random()*2.4;
-          pt.hist.forEach(h=>h.copy(pt.p));
-        }
-        const tailv = pt.hist.pop(); tailv.copy(pt.p); pt.hist.unshift(tailv);
-        /* alpha: quick fade-in, fade-out at end of life — no popping */
-        const env = Math.max(0, Math.min(1, pt.age/0.35, (pt.life-pt.age)/0.55));
-        const o = pi*wind.tail*2;
-        for(let ti=0; ti<wind.tail; ti++){
-          const P=pt.hist[ti];
-          const Q=pt.hist[ti+1] || pt.hist[ti-1] || P;
-          let dx=P.x-Q.x, dz=P.z-Q.z;
-          const len=Math.hypot(dx,dz);
-          let px, pz;
-          if(len>0.0001){ px=-dz/len; pz=dx/len; } else { px=fbPerpX; pz=fbPerpZ; }
-          /* solid grey stroke that tapers to a point — the taper IS the fade */
-          const u = ti/(wind.tail-1);
-          const half = wind.w*0.5*Math.pow(1-u, 0.65);
-          const v=(o+ti*2)*3;
-          pos[v]  =P.x+px*half; pos[v+1]=P.y; pos[v+2]=P.z+pz*half;
-          pos[v+3]=P.x-px*half; pos[v+4]=P.y; pos[v+5]=P.z-pz*half;
-          const a4=(o+ti*2)*4;
-          const alpha = env*(0.9-0.35*u);
-          col[a4+3]=alpha; col[a4+7]=alpha;
-        }
-      });
-      wind.mesh.geometry.attributes.position.needsUpdate = true;
-      wind.mesh.geometry.attributes.color.needsUpdate = true;
-    }
-    if(rain){
-      const pos = rain.mesh.geometry.attributes.position.array;
-      rain.drops.forEach((d,i)=>{
-        d.addScaledVector(rain.vel, rain.speed*dt);
-        if(d.y < 1){ d.set((Math.random()-0.5)*680, 170+Math.random()*20, 110-Math.random()*640); }
-        pos[i*6]=d.x;                       pos[i*6+1]=d.y;                       pos[i*6+2]=d.z;
-        pos[i*6+3]=d.x+rain.vel.x*rain.len; pos[i*6+4]=d.y+rain.vel.y*rain.len;   pos[i*6+5]=d.z+rain.vel.z*rain.len;
-      });
-      rain.mesh.geometry.attributes.position.needsUpdate = true;
-    }
-  }
-}
-
-/* ---------- the real park model, on demand ----------
-   three.js is 600KB, so it is fetched only once the park panel comes within
-   ~700px of the viewport. Then the same initPark3D the MLB radar uses draws
-   tonight's edge-of-the-day park - the game the hero HUD is showing - or
-   Wrigley on a sunny afternoon when no board is posted, labelled as such. */
-(function(){
-  var cv=document.getElementById('parkCanvas'), box=document.getElementById('parkShowcase'); if(!cv||!box) return;
-  var started=false;
-  function esc(x){return String(x==null?'':x).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]})}
-  function timeNum(t){ var m=/(\d+):(\d+)\s*(AM|PM)/i.exec(t||''); if(!m) return 1300; var h=(+m[1])%12+(/PM/i.test(m[3])?12:0); return h*100+(+m[2]); }
-  function example(){ return {home:'CHC',away:'WSH',park:'Wrigley Field',wind:13,windAngle:0,windLabel:'OUT TO CF',temp:84,sky:'Sunny',rain:8,dome:false,sortTime:1420,time:'2:20 PM ET',example:true}; }
-  function tag(g){
-    var e=document.getElementById('park-e'), m=document.getElementById('park-m'); if(!e||!m) return;
-    var wl=(g.windLabel||'').toString().toLowerCase();
-    e.textContent = g.dome ? 'Roof closed' : ('Wind · '+g.wind+' mph'+(wl?' '+wl:''));
-    var name=(g.park||'').split('·')[0].trim() || ((PARKS[g.home]||{}).name) || 'Today\'s park';
-    /* the same label the hero HUD earned: live only when the board is today's */
-    var what = g.example ? 'example scene' : (window.LIVE_EDGE_TAG || 'edge of the day');
-    m.innerHTML = esc(name)+'<small>'+esc(g.sky||'')+' · '+esc(g.temp)+'° · '+esc(what)+'</small>'+
-      (g.example && window.MLB_OFF_NOTE ? '<span class="note">'+esc(window.MLB_OFF_NOTE)+'</span>' : '');
-    var live=!g.example && window.LIVE_EDGE_LIVE===true;
-    var dot=document.getElementById('park-dot'), pill=document.getElementById('park-pill');
-    if(dot) dot.classList.toggle('off', !live);
-    if(pill) pill.textContent = live ? 'Every park, live — open the radar ↗' : 'Every park — open the radar ↗';
-  }
-  function go(){
-    if(started) return; started=true;
-    var g = window.LIVE_EDGE_GAME || example();
-    if(typeof g.sortTime!=='number') g.sortTime=timeNum(g.time);
-    tag(g);
-    var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-    s.onload=function(){ initPark3D(g, cv, 'hero'); };
-    s.onerror=function(){ initPark3D(g, cv, 'hero'); };   /* THREE undefined -> initPark3D draws the flat park instead */
-    document.head.appendChild(s);
-  }
-  function start(){
-    /* wait for the HUD's fetch so the park and the HUD show the same game;
-       cap the wait so a slow network still gets a scene */
-    var p = window.LIVE_EDGE_READY || Promise.resolve();
-    Promise.race([p, new Promise(function(r){ setTimeout(r, 2500); })]).then(go, go);
-  }
-  if('IntersectionObserver' in window){
-    new IntersectionObserver(function(en, io){ if(en[0].isIntersecting){ io.disconnect(); start(); } },{rootMargin:'700px 0px'}).observe(box);
-  } else start();
-})();
+});
 </script>
 </body>
 </html>

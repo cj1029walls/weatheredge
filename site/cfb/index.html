@@ -1,1388 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>College Football Weather Report — Wind & Cold Game Impact | DFSRADAR</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>College Football Weather This Week — Every Game | DFSRADAR</title>
+<meta name="description" content="This week&#x27;s college football weather at every stadium: wind, rain and temperature at kickoff, the hours around it, and what similar weather has done there.">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://dfsradar.com/cfb/">
+<meta name="theme-color" content="#2E3240">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
-<meta property="og:title" content="DFSRADAR CFB — College Football Weather Edges">
-<meta property="og:description" content="Every FBS game's weather, with Power 4 venues backed by more than 6,700 games of history against real closing totals. Free.">
-<meta property="og:image" content="https://dfsradar.com/og-card.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:title" content="College Football Weather This Week — Every Game | DFSRADAR">
+<meta property="og:description" content="This week&#x27;s college football weather at every stadium: wind, rain and temperature at kickoff, the hours around it, and what similar weather has done there.">
 <meta property="og:url" content="https://dfsradar.com/cfb/">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="DFSRADAR CFB — College Football Weather Edges">
-<meta name="twitter:description" content="Every FBS game's weather, with Power 4 venues backed by more than 6,700 games of history against real closing totals. Free.">
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
-
-<meta name="description" content="CFB weather edges: kickoff forecasts for every game and how wind, cold and rain have moved scoring at each stadium historically.">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%2322d3ee" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23a5f3fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
-<style>
-  :root{
-    --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15);
-    --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
-    --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
-    --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
-    --amber-bg:rgba(251,191,36,.15);
-    --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
-    --line-strong:#57627A; --body2:#C7CEDC;
-    --note-bg:rgba(251,191,36,.12); --note-border:rgba(251,191,36,.32); --note-text:#fbbf24;
-    --ou1:#22d3ee; --ou2:#0ea5c4; --radius:14px;
-    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
-    --shadow-hover:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
-  header{position:relative;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 0}
-  .header-inner{max-width:1240px;margin:0 auto}
-  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
-  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
-  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
-  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#22d3ee;font-weight:600}
-  .sport-tabs{display:flex;gap:6px;margin-top:14px}
-  .sport-tabs a,.sport-tabs span{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
-  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .protab{background:#F08A3C;color:#1B1206 !important;border-color:transparent;font-weight:800}
-  .sport-tabs .protab:hover{filter:brightness(1.06)}
-  .sport-tabs .on{background:var(--card);color:var(--navy);border-color:#fff}
-  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:#F08A3C;color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
-  .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
-  @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
-  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
-  .kx-card .kx-t b{color:#fff}
-  .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
-  .kx-card .kx-go{background:#F08A3C;color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
-  .kx-card .kx-go:hover{filter:brightness(1.1)}
-  .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
-  .kx-hook a{color:#F08A3C;font-weight:800;text-decoration:none}
-  .kx-hook a:hover{text-decoration:underline}
-  .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
-  .date-chip b{color:#fff}
-  nav{display:flex;gap:4px;margin-top:18px}
-  nav button{appearance:none;border:0;background:transparent;color:#95a1b5;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px 10px 0 0;cursor:pointer;letter-spacing:.2px}
-  nav button:hover{color:#fff}
-  nav button.active{background:var(--surface);color:var(--ink)}
-  main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
-  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
-  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
-  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:bpulse 2.2s ease-in-out infinite}
-  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
-  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
-  .brief-body b{color:#fff}
-  .tip{position:relative;cursor:help}
-  .info-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray-bg);color:var(--muted);font-size:10px;font-weight:800;vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong)}
-  .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;font-size:11.5px;font-weight:500;line-height:1.55;text-transform:none;letter-spacing:.1px;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;transition:opacity .15s;z-index:90;text-align:left;white-space:normal}
-  .tip::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90}
-  .tip:hover::after,.tip:hover::before{opacity:1}
-  .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
-  .sum-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .sum-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
-  .sum-card .k{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-  .sum-card .v{font-size:15px;font-weight:800;margin-top:4px}
-  .sum-card .s{font-size:12px;color:var(--muted);margin-top:2px}
-  .pos{color:var(--green)} .neg{color:var(--red)} .neu{color:var(--muted)}
-  .controls{display:flex;align-items:center;justify-content:space-between;margin:6px 0 14px;gap:12px;flex-wrap:wrap}
-  .controls h2{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
-  /* weather-edge severity: one composite read per game */
-  .edge-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:-2px 0 12px}
-  .edge-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-    letter-spacing:.3px;padding:6px 13px;border-radius:20px;border:1px solid var(--line);
-    background:var(--card);color:var(--body2)}
-  .edge-chip i{width:8px;height:8px;border-radius:50%;font-style:normal}
-  .ed-severe i{background:#f87171} .ed-elevated i{background:#F08A3C}
-  .ed-watch i{background:#fbbf24} .ed-none i{background:#57627A} .ed-indoor i{background:#9bb6d6}
-  .sortwrap{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);
-    font-weight:700;letter-spacing:.5px}
-  .sortwrap select{appearance:none;background:var(--card);border:1px solid var(--line);
-    border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer}
-  .lvl{display:inline-block;width:4px;border-radius:3px;align-self:stretch}
-  .b-row.lv-severe{border-left:3px solid #f87171}
-  .b-row.lv-elevated{border-left:3px solid #F08A3C}
-  .b-row.lv-watch{border-left:3px solid #fbbf24}
-  /* dual-baseline metric grid */
-  .mx-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:11px}
-  .mx-toggle{margin-left:auto;display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-  .mx-toggle button{appearance:none;cursor:pointer;border:0;background:var(--card);color:var(--muted);
-    font-size:10.5px;font-weight:800;letter-spacing:.8px;padding:6px 12px}
-  .mx-toggle button.on{background:rgba(34,211,238,.16);color:#67e8f9}
-  .mx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-  .mx{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-  .mx .k{font-size:10px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
-  .mx .v{font-size:26px;font-weight:800;letter-spacing:-.5px;margin:3px 0 2px}
-  .mx .s{font-size:11px;color:var(--muted)}
-  .mx .s b{color:var(--body2)}
-  .mx.pos .v{color:var(--green)} .mx.neg .v{color:var(--red)} .mx.neu .v{color:var(--muted)}
-  .mx-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px}
-  .fcs-note{margin-top:10px;font-size:12px;color:var(--note-text);background:var(--note-bg);
-    border:1px solid var(--note-border);border-radius:10px;padding:8px 13px}
-  .conf-chips{display:flex;gap:6px;flex-wrap:wrap}
-  .conf-chips button{appearance:none;cursor:pointer;font-size:11.5px;font-weight:700;letter-spacing:.4px;padding:6px 13px;border-radius:18px;border:1px solid var(--line-strong);background:var(--card);color:var(--muted);transition:.13s}
-  .conf-chips button:hover{color:var(--ink)}
-  .conf-chips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
-  .board{display:flex;flex-direction:column;gap:10px}
-  .b-row{display:grid;grid-template-columns:96px 1.5fr 1.15fr .8fr 1.15fr 110px;gap:14px;align-items:center;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .b-row:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
-  .b-time{font-size:14px;font-weight:800;line-height:1.15}
-  .b-time span{display:block;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.6px}
-  .b-teams{font-size:15px;font-weight:800;line-height:1.3}
-  .b-teams .at{font-weight:300;color:var(--faint)}
-  .b-stad{font-size:11.5px;color:var(--muted);margin-top:2px}
-  .conf-tag{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.7px;padding:1.5px 7px;border-radius:9px;background:var(--gray-bg);color:var(--muted);margin-left:6px;vertical-align:1px}
-  .b-wx .t{font-size:15px;font-weight:800}
-  .b-wx .w{font-size:11.5px;color:var(--muted);line-height:1.45}
-  .pill{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:16px;letter-spacing:.3px}
-  .pill.pos{background:var(--green-bg);color:var(--green-deep)}
-  .pill.neg{background:var(--red-bg);color:var(--red-deep)}
-  .pill.neu{background:var(--gray-bg);color:var(--muted)}
-  .b-ou{display:flex;align-items:center;gap:10px}
-  .b-ou .txt b{display:block;font-size:13px}
-  .b-ou .txt span{font-size:10.5px;color:var(--muted)}
-  .edge-badge{font-size:10px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
-  .edge-wind{background:#47566d;color:#e2e8f2}
-  .edge-cold{background:#2450b8;color:#dde7fb}
-  .edge-rain{background:#fbbf24;color:#3a2f24}
-  .edge-neutral{background:var(--gray-bg);color:var(--muted)}
-  .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin-top:13px}
-  .hr-cell{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center}
-  .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-  .hr-lab{font-size:9.5px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
-  .hr-t{font-size:18px;font-weight:800;margin-top:2px}
-  .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px;white-space:nowrap}
-  .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
-  .hr-rain.warn{color:var(--red);font-weight:800}
-  .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
-  .field3d-wrap{position:relative;height:340px;background:#10151f;border-radius:11px;overflow:hidden;margin-bottom:14px}
-  .field3d-wrap canvas{width:100%;height:100%;display:block;cursor:grab}
-  .field3d-wrap canvas:active{cursor:grabbing}
-  .f3d-hud{position:absolute;top:14px;left:16px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55);pointer-events:none}
-  .f3d-hud .t{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
-  .f3d-hud .w{font-size:15px;font-weight:800;margin-top:3px}
-  .f3d-badge{position:absolute;top:14px;right:16px;background:rgba(8,12,20,.42);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.7px;padding:5px 11px;border-radius:14px;text-transform:uppercase;pointer-events:none}
-  .f3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none;display:none}
-  .is-3d .f3d-hint{display:block}
-  .f3d-load{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:rgba(255,255,255,.55);font-size:12px;pointer-events:none}
-  .is-3d .f3d-load{display:none}
-  .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
-  .dl-clear{background:var(--green-bg);color:var(--green-deep)}
-  .dl-watch{background:var(--amber-bg);color:#fbbf24}
-  .dl-likely{background:#3a2f24;color:#fbbf24}
-  .dl-severe{background:var(--red-bg);color:var(--red-deep)}
-  .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
-  .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)} .fx-high b{color:#F08A3C} .fx-extreme b{color:var(--red)}
-  .overlay{position:fixed;inset:0;background:rgba(13,25,41,.55);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:34px 16px;z-index:50;overflow-y:auto}
-  .overlay.open{display:flex}
-  .modal{background:var(--surface);border-radius:18px;max-width:860px;width:100%;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35)}
-  .m-head{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:20px 26px;display:flex;justify-content:space-between;align-items:center}
-  .m-head .teams{font-size:20px;font-weight:800}
-  .m-head .meta{font-size:12.5px;color:#93a1b8;margin-top:3px}
-  .m-close{appearance:none;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:15px}
-  .m-body{padding:20px 26px 28px}
-  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
-  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
-  .m-cond{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-  .wx-item .big{font-size:27px;font-weight:800}
-  .wx-item .big sup{font-size:12px;font-weight:700;color:var(--muted)}
-  .wx-item .lab{font-size:11px;color:var(--muted)}
-  .m-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-  .m-tile{border-radius:12px;padding:14px 16px}
-  .m-tile.pos{background:var(--green-bg)} .m-tile.pos .t-val{color:var(--green-deep)}
-  .m-tile.neg{background:var(--red-bg)} .m-tile.neg .t-val{color:var(--red-deep)}
-  .m-tile.neu{background:var(--gray-bg)} .m-tile.neu .t-val{color:var(--muted)}
-  .m-tile .t-lab{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
-  .m-tile .t-val{font-size:26px;font-weight:800;margin:2px 0}
-  .m-tile .t-sub{font-size:11.5px;color:var(--body2)}
-  .hit-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-  .hit-box{flex:1;min-width:120px;border-radius:11px;padding:11px 14px;text-align:center}
-  .hit-box .n{font-size:22px;font-weight:800}
-  .hit-box .l{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
-  .hit-box.over{background:var(--gold-bg)} .hit-box.over .n,.hit-box.over .l{color:var(--gold-deep)}
-  .hit-box.under{background:var(--blue-bg)} .hit-box.under .n,.hit-box.under .l{color:var(--blue-deep)}
-  .hit-box.push{background:var(--gray-bg)} .hit-box.push .n,.hit-box.push .l{color:var(--muted)}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  thead th{text-align:left;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1.5px solid var(--line)}
-  tbody td{padding:8px 10px;border-bottom:1px solid var(--line)}
-  .res-chip{display:inline-block;padding:2.5px 9px;border-radius:8px;font-weight:800;font-size:10.5px;letter-spacing:.4px}
-  .res-chip.over{background:var(--gold-bg);color:var(--gold-deep)}
-  .res-chip.under{background:var(--blue-bg);color:var(--blue-deep)}
-  .res-chip.push{background:var(--gray-bg);color:var(--muted)}
-  .hist-note{font-size:11.5px;color:var(--muted);margin-top:10px}
-  .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
-  .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
-  footer.site-foot{max-width:1180px;margin:36px auto 0;padding:24px 24px 8px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:#A7B0C4;text-align:center}
-  footer.site-foot .fnav{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 4px;margin:0 0 10px}
-  footer.site-foot .fnav a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:20px;color:#C7CEDC;font-size:12.5px;font-weight:700;letter-spacing:.4px;text-decoration:none}
-  footer.site-foot .fnav a:hover{color:#fff;background:rgba(255,255,255,.06)}
-  footer.site-foot .fnav a[aria-current="page"]{color:#67e8f9}
-  footer.site-foot .fnav .f-pro{color:#F08A3C}
-  footer.site-foot p{margin:0 auto 6px;max-width:74ch}
-  footer.site-foot .f-rg b{color:#EFF1F7}
-  footer.site-foot .f-rg a{color:#67e8f9;font-weight:700;text-decoration:none}
-  footer.site-foot .f-rg a:hover{text-decoration:underline}
-  @media(max-width:900px){.b-row{grid-template-columns:80px 1fr 1fr;row-gap:10px}.b-ou,.b-badge{grid-column:span 2}}
-
-  /* ===== DFS Kitchen family — cyan-forward chrome (appended) ===== */
-  .brand h1 .brand-rad{color:#22d3ee}
-  .sport-tabs .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
-  nav button.active{box-shadow:inset 0 -2px 0 #22d3ee}
-  .controls h2,.method h4,.sub-h,.hist-table th{color:#67e8f9}
-  .sum-card{border-top:2px solid rgba(34,211,238,.55)}
-  .sum-card:hover,.b-row:hover,.wxc:hover,.p-card:hover{border-color:rgba(34,211,238,.5)}
-  .hero-tag{color:#67e8f9;background:rgba(34,211,238,.14)}
-  .brief-card::after{border-color:rgba(34,211,238,.30)!important;box-shadow:0 0 0 38px rgba(34,211,238,.06),0 0 0 80px rgba(34,211,238,.04)!important}
-  .brief-head{color:#67e8f9}
-  a{color:#67e8f9}
-  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
-  :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
-  .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
-  /* ===== v2: reading density + cyan lift =====
-     dfskitchen.com sets 19.5px body on a ~680px measure with 64px section
-     padding. A dense data board can't go that far, but 14px text inside 14px
-     card padding was the "clustered" complaint; this is the same intent at
-     table scale. ===== */
-  body{font-size:15.5px;
-    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
-    background-repeat:no-repeat;background-attachment:fixed;
-    padding:26px 26px 88px}
-  main{max-width:1180px}
-  .summary-strip{gap:16px;margin-bottom:30px}
-  .board{gap:14px}
-  .sum-card{padding:20px 22px}
-  .wxc{padding:20px 22px}
-  .m-sec{padding:22px 24px;margin-bottom:16px}
-  .p-card{padding:16px 18px}
-  .brief-card{padding:24px 28px 25px;margin-bottom:26px}
-  .pro-card,.kx-card,.pro-tease{padding:18px 22px;margin-bottom:26px}
-  .b-row{padding:17px 20px}
-  .method{padding:36px 40px}
-  .controls{margin-bottom:20px}
-  .controls h2{font-size:14px;letter-spacing:1.5px}
-  table td,table th{padding-top:11px;padding-bottom:11px}
-  /* prose keeps a readable measure instead of running the full 1180px */
-  .method p,.hist-note,.mx-note,.fcs-note,.empty-season,.tagline{max-width:70ch}
-
-  /* cyan lift -- all-grey was underwhelming; this is DFSRADAR's own colour
-     from the Kitchen system (--radar #22d3ee), spent only where the eye lands. */
-  .brief-card{border-left:3px solid rgba(34,211,238,.6)}
-  .sum-card{border-top:2px solid rgba(34,211,238,.5)}
-  .sum-card:hover,.b-row:hover,.wxc:hover{border-color:rgba(34,211,238,.45)}
-  .m-sec h5,.method h4,.sub-h{color:#67e8f9}
-  .m-head .teams{color:#EFF1F7}
-  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
-  /* ===== v3: narrow-screen header =====
-     Four things pushed every sport page sideways on a phone: .sport-tabs was a
-     non-wrapping flex row holding the header open at a 400px minimum; the
-     .controls heading is a flex item that would not shrink below its own text;
-     .b-row is a fixed six-column grid; and .tip::after is a 250px absolutely
-     positioned tooltip that hangs past the viewport on any tip near the right
-     edge. The tooltip only appears on hover, which is unreliable on touch, so
-     it is suppressed rather than re-anchored. ===== */
-  .sport-tabs{flex-wrap:wrap}
-  .brand,.brand h1{min-width:0;max-width:100%}
-  .brand h1{flex-wrap:wrap;row-gap:6px}
-  .tagline{max-width:100%}
-  .controls h2{min-width:0;overflow-wrap:anywhere}
-  @media(max-width:680px){
-    body{padding-left:14px;padding-right:14px}
-    .brand h1{font-size:21px}
-    .tip::after,.tip::before{display:none}
-    nav{flex-wrap:wrap;row-gap:4px}
-    nav button{white-space:normal}
-    .b-row{grid-template-columns:1fr!important;gap:8px;row-gap:8px}
-    .b-row>*{min-width:0}
-    .summary-strip{grid-template-columns:1fr}
-    .m-tiles,.mx-grid{grid-template-columns:1fr!important}
-    table{display:block;overflow-x:auto;white-space:nowrap}
-    .method{padding:24px 20px}
-    .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
-  }
-
-  /* ===== v5: home =====
-     The wordmark is the link people reach for; the nav item is the one they
-     can see. Both go to the landing page. ===== */
-  .home-link{color:inherit;text-decoration:none;border-radius:4px}
-  .home-link:hover{opacity:.82}
-  .hometab{white-space:nowrap}
-
-  /* ===== v6: honest data states + freshness =====
-     The page used to paint a built-in sample first and keep it whenever
-     data.json failed or had no games. Now it paints a neutral skeleton, then
-     exactly one of: the live slate, a real empty state, or an error with a
-     retry. The sample only appears behind ?demo=1, labelled as demo data. ===== */
-  [hidden]{display:none!important}
-  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .slate-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .slate-meta .fresh{min-height:0}
-  .state-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:38px 28px;text-align:center}
-  .state-card h3{font:700 18px/1.35 Sora,Ubuntu,-apple-system,sans-serif;color:var(--ink);margin-bottom:8px}
-  .state-card p{font-size:14px;line-height:1.65;color:var(--body2);max-width:60ch;margin:0 auto}
-  .state-card.err{border-color:rgba(251,191,36,.38)}
-  .retry-btn{margin-top:18px;appearance:none;cursor:pointer;min-height:40px;padding:0 22px;border-radius:22px;border:1px solid rgba(34,211,238,.5);background:rgba(34,211,238,.12);color:#67e8f9;font:700 13px/1 Ubuntu,-apple-system,sans-serif;letter-spacing:.3px}
-  .retry-btn:hover{background:rgba(34,211,238,.2)}
-  .skel{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px}
-  .skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);animation:skel 1.5s ease-in-out infinite}
-  @keyframes skel{to{transform:translateX(100%)}}
-  .skel-row{height:84px}
-  .skel-card{height:108px;border-radius:var(--radius)}
-  .demo-flag{display:flex;align-items:center;gap:10px;border:1px dashed rgba(251,191,36,.55);background:rgba(251,191,36,.08);color:#fcd34d;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:20px}
-  .demo-flag b{letter-spacing:.8px;text-transform:uppercase;font-size:11.5px}
-  .summary-strip:empty{display:none}
-  .brief-card.is-warn .brief-head .pulse{background:#fbbf24;box-shadow:0 0 8px #fbbf24;animation:none}
-  @media(max-width:680px){.slate-meta{align-items:flex-start}}
-
-  /* ===== v6: Free → PRO path =====
-     One compact card per page pointing at THAT sport's Desk, with a member
-     log in. It sits beside The Optimizer card after the board, so the board
-     comes first. Orange stays reserved for PRO / The Optimizer. ===== */
-  .cta-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;margin-top:30px}
-  .cta-row>*{margin:0!important}
-  .cta-row .kx-card{align-content:center}
-  .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;background:linear-gradient(120deg,#252A35,var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px}
-  .pro-card .px-main{flex:1 1 300px;min-width:0}
-  .pro-card .px-k{font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .pro-card .px-t{font-size:14px;line-height:1.55;color:#dde5f5;margin-top:4px}
-  .pro-card .px-t b{color:#fff}
-  .pro-card .px-s{font-size:12px;color:#A7B0C4;margin-top:4px}
-  .pro-card .px-btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .pro-card .px-go{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border-radius:22px;background:#F08A3C;color:#1B1206;font-size:13px;font-weight:800;letter-spacing:.3px;text-decoration:none;white-space:nowrap}
-  .pro-card .px-go:hover{filter:brightness(1.06)}
-  .pro-card .px-login{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.25);color:#C7CEDC;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
-  .pro-card .px-login:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-
-  /* ===== v6: keyboard, screen readers, touch =====
-     Info tips: the CSS-only bubble was hover-only and hidden ≤680px; a single
-     JS-positioned #tipbox now opens on hover, focus or tap. Icons keep their
-     15px look with a 40px hit area. ===== */
-  .tip::after,.tip::before{content:none!important;display:none!important}
-  .tip{cursor:pointer;border-radius:8px}
-  .info-i{position:relative}
-  .info-i::before{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%)}
-  #tipbox{position:fixed;z-index:300;left:0;top:0;max-width:300px;background:#1F2430;color:#E6EAF2;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:10px 12px;font:500 12.5px/1.55 Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.1px;text-transform:none;text-align:left;white-space:normal}
-  [role="button"][data-game]{cursor:pointer}
-  [role="button"][data-game]:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
-  .m-close{display:inline-flex;align-items:center;justify-content:center}
-  .m-close:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
-
-  /* ===== v6: contrast + phone ergonomics =====
-     Small secondary text was #8E97AD on #323A4A (3.9:1); #A7B0C4 clears 4.5:1
-     on every card and header surface. Text on orange buttons is #1B1206 (7.4:1,
-     was white at 2.5:1). On phones every tab/chip/button is at least 40px tall. ===== */
-  :root{--muted:#A7B0C4;--faint:#A7B0C4}
-  .b-teams .at,.hero-teams .at,.wxc-teams .at{color:#8E97AD}
-  .brand .tagline,nav button{color:#A7B0C4}
-  .m-head .meta{color:#A7B0C4!important}
-  .kx-btn,.kx-btn:hover{color:#1B1206!important}
-  .kx-card .kx-go,.kx-card .kx-go:hover{color:#1B1206}
-  .kx-card .kx-s{color:#A7B0C4}
-  select{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%23C7CEDC"/></svg>')!important;background-repeat:no-repeat!important;background-position:right 12px center!important;padding-right:32px!important}
-  @media(max-width:680px),(pointer:coarse){
-    .sport-tabs a{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
-    nav button{min-height:40px}
-    select{min-height:40px}
-    .kx-btn{min-height:40px}
-    .kx-card .kx-go{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
-    .m-close{width:40px;height:40px}
-  }
-  @media(max-width:680px){
-    .summary-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-bottom:22px}
-    .sum-card{padding:14px 14px!important}
-    .sum-card .k{font-size:10.5px;letter-spacing:.8px}
-    .sum-card .v{font-size:15px!important;line-height:1.3}
-    .sum-card .s{font-size:12px}
-    .scene-card{height:220px}
-  }
-  @media(max-width:359px){.summary-strip{grid-template-columns:1fr!important}}
-
-  /* phone board rows: teams + time on one line, weather beside the badge (PPD /
-     Delay likely / Wind game stay visible), then impact and the O/U lean */
-  @media(max-width:680px){
-    .b-row{grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"match time" "wx badge" "imp imp" "ou ou";gap:10px 12px!important;padding:15px 16px!important}
-    .b-row>.b-match{grid-area:match}
-    .b-row>.b-time{grid-area:time;text-align:right;align-self:start}
-    .b-row>.b-wx{grid-area:wx}
-    .b-row>.b-badge{grid-area:badge;display:block!important;align-self:center;text-align:right}
-    .b-row>.b-imp,.b-row>.b-pts{grid-area:imp}
-    .b-row>.b-ou{grid-area:ou}
-  }
-  /* selected conference chip reads as selected (it was navy-on-card) */
-  .conf-chips button.on{background:rgba(34,211,238,.14);border-color:rgba(34,211,238,.55);color:#67e8f9}
-  .sortwrap select{padding-top:7px;padding-bottom:7px}
-  @media(max-width:680px),(pointer:coarse){
-    .conf-chips button{min-height:40px;padding-top:0;padding-bottom:0}
-    .mx-toggle button{min-height:40px}
-  }
-
-  /* ===== v6: reduced motion =====
-     Honour the OS setting: no CSS animation or transition, no smooth
-     scrolling, the radar logo's SMIL sweep is paused (see script) and the 3D
-     scenes stop orbiting and render still frames. ===== */
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
-    html{scroll-behavior:auto!important}
-    .brief-head .pulse{animation:none!important}
-    .skel::after{animation:none!important;display:none}
-    .b-row:hover{transform:none}
-  }
-</style>
-<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../assets/dr.js?v=a7b89034" defer></script>
+<script src="../assets/feeds.js?v=a7b89034" defer></script>
+<script src="../assets/cfb.js?v=a7b89034" defer></script>
 </head>
 <body>
-<header>
-  <div class="header-inner">
-    <div class="brand-row">
-      <div class="brand">
-        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
-          <defs><linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
-            <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/><stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
-          </linearGradient></defs>
-          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
-          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
-          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
-          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
-          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
-          <g><path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
-          <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
-          <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
-          <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#22c55e"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
-          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
-        </svg><a class="home-link" href="/" aria-label="DFSRADAR home">DFS<span class="brand-rad">RADAR</span></a><span class="sport">CFB</span></h1>
-        <div class="tagline">College football weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
-        <div class="sport-tabs">
-          <a class="hometab" href="/">← Home</a><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a class="on" href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="protab" href="/pro/cfb/">★ PRO</a>
-        </div>
-      </div>
-      <div class="slate-meta">
-        <div class="date-chip" id="date-chip">Loading this week's slate…</div>
-        <div class="fresh" id="fresh" hidden></div>
-      </div>
-    </div>
-    <nav><button type="button" class="active" data-view="slate" aria-pressed="true">This Week</button><button type="button" data-view="method" aria-pressed="false">How It Works</button></nav>
-  </div>
-  <a class="kx-btn" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=header&utm_campaign=cfb" target="_blank" rel="noopener">⚡ The Optimizer</a>
-</header>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>College football weather</span><span class="faint">·</span><span id="wk">This week</span></div>
+    <h1 class="ph__title" id="h1">Every stadium's forecast, every game</h1>
+    <p class="ph__lede" id="lede">Loading this week's forecasts…</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="stale" class="mt24" hidden></div>
 
-<main>
-
-  <div class="demo-flag" id="demo-flag" role="note" hidden><b>Demo data</b> A built-in sample slate for design work — none of these games, forecasts or numbers are live.</div>
-
-  <div class="brief-card" id="brief-card" style="display:none">
-    <div class="brief-head"><span class="pulse"></span><span id="brief-label">This week's read — live from the radar</span><span class="tip" data-tip="Auto-generated from this week's data on every build — cold, wind, and rain risks straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
-    <div class="brief-body" id="brief-body"></div>
-  </div>
-
-
-
-  <section class="view active" id="view-slate">
-    <div class="summary-strip" id="summary-strip"></div>
-    <div class="controls">
-      <h2>Weather impact vs each venue<span class="tip" data-tip="PTS shows how total scoring in historically similar weather at that venue compares to the venue's own average (Power 4 venues, 2010–2025, era-adjusted). O/U hit rates are measured against each past game's REAL closing total — the actual lines that existed."><span class="info-i">i</span></span></h2>
-      <div class="conf-chips" id="conf-chips" role="group" aria-label="Conference">
-        <button type="button" data-conf="P4" class="on" aria-pressed="true">Power 4</button>
-        <button type="button" data-conf="SEC" aria-pressed="false">SEC</button>
-        <button type="button" data-conf="Big Ten" aria-pressed="false">Big Ten</button>
-        <button type="button" data-conf="Big 12" aria-pressed="false">Big 12</button>
-        <button type="button" data-conf="ACC" aria-pressed="false">ACC</button>
-        <button type="button" data-conf="ALL" aria-pressed="false">All FBS</button>
-      </div>
-      <label class="sortwrap">SORT
-        <select id="sort-sel">
-          <option value="edge">Weather edge</option>
-          <option value="time">Kickoff time</option>
-          <option value="wind">Wind</option>
-          <option value="rain">Rain %</option>
-          <option value="cold">Temperature (coldest)</option>
-          <option value="total">Closing total</option>
-        </select>
-      </label>
-    </div>
-    <div class="edge-strip" id="edge-strip"></div>
-    <div class="board" id="board"></div>
+  <section class="sec" id="watch-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">Weather watch</h2>
+      <p class="sec__sub">Wind, rain and temperature strong enough to change how these games are played — Power 4 first.</p></div></div>
+    <div class="watch" id="watch"></div>
   </section>
 
-  <section class="view" id="view-method" style="display:none">
-    <div class="m-sec" style="max-width:860px;margin:0 auto">
-      <h5>Real games. Real weather. Real closing totals.</h5>
-      <p style="font-size:14px;line-height:1.7;color:var(--body2)">For every FBS game inside the forecast window, we take the kickoff forecast at that stadium — temperature, wind, and rain chances — and, at <b>Power 4 home venues</b>, find every game played there in similar conditions since 2010. Then we report what actually happened: total points, and how often those games went over or under <b>their own real closing totals</b>. Scoring environments drift from season to season — Power 4 venues have run several points a game higher in some years than others for reasons that have nothing to do with weather — so older seasons are adjusted onto today's environment before they are averaged, and an era gap isn't mistaken for a weather effect. Domes are weather-neutral and flagged as such. Games at venues outside the Power 4 history set still show the full kickoff forecast and delay outlook. Rebuilt automatically every morning as forecasts sharpen toward kickoff.</p>
-    </div>
+  <section class="sec" id="feature-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">The games to watch</h2><p class="sec__sub">Full forecasts for the games the weather touches most.</p></div></div>
+    <div class="grid g2" id="feature"></div>
   </section>
 
-  <div class="cta-row">
-    <aside class="pro-card" id="pro-card" aria-label="DFSRADAR PRO CFB Desk">
-      <div class="px-main"><div class="px-k" id="pro-card-k">★ PRO · CFB Desk</div>
-      <div class="px-t" id="pro-card-txt">Every game's offensive-line vs defensive-line weight mismatch, paired with kickoff weather for rushing-prop leans.</div>
-      <div class="px-s">$15/mo, every sport included · free with DFS Kitchen All-Access · graded in public</div></div>
-      <div class="px-btns"><a class="px-go" href="/pro/cfb/">See the CFB Desk →</a><a class="px-login" href="/pro/cfb/#login">Member log in</a></div>
-    </aside>
-    <div class="kx-card">
-      <div><div class="kx-k">⚡ Found your edge?</div>
-      <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
-      <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
-      <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=cfb" target="_blank" rel="noopener">Build lineups →</a>
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">All games</h2><p class="sec__sub">Tap a game for the hour-by-hour forecast and what similar weather has done at that stadium.</p></div></div>
+    <div class="toolbar">
+      <div class="seg-scroll"><div class="seg" id="filters" role="group" aria-label="Filter games"></div></div>
+      <span class="grow"></span>
+      <input class="search" id="q" type="search" placeholder="Find a team" aria-label="Find a team">
     </div>
-  </div>
+    <div id="days"><div class="skel"></div></div>
+  </section>
+
+  <section class="band" id="props-band">
+    <div class="wrap" style="padding:0">
+      <div class="sec__h"><div><div class="ph__eyebrow" style="margin-bottom:8px">Weather → props</div>
+        <h2 class="sec__title">The trench board</h2>
+        <p class="sec__sub">College rushing props, built from each offensive line against the defensive front it faces — the signal almost nobody else is pricing.</p></div>
+        <a class="btn btn--cyan" href="../props/cfb/">Open CFB props</a></div>
+      <div id="props-note"></div>
+    </div>
+  </section>
 </main>
-
-<div class="overlay" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title"></div></div>
-
-<footer class="site-foot">
-  <nav class="fnav" aria-label="DFSRADAR"><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/" aria-current="page">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="f-pro" href="/pro/">PRO</a><a href="/record/">Record</a><a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=cfb" target="_blank" rel="noopener">DFS Kitchen</a></nav>
-  <p>DFSRADAR · College football weather edges for DFS · part of The DFS Kitchen family.</p>
-  <p class="f-rg">Weather-adjusted insights are informational, not betting advice. <b>21+.</b> If you or someone you know has a gambling problem, call <a href="tel:+18004262537">1-800-GAMBLER</a>.</p>
-</footer>
+<footer id="dr-foot" class="dr-foot"></footer>
 
 <script>
-/* DEMO DATA — used ONLY with ?demo=1 (design work) and always labelled "Demo
-   data" on the page. The live page never falls back to it. */
-const SAMPLE = {generated:"preview", league:{pts:56.0,n:6842}, counts:{severe:0,elevated:2,watch:1,none:1,indoor:1}, brief:"Coldest kickoff: 27° for Ohio State @ Michigan. Wind watch: 19 mph for Kansas State @ Iowa State at Jack Trice Stadium. No serious rain threats on the Power 4 slate. 1 game indoors — weather-neutral.",
-games:[
- {id:"s1", away:"Ohio State", home:"Michigan", conf:"Big Ten", p4:true, stadium:"Michigan Stadium", day:"Sat Nov 28", time:"12:00 PM ET", sortTime:"1",
-  temp:27, dew:18, wind:14, windLabel:"14 mph wind", sky:"Overcast", skyIcon:"☁️", dome:false,
-  rain:15, rh:60, pres:1017, sample:26, pts:-9, ptsGm:44.3, ptsStad:48.7,
-  ou:{over:31, under:65, push:4, n:26}, total:45.5, note:"±8° temp, ±6 mph wind",
-  windFx:{rating:"MEDIUM", pct10:-6}, delay:{level:"clear", pct:15},
-  hourly:[{lab:"11 AM",c:"☁️",t:28,w:12,rain:10,rh:58},{lab:"12 PM",fp:true,c:"☁️",t:27,w:14,rain:15,rh:60},{lab:"1 PM",c:"☁️",t:28,w:15,rain:16,rh:61},{lab:"2 PM",c:"⛅",t:29,w:13,rain:12,rh:59},{lab:"3 PM",c:"⛅",t:29,w:12,rain:8,rh:57}],
-  edge:{score:8.1,level:"elevated"}, feels:18, fcs:false, venueN:312,
-  metrics:[{k:"pts",label:"SCORING",n:26,cur:44.3,lgAvg:56.0,vnAvg:48.7,lgPct:-21,vnPct:-9},{k:"pa",label:"PASSING YDS",n:26,cur:388,lgAvg:461,vnAvg:437,lgPct:-16,vnPct:-11},{k:"ru",label:"RUSHING YDS",n:26,cur:352,lgAvg:330,vnAvg:341,lgPct:7,vnPct:3},{k:"cp",label:"COMPLETION %",n:26,cur:55.1,lgAvg:60.0,vnAvg:58.4,lgPct:-8,vnPct:-6},{k:"to",label:"TURNOVERS",n:26,cur:3.6,lgAvg:3.0,vnAvg:3.1,lgPct:20,vnPct:16},{k:"fl",label:"FUMBLES",n:26,cur:1.7,lgAvg:1.3,vnAvg:1.3,lgPct:31,vnPct:31}],
-  matches:[{d:"20231125",t:24,w:12,pts:54,line:45.5,res:"over"},{d:"20221126",t:30,w:16,pts:68,line:56.5,res:"over"},{d:"20191130",t:29,w:13,pts:83,line:55.5,res:"over"}]},
- {id:"s2", away:"Kansas State", home:"Iowa State", conf:"Big 12", p4:true, stadium:"Jack Trice Stadium", day:"Sat Nov 28", time:"3:30 PM ET", sortTime:"2",
-  temp:38, dew:26, wind:19, windLabel:"19 mph wind", sky:"Partly cloudy", skyIcon:"⛅", dome:false,
-  rain:6, rh:47, pres:1021, sample:14, pts:-13, ptsGm:41.0, ptsStad:47.1,
-  ou:{over:29, under:64, push:7, n:14}, total:44.5, note:"±8° temp, ±6 mph wind",
-  windFx:{rating:"HIGH", pct10:-10}, delay:{level:"clear", pct:6},
-  hourly:[{lab:"2 PM",c:"⛅",t:40,w:17,rain:4,rh:44},{lab:"3 PM",fp:true,c:"⛅",t:38,w:19,rain:6,rh:47},{lab:"4 PM",c:"⛅",t:37,w:19,rain:6,rh:49},{lab:"5 PM",c:"🌙",t:35,w:17,rain:5,rh:53},{lab:"6 PM",c:"🌙",t:33,w:15,rain:4,rh:56}],
-  edge:{score:13.9,level:"elevated"}, feels:28, fcs:false, venueN:41,
-  metrics:[{k:"pts",label:"SCORING",n:14,cur:41.0,lgAvg:56.0,vnAvg:47.1,lgPct:-27,vnPct:-13},{k:"pa",label:"PASSING YDS",n:14,cur:352,lgAvg:461,vnAvg:430,lgPct:-24,vnPct:-18},{k:"ru",label:"RUSHING YDS",n:14,cur:349,lgAvg:330,vnAvg:335,lgPct:6,vnPct:4},{k:"cp",label:"COMPLETION %",n:14,cur:53.8,lgAvg:60.0,vnAvg:59.1,lgPct:-10,vnPct:-9},{k:"to",label:"TURNOVERS",n:14,cur:3.9,lgAvg:3.0,vnAvg:3.2,lgPct:30,vnPct:22},{k:"fl",label:"FUMBLES",n:14,cur:1.9,lgAvg:1.3,vnAvg:1.4,lgPct:46,vnPct:36}],
-  matches:[{d:"20241130",t:35,w:21,pts:37,line:44.5,res:"under"},{d:"20221029",t:42,w:18,pts:45,line:47.5,res:"under"}]},
- {id:"s3", away:"Vanderbilt", home:"Syracuse", conf:"ACC", p4:true, stadium:"JMA Wireless Dome", day:"Sat Nov 28", time:"7:30 PM ET", sortTime:"3",
-  temp:70, dew:50, wind:0, windLabel:"ROOF/DOME", sky:"Indoor", skyIcon:"🏟️", dome:true,
-  rain:null, rh:null, pres:null, sample:44, pts:0, ptsGm:52.4, ptsStad:52.4,
-  ou:{over:52, under:44, push:4, n:41}, total:55.5, note:"indoor games (domed venue)",
-  windFx:null, delay:null, hourly:null, matches:[{d:"20241123",t:70,w:0,pts:59,line:54.5,res:"over"}]}
-]};
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FC = F.cfb, esc = D.esc;
+  D.shell({ section: "weather", sport: "cfb" });
+  var S = { d: null, filter: "all", q: "" };
+  var FILTERS = [["all", "All games"], ["p4", "Power 4"], ["watch", "Weather watch"], ["wind", "Wind 12+"], ["rain", "Rain"]];
 
-/*3D-ENGINE*/
-/* ==================================================================
-   3D STADIUM ENGINE — stylized college bowl + live weather
-   (same visual language as the MLB park engine: one weather-tinted
-   hue, drag orbit, wind streamlines, rain)
-================================================================== */
-/* ---------- three.js on demand ----------
-   Only the game dialog uses 3D, so three.js is fetched the first time a game
-   is opened (never render-blocking). If it can't load, or WebGL is off, the
-   3D card is removed instead of leaving an empty box. */
-const THREE_SRC = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-const RM = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : {matches:false};
-let threeP = null, threeDead = false, fieldToken = 0;
-function loadThree(){
-  if(window.THREE) return Promise.resolve(window.THREE);
-  if(threeDead) return Promise.reject(new Error("three.js unavailable"));
-  if(!threeP) threeP = new Promise((resolve, reject)=>{
-    const sc = document.createElement("script");
-    let settled = false;
-    const done = (ok, err)=>{ if(settled) return; settled = true; clearTimeout(timer); if(ok) resolve(window.THREE); else { threeP = null; reject(err); } };
-    const timer = setTimeout(()=>done(false, new Error("three.js timed out")), 12000);
-    sc.src = THREE_SRC; sc.async = true;
-    sc.onload = ()=>{ if(window.THREE) done(true); else { threeDead = true; done(false, new Error("three.js missing")); } };
-    sc.onerror = ()=>{ threeDead = true; done(false, new Error("three.js failed to load")); };
-    document.head.appendChild(sc);
+  function inFilter(g, f, ids) {
+    if (S.q && (g.away + " " + g.home).toLowerCase().indexOf(S.q) < 0) return false;
+    if (f === "all") return true;
+    if (f === "p4") return !!g.p4;
+    if (g.dome) return false;
+    if (f === "watch") return ids[g.id];
+    if (f === "wind") return g.wind >= 12;
+    if (f === "rain") return (g.rain || 0) >= 30;
+    return true;
+  }
+  function renderAll() {
+    var d = S.d, ids = {};
+    FC.watch(d).forEach(function (w) { ids[w.id] = true; });
+    var list = d.games.filter(function (g) { return inFilter(g, S.filter, ids); }).sort(function (a, b) { return String(a.sortTime).localeCompare(String(b.sortTime)); });
+    var days = [], by = {};
+    list.forEach(function (g) { var k = g.day || ""; if (!by[k]) { by[k] = []; days.push(k); } by[k].push(g); });
+    document.getElementById("days").innerHTML = list.length ? days.map(function (k) {
+      return '<div class="label" style="margin:26px 0 12px">' + esc(k) + " · " + D.plural(by[k].length, "game") + '</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Game</th><th class="num">Kickoff</th><th class="num">Temp</th><th class="num">Wind</th><th class="num">Rain</th><th class="num">Weather</th></tr></thead><tbody>' +
+        by[k].map(C.row).join("") + "</tbody></table></div>";
+    }).join("") : '<div class="empty card"><h3>No games match</h3></div>';
+    document.getElementById("filters").innerHTML = FILTERS.map(function (f) {
+      var n = d.games.filter(function (g) { return inFilter(g, f[0], ids); }).length;
+      if (f[0] !== "all" && !n) return "";
+      return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + ' <span class="ct">' + n + "</span></button>";
+    }).join("");
+  }
+  function openGame(id, push) {
+    var g = S.d && S.d.games.filter(function (x) { return x.id === id; })[0];
+    if (!g) return;
+    var root = D.sheet.open(g.away + " at " + g.home + " · " + g.day, C.detail(g, { d: S.d }), function () { C.dispose(); D.setHash("g", null); });
+    C.afterDetail(root, g);
+    if (push) D.setHash("g", id);
+  }
+  function route() { var id = D.hashParam("g"); if (id) openGame(id, false); else D.sheet.close(true); }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("[data-open],[data-f],[data-jump]");
+    if (!t) return;
+    if (t.hasAttribute("data-f")) { S.filter = t.getAttribute("data-f"); renderAll(); return; }
+    e.preventDefault();
+    openGame(t.getAttribute("data-open") || t.getAttribute("data-jump"), true);
   });
-  return threeP;
-}
-function compass(d){const P=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];return P[Math.round(((d%360)+360)%360/22.5)%16];}
-let field3D=null;
-function destroyField3D(){
-  if(!field3D) return;
-  cancelAnimationFrame(field3D.raf);
-  field3D.scene.traverse(o=>{
-    if(o.geometry) o.geometry.dispose();
-    const m=Array.isArray(o.material)?o.material:(o.material?[o.material]:[]);
-    m.forEach(x=>{ if(x.map) x.map.dispose(); x.dispose(); });
-  });
-  field3D.renderer.dispose(); field3D=null;
-}
-function ezLabel(txt, fg){
-  const cv=document.createElement("canvas"); cv.width=512; cv.height=128;
-  const cx=cv.getContext("2d");
-  cx.font="800 88px -apple-system,Segoe UI,Arial"; cx.textAlign="center"; cx.textBaseline="middle";
-  cx.fillStyle=fg; cx.fillText(txt.toUpperCase().slice(0,12),256,70);
-  return new THREE.CanvasTexture(cv);
-}
-function initField3D(g, canvas){
-  if(typeof THREE==="undefined") return false;
-  destroyField3D();
-  const W=canvas.clientWidth||780, H=canvas.clientHeight||340;
-  let renderer;
-  try{ renderer=new THREE.WebGLRenderer({canvas, antialias:true}); }catch(e){ return false; }   // WebGL unavailable
-  let dirty=true;          // reduced-motion mode renders only when something changed
-  renderer.setSize(W,H,false);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-  const scene=new THREE.Scene();
-  const night=(g.kickHour!=null? (g.kickHour>=19||g.kickHour<6) : true);
-  const dome=!!g.dome;
-  const rainy=!dome&&(g.rain||0)>=45;
-  let hue,sat;
-  /* same palette anchoring as the MLB park: theme hue at low saturation, with
-     weather nudging toward the accent orange (hot) or radar cyan (cold). */
-  if(dome){hue=0.625;sat=0.07;}
-  else if(rainy){hue=0.58;sat=0.12;}
-  else if(g.temp>=88){hue=0.075;sat=0.26;}
-  else if(g.temp<=45){hue=0.525;sat=0.24;}
-  else {hue=0.625;sat=0.17;}
-  const LT=dome?{bg:0.145,apron:0.235,turf:0.29,stripe:0.33,stand:0.195,deck:0.25}
-          :night?{bg:0.135,apron:0.215,turf:0.265,stripe:0.30,stand:0.175,deck:0.225}
-                :{bg:0.175,apron:0.285,turf:0.345,stripe:0.385,stand:0.235,deck:0.28};
-  const L=l=>new THREE.Color().setHSL(hue,sat,Math.max(0.04,l));
-  /* The frame is always the radar cyan-slate; only the field carries weather. */
-  const SKY=new THREE.Color().setHSL(0.545,0.30,dome?0.115:(night?0.105:0.145));
-  scene.background=SKY;
-  scene.fog=new THREE.Fog(SKY,900,1900);
-  const M=c=>new THREE.MeshBasicMaterial({color:c});
-  /* field: 160 wide (53.3yd) x 360 long (100yd + two 10yd endzones), +z toward camera */
-  const FW=160, FL=300, EZ=30;
-  const apron=new THREE.Mesh(new THREE.PlaneGeometry(FW+120, FL+2*EZ+120), M(L(LT.apron)));
-  apron.rotation.x=-Math.PI/2; apron.position.y=-0.15; scene.add(apron);
-  /* turf in alternating 10-yd mow stripes */
-  for(let i=0;i<10;i++){
-    const st=new THREE.Mesh(new THREE.PlaneGeometry(FW, FL/10), M(L(i%2?LT.turf:LT.stripe)));
-    st.rotation.x=-Math.PI/2; st.position.set(0,0.05,-FL/2+FL/20+i*FL/10); scene.add(st);
-  }
-  /* endzones in team colors (away far, home near) + wordmarks */
-  const teamCol=(c,fb)=>{ try{ return new THREE.Color(c||fb); }catch(e){ return new THREE.Color(fb); } };
-  const az=teamCol(g.awayColor,"#3A4356"), hz=teamCol(g.homeColor,"#22c55e");
-  [[-FL/2-EZ/2, az, g.awayAb||g.away],[FL/2+EZ/2, hz, g.homeAb||g.home]].forEach(([z,col,txt],i)=>{
-    const dk=col.clone(); dk.multiplyScalar(night?0.55:0.75);
-    const ez=new THREE.Mesh(new THREE.PlaneGeometry(FW,EZ), M(dk));
-    ez.rotation.x=-Math.PI/2; ez.position.set(0,0.07,z); scene.add(ez);
-    const lbl=new THREE.Mesh(new THREE.PlaneGeometry(FW*0.7,EZ*0.62),
-      new THREE.MeshBasicMaterial({map:ezLabel(txt,"#f4f6fa"), transparent:true, depthWrite:false}));
-    lbl.rotation.x=-Math.PI/2; lbl.rotation.z=i===0?Math.PI:0; lbl.position.set(0,0.12,z); scene.add(lbl);
-  });
-  /* yard lines every 5 yds + goal lines */
-  for(let y=0;y<=20;y++){
-    const z=-FL/2+y*(FL/20);
-    const major=y%2===0;
-    const ln=new THREE.Mesh(new THREE.PlaneGeometry(FW, major?1.1:0.7), M(0xf4f6fa));
-    ln.rotation.x=-Math.PI/2; ln.position.set(0,0.1,z);
-    ln.material.transparent=true; ln.material.opacity=major?0.95:0.55;
-    scene.add(ln);
-  }
-  /* midfield logo (home) — texture if it loads, skip on failure */
-  if(g.homeLogo){
-    new THREE.TextureLoader().load(g.homeLogo.replace(/^http:/,"https:"),tex=>{
-      const lg=new THREE.Mesh(new THREE.PlaneGeometry(64,64),
-        new THREE.MeshBasicMaterial({map:tex,transparent:true,opacity:0.92,depthWrite:false}));
-      lg.rotation.x=-Math.PI/2; lg.position.set(0,0.14,0); scene.add(lg); dirty=true;
-    },undefined,()=>{});
-  }
-  /* white perimeter wall */
-  const wallM=new THREE.MeshBasicMaterial({color:0xf4f6fa,side:THREE.DoubleSide});
-  const mkWall=(w,d,x,z,ry)=>{ const m=new THREE.Mesh(new THREE.PlaneGeometry(w,4),wallM);
-    m.position.set(x,2,z); m.rotation.y=ry; scene.add(m); };
-  const PX=FW/2+22, PZ=FL/2+EZ+22;
-  mkWall(PZ*2,0,-PX,0,Math.PI/2); mkWall(PZ*2,0,PX,0,Math.PI/2);
-  mkWall(PX*2,0,0,-PZ,0); mkWall(PX*2,0,0,PZ,0);
-  /* grandstands — sloped monochrome decks on all four sides, taller on sidelines */
-  const standM=M(L(LT.stand)), deckM=M(L(LT.deck));
-  function stand(len, depth, hgt, x, z, ry){
-    const geo=new THREE.BufferGeometry();
-    const hd=depth, v=[
-      -len/2,0,0,  len/2,0,0,  len/2,hgt,-hd,  -len/2,hgt,-hd,   // sloped seating face
-      -len/2,hgt,-hd, len/2,hgt,-hd, len/2,hgt-6,-hd-10, -len/2,hgt-6,-hd-10 // top deck lip
-    ];
-    geo.setAttribute("position",new THREE.Float32BufferAttribute(v,3));
-    geo.setIndex([0,1,2, 0,2,3, 4,5,6, 4,6,7]);
-    geo.computeVertexNormals();
-    const m=new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:deckM.color,side:THREE.DoubleSide}));
-    m.position.set(x,0.5,z); m.rotation.y=ry; scene.add(m);
-    /* top rim line — catches the eye like the MLB wall cap */
-    const rim=new THREE.Mesh(new THREE.BoxGeometry(len,0.8,1.2), M(L(LT.stand+0.10)));
-    rim.position.set(x-Math.sin(ry)*hd, hgt+0.4, z-((ry===0)?hd:(ry===Math.PI)?-hd:0));
-    if(ry===Math.PI/2) rim.position.set(x-hd, hgt+0.4, z);
-    if(ry===-Math.PI/2) rim.position.set(x+hd, hgt+0.4, z);
-    rim.rotation.y=ry; scene.add(rim);
-  }
-  stand(PZ*2-8, 60, 52, -PX-4, 0, Math.PI/2);
-  stand(PZ*2-8, 60, 52,  PX+4, 0, -Math.PI/2);
-  stand(PX*2-8, 46, 34, 0, -PZ-4, 0);
-  stand(PX*2-8, 46, 34, 0,  PZ+4, Math.PI);
-  /* goal posts */
-  [[-FL/2-EZ],[FL/2+EZ]].forEach(([z])=>{
-    const gp=new THREE.Group();
-    const post=new THREE.Mesh(new THREE.CylinderGeometry(0.8,0.8,10,8),M(0xffd94a));
-    post.position.y=5; gp.add(post);
-    const bar=new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,18.5,8),M(0xffd94a));
-    bar.rotation.z=Math.PI/2; bar.position.y=10; gp.add(bar);
-    [-9.25,9.25].forEach(x=>{ const up=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,20,8),M(0xffd94a));
-      up.position.set(x,20,0); gp.add(up); });
-    gp.position.set(0,0,z); scene.add(gp);
-  });
-  /* floodlights at night */
-  if(night&&!dome){
-    [[-PX-18,-PZ-12],[PX+18,-PZ-12],[-PX-18,PZ+12],[PX+18,PZ+12]].forEach(([x,z])=>{
-      const pole=new THREE.Mesh(new THREE.CylinderGeometry(1,1.4,88,8),M(L(0.22)));
-      pole.position.set(x,44,z); scene.add(pole);
-      const head=new THREE.Mesh(new THREE.BoxGeometry(16,7,2.5),new THREE.MeshBasicMaterial({color:0xf7f9ff}));
-      head.position.set(x,90,z); head.lookAt(0,0,0); scene.add(head);
-    });
-  }
-  /* dome roof */
-  if(dome){
-    const roof=new THREE.Mesh(new THREE.SphereGeometry(430,36,18,0,Math.PI*2,0,Math.PI/2),
-      new THREE.MeshBasicMaterial({color:0xe8ecf2,transparent:true,opacity:0.10,side:THREE.DoubleSide}));
-    roof.scale.y=0.42; roof.position.set(0,2,0); scene.add(roof);
-  }
-  /* wind streamlines (compass-oriented: flow direction = from-dir + 180°) */
-  let wind=null;
-  if(!dome&&g.wind>2){
-    const N=120,TAIL=22;
-    const base=(((g.windDir!=null?g.windDir:0)+180)%360)*Math.PI/180;
-    const spawn=()=>new THREE.Vector3((Math.random()-0.5)*760,8+Math.random()*130,(Math.random()-0.5)*760);
-    const parts=[];
-    for(let i=0;i<N;i++){const p=spawn();parts.push({p,age:Math.random()*3,life:3+Math.random()*2.6,hist:Array.from({length:TAIL},()=>p.clone())});}
-    const vCount=N*TAIL*2, geo=new THREE.BufferGeometry();
-    geo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(vCount*3),3));
-    const colArr=new Float32Array(vCount*4), GREY=new THREE.Color(0xa8b2c1);
-    for(let i=0;i<vCount;i++){colArr[i*4]=GREY.r;colArr[i*4+1]=GREY.g;colArr[i*4+2]=GREY.b;colArr[i*4+3]=0;}
-    geo.setAttribute("color",new THREE.BufferAttribute(colArr,4));
-    const idx=[];
-    for(let p=0;p<N;p++){const o=p*TAIL*2;for(let i=0;i<TAIL-1;i++){const a2=o+i*2;idx.push(a2,a2+1,a2+2,a2+1,a2+3,a2+2);}}
-    geo.setIndex(idx);
-    wind={mesh:new THREE.Mesh(geo,new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:0.7,side:THREE.DoubleSide,depthWrite:false})),
-          parts,tail:TAIL,base,spawn,t:0,speed:46+g.wind*6.5,w:2.8};
-    scene.add(wind.mesh);
-  }
-  /* rain */
-  let rain=null;
-  if(rainy){
-    const RN=Math.round(90+Math.min(1,(g.rain-45)/45)*130);
-    const a=(((g.windDir!=null?g.windDir:0)+180)%360)*Math.PI/180;
-    const tilt=Math.min(0.45,(g.wind||0)*0.03);
-    const vel=new THREE.Vector3(Math.sin(a)*tilt,-1,-Math.cos(a)*tilt).normalize();
-    const drops=[];
-    for(let i=0;i<RN;i++)drops.push(new THREE.Vector3((Math.random()-0.5)*720,Math.random()*185,(Math.random()-0.5)*720));
-    const rgeo=new THREE.BufferGeometry();
-    rgeo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(RN*6),3));
-    rain={mesh:new THREE.LineSegments(rgeo,new THREE.LineBasicMaterial({color:new THREE.Color().setHSL(hue,Math.min(0.25,sat),night?0.55:0.72),transparent:true,opacity:0.38})),
-          drops,vel,len:9,speed:330};
-    scene.add(rain.mesh);
-  }
-  /* camera orbit */
-  const cam=new THREE.PerspectiveCamera(36,W/H,1,3200);
-  const target=new THREE.Vector3(0,4,0);
-  let theta=0.5,el=0.55,dragging=false,lastX=0,lastY=0,idleT=0;
-  canvas.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
-  canvas.addEventListener("pointermove",e=>{if(!dragging)return;
-    theta-=(e.clientX-lastX)*0.006;el=Math.min(1.15,Math.max(0.22,el+(e.clientY-lastY)*0.004));
-    lastX=e.clientX;lastY=e.clientY;idleT=0;dirty=true;});
-  canvas.addEventListener("pointerup",()=>dragging=false);
-  canvas.addEventListener("pointercancel",()=>dragging=false);
-  const clock=new THREE.Clock();
-  const inst={renderer,scene,raf:0}; field3D=inst;
-  function advance(dt){
-    if(wind){
-      wind.t+=dt;
-      const pos=wind.mesh.geometry.attributes.position.array;
-      const col=wind.mesh.geometry.attributes.color.array;
-      const fbPerpX=Math.cos(wind.base),fbPerpZ=Math.sin(wind.base);
-      wind.parts.forEach((pt,pi)=>{
-        pt.age+=dt;
-        const curl=0.42*Math.sin(pt.p.x*0.010+wind.t*0.5)+0.30*Math.sin(pt.p.z*0.0065-wind.t*0.33);
-        const a2=wind.base+curl;
-        pt.p.x+=Math.sin(a2)*wind.speed*dt;
-        pt.p.z+=-Math.cos(a2)*wind.speed*dt;
-        const out=Math.abs(pt.p.x)>420||Math.abs(pt.p.z)>420;
-        if(pt.age>pt.life||out){pt.p.copy(wind.spawn());pt.age=0;pt.life=2.2+Math.random()*2.4;pt.hist.forEach(h2=>h2.copy(pt.p));}
-        const tailv=pt.hist.pop();tailv.copy(pt.p);pt.hist.unshift(tailv);
-        const env=Math.max(0,Math.min(1,pt.age/0.35,(pt.life-pt.age)/0.55));
-        const o=pi*wind.tail*2;
-        for(let ti=0;ti<wind.tail;ti++){
-          const P=pt.hist[ti],Q=pt.hist[ti+1]||pt.hist[ti-1]||P;
-          let dx=P.x-Q.x,dz=P.z-Q.z;const len=Math.hypot(dx,dz);
-          let px,pz;if(len>0.0001){px=-dz/len;pz=dx/len;}else{px=fbPerpX;pz=fbPerpZ;}
-          const u=ti/(wind.tail-1),half=wind.w*0.5*Math.pow(1-u,0.65);
-          const v=(o+ti*2)*3;
-          pos[v]=P.x+px*half;pos[v+1]=P.y;pos[v+2]=P.z+pz*half;
-          pos[v+3]=P.x-px*half;pos[v+4]=P.y;pos[v+5]=P.z-pz*half;
-          const a4=(o+ti*2)*4,alpha=env*(0.9-0.35*u);
-          col[a4+3]=alpha;col[a4+7]=alpha;
-        }
-      });
-      wind.mesh.geometry.attributes.position.needsUpdate=true;
-      wind.mesh.geometry.attributes.color.needsUpdate=true;
-    }
-    if(rain){
-      const pos=rain.mesh.geometry.attributes.position.array;
-      rain.drops.forEach((d,i)=>{
-        d.addScaledVector(rain.vel,rain.speed*dt);
-        if(d.y<0){d.set((Math.random()-0.5)*720,180+Math.random()*20,(Math.random()-0.5)*720);}
-        const v=i*6;
-        pos[v]=d.x;pos[v+1]=d.y;pos[v+2]=d.z;
-        pos[v+3]=d.x-rain.vel.x*rain.len;pos[v+4]=d.y-rain.vel.y*rain.len;pos[v+5]=d.z-rain.vel.z*rain.len;
-      });
-      rain.mesh.geometry.attributes.position.needsUpdate=true;
-    }
-  }
-  function draw(){
-    const r=560;
-    cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r,target.y+Math.sin(el)*r,target.z+Math.cos(theta)*Math.cos(el)*r);
-    cam.lookAt(target);
-    renderer.render(scene,cam);
-  }
-  /* reduced motion: no auto-rotation, wind and rain warmed up into a still frame */
-  const still=RM.matches;
-  if(still) for(let i=0;i<90;i++) advance(1/60);
-  (function tick(){
-    inst.raf=requestAnimationFrame(tick);
-    const dt=Math.min(clock.getDelta(),0.05);
-    if(still){ if(dirty){ dirty=false; draw(); } return; }
-    idleT+=dt;
-    if(!dragging&&idleT>2.5)theta+=dt*0.07;
-    advance(dt);
-    draw();
-  })();
-  return true;
-}
+  document.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.matches && e.target.matches("tr[data-open]")) openGame(e.target.getAttribute("data-open"), true); });
+  document.getElementById("q").addEventListener("input", function (e) { S.q = e.target.value.trim().toLowerCase(); renderAll(); });
+  window.addEventListener("popstate", route);
 
-const MIN_METRIC_N = 12;   // mirrors MIN_METRIC_N in scripts/cfb/weekly_build.py
-let DATA = {games:[]}, LIVE = null, FILTER = "P4", SORTBY = "edge", MX_MODE = "fbs";
-const DEMO = /[?&]demo=1(?:&|$)/.test(location.search);
-const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-/* ---------- PRO teaser (Trench board) ----------
-   Only shown when teaser.json is live and describes the SAME week as the
-   free board: never when it's stale or paused (week:null, targets:0), and
-   never for a different week than the games below. */
-let TEASER = null;
-function boardWeek(){
-  const n = {};
-  (DATA.games||[]).forEach(g=>{ if(g.week!=null) n[g.week] = (n[g.week]||0) + 1; });
-  const ws = Object.keys(n).sort((a,b)=>n[b]-n[a]);
-  return ws.length ? +ws[0] : null;
-}
-function teaserOK(t){
-  if(!t || !LIVE || DEMO) return false;
-  if(t.stale || t.paused || (t.status && t.status.ok === false)) return false;
-  if(t.week == null || !((t.targets||0) + (t.fades||0))) return false;
-  const w = boardWeek();
-  return w != null && +t.week === w;
-}
-const PRO_TXT = document.getElementById("pro-card-txt").innerHTML;
-function renderTeaser(){
-  const t = TEASER, k = document.getElementById("pro-card-k"), txt = document.getElementById("pro-card-txt");
-  if(!teaserOK(t)){ k.textContent = "★ PRO · CFB Desk"; txt.innerHTML = PRO_TXT; return; }
-  const bits = [];
-  if(t.stacked) bits.push(`<b>${+t.stacked} STACKED RUSH</b> (trench edge × wind)`);
-  bits.push(`<b>${+t.targets||0} rushing-prop targets</b>`);
-  if(t.fades) bits.push(`<b>${+t.fades} fades</b>`);
-  k.textContent = `★ PRO · Week ${+t.week} Trench board`;
-  txt.innerHTML = `${bits.join(" · ")} — with the backs to play and the fronts to avoid.`;
-}
-async function loadTeaser(){
-  TEASER = null;
-  try{ const r = await fetch("/cfb/teaser.json?_=" + Date.now(), {cache: "no-store"}); if(r.ok) TEASER = await r.json(); }catch(e){}
-  renderTeaser();
-}
-const pct = v => (v>0?"+":"")+v+"%";
-const cls = v => v>0?"pos":(v<0?"neg":"neu");
-function edgeBadge(g){
-  if(g.dome) return `<span class="edge-badge edge-neutral">Dome</span>`;
-  if(g.delay && (g.delay.level==="likely"||g.delay.level==="severe")) return `<span class="edge-badge edge-rain">${g.delay.level==="severe"?"PPD risk":"Delay likely"}</span>`;
-  if(g.wind>=15) return `<span class="edge-badge edge-wind">Wind game</span>`;
-  if(g.temp<=25) return `<span class="edge-badge edge-cold">Deep freeze</span>`;
-  const bb=(g.badges||[])[0];
-  if(bb) return `<span class="edge-badge edge-neutral" title="${bb.txt}">${bb.k==="LONG HAUL"?"✈️ Long haul":"⛰️ Altitude"}</span>`;
-  return "";
-}
-function gauge(g, size=48){
-  const r=17, c=2*Math.PI*r;
-  const o=g.ou.over/100*c, p=g.ou.push/100*c, u=g.ou.under/100*c;
-  const center = g.total!=null ? g.total.toFixed(1) : "—";
-  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46" aria-hidden="true" focusable="false">
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#22d3ee" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#454E61" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#93b4d8" stroke-width="6" stroke-dasharray="${u} ${c}" stroke-dashoffset="${-(o+p)}" transform="rotate(-90 23 23)"/>
-    <text x="23" y="27" text-anchor="middle" font-size="11" font-weight="800" fill="#EFF1F7">${center}</text>
-  </svg>`;
-}
-function leanTxt(g){
-  if(!g.p4) return `<b class="neu">FORECAST ONLY</b>`;
-  if(!g.ou.n) return `<b class="neu">NO LINE DATA</b>`;
-  return g.ou.over>g.ou.under+3 ? `<b style="color:var(--gold-deep)">OVER ${g.ou.over}%</b>`
-    : g.ou.under>g.ou.over+3 ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
-    : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
-}
-function rowHTML(g){
-  const imp = (g.dome||!g.p4||g.pts==null) ? `<span class="pill neu">PTS —</span>` : `<span class="pill ${cls(g.pts)}">PTS ${pct(g.pts)}</span>`;
-  const wx = g.dome ? `<div class="w">dome<br>weather sealed out</div>`
-    : `<div class="w">${g.windLabel}<br>${(g.rain!=null&&g.rain>=15)?`Rain ${g.rain}% · `:""}dew ${g.dew}°</div>`;
-  const sub = g.p4 ? `vs real closing totals · ${g.ou.n||g.sample} gms` : `no venue history yet`;
-  return `<div class="b-row lv-${edgeLevel(g)}" data-game="${g.id}" role="button" tabindex="0">
-    <div class="b-time">${g.day}<span>${g.time.replace(" ET","")} ET</span></div>
-    <div class="b-match"><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}<span class="conf-tag">${g.conf}</span></div><div class="b-stad">${g.stadium}${(g.badges||[]).map(x=>` · ${x.k==="LONG HAUL"?"✈️":"⛰️"} ${x.txt}`).join("")}</div></div>
-    <div class="b-wx"><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div>
-    <div class="b-pts">${imp}</div>
-    <div class="b-ou">${gauge(g)}<div class="txt">${leanTxt(g)}<span>${sub}</span></div></div>
-    <div class="b-badge">${edgeBadge(g)}</div>
-  </div>`;
-}
-const EDGE_ORDER={severe:0,elevated:1,watch:2,none:3,indoor:4};
-function edgeLevel(g){ return (g.edge&&g.edge.level) || (g.dome?"indoor":"none"); }
-function edgeScore(g){ return (g.edge&&g.edge.score) || 0; }
-function visibleGames(){
-  let list = DATA.games;
-  if(FILTER==="P4") list = list.filter(g=>g.conf!=="Other");
-  else if(FILTER!=="ALL") list = list.filter(g=>g.conf===FILTER);
-  const by={
-    edge:(a,b)=> (EDGE_ORDER[edgeLevel(a)]-EDGE_ORDER[edgeLevel(b)]) || (edgeScore(b)-edgeScore(a)) || a.sortTime.localeCompare(b.sortTime),
-    time:(a,b)=> a.sortTime.localeCompare(b.sortTime),
-    wind:(a,b)=> (b.wind||0)-(a.wind||0),
-    rain:(a,b)=> ((b.rain||0)-(a.rain||0)),
-    cold:(a,b)=> (a.temp)-(b.temp),
-    total:(a,b)=> ((b.total==null?-1:b.total)-(a.total==null?-1:a.total)),
-  };
-  return [...list].sort(by[SORTBY]||by.edge);
-}
-function renderEdgeStrip(){
-  const el=document.getElementById("edge-strip");
-  if(!el) return;
-  const vis=visibleGames();
-  const c={severe:0,elevated:0,watch:0,none:0,indoor:0};
-  vis.forEach(g=>{ c[edgeLevel(g)]=(c[edgeLevel(g)]||0)+1; });
-  const LBL={severe:"severe",elevated:"elevated",watch:"watch",none:"no edge",indoor:"indoor"};
-  el.innerHTML=["severe","elevated","watch","none","indoor"]
-    .filter(k=>c[k])
-    .map(k=>`<span class="edge-chip ed-${k}"><i></i>${c[k]} ${LBL[k]}</span>`).join("");
-}
-function renderSummary(){
-  const vis = visibleGames();
-  const live = vis.filter(g=>!g.dome);
-  const hist = live.filter(g=>g.p4&&g.ou.n>=MIN_METRIC_N);
-  const el = document.getElementById("summary-strip");
-  if(!live.length){ el.innerHTML=""; return; }
-  const windy=[...live].sort((a,b)=>b.wind-a.wind)[0];
-  const cold=[...live].sort((a,b)=>a.temp-b.temp)[0];
-  const cards=[
-    {k:"Biggest wind game", v:`${windy.away} @ ${windy.home} <span class="neg">${windy.wind} mph</span>`, s:windy.stadium, id:windy.id},
-    {k:"Coldest kickoff", v:`${cold.away} @ ${cold.home} <span class="neg">${cold.temp}°</span>`, s:cold.sky.toLowerCase(), id:cold.id}];
-  if(hist.length){
-    const under=[...hist].sort((a,b)=>b.ou.under-a.ou.under)[0];
-    const over=[...hist].sort((a,b)=>b.ou.over-a.ou.over)[0];
-    cards.push({k:"Strongest under history", v:`${under.away} @ ${under.home} <span class="neg">${under.ou.under}%</span>`, s:"vs real closing totals in similar weather", id:under.id},
-               {k:"Strongest over history", v:`${over.away} @ ${over.home} <span class="pos">${over.ou.over}%</span>`, s:"vs real closing totals in similar weather", id:over.id});
-  }
-  el.innerHTML = cards.map(c=>`<div class="sum-card" data-game="${c.id}" role="button" tabindex="0"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s}</div></div>`).join("");
-}
-function hourlyStrip(g){
-  if(g.dome || !g.hourly || !g.hourly.length) return "";
-  return `<div class="hourly">${g.hourly.map(h=>`
-    <div class="hr-cell ${h.fp?"hr-fp":""}">
-      <div class="hr-lab">${h.lab||""}${h.fp?" · kickoff":""}</div>
-      <div class="hr-t">${h.c?h.c+" ":""}${h.t}°</div>
-      <div class="hr-w">${h.w} mph wind</div>
-      <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
-    </div>`).join("")}<div class="hr-note">Hour by hour at the stadium · local time</div></div>`;
-}
-function delayChip(g){
-  if(g.dome || !g.delay) return "";
-  const M={clear:["No delay concern","dl-clear"],watch:["Worth monitoring","dl-watch"],likely:["Delay likely","dl-likely"],severe:["Postponement risk","dl-severe"]};
-  const [txt,c]=M[g.delay.level]||M.clear;
-  return `<div class="delay-chip ${c}">DELAY OUTLOOK: <b>${txt}</b> — peak ${g.delay.pct}% rain in the game window</div>`;
-}
-function windFxChip(g){
-  if(g.dome || !g.windFx) return "";
-  const f=g.windFx;
-  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS VENUE: <b>${f.rating}</b> — 10 mph of wind moves scoring ~${Math.abs(f.pct10)}% here historically<span class="tip" data-tip="Measured from every game at this venue since 2010: the relationship between wind speed and total points. Exposed venues rate high; sheltered bowls rate low."><span class="info-i">i</span></span></div>`;
-}
-/* Six weather-impact metrics, each against two baselines. When the matched
-   sample is too thin we show the count instead of inventing a percentage. */
-function metricGrid(g){
-  const ms=(g.metrics||[]).filter(m=>m.cur!=null);
-  if(!ms.length) return "";
-  const mode = MX_MODE;
-  const cells = ms.map(m=>{
-    const p = mode==="venue" ? m.vnPct : m.lgPct;
-    const base = mode==="venue" ? m.vnAvg : m.lgAvg;
-    const k = p==null ? "neu" : cls(p);
-    const val = p==null ? "—" : pct(p);
-    const sub = base==null ? `${m.cur}` :
-      `<b>${m.cur}</b> vs ${base} ${mode==="venue"?"venue":"FBS"} avg`;
-    return `<div class="mx ${k}"><div class="k">${m.label}</div>
-      <div class="v">${val}</div><div class="s">${sub}</div></div>`;
-  }).join("");
-  // Two different blanks, and conflating them would be a lie: either the matched
-  // sample is below MIN_METRIC_N, or that baseline simply has no data on record.
-  const n = ms[0].n;
-  const blank = ms.some(m=>(mode==="venue"?m.vnPct:m.lgPct)==null);
-  const note = !blank ? ""
-    : n < MIN_METRIC_N
-      ? `<div class="mx-note">Only ${n} past game${n===1?"":"s"} match this weather — too few for a reliable %</div>`
-      : `<div class="mx-note">No ${mode==="venue"?"venue":"FBS"} baseline on record for the blank rows</div>`;
-  return `<div class="m-sec">
-    <div class="mx-head"><h5 style="margin:0">Weather impact in similar weather</h5>
-      <div class="mx-toggle" id="mx-toggle">
-        <button type="button" data-mx="fbs" class="${mode==="fbs"?"on":""}" aria-pressed="${mode==="fbs"}">FBS AVG</button>
-        <button type="button" data-mx="venue" class="${mode==="venue"?"on":""}" aria-pressed="${mode==="venue"}">THIS VENUE</button>
-      </div></div>
-    <div class="mx-grid">${cells}</div>${note}
-    ${g.fcs?`<div class="fcs-note">Non-conference vs an FCS opponent — weather typically moves these games less, and blowouts distort totals. Treat the read as softer.</div>`:""}
-  </div>`;
-}
-function openModal(g){
-  const modal=document.getElementById("modal");
-  const body = g.matches.map(m=>{
-    const ds=`${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
-    return `<tr><td>${ds}</td><td>${m.t}°</td><td>${m.w} mph</td><td>${m.line!=null?m.line:"—"}</td><td><b>${m.pts}</b></td><td>${m.res?`<span class="res-chip ${m.res}">${m.res.toUpperCase()}</span>`:"—"}</td></tr>`;
-  }).join("");
-  // A P4 venue with no matched games (a rebuilt stadium, or weather nothing
-  // in its history resembles) has nothing to average — say so rather than
-  // rendering zeros as if they were a measurement.
-  const noHist = !g.p4 || !g.sample;
-  const histSecs = noHist ? `
-      <div class="m-sec"><h5>Venue history</h5>
-        <div class="hist-note" style="margin-top:0">${!g.p4
-          ? "This venue isn't in the Power 4 history set, so no similar-weather scoring history is shown"
-          : "No past game at this venue matches these conditions, so there's no similar-weather scoring history to show"} — the kickoff forecast and delay outlook above are live and real.${g.total!=null?` Today's total: ${g.total.toFixed(1)}.`:""}</div>
-      </div>` : `
-      <div class="m-sec"><h5>Scoring in this weather at ${g.stadium}</h5>
-        <div class="m-tiles">
-          <div class="m-tile ${(g.dome||g.pts==null)?"neu":cls(g.pts)}"><div class="t-lab">Total points</div><div class="t-val">${(g.dome||g.pts==null)?"—":pct(g.pts)}</div>
-            <div class="t-sub">${g.ptsGm} pts/gm in these conditions · ${g.ptsStad} venue avg${(!g.dome&&g.pts==null)?` · only ${g.sample} matching game${g.sample===1?"":"s"}, too few for a %`:""}</div></div>
-        </div>
-      </div>
-      ${metricGrid(g)}
-      <div class="m-sec"><h5>What actually happened — vs real closing totals<span class="tip" data-tip="Every matched game's final score against the closing total that was actually on the board that day. No estimates — these are the real lines."><span class="info-i">i</span></span></h5>
-        <div class="hit-summary">
-          <div class="hit-box over"><div class="n">${g.ou.over}%</div><div class="l">went over</div></div>
-          <div class="hit-box under"><div class="n">${g.ou.under}%</div><div class="l">went under</div></div>
-          <div class="hit-box push"><div class="n">${g.ou.push}%</div><div class="l">pushed</div></div>
-        </div>
-        <table><thead><tr><th>Date</th><th>Temp</th><th>Wind</th><th>Closing</th><th>Final</th><th>Result</th></tr></thead>
-        <tbody>${body}</tbody></table>
-        <div class="hist-note">${g.note?"Match window: "+g.note+". ":""}${g.total!=null?`Today's total: ${g.total.toFixed(1)} (book median).`:"No total posted yet."}${(g.ou.n&&g.ou.n<MIN_METRIC_N)?` Only ${g.ou.n} matched game${g.ou.n===1?"":"s"} had a closing total on record — read these rates as thin.`:""}</div>
-      </div>`;
-  modal.innerHTML=`
-    <div class="m-head"><div><div class="teams" id="m-title">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
-      <div class="meta">${g.day} · ${g.time} · ${g.stadium} · ${g.conf}</div></div>
-      <button type="button" class="m-close" aria-label="Close game breakdown">✕</button></div>
-    <div class="m-body">
-      <div class="field3d-wrap"><canvas id="field3d" hidden></canvas>
-        <div class="f3d-load">Loading 3D view…</div>
-        <div class="f3d-hud"><div class="t">${g.stadium} · live view</div>
-          <div class="w">${g.dome?"Indoor — weather sealed out":`${g.wind} mph${g.windDir!=null?" from "+compass(g.windDir):""} · ${g.temp}°`}</div></div>
-        <div class="f3d-badge">${g.skyIcon} ${g.sky}</div>
-        <div class="f3d-hint">drag to look around</div></div>
-      <div class="m-sec"><h5>Kickoff forecast</h5>
-        <div class="m-cond">
-          <div class="wx-item"><div class="big">${g.temp}<sup>°F</sup></div><div class="lab">${g.dome?"indoor":"temp"}</div></div>
-          <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">wind</div></div>
-          ${(!g.dome&&g.rain!=null)?`<div class="wx-item"><div class="big">${g.rain}<sup>%</sup></div><div class="lab">rain chance</div></div>`:""}
-          ${(!g.dome&&g.rh!=null)?`<div class="wx-item"><div class="big">${g.rh}<sup>%</sup></div><div class="lab">humidity</div></div>`:""}
-          ${(!g.dome&&g.feels!=null&&Math.abs(g.feels-g.temp)>=3)?`<div class="wx-item"><div class="big">${g.feels}<sup>°F</sup></div><div class="lab">feels like</div></div>`:""}
-          <div style="margin-left:auto;text-align:right"><div style="font-weight:700;color:var(--gold)">${g.skyIcon} ${g.sky}</div>
-          <div style="font-size:12px;color:var(--muted)">${g.p4?`${g.sample} similar games`:"forecast only"}</div></div>
-        </div>
-        ${hourlyStrip(g)}${delayChip(g)}${windFxChip(g)}
-      </div>
-      ${histSecs}
-      <div class="kx-hook">⚡ Feed this edge into your lineups — <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=modal&utm_campaign=cfb" target="_blank" rel="noopener">try The Optimizer</a> · part of The DFS Kitchen</div>
-    </div>`;
-  document.getElementById("overlay").classList.add("open");
-  document.body.style.overflow="hidden";
-  modal.querySelector(".m-close").addEventListener("click", closeModal);
-  dialogOpened();
-  modal.querySelectorAll("#mx-toggle button").forEach(b=>{
-    b.addEventListener("click", ev=>{ ev.stopPropagation(); MX_MODE=b.dataset.mx; openModal(g);
-      const again = document.querySelector(`#mx-toggle [data-mx="${MX_MODE}"]`); if(again) again.focus(); });
-  });
-  const fw=modal.querySelector(".field3d-wrap"), token=++fieldToken;
-  loadThree().then(()=>{
-    if(token!==fieldToken || !document.getElementById("overlay").classList.contains("open")) return;
-    const cv=fw.querySelector("canvas"); cv.hidden=false;
-    if(initField3D(g, cv)) fw.classList.add("is-3d"); else fw.hidden=true;
-  }).catch(()=>{ if(token===fieldToken) fw.hidden=true; });
-}
-function closeModal(){ fieldToken++; destroyField3D(); document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; dialogClosed(); }
-document.getElementById("overlay").addEventListener("click", e=>{ if(e.target.id==="overlay") closeModal(); });
-/* ---------- dialog focus ----------
-   Open: remember what opened it, lock the page behind (inert), move focus to
-   the close button. Tab stays inside. Esc / close / backdrop: restore focus
-   to the row or card that opened it. */
-const DLG = {open:false, opener:null, key:null};
-const DLG_BG = ["body > header", "main", "footer.site-foot"];
-function dialogOpened(){
-  const md = document.getElementById("modal");
-  if(!DLG.open){
-    const a = document.activeElement;
-    DLG.opener = (a && a !== document.body && !md.contains(a)) ? a : null;
-    const host = DLG.opener && DLG.opener.closest ? DLG.opener.closest("[data-game]") : null;
-    DLG.key = host ? host.dataset.game : null;
-    DLG.open = true;
-    DLG_BG.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.inert = true; });
-  }
-  document.getElementById("overlay").scrollTop = 0;
-  const c = md.querySelector(".m-close"); if(c) c.focus({preventScroll:true});
-}
-function dialogClosed(){
-  if(!DLG.open) return;
-  DLG.open = false;
-  DLG_BG.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.inert = false; });
-  let el = DLG.opener;
-  if((!el || !document.contains(el)) && DLG.key)
-    el = document.querySelector(`[data-game="${DLG.key}"][tabindex="0"], button[data-game="${DLG.key}"]`);
-  DLG.opener = null; DLG.key = null;
-  if(el && el.focus) el.focus();
-}
-document.addEventListener("keydown", e=>{
-  if(!DLG.open) return;
-  if(e.key === "Escape"){ e.preventDefault(); closeModal(); return; }
-  if(e.key !== "Tab") return;
-  const md = document.getElementById("modal");
-  const f = [...md.querySelectorAll('a[href],button:not([disabled]),select,input,textarea,[tabindex="0"]')]
-    .filter(x=>x.getClientRects().length);
-  if(!f.length) return;
-  const first = f[0], last = f[f.length-1], a = document.activeElement;
-  if(e.shiftKey && (a === first || !md.contains(a))){ e.preventDefault(); last.focus(); }
-  else if(!e.shiftKey && (a === last || !md.contains(a))){ e.preventDefault(); first.focus(); }
-});
-/* game rows and summary cards are role="button": Enter / Space open them */
-document.addEventListener("keydown", e=>{
-  if(e.key !== "Enter" && e.key !== " ") return;
-  const t = e.target;
-  if(!t || !t.matches || !t.matches('[data-game][role="button"]')) return;
-  e.preventDefault(); t.click();
-});
-
-document.addEventListener("click", e=>{
-  const el=e.target.closest("[data-game]");
-  if(!el) return;
-  const g=DATA.games.find(x=>x.id===el.dataset.game);
-  if(g) openModal(g);
-});
-document.querySelectorAll("nav button").forEach(b=>{
-  b.addEventListener("click", ()=>{
-    document.querySelectorAll("nav button").forEach(x=>{ x.classList.remove("active"); x.setAttribute("aria-pressed","false"); });
-    b.classList.add("active"); b.setAttribute("aria-pressed","true");
-    document.getElementById("view-slate").style.display = b.dataset.view==="slate"?"":"none";
-    document.getElementById("view-method").style.display = b.dataset.view==="method"?"":"none";
-  });
-});
-(function(){
-  const sel=document.getElementById("sort-sel");
-  if(sel) sel.addEventListener("change", ()=>{ SORTBY=sel.value; renderAll(); });
-})();
-document.querySelectorAll("#conf-chips button").forEach(b=>{
-  b.addEventListener("click", e=>{
-    e.stopPropagation();
-    FILTER=b.dataset.conf;
-    document.querySelectorAll("#conf-chips button").forEach(x=>{ x.classList.toggle("on", x===b); x.setAttribute("aria-pressed", String(x===b)); });
-    renderAll();
-  });
-});
-/* ---------- data states ----------
-   loading (skeleton) → live | empty (season-aware) | error (retry). */
-const MAIN = document.querySelector("main");
-function setChip(html){ document.getElementById("date-chip").innerHTML = html; }
-function stateCard(title, body, retry){
-  return `<div class="state-card${retry?" err":""}" role="${retry?"alert":"status"}"><h3>${esc(title)}</h3>`
-    + (body?`<p>${esc(body)}</p>`:"")
-    + (retry?`<button type="button" class="retry-btn" data-retry>Try again</button>`:"") + `</div>`;
-}
-function todayET(){ return window.RadarFresh ? RadarFresh.todayET() : new Date(Date.now() - 4*36e5).toISOString().slice(0,10); }
-/* Empty-board copy follows the college football calendar — "Kickoff is
-   almost here" is only true in August. */
-function emptyCopy(d){
-  const t = todayET(), md = (+t.slice(5,7))*100 + (+t.slice(8,10));
-  const yrs = (d && d.seasons && d.seasons.length) ? `${d.seasons[0]}–${d.seasons[d.seasons.length-1]}, ` : "";
-  const hist = `The history engine stays loaded: ${yrs}every Power 4 venue, real closing totals.`;
-  if(md >= 801 && md <= 831) return {chip: "Preseason", title: "Kickoff is almost here",
-    body: `Games appear once they're inside the 8-day forecast window. ${hist}`};
-  if(md >= 121 && md < 801) return {chip: "Offseason", title: "The college football season is over",
-    body: `The radar returns in late August, as soon as the first games are inside the forecast window. ${hist}`};
-  return {chip: "No games in the window", title: "No games in the forecast window yet",
-    body: "Games appear once they're inside the 8-day forecast window — the board rebuilds every morning as forecasts sharpen."};
-}
-const FILTER_NAME = {P4: "Power 4", ALL: "FBS"};
-function niceStamp(text){
-  return window.RadarFresh ? String(text).replace(/(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2}) ET/g,
-    (m, t)=>{ const d = RadarFresh.parseET(t); return d ? RadarFresh.fmt(d, true) : m; }) : String(text);
-}
-function renderBrief(text){
-  const card = document.getElementById("brief-card");
-  if(!text){ card.style.display = "none"; return; }
-  document.getElementById("brief-body").innerHTML = esc(niceStamp(text)).replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
-  card.style.display = "";
-}
-function renderLoading(){
-  MAIN.setAttribute("aria-busy","true");
-  DATA = {games:[]};
-  document.getElementById("conf-chips").hidden = true;
-  document.querySelector(".sortwrap").hidden = true;
-  setChip("Loading this week's slate…");
-  document.getElementById("fresh").hidden = true;
-  renderBrief("");
-  TEASER = null; renderTeaser();
-  document.getElementById("edge-strip").innerHTML = "";
-  document.getElementById("summary-strip").innerHTML = '<div class="skel skel-card"></div>'.repeat(4);
-  document.getElementById("board").innerHTML = '<div class="skel skel-row"></div>'.repeat(5)
-    + '<span class="sr-only" role="status">Loading this week’s slate</span>';
-}
-function renderError(){
-  MAIN.removeAttribute("aria-busy");
-  DATA = {games:[]};
-  document.getElementById("conf-chips").hidden = true;
-  document.querySelector(".sortwrap").hidden = true;
-  setChip("Slate unavailable");
-  document.getElementById("fresh").hidden = true;
-  renderBrief("");
-  TEASER = null; renderTeaser();
-  document.getElementById("edge-strip").innerHTML = "";
-  document.getElementById("summary-strip").innerHTML = "";
-  document.getElementById("board").innerHTML = stateCard("We couldn't load this week's slate",
-    "The radar data didn't come through — usually a brief network hiccup. Nothing is shown until the real numbers load.", true);
-}
-function renderAll(){
-  MAIN.removeAttribute("aria-busy");
-  const vis = visibleGames(), all = DATA.games.length;
-  const wk = boardWeek();
-  document.getElementById("conf-chips").hidden = !all;          // nothing to filter or sort on an empty board
-  document.querySelector(".sortwrap").hidden = !all;
-  if(!all){
-    const c = emptyCopy(DATA);
-    setChip(c.chip);
-    document.getElementById("board").innerHTML = stateCard(c.title, c.body);
-  } else {
-    const fname = FILTER_NAME[FILTER] || FILTER;
-    setChip(`${DEMO ? "<b>Demo slate</b>" : (wk!=null ? `Week ${wk}` : "This week")} · <b>${vis.length}</b> ${esc(fname)} game${vis.length===1?"":"s"}`);
-    document.getElementById("board").innerHTML = vis.length ? vis.map(rowHTML).join("")
-      : stateCard(`No ${fname} games in the window`, `Pick another conference above — ${all} FBS game${all===1?" is":"s are"} on this week's board.`);
-  }
-  renderEdgeStrip();
-  renderSummary();
-  renderBrief(DATA.brief);
-}
-/* freshness chip (shared /assets/fresh.js) + the brief's live/stale cue */
-function applyFreshness(){
-  const el = document.getElementById("fresh");
-  if(!LIVE){ el.hidden = true; return; }
-  let warn = !!(LIVE.stale || (LIVE.status && LIVE.status.ok === false));
-  if(window.RadarFresh){
-    const a = RadarFresh.render(el, {built: LIVE.generated, stale: LIVE.stale, status: LIVE.status, maxAgeH: 36});
-    warn = warn || !!(a && a.level === "warn");
-    renderBrief(LIVE.brief);
-  }
-  document.getElementById("brief-card").classList.toggle("is-warn", warn);
-  document.getElementById("brief-label").textContent = warn ? "Latest read — from the radar" : "This week's read — live from the radar";
-}
-window.addEventListener("load", applyFreshness);   // fresh.js is deferred; re-apply once it has run
-async function load(){
-  if(DEMO){
-    document.getElementById("demo-flag").hidden = false;
-    document.getElementById("brief-label").textContent = "Demo read — sample data";
-    DATA = SAMPLE; renderAll(); return;
-  }
-  renderLoading();
-  let d = null;
-  try{
-    const r = await fetch("data.json?_=" + Date.now(), {cache: "no-store"});
-    if(!r.ok) throw new Error("HTTP " + r.status);
-    d = await r.json();
-    if(!d || !Array.isArray(d.games)) throw new Error("unexpected data.json");
-  }catch(e){ LIVE = null; renderError(); return; }
-  DATA = d; LIVE = d;
-  renderAll();
-  applyFreshness();
-  loadTeaser();
-}
-document.addEventListener("click", e=>{ if(e.target.closest("[data-retry]")) load(); });
-/* ---------- info tips: hover (mouse), keyboard focus and tap (touch) ----------
-   One positioned #tipbox serves every .tip (the old CSS bubble was hover-only
-   and hidden on phones). Enter/Space or a tap pins it; Esc, a second tap or a
-   tap elsewhere closes it. */
-(function(){
-  const box = document.createElement("div");
-  box.id = "tipbox"; box.setAttribute("role", "tooltip"); box.hidden = true;
-  document.body.appendChild(box);
-  let cur = null, pinned = false;
-  function prep(){
-    document.querySelectorAll(".tip:not([data-tipready])").forEach(t=>{
-      t.setAttribute("data-tipready", ""); t.tabIndex = 0;
-      t.setAttribute("role", "button"); t.setAttribute("aria-expanded", "false");
-      const i = t.querySelector(".info-i"); if(i) i.setAttribute("aria-hidden", "true");
-      const own = [...t.childNodes].filter(n=>!(n.classList && n.classList.contains("info-i"))).map(n=>n.textContent).join("").trim();
-      if(!own) t.setAttribute("aria-label", "More info");
-    });
-  }
-  function place(){
-    if(!cur) return;
-    const r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
-    box.style.maxWidth = Math.min(300, vw - 24) + "px";
-    const bw = box.offsetWidth, bh = box.offsetHeight;
-    let x = r.left + r.width/2 - bw/2; x = Math.max(12, Math.min(x, vw - bw - 12));
-    let y = r.top - bh - 10; if(y < 8) y = r.bottom + 10; if(y + bh > vh - 8) y = Math.max(8, vh - bh - 8);
-    box.style.left = Math.round(x) + "px"; box.style.top = Math.round(y) + "px";
-  }
-  function show(t, pin){
-    if(cur && cur !== t) hide();
-    cur = t; pinned = !!pin;
-    box.textContent = t.getAttribute("data-tip") || "";
-    box.hidden = false; place();
-    t.setAttribute("aria-describedby", "tipbox"); t.setAttribute("aria-expanded", "true");
-  }
-  function hide(){
-    if(cur){ cur.removeAttribute("aria-describedby"); cur.setAttribute("aria-expanded", "false"); }
-    cur = null; pinned = false; box.hidden = true;
-  }
-  const tipOf = el => (el && el.closest) ? el.closest(".tip") : null;
-  document.addEventListener("mouseover", e=>{ const t = tipOf(e.target); if(t && !pinned && t !== cur) show(t, false); });
-  document.addEventListener("mouseout", e=>{ const t = tipOf(e.target); if(t && t === cur && !pinned && !t.contains(e.relatedTarget)) hide(); });
-  document.addEventListener("focusin", e=>{ const t = tipOf(e.target); if(t){ if(t !== cur) show(t, false); } else if(cur && !pinned) hide(); });
-  document.addEventListener("focusout", e=>{ if(cur && e.target === cur && !pinned) hide(); });
-  document.addEventListener("click", e=>{
-    if(box.contains(e.target)){ e.preventDefault(); e.stopPropagation(); hide(); return; }
-    const t = tipOf(e.target);
-    if(t){ e.preventDefault(); e.stopPropagation(); if(t === cur && pinned) hide(); else show(t, true); return; }
-    if(pinned) hide();
-  }, true);
-  document.addEventListener("keydown", e=>{
-    const t = tipOf(e.target);
-    if(t && t === e.target && (e.key === "Enter" || e.key === " ")){
-      e.preventDefault(); e.stopPropagation();
-      if(t === cur && pinned) hide(); else show(t, true);
-      return;
+  Promise.all([D.get(FC.url), D.get(FC.proUrl)]).then(function (r) {
+    var d = r[0], pro = r[1];
+    if (!d || !d.games) { document.getElementById("lede").textContent = "This week's forecasts couldn't be loaded — refresh in a minute."; document.getElementById("days").innerHTML = ""; return; }
+    S.d = d;
+    var wk = d.games[0] && d.games[0].week;
+    document.getElementById("wk").textContent = wk ? "Week " + wk : "This week";
+    document.getElementById("h1").textContent = "Every stadium's forecast, all " + d.games.length + " games";
+    var f = D.fresh(document.getElementById("fresh"), { built: d.generated, stale: d.stale, status: d.status, maxAgeH: 30 });
+    if (f && f.level === "warn") {
+      var st = document.getElementById("stale"); st.hidden = false;
+      D.banner(st, f.text + " — forecasts may have shifted since.", "Our college data source (CollegeFootballData) stopped answering, so this week's slate hasn't rebuilt. Forecasts older than a day or two can miss a change in the weather — check back after the next refresh.");
     }
-    if(e.key === "Escape" && cur){ e.preventDefault(); e.stopImmediatePropagation(); hide(); }
-  }, true);
-  window.addEventListener("scroll", ()=>{ if(!cur) return; if(pinned) place(); else hide(); }, true);
-  window.addEventListener("resize", ()=>{ if(cur) hide(); });
-  new MutationObserver(prep).observe(document.body, {childList:true, subtree:true});
-  prep();
-})();
-/* reduced motion: pause the radar logo's SMIL sweep (held mid-sweep, both blips lit) */
-(function(){
-  if(!window.matchMedia) return;
-  const mq = matchMedia("(prefers-reduced-motion: reduce)");
-  function apply(){
-    document.querySelectorAll("svg.radar-logo").forEach(svg=>{
-      try{ if(mq.matches){ svg.setCurrentTime(0.6); svg.pauseAnimations(); } else svg.unpauseAnimations(); }catch(e){}
-    });
-  }
-  apply();
-  if(mq.addEventListener) mq.addEventListener("change", apply); else if(mq.addListener) mq.addListener(apply);
-})();
-load();
+    var c = d.counts || {};
+    var open = d.games.filter(function (g) { return !g.dome; });
+    var windy = open.filter(function (g) { return g.wind >= 16; }).length, wet = open.filter(function (g) { return g.rain >= 50; }).length;
+    document.getElementById("lede").textContent = D.plural(d.games.length, "game") + " inside the forecast window. " +
+      (windy ? D.plural(windy, "game") + " with 16+ mph wind" : "No big wind") + ", " + (wet ? wet + " with a better-than-even chance of rain" : "no serious rain threats") + "." +
+      (c.indoor ? " " + D.plural(c.indoor, "game") + " indoors." : "");
+    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + D.plural(d.games.length, "game") + "</span>" +
+      (c.severe ? '<span class="chip chip--bad">' + c.severe + " severe</span>" : "") + (c.elevated ? '<span class="chip chip--warn">' + c.elevated + " elevated</span>" : "");
+    var w = FC.watch(d);
+    document.getElementById("watch-sec").hidden = !w.length;
+    document.getElementById("watch").innerHTML = w.slice(0, 8).map(function (x) {
+      return '<a href="#g=' + esc(x.id) + '" data-jump="' + esc(x.id) + '"><span class="ic ' + (x.tone || "") + '" aria-hidden="true">' + x.icon + "</span>" +
+        '<span><span class="w" style="display:block;margin:0 0 4px">' + esc(x.game + " · " + x.when) + '</span><span class="t" style="display:block">' + esc(x.title) + "</span>" +
+        '<span class="s" style="display:block">' + esc(x.sub) + (x.also && x.also.length ? " Also: " + esc(x.also.join(" · ")) + "." : "") + "</span></span></a>";
+    }).join("");
+    var feat = w.slice(0, 4).map(function (x) { return d.games.filter(function (g) { return g.id === x.id; })[0]; }).filter(Boolean);
+    document.getElementById("feature-sec").hidden = !feat.length;
+    document.getElementById("feature").innerHTML = feat.map(C.card).join("");
+    var pn = document.getElementById("props-note");
+    if (pro && (pro.paused || pro.stale)) pn.innerHTML = '<div class="note note--warn">' + D.IC.warn + "<div><b>The trench board is paused this week.</b> " + esc((pro.status && pro.status.reason) || "Our college data source isn't answering.") + " The record and the wind study are still up.</div></div>";
+    else if (pro && pro.leans && pro.leans.length) pn.innerHTML = '<div class="note note--cyan">' + D.IC.info + "<div><b>" + D.plural(pro.leans.length, "rushing lean") + "</b> on the board this week — the top one is free.</div></div>";
+    renderAll(); route();
+  });
+});
 </script>
 </body>
 </html>

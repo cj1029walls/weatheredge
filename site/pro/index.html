@@ -2,420 +2,137 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DFSRADAR PRO — The Desks</title>
-<meta name="description" content="DFSRADAR PRO, $15/mo: six desks — MLB home-run targets, NFL crews and spots, the CFB Trench Edge, PGA course and wave boards, NASCAR track boards and one cross-sport props feed — each graded in public.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DFSRADAR PRO — Every Prop, Every Board, Every Sport · $15/mo</title>
+<meta name="description" content="DFSRADAR PRO opens every prop on every board — MLB, NFL, college football, golf and NASCAR — with our number beside the books&#x27; and the research behind it. $15/mo, cancel anytime.">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://dfsradar.com/pro/">
+<meta name="theme-color" content="#2E3240">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
-<meta property="og:title" content="DFSRADAR PRO — The Desks">
-<meta property="og:description" content="Six desks, one public record. MLB, NFL, CFB, PGA, NASCAR and a cross-sport props feed — $15/mo.">
-<meta property="og:image" content="https://dfsradar.com/og-pro.png">
+<meta property="og:title" content="DFSRADAR PRO — Every Prop, Every Board, Every Sport · $15/mo">
+<meta property="og:description" content="DFSRADAR PRO opens every prop on every board — MLB, NFL, college football, golf and NASCAR — with our number beside the books&#x27; and the research behind it. $15/mo, cancel anytime.">
 <meta property="og:url" content="https://dfsradar.com/pro/">
+<meta property="og:image" content="https://dfsradar.com/og-pro.png">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
-<!-- deferred: a slow or blocked login script must never hold up the page — the gate
-     shows "Checking your membership…" meanwhile and says so if it never arrives -->
-<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" defer></script>
-<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
-<style>
-  :root{
-    --bg:#2E3240; --panel:#323A4A; --panel2:#3C4455; --inset:#252A35;
-    --line:#454E61; --line-soft:rgba(255,255,255,.07);
-    --ink:#EFF1F7; --body:#C7CEDC; --dim:#8E97AD;
-    --radar:#22d3ee; --radar-soft:#67e8f9;
-    --accent:#F08A3C; --accent-soft:#FFA05A; --on-accent:#1B1206;
-    --good:#22c55e; --warn:#fbbf24;
-    --radius:16px;
-    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
-    --shadow-hi:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
-    --font:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --display:Sora,Ubuntu,-apple-system,BlinkMacSystemFont,sans-serif;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:var(--font);color:var(--body);font-size:16px;line-height:1.65;
-    background:var(--bg);
-    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
-    background-repeat:no-repeat;background-attachment:fixed;-webkit-font-smoothing:antialiased}
-  a{color:var(--radar-soft)}
-  /* .wrap owns the side gutter. Blocks that are also .wrap set only their top/bottom
-     padding, so the gutter survives on a phone (it used to be reset to 0 there). */
-  .wrap{max-width:1180px;margin:0 auto;padding-left:24px;padding-right:24px}
-
-  header{border-bottom:1px solid var(--line-soft);background:rgba(37,42,53,.6)}
-  .hrow{display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;padding-top:16px;padding-bottom:16px}
-  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);min-height:44px}
-  .logo .n{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.4px}
-  .logo .r{color:var(--radar)}
-  .pro-pill{font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:1.6px;
-    background:var(--accent);color:var(--on-accent);border-radius:7px;padding:4px 9px}
-  .hgap{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .hgap a{display:inline-flex;align-items:center;min-height:42px;color:var(--body);text-decoration:none;font-size:14px;padding:0 14px;
-    border-radius:10px;border:1px solid var(--line)}
-  .hgap a:hover{border-color:rgba(34,211,238,.5);color:var(--radar-soft)}
-  #member-bar{display:none;align-items:center;justify-content:flex-end;gap:2px;font-size:13px;color:var(--dim);
-    padding-top:2px;padding-bottom:6px}
-  #member-bar a{color:var(--radar-soft);font-weight:700;text-decoration:none}
-
-  .lede{padding-top:48px;padding-bottom:8px}
-  .lede h1{font-family:var(--display);font-weight:800;color:var(--ink);
-    font-size:clamp(27px,4vw,38px);line-height:1.12;letter-spacing:-1.1px;margin:0 0 14px;text-wrap:balance}
-  .lede p{font-size:17px;max-width:68ch;margin:0}
-
-  .desk-sec{padding-top:34px;padding-bottom:72px}
-  .desks{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-  @media (max-width:780px){.desks{grid-template-columns:1fr}}
-
-  .desk{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
-    border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 26px 22px;
-    text-decoration:none;color:inherit;transition:.15s}
-  .desk:hover{border-color:rgba(34,211,238,.45);box-shadow:var(--shadow-hi);transform:translateY(-1px)}
-  .d-top{display:flex;align-items:center;gap:11px;margin-bottom:6px}
-  .d-name{font-family:var(--display);font-weight:700;font-size:20px;color:var(--ink);letter-spacing:-.4px}
-  .d-state{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;
-    padding:4px 10px;border-radius:20px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
-  .d-state.live{color:var(--radar-soft);border-color:rgba(34,211,238,.45);background:rgba(34,211,238,.10)}
-  .d-state.warn{color:#fcd34d;border-color:rgba(251,191,36,.42);background:rgba(251,191,36,.10)}
-  .d-edge{font-size:15px;color:var(--body);margin:0 0 16px;max-width:52ch}
-  .tools{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
-  .tool{font-size:12.5px;color:var(--body);background:var(--inset);border:1px solid var(--line);
-    border-radius:8px;padding:5px 10px}
-  .d-foot{margin-top:auto;display:flex;align-items:flex-end;gap:12px;
-    border-top:1px solid var(--line-soft);padding-top:15px}
-  .d-meta{min-width:0;display:flex;flex-direction:column;gap:3px}
-  .rec,.upd{font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
-  .rec b{color:var(--ink);font-weight:700}
-  .rec .bar{color:var(--dim)}
-  .upd{display:flex;align-items:center;gap:7px}
-  .upd::before{content:"";flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#5b6477}
-  .upd.ok::before{background:var(--good);box-shadow:0 0 0 3px rgba(34,197,94,.16)}
-  .upd.warn{color:#fcd34d}
-  .upd.warn::before{background:var(--warn);box-shadow:0 0 0 3px rgba(251,191,36,.2)}
-  .upd:empty{display:none}
-  .go{margin-left:auto;font-size:13.5px;font-weight:700;color:var(--radar-soft);white-space:nowrap;padding-bottom:1px}
-
-  .note{margin-top:26px;font-size:13.5px;color:var(--dim);background:var(--inset);
-    border:1px solid var(--line);border-left:3px solid rgba(34,211,238,.6);
-    border-radius:12px;padding:16px 20px;max-width:78ch}
-  .note b{color:var(--body)}
-
-  /* ---- paywall: the public face of /pro/ ---- */
-  #paywall{display:none;max-width:760px;margin:48px auto 64px;background:var(--panel);
-    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:36px 36px 30px}
-  .pw-badge{display:inline-block;font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:2px;
-    background:var(--accent);color:var(--on-accent);border-radius:8px;padding:4px 12px;margin-bottom:14px}
-  #paywall h2{font-family:var(--display);font-weight:800;color:var(--ink);font-size:clamp(24px,3.4vw,30px);
-    line-height:1.15;letter-spacing:-.8px;margin:0 0 10px}
-  .pw-lede{font-size:16px;margin:0 0 18px;max-width:60ch}
-  .pw-price{font-family:var(--display);font-weight:800;color:var(--ink);font-size:40px;letter-spacing:-1px;margin:0 0 2px}
-  .pw-price span{font-family:var(--font);font-size:15px;font-weight:500;color:var(--dim);letter-spacing:0}
-  .pw-desks{list-style:none;margin:18px 0 24px;padding:0;display:grid;gap:10px}
-  .pw-desks li{display:grid;grid-template-columns:30px 1fr;gap:4px 10px;align-items:start;font-size:14.5px;line-height:1.55;
-    background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
-  .pw-desks .ic{font-size:18px;line-height:1.3}
-  .pw-desks b{color:var(--ink)}
-  .pw-btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  .btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font);cursor:pointer;
-    font-weight:700;font-size:15px;text-decoration:none;min-height:46px;padding:0 24px;border-radius:12px;border:1px solid transparent}
-  .btn-pro{background:var(--accent);color:var(--on-accent)} .btn-pro:hover{background:var(--accent-soft)}
-  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-  .btn-ghost:hover{border-color:rgba(34,211,238,.5);color:var(--radar-soft)}
-  .pw-kitchen{margin:18px 0 0;font-size:13.5px;color:var(--dim)}
-  .pw-kitchen a{color:var(--accent);font-weight:700;text-decoration:none}
-  .pw-kitchen a:hover{text-decoration:underline}
-  .pw-free{margin:8px 0 0;font-size:13.5px;color:var(--dim)}
-
-  footer{border-top:1px solid var(--line-soft);padding-top:28px;padding-bottom:44px;font-size:13px;color:var(--dim);text-align:center;line-height:1.75}
-  :focus-visible{outline:2px solid var(--radar);outline-offset:2px}
-  ::selection{background:rgba(34,211,238,.32);color:var(--ink)}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-
-  /* ===== v5: home =====
-     The wordmark is the link people reach for; the nav item is the one they
-     can see. Both go to the landing page. ===== */
-  .home-link{color:inherit;text-decoration:none;border-radius:4px}
-  .home-link:hover{opacity:.82}
-  .hometab{white-space:nowrap}
-
-  @media (max-width:640px){
-    .wrap{padding-left:16px;padding-right:16px}
-    .hrow{padding-top:12px;padding-bottom:12px}
-    .hgap{margin-left:0;width:100%}
-    .hgap a{flex:1 1 auto;justify-content:center}
-    .lede{padding-top:32px}
-    .lede p{font-size:16px}
-    .desk-sec{padding-top:26px;padding-bottom:48px}
-    .desk{padding:22px 20px 18px}
-    #paywall{margin:24px 16px 48px;padding:26px 20px 22px}
-    .pw-price{font-size:34px}
-    .pw-btns .btn{flex:1 1 auto}
-  }
-</style>
-<script src="/pro/gate.js"></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../assets/dr.js?v=a7b89034" defer></script>
+<script src="../assets/feeds.js?v=a7b89034" defer></script>
+<script src="../assets/props.js?v=a7b89034" defer></script>
+<script src="../assets/hub.js?v=a7b89034" defer></script>
 </head>
 <body>
+<header id="dr-top" class="dr-top"></header>
+<main class="wrap">
+  <section class="ph" id="member-view" hidden>
+    <div class="ph__eyebrow" style="color:var(--pro2)">DFSRADAR PRO · active</div>
+    <h1 class="ph__title">Your desks</h1>
+    <p class="ph__lede" id="member-line">Every board is open. Here's where to start today.</p>
+    <div class="grid g5 mt24" id="member-desks"></div>
+    <div class="row row--wrap mt24"><button class="btn btn--ghost ms-account" type="button">Manage account &amp; billing</button><button class="btn btn--ghost ms-logout" type="button">Log out</button></div>
+  </section>
 
-<header>
-  <div class="wrap hrow">
-    <a class="logo" href="/"><span class="n">DFS<span class="r">RADAR</span></span><span class="pro-pill">PRO</span></a>
-    <nav class="hgap" aria-label="Site">
-      <a class="hometab" href="/">← Home</a>
-      <a href="/mlb/">Free radars</a>
-      <a href="#login" class="ms-login" data-gate-show="loggedout unreachable" hidden>Log in</a>
-    </nav>
-  </div>
-  <div class="wrap" id="member-bar"><span id="member-email"></span> · <a href="#" class="ms-account" role="button">Account</a> · <a href="#" class="ms-logout" role="button">Log out</a></div>
-</header>
+  <section id="sales-view">
+    <div class="grid g2" style="align-items:center;gap:40px;padding-top:56px">
+      <div>
+        <div class="ph__eyebrow" style="color:var(--pro2)">DFSRADAR PRO</div>
+        <h1 style="font-size:clamp(32px,4.6vw,52px);line-height:1.06;letter-spacing:-.03em">Every prop on every board, with our number beside the books'.</h1>
+        <p class="ph__lede">The free side shows you each desk's top pick. PRO opens everything underneath it — every priced prop, the research that built it, and the tools to find your own — across MLB, NFL, college football, golf and NASCAR.</p>
+        <div class="gate-line mt16" data-gate-show="checking"><span class="spin" aria-hidden="true"></span>Checking your membership…</div>
+      </div>
+      <div class="card card--pad" style="padding:28px;border-color:var(--pro-line);background:linear-gradient(180deg,rgba(240,138,60,.08),rgba(240,138,60,0) 55%),var(--panel)">
+        <div class="label" style="color:var(--pro2)">Monthly</div>
+        <div class="row mt12" style="align-items:baseline;gap:8px"><span style="font:700 52px/1 var(--display);letter-spacing:-.03em">$15</span><span class="muted">per month</span></div>
+        <p class="small dim mt8">Cancel anytime from your account.</p>
+        <div class="stack mt24" style="font-size:14.5px">
+          <div class="row" style="gap:10px"><span class="good">✓</span>Every MLB home run and strikeout prop, ranked</div>
+          <div class="row" style="gap:10px"><span class="good">✓</span>NFL weather leans with every player's splits</div>
+          <div class="row" style="gap:10px"><span class="good">✓</span>The college trench board and wind study</div>
+          <div class="row" style="gap:10px"><span class="good">✓</span>Golf and NASCAR targets with the boards behind them</div>
+          <div class="row" style="gap:10px"><span class="good">✓</span>Umpires, game environments, intel and research tabs</div>
+        </div>
+        <div id="buy-box" class="mt24"></div>
+        <p class="small dim mt16">Already on <b>DFS Kitchen All-Access</b> ($60/mo)? PRO is included — just <a href="#login" class="ms-login">log in</a>.</p>
+      </div>
+    </div>
+  </section>
 
-<div class="wrap">
-  <div id="gate-status" class="gate-status" role="status" aria-live="polite"><div class="gate-box gate-checking"><span class="gate-spin" aria-hidden="true"></span><span><span class="gt">Checking your membership…</span><span class="gs">Your desks open as soon as your login is confirmed.</span></span></div></div>
-</div>
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">Today's free picks — the top of each board</h2><p class="sec__sub">What the free side sees. PRO sees every row beneath.</p></div><a class="sec__more" href="../props/">All props →</a></div>
+    <div class="grid g3" id="picks"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  </section>
 
-<div id="paywall">
-  <span class="pw-badge">DFSRADAR PRO</span>
-  <h2>Six desks. One public record.</h2>
-  <p class="pw-lede">The weather radars stay free for everyone. PRO adds the player-level desks on top — each built
-     around the edge that exists in its sport, with its calls archived before the games and graded in public.</p>
-  <div class="pw-price">$15<span> / month · every desk included</span></div>
-  <ul class="pw-desks">
-    <li><span class="ic">⚾</span><span><b>MLB</b> — tonight's home-run targets: our probability beside the books' median price, plus lineups, umpires and park factors.</span></li>
-    <li><span class="ic">🏈</span><span><b>NFL</b> — referee crews, travel and rest spots, and QB and kicker weather splits, priced where books post props.</span></li>
-    <li><span class="ic">🎓</span><span><b>CFB</b> — the Trench Edge: offensive-line vs defensive-line weight mismatches for rushing props, backtested over four seasons.</span></li>
-    <li><span class="ic">⛳</span><span><b>PGA</b> — course history, wind pedigree and the AM/PM wave draw for each week's event.</span></li>
-    <li><span class="ic">🏁</span><span><b>NASCAR</b> — track history in the Next Gen car, track-type form and the heat edge.</span></li>
-    <li><span class="ic">🎯</span><span><b>Props</b> — every in-season desk's top calls in one feed.</span></li>
-  </ul>
-  <div class="pw-btns">
-    <button type="button" class="btn btn-pro pay-cta">Subscribe — $15/mo</button>
-    <a class="btn btn-ghost pay-login" href="#login">Log in</a>
-  </div>
-  <p class="pw-kitchen">DFS Kitchen <a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=paywall&amp;utm_campaign=pro-index" target="_blank" rel="noopener">All-Access</a> ($60/mo) includes PRO — log in with your Kitchen account and every desk opens.</p>
-  <p class="pw-free">Just want the weather? <a href="/mlb/">The free radars</a> need no account.</p>
-</div>
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">What's on each desk</h2></div></div>
+    <div class="grid g2" id="desks">
+      <div class="card card--pad card--flat"><div class="label cyan">MLB · daily</div><h3 style="font-size:19px;margin-top:10px">Home runs, strikeouts, game environments</h3><p class="small muted mt8">Every hitter's HR chance against the books' price with the edge, weather, umpire and opposing starter broken out; strikeout projections against every line; expected home runs and our run total for every game; tonight's plate umpires; intel notes.</p></div>
+      <div class="card card--pad card--flat"><div class="label cyan">NFL · weekly</div><h3 style="font-size:19px;margin-top:10px">Weather leans and the splits behind them</h3><p class="small muted mt8">Quarterbacks, kickers, backs and receivers whose own games in wind and cold moved their numbers — beside the books' line and price. Plus schedule and officiating spots, and every player's weather split for the week.</p></div>
+      <div class="card card--pad card--flat"><div class="label cyan">College football · weekly</div><h3 style="font-size:19px;margin-top:10px">The trench board</h3><p class="small muted mt8">Team rushing leans from each offensive line against the front it faces, and the college wind study: what each band of wind does to passing, rushing and scoring across thousands of games.</p></div>
+      <div class="card card--pad card--flat"><div class="label cyan">Golf &amp; NASCAR · weekly</div><h3 style="font-size:19px;margin-top:10px">Targets from history, wind and heat</h3><p class="small muted mt8">Golf: course horses, wind players, current form and the morning-versus-afternoon wave. NASCAR: track history, track-type form and the heat board.</p></div>
+    </div>
+  </section>
 
-<main id="pro-app" style="display:none">
-  <div class="wrap lede">
-    <h1>Six desks. One record.</h1>
-    <p>Each desk is built around the edge that actually exists in that sport — not the same
-       template five times. Each desk's calls are archived before the games and graded from the
-       final results in a public record, losing stretches included.</p>
-  </div>
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">The record comes first</h2><p class="sec__sub">Every desk's calls are graded in public — look before you buy.</p></div><a class="sec__more" href="../record/">Full record →</a></div>
+    <div class="grid g5" id="recs"></div>
+  </section>
 
-  <section class="wrap desk-sec">
-    <div class="desks" id="desks"></div>
-    <div class="note" id="rebuild-note">
-      <b>When desks update.</b> MLB rebuilds four times a day — early morning, late morning, midday and
-      before the night games — as lineups and prop lines post. NFL, CFB, PGA and NASCAR rebuild every
-      morning as forecasts sharpen, and football gets a final pre-kickoff refresh on Saturday and Sunday.
-      A desk reads <b>Off-season</b> when its sport has nothing scheduled and <b>Delayed</b> when its last
-      rebuild didn't land — the desk itself says what's missing.
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">Questions</h2></div></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="stack">
+        <details class="more"><summary>When do the boards update?</summary><div class="in"><p>MLB rebuilds four times a day — early morning, late morning, midday and before the night games — with fresh prices each time. NFL and college boards build daily through the week and sharpen as kickoff gets closer. Golf and NASCAR post for each event and refresh as the forecast comes into range.</p></div></details>
+        <details class="more"><summary>Whose prices are these?</summary><div class="in"><p>The sportsbooks'. We pull US books' lines and prices and show the median (or the best price, where noted). They're never our numbers, and they move — always check your book before you bet.</p></div></details>
+        <details class="more"><summary>Can I cancel?</summary><div class="in"><p>Anytime, from your account. Your desks stay open through the end of the period you paid for.</p></div></details>
+      </div>
+      <div class="stack">
+        <details class="more"><summary>What's All-Access?</summary><div class="in"><p>DFS Kitchen All-Access ($60/mo) bundles DFSRADAR PRO with DFSPREP, DFS Books and The Optimizer. If you have it, log in with the same account — PRO is already included.</p></div></details>
+        <details class="more"><summary>Is this betting advice?</summary><div class="in"><p>No. It's information: forecasts, history and our own numbers, with every sample size shown so you can judge them. Tendencies aren't guarantees — the record shows the misses too. 21+. If gambling is a problem for you, call 1-800-GAMBLER.</p></div></details>
+        <details class="more"><summary>Trouble logging in?</summary><div class="in"><p>Membership is checked by our login service. If it doesn't load, a content blocker is usually the cause — allow dfsradar.com and reload.</p></div></details>
+      </div>
     </div>
   </section>
 </main>
-
-<footer>
-  <div class="wrap">DFSRADAR PRO · part of
-    <a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=pro" target="_blank" rel="noopener">The DFS Kitchen</a><br>
-    21+. Informational only, not betting advice. If you or someone you know has a gambling problem, call 1-800-GAMBLER.</div>
-</footer>
+<footer id="dr-foot" class="dr-foot"></footer>
 
 <script>
-/* Every desk that exists today, named by the tools it actually has — the same names its
-   rail uses, so a chip here is something you will find there. */
-const DESKS = [
-  { key:"mlb",  name:"MLB",  href:"/pro/mlb/",    rec:"/pro/record.json", board:"/pro/data.json",
-    edge:"Weather, park and umpire against every comparable night that park has already played.",
-    tools:["Slate","Confirmed Lineups","HR Targets","Intel","Umpire Board","Park Factors","Game Log","Record & Method"] },
-  { key:"cfb",  name:"CFB",  href:"/pro/cfb/",    rec:"/pro/cfb_record.json", board:"/pro/cfb.json",
-    edge:"Offensive-line against defensive-line weight edges, and sixteen seasons of what wind does to a football game.",
-    tools:["Trench Board","Full Slate","Trench View","Wind Factor","Record","Method"] },
-  { key:"nfl",  name:"NFL",  href:"/pro/nfl/",    rec:"/pro/nfl_record.json", board:"/pro/nfl.json",
-    edge:"Referee crews, travel and rest spots, and the QB and kicker splits that wind and cold actually move.",
-    tools:["Leans","Full Slate","Record","Method"] },
-  { key:"pga",  name:"PGA",  href:"/pro/pga/",    rec:"/pro/pga_record.json", board:"/pro/pga.json",
-    edge:"Course history, wind pedigree, and the wind each tee-time wave actually plays into.",
-    tools:["Leans","Wave Draw","Course History","Wind Pedigree","Recent Form","Record"] },
-  { key:"nascar", name:"NASCAR", href:"/pro/nascar/", rec:"/pro/nascar_record.json", board:"/pro/nascar.json",
-    edge:"Track history in the Next Gen car, same-type form, and who holds up when the track runs hot.",
-    tools:["Leans","Track History","Track-Type Form","Heat Edge","Record"] },
-  { key:"props", name:"Props", href:"/pro/props/", rec:null, board:null,
-    edge:"One cross-sport feed: every in-season desk's top calls, each with the books' number where one exists.",
-    tools:["MLB targets","NFL leans","CFB leans","PGA leans","NASCAR leans"] }
-];
-const LABEL = {mlb:"MLB", cfb:"CFB", nfl:"NFL", pga:"PGA", nascar:"NASCAR"};
-
-const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-function card(d){
-  const tools = (d.tools||[]).map(t=>`<span class="tool">${esc(t)}</span>`).join("");
-  return `<a class="desk" href="${d.href}" data-key="${d.key}">
-    <div class="d-top"><span class="d-name">${esc(d.name)} Desk</span>
-      <span class="d-state" data-state>—</span></div>
-    <p class="d-edge">${esc(d.edge)}</p>
-    <div class="tools">${tools}</div>
-    <div class="d-foot"><div class="d-meta"><span class="rec" data-rec>Record loading…</span><span class="upd" data-upd></span></div><span class="go">Open →</span></div>
-  </a>`;
-}
-document.getElementById("desks").innerHTML = DESKS.map(card).join("");
-
-/* ---- freshness: when each desk last rebuilt, in the same words the desk uses ---- */
-const TODAY = () => (window.RadarFresh ? RadarFresh.todayET() : new Date().toISOString().slice(0,10));
-function assess(info){
-  if(window.RadarFresh) return RadarFresh.assess(info);
-  return {level: info.stale ? "warn" : "ok", text: info.built ? "Updated " + info.built : "", why:""};
-}
-function builtFmt(s){
-  if(!window.RadarFresh) return s || "";
-  const t = RadarFresh.parseET(s); return t ? RadarFresh.fmt(t, true) : (s || "");
-}
-/* A CFB game is over once its kickoff (ISO `kick`, else "Sat Sep 19" + season) is 5 h past —
-   the same test the builder uses before it pauses a finished board. */
-function cfbKick(g, season){
-  if(g.kick){ const t = Date.parse(g.kick); if(!isNaN(t)) return t; }
-  const m = /^[A-Za-z]{3} ([A-Za-z]{3}) (\d{1,2})$/.exec(g.day||"");
-  if(!m || !season) return null;
-  const mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(m[1]);
-  if(mo < 0) return null;
-  return Date.UTC(+season, mo, +m[2], 23 + 4, 59);          // 11:59 PM ET (EDT) on that day
-}
-function cfbFinal(j){
-  const gs = j.games||[];
-  if(!gs.length) return false;
-  const now = Date.now();
-  return gs.every(g => { const t = cfbKick(g, j.season); return t != null && t + 5*36e5 < now; });
-}
-const SUMMARY = {
-  mlb(j){
-    const info = {built:j.generated, stale:j.stale, status:j.status, maxAgeH:8, forDate:j.date};
-    const a = assess(info), n = (j.games||[]).length;
-    if(j.stale || (j.status && j.status.ok===false)) return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    if(!n){
-      const b = String(j.brief||"");
-      const off = /season (is )?(complete|over)|off-?season/i.test(b);
-      const nxt = /No MLB games today/i.test(b) ? b.replace(/^.*?No MLB games today\s*[—-]\s*/i, "") : "";
-      return {state: off ? "Off-season" : "Off day", cls:"", line: off ? b : ("No games today" + (nxt ? " · " + nxt : "")), lvl:"off"};
-    }
-    if(a.level === "warn") return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    return {state:"Live", cls:"live", line:`${a.text} · ${n} game${n===1?"":"s"}`, lvl:"ok", live:(j.targets||[]).length};
-  },
-  nfl(j){
-    const info = {built:j.updated, stale:j.stale, status:j.status, maxAgeH:36};
-    const a = assess(info), gs = j.games||[];
-    if(j.seasonComplete || (!j.season && !gs.length)) return {state:"Off-season", cls:"", line:j.note||"Season complete", lvl:"off"};
-    if(j.stale || (j.status && j.status.ok===false)) return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    const today = TODAY();
-    if(gs.length && gs.every(g => g.date && g.date < today))
-      return {state:"Delayed", cls:"warn", line:`Week ${j.week} is final · last built ${builtFmt(j.updated)}`, lvl:"warn"};
-    if(a.level === "warn") return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    return {state:"Live", cls:"live", line:`Week ${j.week} · ${a.text}`, lvl:"ok", live:(j.leans||[]).length};
-  },
-  cfb(j){
-    const info = {built:j.updated, stale:j.stale, status:j.status, maxAgeH:36};
-    const a = assess(info), gs = j.games||[];
-    if(j.paused) return {state:"Paused", cls:"warn", line:`Week ${j.week} is final · next board delayed`, lvl:"warn"};
-    if(j.week == null && !gs.length) return {state:"Off-season", cls:"", line:j.note||"No games scheduled", lvl:"off"};
-    if(cfbFinal(j)) return {state:"Delayed", cls:"warn", line:`Week ${j.week} is final · last built ${builtFmt(j.updated)}`, lvl:"warn"};
-    if(j.stale || (j.status && j.status.ok===false) || a.level === "warn") return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    return {state:"Live", cls:"live", line:`Week ${j.week} · ${a.text}`, lvl:"ok", live:(j.leans||[]).length};
-  },
-  pga(j){
-    const info = {built:j.updated, stale:j.stale, status:j.status, maxAgeH:36};
-    const a = assess(info), ev = j.event;
-    if(j.seasonComplete || !ev) return {state:"Off-season", cls:"", line:j.note||"Season complete", lvl:"off"};
-    if(j.stale || (j.status && j.status.ok===false)) return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    if(ev.key === "team-cup") return {state:"Team week", cls:"", line:`${ev.name} — team match play, no board`, lvl:"off"};
-    if(ev.end && ev.end < TODAY()) return {state:"Delayed", cls:"warn", line:`${ev.name} is over · last built ${builtFmt(j.updated)}`, lvl:"warn"};
-    if(a.level === "warn") return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    return {state:"Live", cls:"live", line:`${ev.name} · ${a.text}`, lvl:"ok", live:(j.leans||[]).length};
-  },
-  nascar(j){
-    const info = {built:j.updated, stale:j.stale, status:j.status, maxAgeH:36};
-    const a = assess(info), r = j.race;
-    if(j.seasonComplete || !r) return {state:"Off-season", cls:"", line:j.note||"Season complete", lvl:"off"};
-    if(j.stale || (j.status && j.status.ok===false)) return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    if(r.date && r.date < TODAY()) return {state:"Delayed", cls:"warn", line:`${r.name} is over · last built ${builtFmt(j.updated)}`, lvl:"warn"};
-    if(a.level === "warn") return {state:"Delayed", cls:"warn", line:a.text, lvl:"warn"};
-    return {state:"Live", cls:"live", line:`${r.name} · ${a.text}`, lvl:"ok", live:(j.leans||[]).length};
-  }
-};
-function setState(el, s){
-  const st = el.querySelector("[data-state]"), up = el.querySelector("[data-upd]");
-  st.textContent = s.state; st.className = "d-state" + (s.cls ? " " + s.cls : "");
-  up.textContent = s.line || ""; up.className = "upd" + (s.lvl === "ok" ? " ok" : s.lvl === "warn" ? " warn" : "");
-}
-async function getJSON(url){
-  const r = await fetch(url + "?_=" + Date.now());
-  if(!r.ok) throw new Error(r.status);
-  const j = await r.json();
-  if(!j || typeof j !== "object") throw new Error("bad json");
-  return j;
-}
-/* Only the handful of fields the status needs are kept from each board. */
-async function loadBoards(){
-  const out = {};
-  await Promise.all(DESKS.filter(d=>d.board).map(async d=>{
-    const el = document.querySelector(`.desk[data-key="${d.key}"]`);
-    try{
-      const j = await getJSON(d.board);
-      out[d.key] = SUMMARY[d.key](j);
-    }catch(e){
-      out[d.key] = {state:"—", cls:"", line:"Board unavailable right now", lvl:"off"};
-    }
-    if(el) setState(el, out[d.key]);
-  }));
-  const props = document.querySelector('.desk[data-key="props"]');
-  if(props){
-    const live = Object.keys(out).filter(k => out[k].state === "Live" && out[k].live);
-    setState(props, live.length
-      ? {state:"Live", cls:"live", line:`Pulling from ${live.map(k=>LABEL[k]).join(", ")}`, lvl:"ok"}
-      : {state:"Quiet", cls:"", line:"No desk has current calls right now", lvl:"off"});
-  }
-}
-
-/* Each desk's graded record, stated in the same numbers the desk uses. */
-function calRange(r){ const m = /^(\d+)\s*[–-]\s*\+$/.exec(r||""); return m ? `${m[1]}%+` : `${r}%`; }
-async function loadRecords(){
-  await Promise.all(DESKS.map(async d=>{
-    const el = document.querySelector(`.desk[data-key="${d.key}"]`);
-    if(!el) return;
-    const recEl = el.querySelector("[data-rec]");
-    if(!d.rec){ recEl.textContent = "Each call is graded on its own desk"; return; }
-    try{
-      const j = await getJSON(d.rec);
-      const s = (j.summary)||{}, o = s.overall||{};
-      if(o.n){
-        /* same rule as the Record page: a rate only once there are 10 graded calls */
-        const pct = o.n >= 10 ? ` · ${Math.round(o.w / o.n * 100)}%` : "";
-        recEl.innerHTML = `<b>${o.w}–${o.n - o.w}</b> graded${pct}` +
-          (s.bar ? ` <span class="bar">vs ${esc(s.bar)}</span>` : "");
-      }else if(s.graded){
-        /* MLB grades probabilities rather than calls, so it reports volume and
-           calibration — how close the predicted rate landed to the real one. */
-        const cal = (s.cal||[]).filter(c=>c.n);
-        const worst = cal.length ? cal.reduce((a,c)=>Math.abs(c.act-c.exp)>Math.abs(a.act-a.exp)?c:a) : null;
-        recEl.innerHTML = `<b>${s.graded}</b> targets graded · ${s.nights} nights` +
-          (worst ? ` <span class="bar">· widest gap ${esc(calRange(worst.range))}: ${worst.exp}% called, ${worst.act}% hit</span>` : "");
-      }else{
-        recEl.textContent = "No graded calls yet this season";
-      }
-    }catch(e){
-      recEl.textContent = "Record unavailable right now";
-    }
-  }));
-}
-/* fresh.js is deferred: word the status lines once it has run (it always has by the time a
-   member is confirmed, but a slow file must not leave raw timestamps behind). */
-function whenFresh(fn){
-  if(window.RadarFresh||document.readyState!=="loading") fn();
-  else document.addEventListener("DOMContentLoaded",fn,{once:true});
-}
-function loadDesks(){ whenFresh(loadBoards); loadRecords(); }
-
-if(window.ProGate) ProGate.start({ load: loadDesks });
-else document.getElementById("gate-status").textContent = "The membership check didn't load — please refresh the page.";
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, esc = D.esc;
+  D.shell({ section: "pro" });
+  var ORDER = ["mlb", "nfl", "cfb", "pga", "nascar"];
+  var buy = document.getElementById("buy-box");
+  D.gate.on(function (st) {
+    var m = st === "member";
+    document.getElementById("member-view").hidden = !m;
+    document.getElementById("sales-view").hidden = m;
+    if (st === "billing") buy.innerHTML = '<div class="note note--warn">' + D.IC.warn + '<div><b>Your last payment didn\'t go through.</b> Update the card on file and every desk reopens right away.</div></div><button class="btn btn--pro btn--block mt12" type="button" data-gate-portal>Fix billing</button>';
+    else if (st === "lapsed") buy.innerHTML = '<a class="btn btn--pro btn--block pay-cta" href="#">Get PRO — $15/mo</a><p class="small dim mt8">You\'re logged in, but this account doesn\'t have PRO yet. <button class="dr-link ms-logout" type="button" style="padding:0">Log out</button></p>';
+    else if (st === "unreachable") buy.innerHTML = '<div class="note note--warn">' + D.IC.warn + '<div><b>Couldn\'t reach the login service.</b> That\'s usually a content blocker — allow dfsradar.com, then retry.</div></div><div class="row mt12"><button class="btn btn--ghost" type="button" data-gate-retry>Retry</button><a class="btn btn--pro pay-cta" href="#">Get PRO</a></div>';
+    else buy.innerHTML = '<a class="btn btn--pro btn--block pay-cta" href="#" style="min-height:52px;font-size:16px">Get PRO — $15/mo</a><div class="row mt12" style="justify-content:center"><a class="dr-link ms-login" href="#login">Already a member? Log in</a></div>';
+  });
+  document.getElementById("member-desks").innerHTML = ORDER.map(function (k) {
+    var sp = D.sport(k);
+    return '<a class="card card--pad" href="' + D.u(sp.props) + '" style="padding:18px"><div class="label" style="color:var(--cyan2)">' + sp.name + '</div><div style="font:700 17px/1.3 var(--display);margin-top:8px">' + sp.name + ' props</div><div class="small dim mt8">Open the desk →</div></a>';
+  }).join("");
+  H.load(["pro", "rec"]).then(function (all) {
+    var withPick = ORDER.filter(function (k) { return H.pickCard(k, all[k]).indexOf("pc--free") >= 0; });
+    document.getElementById("picks").innerHTML = (withPick.length ? withPick : ORDER).slice(0, 3).map(function (k) { return H.pickCard(k, all[k]); }).join("");
+    document.getElementById("recs").innerHTML = ORDER.map(function (k) {
+      var x = H.recordLine(k, all[k]);
+      return '<a class="card card--pad" href="' + D.u("/record/") + "#" + k + '" style="padding:18px"><div class="label" style="color:var(--cyan2)">' + D.sport(k).name + '</div><div class="rec-big ' + (x.cls || "") + '" style="font-size:28px;margin-top:10px">' + x.v + '</div><div class="small dim mt8">' + esc(x.s) + "</div></a>";
+    }).join("");
+  });
+});
 </script>
 </body>
 </html>

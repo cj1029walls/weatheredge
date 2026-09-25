@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CFB Props — The Trench Board: College Rushing Edges | DFSRADAR</title>
+<meta name="description" content="College football rushing props built from each offensive line against the defensive front it faces, plus the college wind study. Free top pick weekly, graded in public.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://dfsradar.com/props/cfb/">
+<meta name="theme-color" content="#2E3240">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="CFB Props — The Trench Board: College Rushing Edges | DFSRADAR">
+<meta property="og:description" content="College football rushing props built from each offensive line against the defensive front it faces, plus the college wind study. Free top pick weekly, graded in public.">
+<meta property="og:url" content="https://dfsradar.com/props/cfb/">
+<meta property="og:image" content="https://dfsradar.com/og-pro.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-pro.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../../assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../../assets/dr.js?v=a7b89034" defer></script>
+<script src="../../assets/feeds.js?v=a7b89034" defer></script>
+<script src="../../assets/props.js?v=a7b89034" defer></script>
+</head>
+<body>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>CFB props</span><span class="faint">·</span><span id="wk">This week</span></div>
+    <h1 class="ph__title">College rushing props: the trench board</h1>
+    <p class="ph__lede">We grade every offensive line against the defensive front it faces and flag the rushing mismatches — then add what the week's wind does to the passing game. Team rushing leans, graded against the box score.</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="stale" class="mt24" hidden></div>
+
+  <section class="sec" id="top-sec">
+    <div class="sec__h"><div><h2 class="sec__title">This week's free pick</h2><p class="sec__sub">The biggest trench mismatch on the board — free, and graded.</p></div>
+      <a class="sec__more" href="../../record/#cfb">See the record →</a></div>
+    <div class="grid g2" id="top-cards"></div>
+  </section>
+
+  <section class="sec" id="boards">
+    <div class="sec__h"><div><h2 class="sec__title">The boards</h2></div></div>
+    <div class="seg-scroll" style="margin-bottom:18px"><div class="seg" id="tabs" role="tablist" aria-label="CFB boards">
+      <button type="button" data-tab="leans">Rush edges <span class="ct" id="ct-leans"></span></button>
+      <button type="button" data-tab="wind">Wind study <span class="ct" id="ct-wind"></span></button>
+      <button type="button" data-tab="bt">The backtest</button>
+    </div></div>
+    <div data-panel="leans"><div id="b-leans"></div>
+      <p class="small dim mt12"><b>Trench edge</b> = how far this offensive line's run blocking outgrades the defensive front it faces, against the league. Targets are the biggest edges; fades the biggest deficits; stacked means the weather points the same way.</p></div>
+    <div data-panel="wind" hidden><div id="b-wind"></div><div id="b-wind-games" class="mt24"></div></div>
+    <div data-panel="bt" hidden><div id="b-bt"></div></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec__h"><div><h2 class="sec__title">The CFB record</h2><p class="sec__sub">Each lean graded on the team's actual yards per carry against the week's median.</p></div>
+      <a class="sec__more" href="../../record/#cfb">Full record →</a></div>
+    <div id="rec"></div><div id="rec-recent" class="mt16"></div>
+  </section>
+</main>
+<footer id="dr-foot" class="dr-foot"></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FC = F.cfb, esc = D.esc, isNum = D.isNum;
+  D.shell({ section: "props", sport: "cfb" });
+  var S = { pro: null, wx: null, rec: null, member: false };
+
+  var COLS = [
+    { k: "who", label: "Team · rushing", html: function (p, i, free) { return '<div class="who">' + esc(p.player) + (free ? ' <span class="chip chip--free">FREE</span>' : "") + "<small>" + esc(p.game) + " · " + esc(F.cap(String(p.k).toLowerCase())) + "</small></div>"; } },
+    { k: "side", label: "Lean", html: function (p) { return P.sideTag(p.side); } },
+    { k: "cd", label: "Trench edge", num: true, sort: function (p) { return Math.abs(p.cd || 0); }, html: function (p) { return isNum(p.cd) ? '<b class="' + (p.cd > 0 ? "good" : "cool") + '">' + D.signed(p.cd, 1) + "</b>" : "—"; } }
+  ];
+
+  function renderLeans() {
+    var picks = FC.picks(S.pro), m = S.member;
+    document.getElementById("ct-leans").textContent = picks.length;
+    P.board(document.getElementById("b-leans"), { cols: COLS, rows: picks, key: function (p) { return p.player + p.game; }, member: m, free: 1, sort: { k: "cd", dir: "desc" },
+      lock: { what: "rushing lean" }, emptyTitle: S.pro && S.pro.paused ? "The trench board is paused this week" : "No rushing leans this week",
+      empty: S.pro && S.pro.paused ? esc((S.pro.status && S.pro.status.reason) || "") + " — it resumes as soon as the data source answers." : "Leans post once the week's matchups are graded." });
+    var top = document.getElementById("top-cards");
+    if (!picks.length) {
+      top.innerHTML = '<div class="pc" style="grid-column:1/-1"><div class="pc__top"><span class="pc__sport">CFB · this week</span></div><div class="pc__who">No free pick this week' +
+        "<small>" + (S.pro && S.pro.paused ? "The trench board needs our college data source, and it's been refusing calls (monthly quota). The record below is unaffected." : "No matchup cleared the bar this week.") + "</small></div></div>";
+      return;
+    }
+    var p = picks[0];
+    top.innerHTML = P.topCard({ sportLabel: "CFB · team rushing · " + p.game, player: p.player, side: p.side, sub: F.cap(String(p.k).toLowerCase()),
+      nums: [{ v: isNum(p.cd) ? D.signed(p.cd, 1) : "—", l: "Trench edge", cls: "cyan" }, { v: S.rec && S.rec.summary ? S.rec.summary.overall.w + "–" + (S.rec.summary.overall.n - S.rec.summary.overall.w) : "—", l: "Season record" }] }) +
+      (m && picks[1] ? P.topCard({ sportLabel: "CFB · #2 · " + picks[1].game, player: picks[1].player, side: picks[1].side, sub: F.cap(String(picks[1].k).toLowerCase()), nums: [{ v: D.signed(picks[1].cd, 1), l: "Trench edge" }] }, { tag: "PRO", pro: true, plain: true })
+        : P.lockedCard("CFB · the rest of the board", picks.length - 1, "Every rushing target and fade, with the wind study behind them."));
+  }
+
+  function renderWind() {
+    var w = S.wx, el = document.getElementById("b-wind");
+    if (!w || !w.bands) { el.innerHTML = '<div class="empty card"><p>The wind study isn\'t loaded.</p></div>'; return; }
+    document.getElementById("ct-wind").textContent = (w.games || []).length;
+    var mets = w.metrics || [];
+    var head = "<tr><th>Wind at kickoff</th><th class=\"num\">Games</th>" + mets.map(function (m) { return '<th class="num">' + esc(F.cap(String(m.label).toLowerCase())) + "</th>"; }).join("") + "</tr>";
+    var body = w.bands.map(function (b) {
+      return '<tr><td class="who">' + esc(b.name) + "<small>" + esc(b.lo + "–" + b.hi + " mph") + " · " + esc(b.note || "") + '</small></td><td class="num">' + b.n.toLocaleString() + "</td>" +
+        mets.map(function (m) {
+          var x = b.m && b.m[m.k]; if (!x) return '<td class="num">—</td>';
+          return '<td class="num"><span class="' + (x.sig ? (x.pct > 0 ? "good" : "cool") : "dim") + '">' + D.signed(x.pct, 1, "%") + "</span>" + (x.sig ? " ●" : "") + "</td>";
+        }).join("") + "</tr>";
+    }).join("");
+    var content = '<div class="tbl-wrap"><table class="tbl"><thead>' + head + "</thead><tbody>" + body + '</tbody></table><div class="tbl-foot">● = statistically significant (|z| ≥ ' + (w.sigZ || 2) + ") · " +
+      (w.nGames || 0).toLocaleString() + " games at " + (w.nVenues || 0) + " stadiums, " + esc((w.seasons || []).join("–")) + ". Versus the all-games average.</div></div>" +
+      (w.venueTest && w.venueTest.indistinguishable ? '<p class="small dim mt12">We tested whether some stadiums are "windier" than others after the forecast: shuffled 400 times, the real stadium spread (' + w.venueTest.realSd + ") is indistinguishable from chance (" + w.venueTest.shuffledSd95 + " at the 95th percentile) — so the forecast wind is what matters, not the venue's reputation.</p>" : "");
+    if (!S.member) { el.innerHTML = '<div class="tbl-wrap">' + D.lockbar({ title: "The college wind study — unlock with PRO", sub: "What each band of wind has done to scoring, passing, rushing and completion rate across " + (w.nGames || 0).toLocaleString() + " games — and this week's games sorted into those bands." }) + "</div>"; document.getElementById("b-wind-games").innerHTML = ""; return; }
+    el.innerHTML = content;
+    var gs = (w.games || []).slice().sort(function (a, b) { return (b.wind || 0) - (a.wind || 0); }).slice(0, 30);
+    document.getElementById("b-wind-games").innerHTML = '<div class="label" style="margin-bottom:12px">This week by wind band</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Game</th><th class="num">Wind</th><th class="num">Band</th><th class="num">Kickoff</th></tr></thead><tbody>' +
+      gs.map(function (g) { return '<tr><td class="who">' + esc(g.away) + " @ " + esc(g.home) + "<small>" + esc(g.stadium || "") + '</small></td><td class="num"><b>' + g.wind + '</b> mph</td><td class="num">' + esc(g.band || "") + '</td><td class="num">' + esc(g.day + " " + g.time) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+  }
+
+  function renderBt() {
+    var bt = S.pro && S.pro.backtest, el = document.getElementById("b-bt");
+    if (!bt || !bt.ladder) { el.innerHTML = '<div class="empty card"><p>Backtest not loaded.</p></div>'; return; }
+    var max = Math.max.apply(null, bt.ladder.map(function (x) { return x.ypc; }));
+    el.innerHTML = '<div class="card card--pad"><div class="label" style="margin-bottom:16px">Yards per carry by trench-edge quintile · ' + bt.n.toLocaleString() + " team-games, " + esc(bt.seasons.join(", ")) + "</div>" +
+      bt.ladder.map(function (q) {
+        return '<div class="imp" style="grid-template-columns:150px 1fr 70px"><span class="k">' + esc(q.label) + '</span><span class="bar" style="background:rgba(255,255,255,.05)"><i style="left:0;width:' + (q.ypc / max * 100).toFixed(1) + '%;background:var(--cyan)"></i></span><span class="v">' + q.ypc.toFixed(2) + "</span></div>";
+      }).join("") + '<p class="small dim mt16">The heavier the line\'s edge, the more yards per carry — a steady climb from ' + bt.ladder[0].ypc + " to " + bt.ladder[bt.ladder.length - 1].ypc + ". That gradient is what the board is built on.</p></div>";
+  }
+
+  function renderRecord() {
+    var r = S.rec && S.rec.summary, el = document.getElementById("rec");
+    if (!r) { el.innerHTML = '<div class="note">' + D.IC.info + "<div>No graded weeks yet.</div></div>"; return; }
+    var t = function (x) { return x && x.n ? x.w + "–" + (x.n - x.w) : "—"; };
+    el.innerHTML = P.recordStrip([
+      { v: t(r.overall), l: "All leans", s: r.overall.n ? D.pct(r.overall.w / r.overall.n * 100, 0) + " over " + D.plural(r.weeks, "week") : "" },
+      { v: t(r.targets), l: "Rush targets", s: "" }, { v: t(r.fades), l: "Rush fades", s: "" }, { v: t(r.stacked), l: "Stacked (weather + trenches)", s: "" }]);
+    var list = [];
+    (S.rec.recent || []).slice(0, 2).forEach(function (w) { (w.leans || []).forEach(function (l) {
+      list.push({ res: l.hit ? "w" : "l", title: esc(l.who) + " · " + esc(String(l.side).toLowerCase()) + ' <span class="dim">' + D.signed(l.cd, 1) + "</span>",
+        sub: esc(String(w.week).replace(/^(\d{4})-w(\d+)$/, "$1 · week $2")) + " · " + esc(l.game) + (l.act ? " · " + l.act.att + " carries, " + l.act.yds + " yds (" + l.act.ypc + " ypc vs " + w.medYpc + " median)" : "") });
+    }); });
+    document.getElementById("rec-recent").innerHTML = list.length ? '<div class="label" style="margin:22px 0 12px">Recent weeks</div>' + P.results(list.slice(0, 14)) : "";
+  }
+
+  Promise.all([D.get(FC.proUrl), D.get(FC.wxUrl), D.get(FC.recUrl)]).then(function (r) {
+    S.pro = r[0]; S.wx = r[1]; S.rec = r[2];
+    var pro = S.pro || {};
+    document.getElementById("wk").textContent = pro.week ? "Week " + pro.week : "This week";
+    var f = D.fresh(document.getElementById("fresh"), { built: pro.updated, stale: pro.stale, status: pro.status, maxAgeH: 40 });
+    if (pro.paused || (f && f.level === "warn")) {
+      var st = document.getElementById("stale"); st.hidden = false;
+      D.banner(st, "The trench board is paused.", ((pro.status && pro.status.reason) || "Our college data source isn't answering") + ". Last good board: " + ((pro.status && pro.status.lastGood) || pro.updated || "—") + ". The wind study and the record below are unaffected.");
+    }
+    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + D.plural((pro.leans || []).length, "lean") + "</span>";
+    renderRecord(); renderBt();
+    D.tabs(document.getElementById("tabs"), null, "cfb-props-tab");
+    D.gate.on(function (st) { S.member = st === "member"; renderLeans(); renderWind(); });
+  });
+});
+</script>
+</body>
+</html>

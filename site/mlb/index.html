@@ -1,2137 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
-<title>DFSRADAR — MLB Weather, Umpire & Home Run Data for DFS</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MLB Weather Today — Every Ballpark, Game by Game | DFSRADAR</title>
+<meta name="description" content="Today&#x27;s MLB weather at every ballpark: temperature, wind relative to the field, rain chance and the hours around first pitch — plus what weather like this has meant at each park.">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://dfsradar.com/mlb/">
+<meta name="theme-color" content="#2E3240">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
-<meta property="og:title" content="DFSRADAR — MLB Weather Edges for DFS">
-<meta property="og:description" content="Park-specific weather impact on home runs, runs and strikeouts, from thousands of historically similar games. Free, updated all day. Scan the slate. Find the edge.">
-<meta property="og:image" content="https://dfsradar.com/og-card.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:title" content="MLB Weather Today — Every Ballpark, Game by Game | DFSRADAR">
+<meta property="og:description" content="Today&#x27;s MLB weather at every ballpark: temperature, wind relative to the field, rain chance and the hours around first pitch — plus what weather like this has meant at each park.">
 <meta property="og:url" content="https://dfsradar.com/mlb/">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="DFSRADAR — MLB Weather Edges for DFS">
-<meta name="twitter:description" content="Park-specific weather impact on home runs, runs and strikeouts, from thousands of historically similar games. Free, updated all day. Scan the slate. Find the edge.">
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
-
-<meta name="description" content="Free MLB weather edges for DFS and home run props: tonight's forecast at every park, how scoring changes in these exact conditions, umpire HR tendencies, and real over/under history. Scan the slate. Find the edge.">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%2322d3ee" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23a5f3fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
-<style>
-  :root{
-    /* DFS Kitchen family theme — DFSRADAR wears cyan (its family color);
-       orange is reserved for family currency (PRO / All-Access).
-       green = HR-boost / positive, red = suppress / negative, amber = small sample.
-       Token NAMES are kept from the old light palette so every var() reference
-       flips at once; only the values change to the dark family surfaces. */
-    --navy:#2E3440; --navy2:#3A4356; --navy3:#454E61;
-    --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15); --green-bg2:rgba(34,197,94,.24);
-    --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15); --red-bg2:rgba(248,113,113,.24);
-    /* under / neutral-cool = slate-blue (kept distinct from red impact language) */
-    --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
-    --purple:#9bb6d6; --purple-bg:rgba(155,182,214,.14);
-    /* over / product accent = radar cyan */
-    --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
-    --info:#22d3ee;
-    --amber:#fbbf24; --amber-bg:rgba(251,191,36,.15);
-    --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
-    --line-strong:#57627A; --hover:#3C4455; --body2:#C7CEDC;
-    --note-bg:rgba(251,191,36,.12); --note-border:rgba(251,191,36,.32); --note-text:#fbbf24;
-    --ou1:#22d3ee; --ou2:#0ea5c4;
-    --bolt1:#fbbf24; --bolt2:#F08A3C;
-    --meterp1:#22c55e; --meterp2:#22c55e; --metern1:#f87171; --metern2:#b91c1c;
-    --on-accent:#1B1206;
-    --radius:14px;
-    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
-    --shadow-hover:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--surface); color:var(--ink); line-height:1.45;
-  }
-  /* ---------- info tooltips ---------- */
-  .tip{position:relative;cursor:help}
-  .info-i{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:15px;height:15px;border-radius:50%;background:var(--gray-bg);
-    color:var(--muted);font-size:10px;font-weight:800;font-style:normal;
-    vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong);
-  }
-  .tip.on-dark .info-i{background:rgba(255,255,255,.14);color:#c8d5f2;border-color:rgba(255,255,255,.3)}
-  .tip::after{
-    content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;
-    transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;
-    font-size:11.5px;font-weight:500;line-height:1.55;letter-spacing:.1px;
-    text-transform:none;padding:10px 12px;border-radius:10px;
-    box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;
-    transition:opacity .15s;z-index:90;text-align:left;white-space:normal;
-  }
-  .tip::before{
-    content:"";position:absolute;bottom:calc(100% + 3px);left:50%;
-    transform:translateX(-50%);border:6px solid transparent;
-    border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90;
-  }
-  .tip:hover::after,.tip:hover::before{opacity:1}
-  .tip.tip-right::after{left:auto;right:-10px;transform:none}
-  /* ---------- header ---------- */
-  header{
-    position:relative;
-    background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
-    color:#fff; padding:26px 24px 0;
-  }
-  .header-inner{max-width:1240px;margin:0 auto}
-  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
-  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
-  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#22d3ee;font-weight:600}
-  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
-  .sport-tabs{display:flex;gap:6px;margin-top:14px}
-  .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
-  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .on{background:var(--gold-bg);color:var(--gold-deep);border-color:rgba(34,211,238,.45)}
-  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:#F08A3C;color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
-  .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
-  @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
-  .sport-tabs .protab{background:#F08A3C;color:#1B1206 !important;border-color:transparent;font-weight:800}
-  .sport-tabs .protab:hover{filter:brightness(1.06);color:#1B1206}
-  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
-  .kx-card .kx-t b{color:#fff}
-  .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
-  .kx-card .kx-go{background:#F08A3C;color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
-  .kx-card .kx-go:hover{filter:brightness(1.1)}
-  .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
-  .kx-hook a{color:#F08A3C;font-weight:800;text-decoration:none}
-  .kx-hook a:hover{text-decoration:underline}
-  .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
-  .date-chip b{color:#fff}
-  /* tabs */
-  nav{display:flex;gap:4px;margin-top:22px}
-  nav button{
-    appearance:none;border:0;background:transparent;color:#95a1b5;font-size:14px;font-weight:600;
-    padding:11px 18px;border-radius:10px 10px 0 0;cursor:pointer;letter-spacing:.2px;
-  }
-  nav button:hover{color:#fff}
-  nav button.active{background:var(--surface);color:var(--ink)}
-  /* ---------- slate summary strip ---------- */
-  main{max-width:1240px;margin:0 auto;padding:22px 24px 70px}
-  /* ---- PRO teaser card ---- */
-  .pro-tease{background:linear-gradient(120deg,#252A35,#3A4356);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 20px;margin-bottom:18px;border-left:4px solid #F08A3C}
-  .pro-tease .pt-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .pt-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:9px}
-  .pt-main{flex:1;min-width:230px}
-  .pt-name{font-size:20px;font-weight:800;color:#fff}
-  .pt-sub{font-size:12px;color:#9fb0d4;margin-top:2px}
-  .pt-prob{font-size:26px;font-weight:800;color:#F08A3C}
-  .pt-prob span{font-size:12px;color:#9fb0d4;font-weight:700;display:block}
-  .pt-locked{margin-top:12px}
-  .pt-lock-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.09)}
-  .pt-lock-row .rk{font-size:12px;font-weight:800;color:#5d6f96;width:22px}
-  .pt-blur{flex:1;height:13px;border-radius:7px;background:linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.12));filter:blur(4px)}
-  .pt-blur.b2{max-width:60%}
-  .pt-lock-row .pr-blur{width:34px;height:11px;border-radius:6px;background:rgba(255,255,255,.22);filter:blur(3px)}
-  .pt-more{font-size:11.5px;color:#9fb0d4;margin-top:6px}
-  .pt-fine{font-size:11px;color:#A7B0C4;margin-top:8px}
-  .cta-row .pro-tease{grid-column:1/-1}
-  .cta-row.has-tease>.kx-card{grid-column:1/-1}
-  .pt-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .pt-go{background:#F08A3C;color:#1B1206;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 20px;border-radius:22px;text-decoration:none;white-space:nowrap}
-  .pt-go:hover{filter:brightness(1.06)}
-  .pt-login{color:#c9d4ea;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:8px 16px}
-  .pt-login:hover{color:#fff;border-color:#fff}
-  .pt-receipts{font-size:11.5px;color:#9fb0d4}
-  .pt-receipts b{color:#22c55e}
-
-  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
-  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
-  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:bpulse 2.2s ease-in-out infinite}
-  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
-  .brief-head .tip .info-i{background:rgba(255,255,255,.13);color:#c8d5f2;border-color:rgba(255,255,255,.3)}
-  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
-  .brief-body b{color:#fff;font-weight:700}
-  .summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:22px}
-  .sum-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .sum-card:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
-  .sum-card .k{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-  .sum-card .v{font-size:19px;font-weight:800;margin-top:3px}
-  .sum-card .s{font-size:12.5px;color:var(--muted);margin-top:2px}
-  .v .pos{color:var(--green)} .v .neg{color:var(--red)} .v .neu{color:var(--muted)}
-  .v .over{color:var(--gold-deep)} .v .under{color:var(--blue-deep)}
-  /* ---------- controls ---------- */
-  .controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-  .controls h2{font-size:15px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700}
-  .sort-wrap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
-  select{
-    appearance:none;background:var(--card) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%2378859a"/></svg>') no-repeat right 12px center;
-    border:1px solid var(--line);border-radius:9px;padding:8px 32px 8px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;box-shadow:var(--shadow)
-  }
-  /* ---------- hero: edge of the day ---------- */
-  .hero{display:grid;grid-template-columns:1.15fr 1fr;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px;border:1px solid var(--line)}
-  .hero-3d{position:relative;min-height:350px;background:#10151f}
-  .hero-3d canvas{width:100%;height:100%;display:block;cursor:grab}
-  .hero-3d canvas:active{cursor:grabbing}
-  .hero-info{padding:24px 26px;display:flex;flex-direction:column;gap:12px}
-  .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold-deep);background:var(--gold-bg);padding:5px 12px;border-radius:16px;width:fit-content}
-  .hero-teams{font-size:34px;font-weight:800;letter-spacing:.3px;line-height:1.1}
-  .hero-teams .at{font-weight:300;color:var(--faint)}
-  .hero-meta{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-top:-4px}
-  .hero-wx{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--body2);align-items:center}
-  .hero-wx b{font-size:15px}
-  .hero-imp{display:flex;flex-direction:column;gap:8px;margin-top:2px}
-  .hi-row{display:grid;grid-template-columns:88px 1fr 62px;align-items:center;gap:12px}
-  .hi-row .l{font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--muted);text-transform:uppercase}
-  .hi-bar{height:10px;background:var(--gray-bg);border-radius:6px;position:relative}
-  .hi-bar .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:var(--line-strong);border-radius:2px}
-  .hi-bar .f{position:absolute;top:0;bottom:0;border-radius:6px}
-  .hi-val{font-weight:800;font-size:15px;text-align:right}
-  .hi-val.pos{color:var(--green)} .hi-val.neg{color:var(--red)} .hi-val.neu{color:var(--muted)}
-  .hero-foot{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:8px;flex-wrap:wrap}
-  .hero-lean{display:flex;align-items:center;gap:12px}
-  .hero-lean .txt b{display:block;font-size:16px}
-  .hero-lean .txt span{font-size:12px;color:var(--muted)}
-  .hero-cta{margin-left:auto;appearance:none;border:0;background:linear-gradient(135deg,var(--ou1),var(--ou2));color:var(--on-accent);font-size:13px;font-weight:800;padding:10px 18px;border-radius:10px;cursor:pointer;letter-spacing:.3px}
-  .hero-cta:hover{filter:brightness(1.08)}
-  /* ---------- slate board rows ---------- */
-  .board{display:flex;flex-direction:column;gap:10px}
-  .b-row{display:grid;grid-template-columns:76px 1.45fr 1.5fr 1.9fr 1.25fr 108px;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 18px;cursor:pointer;transition:.14s;box-shadow:var(--shadow)}
-  .b-row:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover);transform:translateY(-1px)}
-  .b-time{font-size:15px;font-weight:800}
-  .b-time span{display:block;font-size:10px;color:var(--faint);font-weight:700;letter-spacing:1px}
-  .b-teams{font-size:17px;font-weight:800}
-  .b-teams .at{font-weight:300;color:var(--faint)}
-  .b-park{font-size:11.5px;color:var(--muted)}
-  .b-wx{display:flex;align-items:center;gap:10px}
-  .b-wx .t{font-size:17px;font-weight:800}
-  .b-wx .w{font-size:11.5px;color:var(--muted);line-height:1.3}
-  .b-imp{display:flex;gap:6px;flex-wrap:wrap}
-  .pill{font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:8px;white-space:nowrap}
-  .pill.pos{background:var(--green-bg);color:var(--green)}
-  .pill.neg{background:var(--red-bg);color:var(--red)}
-  .pill.neu{background:var(--gray-bg);color:var(--muted)}
-  .b-ou{display:flex;align-items:center;gap:10px}
-  .b-ou .txt b{display:block;font-size:13px}
-  .b-ou .txt span{font-size:11px;color:var(--muted)}
-  .b-badge{text-align:right}
-  .b-badge .edge-badge{white-space:nowrap;font-size:9.5px;padding:4px 8px}
-  .wx-item .big{font-size:22px;font-weight:800}
-  .wx-item .big sup{font-size:12px;font-weight:600;color:var(--muted)}
-  .wx-item .lab{font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.8px;text-transform:uppercase}
-  .sample{display:inline-flex;align-items:center;gap:5px;margin-top:4px;font-size:11.5px;font-weight:600}
-  .dot{width:8px;height:8px;border-radius:50%}
-  .dot.strong{background:var(--green)}.dot.fair{background:var(--amber)}.dot.limited{background:var(--red)}
-  .edge-badge{font-size:10.5px;font-weight:800;letter-spacing:.6px;padding:4px 9px;border-radius:20px;text-transform:uppercase}
-  .edge-hr{background:#22c55e;color:#06210F}
-  .edge-under{background:#47566d;color:#e2e8f2}
-  .edge-rain{background:#2450b8;color:#dde7fb}
-  .edge-neutral{background:var(--gray-bg);color:var(--muted)}
-  .rain-cmp{font-size:13px;color:var(--ink);background:var(--blue-bg);border-radius:10px;padding:10px 13px;margin-top:10px;line-height:1.5}
-  /* probable pitchers */
-  .p-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
-  .p-card{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
-  .p-side{font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--muted);background:var(--gray-bg);border-radius:8px;padding:4px 8px;height:fit-content}
-  .p-name{font-weight:800;font-size:14.5px;margin-bottom:5px}
-  .p-nums{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;align-items:baseline}
-  .p-nums b{font-size:16px}
-  .p-nums .pos b{color:var(--green)} .p-nums .neg b{color:var(--red)}
-  .p-nums .p-n{font-size:11.5px;color:var(--muted);width:100%}
-  .p-nums.p-na{font-size:12.5px;color:var(--muted)}
-  .p-all{font-size:11.5px;color:var(--muted);margin-top:5px}
-  /* hour-by-hour forecast strip */
-  .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;margin-top:13px}
-  .hr-cell{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center}
-  .hr-lab{font-size:9.5px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
-  .hr-t{font-size:18px;font-weight:800;margin-top:2px}
-  .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px;white-space:nowrap}
-  .hr-arrow{display:inline-block;font-weight:800;color:var(--blue-deep)}
-  .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
-  .hr-rain.warn{color:var(--red);font-weight:800}
-  .hr-note{grid-column:1/-1;font-size:11px;color:var(--muted);text-align:right;margin-top:-2px}
-  .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-  .wet-tag{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:var(--blue-bg);color:var(--blue-deep);border-radius:6px;padding:1px 5px;vertical-align:1px}
-  .hr-ic{font-size:12px}
-  /* delay outlook chip */
-  .delay-chip{margin-top:11px;margin-right:8px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;border-radius:9px;padding:7px 11px;border:1px solid var(--line)}
-  .dl-clear{background:var(--green-bg);color:var(--green-deep);border-color:#3a5545}
-  .dl-watch{background:var(--amber-bg);color:#fbbf24;border-color:#4d452e}
-  .dl-likely{background:#3a2f24;color:#fbbf24;border-color:#4d3b24}
-  .dl-severe{background:var(--red-bg);color:var(--red-deep);border-color:#4d3232}
-  /* wind factor chip */
-  .windfx{margin-top:11px;display:inline-block;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px}
-  .windfx b{letter-spacing:1px}
-  .fx-low b{color:var(--blue)} .fx-medium b{color:var(--gold-deep)}
-  .fx-high b{color:#F08A3C} .fx-extreme b{color:var(--red)}
-  @media(max-width:960px){
-    .hero{grid-template-columns:1fr}
-    .b-row{grid-template-columns:70px 1fr 1.2fr;row-gap:10px}
-    .b-imp{grid-column:1/-1}
-    .b-ou{grid-column:1/3}
-    .b-badge{grid-column:3;text-align:right}
-  }
-  /* ---------- weather report cards ---------- */
-  #wx-board{display:flex;flex-direction:column;gap:12px}
-  .wxc{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 18px;cursor:pointer;border:1px solid transparent;transition:.15s}
-  .wxc:hover{border-color:var(--line-strong);box-shadow:var(--shadow-hover)}
-  .wxc-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .wxc-time{font-size:15px;font-weight:800;line-height:1.1}
-  .wxc-time span{display:block;font-size:9.5px;font-weight:700;color:var(--muted);letter-spacing:1px}
-  .wxc-teams{font-size:16px;font-weight:800}
-  .wxc-teams .at{font-weight:300;color:var(--faint)}
-  .wxc-park{font-size:11.5px;color:var(--muted)}
-  .wxc-dome{font-size:12.5px;color:var(--muted);margin-top:8px}
-  .wxc-foot{display:flex;flex-wrap:wrap;gap:4px;font-size:12px;color:var(--body2);margin-top:10px}
-  .wxc-foot b{letter-spacing:.5px}
-  .wfx-low{color:var(--blue)} .wfx-medium{color:var(--gold-deep)} .wfx-high{color:#F08A3C} .wfx-extreme{color:var(--red)}
-  .wxc-link{margin-left:auto;color:var(--gold-deep);font-weight:700}
-  /* ---------- compare table ---------- */
-  .table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
-  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:860px}
-  thead th{
-    position:sticky;top:0;background:var(--navy);color:#a3aec2;font-size:11px;letter-spacing:.8px;text-transform:uppercase;
-    padding:12px 14px;text-align:right;cursor:pointer;user-select:none;white-space:nowrap
-  }
-  thead th:first-child,thead th:nth-child(2),thead th:nth-child(3){text-align:left}
-  thead th:hover{color:#fff}
-  thead th .arr{font-size:9px;margin-left:4px}
-  tbody td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-  tbody td:first-child,tbody td:nth-child(2),tbody td:nth-child(3){text-align:left}
-  tbody tr{cursor:pointer;transition:background .1s}
-  tbody tr:hover{background:var(--hover)}
-  .cell-chip{display:inline-block;min-width:56px;text-align:center;padding:4px 8px;border-radius:8px;font-weight:800;font-size:12.5px}
-  .cell-chip.pos{background:var(--green-bg);color:var(--green)}
-  .cell-chip.neg{background:var(--red-bg);color:var(--red)}
-  .cell-chip.neu{background:var(--gray-bg);color:var(--muted)}
-  .lean-cell{font-weight:800}
-  .lean-cell.over{color:var(--gold)} .lean-cell.under{color:var(--blue-deep)} .lean-cell.none{color:var(--faint);font-weight:600}
-  .tbl-teams{font-weight:800;font-size:14px}
-  .tbl-park{color:var(--muted);font-size:12px}
-  /* ---------- method ---------- */
-  .method{max-width:760px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 34px;margin:0 auto}
-  .method h3{font-size:20px;font-weight:800;margin-bottom:12px}
-  .method h4{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
-  .method p{font-size:14.5px;color:var(--body2);margin-bottom:12px}
-  .method .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-  .pill{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;font-weight:600}
-  /* ---------- modal ---------- */
-  .overlay{position:fixed;inset:0;background:rgba(13,25,41,.55);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:34px 16px;z-index:50;overflow-y:auto}
-  .overlay.open{display:flex}
-  .modal{background:var(--surface);border-radius:18px;max-width:860px;width:100%;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35);animation:pop .18s ease-out}
-  @keyframes pop{from{transform:translateY(10px);opacity:.4}to{transform:none;opacity:1}}
-  .m-head{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start}
-  .m-head .teams{font-size:30px;font-weight:800;letter-spacing:.5px}
-  .m-head .meta{color:#93a1b8;font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;font-weight:600;margin-top:4px}
-  .m-close{appearance:none;border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;flex:0 0 auto}
-  .m-close:hover{background:rgba(255,255,255,.24)}
-  .m-body{padding:20px 26px 28px}
-  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px}
-  .sub-h{font-size:10px;font-weight:800;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase;margin:15px 0 9px;padding-top:13px;border-top:1px dashed var(--line)}
-  .sub-h:first-of-type{margin-top:2px;padding-top:0;border-top:0}
-  .league-row{font-size:12.5px;color:var(--muted);margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
-  .league-row b.pos{color:var(--green)} .league-row b.neg{color:var(--red)} .league-row b.neu{color:var(--ink)}
-  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
-  .m-cond{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-  .m-cond .wx-item .big{font-size:27px}
-  .m-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .m-tile{border-radius:12px;padding:14px 16px}
-  .m-tile .t-lab{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
-  .m-tile .t-val{font-size:32px;font-weight:800;letter-spacing:-1px;margin:2px 0 6px}
-  .m-tile .t-sub{display:flex;gap:14px;font-size:11.5px}
-  .m-tile .t-sub b{display:block;font-size:14px}
-  .m-tile.pos{background:var(--green-bg)} .m-tile.pos .t-lab,.m-tile.pos .t-sub{color:var(--green-deep)} .m-tile.pos .t-val{color:var(--green)}
-  .m-tile.neg{background:var(--red-bg)} .m-tile.neg .t-lab,.m-tile.neg .t-sub{color:var(--red-deep)} .m-tile.neg .t-val{color:var(--red)}
-  .m-tile.neu{background:var(--gray-bg)} .m-tile.neu .t-lab,.m-tile.neu .t-sub{color:var(--muted)} .m-tile.neu .t-val{color:var(--muted)}
-  /* mlb-average meters */
-  .meter-row{display:grid;grid-template-columns:120px 1fr 58px;align-items:center;gap:14px;margin-bottom:13px}
-  .meter-row:last-child{margin-bottom:2px}
-  .meter-lab{font-size:12.5px;font-weight:700}
-  .meter-lab span{color:var(--muted);font-weight:500;font-size:11.5px;display:block}
-  .meter{position:relative;height:12px;background:var(--gray-bg);border-radius:8px}
-  .meter .fill{position:absolute;top:0;bottom:0;border-radius:8px}
-  .meter .fill.pos{background:linear-gradient(90deg,var(--meterp1),var(--meterp2))}
-  .meter .fill.neg{background:linear-gradient(90deg,var(--metern1),var(--metern2))}
-  .p3d-dims{position:absolute;left:16px;bottom:10px;color:rgba(255,255,255,.65);font-size:11px;letter-spacing:.5px;pointer-events:none}
-  .meter .mid{position:absolute;top:-4px;bottom:-4px;left:50%;width:2px;background:#556074;border-radius:2px}
-  .meter-val{font-size:14px;font-weight:800;text-align:right}
-  .meter-val.pos{color:var(--green)} .meter-val.neg{color:var(--red)} .meter-val.neu{color:var(--muted)}
-  /* history table */
-  .hist-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:0}
-  .hist-table th{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);position:static;background:none;cursor:default}
-  .hist-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-  .hist-table th:nth-child(n+3),.hist-table td:nth-child(n+3){text-align:right}
-  .res-chip{display:inline-block;padding:2.5px 9px;border-radius:8px;font-weight:800;font-size:10.5px;letter-spacing:.4px}
-  .res-chip.over{background:var(--gold-bg);color:var(--gold-deep)}
-  .res-chip.under{background:var(--blue-bg);color:var(--blue-deep)}
-  .res-chip.push{background:var(--gray-bg);color:var(--muted)}
-  .hist-note{font-size:11.5px;color:var(--faint);margin-top:8px}
-  /* 3D park view */
-  .park3d-wrap{position:relative;height:330px;background:#10151f;border-radius:11px;overflow:hidden}
-  .park3d-wrap canvas{width:100%;height:100%;display:block;cursor:grab}
-  .park3d-wrap canvas:active{cursor:grabbing}
-  .p3d-hud{position:absolute;top:14px;left:16px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55);pointer-events:none}
-  .p3d-hud .t{font-size:10.5px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78;font-weight:700}
-  .p3d-hud .w{font-size:15px;font-weight:800;margin-top:3px}
-  .p3d-badge{position:absolute;top:14px;right:16px;background:rgba(8,12,20,.42);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.7px;padding:5px 11px;border-radius:14px;text-transform:uppercase;pointer-events:none}
-  .p3d-hint{position:absolute;right:14px;bottom:10px;color:rgba(255,255,255,.5);font-size:11px;pointer-events:none}
-  .p3d-flat{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-  .is-3d .p3d-flat{display:none}
-  .p3d-hint{display:none} .is-3d .p3d-hint{display:block}
-  .hit-summary{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-  .hit-box{flex:1;min-width:120px;border-radius:11px;padding:11px 14px;text-align:center}
-  .hit-box .n{font-size:22px;font-weight:800}
-  .hit-box .l{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}
-  .hit-box.over{background:var(--gold-bg)} .hit-box.over .n{color:var(--gold-deep)} .hit-box.over .l{color:var(--gold-deep)}
-  .hit-box.under{background:var(--blue-bg)} .hit-box.under .n,.hit-box.under .l{color:var(--blue-deep)}
-  .hit-box.push{background:var(--gray-bg)} .hit-box.push .n,.hit-box.push .l{color:var(--muted)}
-  footer.site-foot{max-width:1180px;margin:36px auto 0;padding:24px 24px 8px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:#A7B0C4;text-align:center}
-  footer.site-foot .fnav{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 4px;margin:0 0 10px}
-  footer.site-foot .fnav a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:20px;color:#C7CEDC;font-size:12.5px;font-weight:700;letter-spacing:.4px;text-decoration:none}
-  footer.site-foot .fnav a:hover{color:#fff;background:rgba(255,255,255,.06)}
-  footer.site-foot .fnav a[aria-current="page"]{color:#67e8f9}
-  footer.site-foot .fnav .f-pro{color:#F08A3C}
-  footer.site-foot p{margin:0 auto 6px;max-width:74ch}
-  footer.site-foot .f-rg b{color:#EFF1F7}
-  footer.site-foot .f-rg a{color:#67e8f9;font-weight:700;text-decoration:none}
-  footer.site-foot .f-rg a:hover{text-decoration:underline}
-  .view{display:none}.view.active{display:block}
-  @media(max-width:640px){
-    .gc-head .teams{font-size:18px}
-    .m-tiles{grid-template-columns:1fr}
-    .brand h1{font-size:22px}
-  }
-  /* Kitchen family display face */
-  .brand h1,.hero-teams,.b-teams,.m-head .teams,.pt-name,.pt-prob,
-  .m-tile .t-val,.wx-item .big,.hit-box .n,.method h3,.hero-tag{
-    font-family:Sora,Ubuntu,-apple-system,sans-serif;
-  }
-
-  /* ===== DFS Kitchen family — cyan-forward chrome (appended) ===== */
-  .brand h1 .brand-rad{color:#22d3ee}
-  .sport-tabs .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
-  nav button.active{box-shadow:inset 0 -2px 0 #22d3ee}
-  .controls h2,.method h4,.sub-h,.hist-table th{color:#67e8f9}
-  .sum-card{border-top:2px solid rgba(34,211,238,.55)}
-  .sum-card:hover,.b-row:hover,.wxc:hover,.p-card:hover{border-color:rgba(34,211,238,.5)}
-  .hero-tag{color:#67e8f9;background:rgba(34,211,238,.14)}
-  .brief-card::after{border-color:rgba(34,211,238,.30)!important;box-shadow:0 0 0 38px rgba(34,211,238,.06),0 0 0 80px rgba(34,211,238,.04)!important}
-  .brief-head{color:#67e8f9}
-  .pro-nav .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
-  .p3d-hud{max-width:calc(100% - 160px)}
-  .p3d-hud .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  a{color:#67e8f9}
-  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
-  :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
-  .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
-  /* ===== v2: reading density + cyan lift =====
-     dfskitchen.com sets 19.5px body on a ~680px measure with 64px section
-     padding. A dense data board can't go that far, but 14px text inside 14px
-     card padding was the "clustered" complaint; this is the same intent at
-     table scale. ===== */
-  body{font-size:15.5px;
-    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
-    background-repeat:no-repeat;background-attachment:fixed;
-    padding:26px 26px 88px}
-  main{max-width:1180px}
-  .summary-strip{gap:16px;margin-bottom:30px}
-  .board{gap:14px}
-  .sum-card{padding:20px 22px}
-  .wxc{padding:20px 22px}
-  .m-sec{padding:22px 24px;margin-bottom:16px}
-  .p-card{padding:16px 18px}
-  .brief-card{padding:24px 28px 25px;margin-bottom:26px}
-  .pro-card,.kx-card,.pro-tease{padding:18px 22px;margin-bottom:26px}
-  .b-row{padding:17px 20px}
-  .method{padding:36px 40px}
-  .controls{margin-bottom:20px}
-  .controls h2{font-size:14px;letter-spacing:1.5px}
-  table td,table th{padding-top:11px;padding-bottom:11px}
-  /* prose keeps a readable measure instead of running the full 1180px */
-  .method p,.hist-note,.mx-note,.fcs-note,.empty-season,.tagline{max-width:70ch}
-
-  /* cyan lift -- all-grey was underwhelming; this is DFSRADAR's own colour
-     from the Kitchen system (--radar #22d3ee), spent only where the eye lands. */
-  .brief-card{border-left:3px solid rgba(34,211,238,.6)}
-  .sum-card{border-top:2px solid rgba(34,211,238,.5)}
-  .sum-card:hover,.b-row:hover,.wxc:hover{border-color:rgba(34,211,238,.45)}
-  .m-sec h5,.method h4,.sub-h{color:#67e8f9}
-  .m-head .teams{color:#EFF1F7}
-  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
-  /* ===== v3: narrow-screen header =====
-     Four things pushed every sport page sideways on a phone: .sport-tabs was a
-     non-wrapping flex row holding the header open at a 400px minimum; the
-     .controls heading is a flex item that would not shrink below its own text;
-     .b-row is a fixed six-column grid; and .tip::after is a 250px absolutely
-     positioned tooltip that hangs past the viewport on any tip near the right
-     edge. The tooltip only appears on hover, which is unreliable on touch, so
-     it is suppressed rather than re-anchored. ===== */
-  .sport-tabs{flex-wrap:wrap}
-  .brand,.brand h1{min-width:0;max-width:100%}
-  .brand h1{flex-wrap:wrap;row-gap:6px}
-  .tagline{max-width:100%}
-  .controls h2{min-width:0;overflow-wrap:anywhere}
-  @media(max-width:680px){
-    body{padding-left:14px;padding-right:14px}
-    .brand h1{font-size:21px}
-    .tip::after,.tip::before{display:none}
-    nav{flex-wrap:wrap;row-gap:4px}
-    nav button{white-space:normal}
-    .b-row{grid-template-columns:1fr!important;gap:8px;row-gap:8px}
-    .b-row>*{min-width:0}
-    .summary-strip{grid-template-columns:1fr}
-    .m-tiles,.mx-grid{grid-template-columns:1fr!important}
-    table{display:block;overflow-x:auto;white-space:nowrap}
-    .method{padding:24px 20px}
-    .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
-  }
-
-  /* ===== v5: home =====
-     The wordmark is the link people reach for; the nav item is the one they
-     can see. Both go to the landing page. ===== */
-  .home-link{color:inherit;text-decoration:none;border-radius:4px}
-  .home-link:hover{opacity:.82}
-  .hometab{white-space:nowrap}
-
-  /* ===== v6: honest data states + freshness =====
-     The page used to paint a built-in sample first and keep it whenever
-     data.json failed or had no games. Now it paints a neutral skeleton, then
-     exactly one of: the live slate, a real empty state, or an error with a
-     retry. The sample only appears behind ?demo=1, labelled as demo data. ===== */
-  [hidden]{display:none!important}
-  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .slate-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .slate-meta .fresh{min-height:0}
-  .state-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:38px 28px;text-align:center}
-  .state-card h3{font:700 18px/1.35 Sora,Ubuntu,-apple-system,sans-serif;color:var(--ink);margin-bottom:8px}
-  .state-card p{font-size:14px;line-height:1.65;color:var(--body2);max-width:60ch;margin:0 auto}
-  .state-card.err{border-color:rgba(251,191,36,.38)}
-  .retry-btn{margin-top:18px;appearance:none;cursor:pointer;min-height:40px;padding:0 22px;border-radius:22px;border:1px solid rgba(34,211,238,.5);background:rgba(34,211,238,.12);color:#67e8f9;font:700 13px/1 Ubuntu,-apple-system,sans-serif;letter-spacing:.3px}
-  .retry-btn:hover{background:rgba(34,211,238,.2)}
-  .skel{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px}
-  .skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);animation:skel 1.5s ease-in-out infinite}
-  @keyframes skel{to{transform:translateX(100%)}}
-  .skel-row{height:84px}
-  .skel-card{height:108px;border-radius:var(--radius)}
-  .demo-flag{display:flex;align-items:center;gap:10px;border:1px dashed rgba(251,191,36,.55);background:rgba(251,191,36,.08);color:#fcd34d;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:20px}
-  .demo-flag b{letter-spacing:.8px;text-transform:uppercase;font-size:11.5px}
-  .summary-strip:empty{display:none}
-  .brief-card.is-warn .brief-head .pulse{background:#fbbf24;box-shadow:0 0 8px #fbbf24;animation:none}
-  @media(max-width:680px){.slate-meta{align-items:flex-start}}
-
-  /* ===== v6: Free → PRO path =====
-     One compact card per page pointing at THAT sport's Desk, with a member
-     log in. It sits beside The Optimizer card after the board, so the board
-     comes first. Orange stays reserved for PRO / The Optimizer. ===== */
-  .cta-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;margin-top:30px}
-  .cta-row>*{margin:0!important}
-  .cta-row .kx-card{align-content:center}
-  .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;background:linear-gradient(120deg,#252A35,var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px}
-  .pro-card .px-main{flex:1 1 300px;min-width:0}
-  .pro-card .px-k{font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .pro-card .px-t{font-size:14px;line-height:1.55;color:#dde5f5;margin-top:4px}
-  .pro-card .px-t b{color:#fff}
-  .pro-card .px-s{font-size:12px;color:#A7B0C4;margin-top:4px}
-  .pro-card .px-btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .pro-card .px-go{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border-radius:22px;background:#F08A3C;color:#1B1206;font-size:13px;font-weight:800;letter-spacing:.3px;text-decoration:none;white-space:nowrap}
-  .pro-card .px-go:hover{filter:brightness(1.06)}
-  .pro-card .px-login{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.25);color:#C7CEDC;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
-  .pro-card .px-login:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-
-  /* ===== v6: keyboard, screen readers, touch =====
-     Info tips: the CSS-only bubble was hover-only and hidden ≤680px; a single
-     JS-positioned #tipbox now opens on hover, focus or tap. Icons keep their
-     15px look with a 40px hit area. ===== */
-  .tip::after,.tip::before{content:none!important;display:none!important}
-  .tip{cursor:pointer;border-radius:8px}
-  .info-i{position:relative}
-  .info-i::before{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%)}
-  #tipbox{position:fixed;z-index:300;left:0;top:0;max-width:300px;background:#1F2430;color:#E6EAF2;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:10px 12px;font:500 12.5px/1.55 Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.1px;text-transform:none;text-align:left;white-space:normal}
-  [role="button"][data-game]{cursor:pointer}
-  [role="button"][data-game]:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
-  .m-close{display:inline-flex;align-items:center;justify-content:center}
-  .m-close:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
-  .tbl-open{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;font-weight:800;font-size:14px;color:inherit;cursor:pointer;text-align:left}
-  .tbl-open:hover{color:#67e8f9}
-
-  /* ===== v6: contrast + phone ergonomics =====
-     Small secondary text was #8E97AD on #323A4A (3.9:1); #A7B0C4 clears 4.5:1
-     on every card and header surface. Text on orange buttons is #1B1206 (7.4:1,
-     was white at 2.5:1). On phones every tab/chip/button is at least 40px tall. ===== */
-  :root{--muted:#A7B0C4;--faint:#A7B0C4}
-  .b-teams .at,.hero-teams .at,.wxc-teams .at{color:#8E97AD}
-  .brand .tagline,nav button{color:#A7B0C4}
-  .m-head .meta{color:#A7B0C4!important}
-  .kx-btn,.kx-btn:hover{color:#1B1206!important}
-  .kx-card .kx-go,.kx-card .kx-go:hover{color:#1B1206}
-  .kx-card .kx-s{color:#A7B0C4}
-  select{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%23C7CEDC"/></svg>')!important;background-repeat:no-repeat!important;background-position:right 12px center!important;padding-right:32px!important}
-  @media(max-width:680px),(pointer:coarse){
-    .sport-tabs a{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
-    nav button{min-height:40px}
-    select{min-height:40px}
-    .kx-btn{min-height:40px}
-    .kx-card .kx-go{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
-    .m-close{width:40px;height:40px}
-  }
-  @media(max-width:680px){
-    .summary-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-bottom:22px}
-    .sum-card{padding:14px 14px!important}
-    .sum-card .k{font-size:10.5px;letter-spacing:.8px}
-    .sum-card .v{font-size:15px!important;line-height:1.3}
-    .sum-card .s{font-size:12px}
-    .scene-card{height:220px}
-  }
-  @media(max-width:359px){.summary-strip{grid-template-columns:1fr!important}}
-
-  /* phone board rows: teams + time on one line, weather beside the badge (PPD /
-     Delay likely / Wind game stay visible), then impact and the O/U lean */
-  @media(max-width:680px){
-    .b-row{grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"match time" "wx badge" "imp imp" "ou ou";gap:10px 12px!important;padding:15px 16px!important}
-    .b-row>.b-match{grid-area:match}
-    .b-row>.b-time{grid-area:time;text-align:right;align-self:start}
-    .b-row>.b-wx{grid-area:wx}
-    .b-row>.b-badge{grid-area:badge;display:block!important;align-self:center;text-align:right}
-    .b-row>.b-imp,.b-row>.b-pts{grid-area:imp}
-    .b-row>.b-ou{grid-area:ou}
-  }
-  .pt-lock-row .rk{color:#9fb0d4}
-  @media(max-width:680px){.hero-3d{min-height:200px}.hero-3d canvas{height:200px}}
-  @media(max-width:680px),(pointer:coarse){.pt-go,.pt-login{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}}
-
-  /* ===== v6: reduced motion =====
-     Honour the OS setting: no CSS animation or transition, no smooth
-     scrolling, the radar logo's SMIL sweep is paused (see script) and the 3D
-     scenes stop orbiting and render still frames. ===== */
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
-    html{scroll-behavior:auto!important}
-    .brief-head .pulse{animation:none!important}
-    .skel::after{animation:none!important;display:none}
-    .b-row:hover{transform:none}
-  }
-</style>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"DFSRADAR","url":"https://dfsradar.com/","description":"Weather, umpire and matchup edges for daily fantasy sports across MLB, NFL, PGA and NASCAR."}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"DFSRADAR","url":"https://dfsradar.com/","logo":"https://dfsradar.com/og-card.png","sameAs":[]}</script>
+<script src="/pro/gate.js" defer></script>
+<script src="../assets/dr.js?v=a7b89034" defer></script>
+<script src="../assets/feeds.js?v=a7b89034" defer></script>
+<script src="../assets/mlb.js?v=a7b89034" defer></script>
 </head>
 <body>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap" id="main">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>MLB weather</span><span class="faint">·</span><span id="date">Today</span></div>
+    <h1 class="ph__title">Every ballpark's weather, game by game</h1>
+    <p class="ph__lede" id="lede">Loading today's forecasts…</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="stale" class="mt24" hidden></div>
 
-<header>
-  <div class="header-inner">
-    <div class="brand-row">
-      <div class="brand">
-        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
-          <defs>
-            <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
-              <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/>
-              <stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
-          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
-          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
-          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
-          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
-          <g>
-            <path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
-            <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
-            <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/>
-          </g>
-          <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C">
-            <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#22c55e">
-            <animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
-        </svg><a class="home-link" href="/" aria-label="DFSRADAR home">DFS<span class="brand-rad">RADAR</span></a><span class="sport">MLB</span></h1>
-        <div class="tagline">MLB weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
-        <div class="sport-tabs">
-          <a class="hometab" href="/">← Home</a><a class="on" href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="protab" href="/pro/mlb/">★ PRO</a>
-        </div>
-      </div>
-      <div class="slate-meta">
-        <div class="date-chip" id="date-chip">Loading today's slate…</div>
-        <div class="fresh" id="fresh" hidden></div>
-      </div>
-    </div>
-    <nav>
-      <button type="button" class="active" data-view="slate" aria-pressed="true">Today's Slate</button>
-      <button type="button" data-view="weather" aria-pressed="false">Weather Report</button>
-      <button type="button" data-view="compare" aria-pressed="false">Compare All Games</button>
-      <button type="button" data-view="method" aria-pressed="false">How It Works</button>
-    </nav>
-  </div>
-  <a class="kx-btn" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=header&utm_campaign=mlb" target="_blank" rel="noopener">⚡ The Optimizer</a>
-</header>
+  <section class="sec" id="watch-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">Weather watch</h2>
+      <p class="sec__sub">The games where the forecast actually matters today — tap one to jump to it.</p></div></div>
+    <div class="watch" id="watch"></div>
+  </section>
 
-<main>
-
-  <div class="demo-flag" id="demo-flag" role="note" hidden><b>Demo data</b> A built-in sample slate for design work — none of these games, forecasts or numbers are live.</div>
-
-  <div class="brief-card" id="brief-card" style="display:none">
-    <div class="brief-head"><span class="pulse"></span><span id="brief-label">Today's read — live from the radar</span><span class="tip" data-tip="Auto-generated from today's data on every build — temps, the biggest wind edge, rain risks, and the sharpest over/under environments. Straight from the numbers, no opinions."><span class="info-i">i</span></span></div>
-    <div class="brief-body" id="brief-body"></div>
-  </div>
-
-  <div class="summary-strip" id="summary-strip"></div>
-
-  <section class="hero" id="hero"></section>
-
-
-
-  <!-- ======== SLATE VIEW ======== -->
-  <section class="view active" id="view-slate">
-    <div class="controls">
-      <h2>Weather impact vs each park<span class="tip" data-tip="HR, R, and K show how home runs, runs, and strikeouts in historically similar weather at that park compare to the park's own average. Green = weather boosts it, red = weather suppresses it."><span class="info-i">i</span></span></h2>
-      <label class="sort-wrap">
-        Sort by
-        <select id="sort-select">
+  <section class="sec" id="slate-sec">
+    <div class="sec__h"><div><h2 class="sec__title">Every game</h2>
+      <p class="sec__sub">Conditions at first pitch, the hours around it, and what weather like this has meant at that park.</p></div></div>
+    <div class="toolbar">
+      <div class="seg-scroll"><div class="seg" id="filters" role="group" aria-label="Filter games"></div></div>
+      <span class="grow"></span>
+      <label class="row small dim" style="gap:8px">Sort
+        <select class="select" id="sort">
           <option value="time">First pitch</option>
-          <option value="hr">HR boost</option>
-          <option value="runs">Run boost</option>
-          <option value="ks">K boost</option>
-          <option value="over">Over lean</option>
-          <option value="under">Under lean</option>
-        </select>
-      </label>
+          <option value="impact">Biggest weather effect</option>
+          <option value="wind">Most wind</option>
+          <option value="rain">Rain risk</option>
+        </select></label>
     </div>
-    <div class="board" id="board"></div>
-  </section>
-
-  <!-- ======== WEATHER VIEW ======== -->
-  <section class="view" id="view-weather">
-    <div class="controls"><h2>Stadium weather report<span class="tip" data-tip="The full forecast for every park on the slate — hour by hour from before first pitch through the game, with delay outlook and how much wind matters at each stadium. Click any game for the full breakdown."><span class="info-i">i</span></span></h2></div>
-    <div id="wx-board"></div>
-  </section>
-
-  <!-- ======== COMPARE VIEW ======== -->
-  <section class="view" id="view-compare">
-    <div class="controls"><h2>Every game, one board — click a column to rank it</h2></div>
-    <div id="cmp-state"></div>
-    <div class="table-card" id="cmp-card">
-      <table id="cmp-table">
-        <thead><tr>
-          <th data-k="teams">Game</th>
-          <th data-k="time">First pitch</th>
-          <th data-k="wx">Conditions</th>
-          <th data-k="hr">HR impact</th>
-          <th data-k="runs">Runs</th>
-          <th data-k="ks">Strikeouts</th>
-          <th data-k="lean">O/U lean</th>
-          <th data-k="total">Avg total</th>
-        </tr></thead>
-        <tbody id="cmp-body"></tbody>
-      </table>
+    <div class="grid g2" id="games"><div class="skel"></div><div class="skel"></div></div>
+    <div id="later" class="mt32" hidden>
+      <div class="label" style="margin-bottom:14px">Already underway</div>
+      <div class="grid g2" id="games-later"></div>
     </div>
   </section>
 
-  <!-- ======== METHOD VIEW ======== -->
-  <section class="view" id="view-method">
-    <div class="method">
-      <h3>Real games. Real weather. Real results.</h3>
-      <p>For every game on today's slate, we take the forecast at first pitch — temperature, wind speed and direction relative to the park's orientation, dew point, sky cover, and rain chances — and find every game played at <b>that same ballpark in similar conditions</b> since 2015 (or the park's first season) — matched on temperature, wind speed and direction, and humidity via dew point.</p>
-      <p>Then we simply report what actually happened in those games: how many home runs flew, how many runs scored, how many hitters struck out — and how often the game went over or under the closing total. No projections, no simulations, no black box. Just history, matched to today.</p>
-      <h4>Reading the sample badge</h4>
-      <div class="pill-row">
-        <span class="pill"><span class="dot strong"></span> Strong — 40+ matched games</span>
-        <span class="pill"><span class="dot fair"></span> Fair — 15–39 matched games</span>
-        <span class="pill"><span class="dot limited"></span> Limited — under 15 games</span>
+  <section class="band" id="props-band" hidden>
+    <div class="wrap" style="padding:0">
+      <div class="sec__h"><div><div class="ph__eyebrow" style="margin-bottom:8px">Weather → props</div>
+        <h2 class="sec__title">Turn today's weather into props</h2>
+        <p class="sec__sub">Every home run and strikeout prop on the slate, our number against the books' number — with the weather, park, umpire and matchup already built in.</p></div>
+        <a class="btn btn--cyan" href="../props/mlb/">Open MLB props</a></div>
+      <div class="grid g2" id="props-cards"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <details class="more">
+      <summary>How to read this page</summary>
+      <div class="in">
+        <p><b>The four numbers</b> on each card are the forecast at first pitch: temperature, wind (with a diagram of the field — the arrow shows where the wind is blowing), rain chance, and how home runs have run at that park in games played in weather like today's, against the park's own normal.</p>
+        <p><b>Similar weather</b> means games at the same park within a few degrees and a few mph of today's forecast, since 2015. Every number shows how many games it's built on — small samples are shown, but treat them as small.</p>
+        <p><b>Wind-sensitive parks</b> are the ones where wind has measurably moved home runs over the years. At a wind-shielded park, the same breeze matters less.</p>
+        <p>Forecasts refresh through the day — morning, late morning, midday and before the night games. A roof-closed game is weather-neutral no matter what's happening outside.</p>
       </div>
-      <h4>What is the "Edge of the day"?</h4>
-      <p>The headline game at the top of the slate is the open-air game where today's weather pushes <b>home-run expectation furthest from that park's own average</b> — in either direction. A +20% HR day at a park and a −20% HR day are both edges; domes never qualify. It's simply the biggest weather signal on the board, not a pick.</p>
-      <h4>Probable pitchers in these conditions</h4>
-      <p>Each breakdown also shows both probable pitchers' <b>real career starts in weather like today's</b> — strikeouts, home runs allowed, and ERA per 9 innings in similar conditions vs. their overall numbers. Same philosophy: actual game logs, not projections.</p>
-      <h4>Conditions MVP</h4>
-      <p>Each breakdown highlights the hitter on each team who has <b>slugged best in weather like today's</b> — three seasons of real game logs across all parks, matched to our weather history, minimum 25 at-bats. Rosters and logs refresh weekly.</p>
-      <h4>Park-specific vs. league-wide</h4>
-      <p><b>Weather impact vs this park</b> compares today's conditions to that park's own average — the sharpest signal, since every park plays differently. <b>Vs MLB average</b> puts the same game on a league-wide scale so you can compare across the whole slate.</p>
-      <h4>Domes & retractable roofs</h4>
-      <p>When a roof is closed, weather is neutral by definition — we flag it and show the park's indoor baselines instead of a false edge.</p>
-      <h4>Always current</h4>
-      <p>DFSRADAR rebuilds automatically four times a day — early morning, again once the day's lines are posted, and before the afternoon and evening slates — pulling the live MLB schedule, first-pitch forecasts at every park, real sportsbook totals, and every game logged since 2015. Built for DFS players by the team behind DFS Books.</p>
-    </div>
+    </details>
   </section>
-
-  <div class="cta-row" id="cta-row">
-    <aside class="pro-tease" id="pro-tease" style="display:none" aria-label="Tonight's #1 HR target from DFSRADAR PRO">
-      <div class="pt-k">💣 Tonight's #1 HR target — free from DFSRADAR PRO</div>
-      <div class="pt-row">
-        <div class="pt-main"><div class="pt-name" id="pt-name"></div><div class="pt-sub" id="pt-sub"></div></div>
-        <div class="pt-prob" id="pt-prob"></div>
-      </div>
-      <div class="pt-locked" id="pt-locked"></div>
-      <div class="pt-cta">
-        <a class="pt-go" href="/pro/mlb/">Unlock the full board — $15/mo</a>
-        <a class="pt-login" href="/pro/mlb/#login">Member log in</a>
-        <div class="pt-receipts" id="pt-receipts"></div>
-      </div>
-      <div class="pt-fine">Included free with DFS Kitchen All-Access · graded in public every night</div>
-    </aside>
-    <aside class="pro-card" id="pro-card" aria-label="DFSRADAR PRO MLB Desk">
-      <div class="px-main"><div class="px-k" id="pro-card-k">★ PRO · MLB Desk</div>
-      <div class="px-t" id="pro-card-txt">Ranked home run prop targets for every slate — our probability vs the books' live price, built from weather, umpires, pitchers and batters.</div>
-      <div class="px-s">$15/mo, every sport included · free with DFS Kitchen All-Access · graded in public</div></div>
-      <div class="px-btns"><a class="px-go" href="/pro/mlb/">See the MLB Desk →</a><a class="px-login" href="/pro/mlb/#login">Member log in</a></div>
-    </aside>
-    <div class="kx-card">
-      <div><div class="kx-k">⚡ Found your edge?</div>
-      <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
-      <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
-      <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=mlb" target="_blank" rel="noopener">Build lineups →</a>
-    </div>
-  </div>
 </main>
-
-<footer class="site-foot">
-  <nav class="fnav" aria-label="DFSRADAR"><a href="/mlb/" aria-current="page">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/">NASCAR</a><a class="f-pro" href="/pro/">PRO</a><a href="/record/">Record</a><a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=mlb" target="_blank" rel="noopener">DFS Kitchen</a></nav>
-  <p>DFSRADAR · MLB weather edges for DFS · part of The DFS Kitchen family.</p>
-  <p class="f-rg">Weather-adjusted insights are informational, not betting advice. <b>21+.</b> If you or someone you know has a gambling problem, call <a href="tel:+18004262537">1-800-GAMBLER</a>.</p>
-</footer>
-
-<!-- ======== MODAL ======== -->
-<div class="overlay" id="overlay">
-  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title"></div>
-</div>
+<footer id="dr-foot" class="dr-foot"></footer>
 
 <script>
-/* ==================================================================
-   DEMO DATA — a representative July slate, used ONLY with ?demo=1 (for
-   design work) and always labelled "Demo data" on the page. The live page
-   never falls back to it: a missing or empty data.json shows an honest
-   error or empty state instead.
-   windAngle: degrees clockwise from straight out to CF (0 = out to CF,
-   90 = out to RF line side, 180 = blowing in, 270 = out to LF side)
-================================================================== */
-const SAMPLE_GAMES = [
-  {id:"tb-stl", away:"TB", home:"STL", park:"Busch Stadium", time:"4:15 PM ET", sortTime:1615,
-   temp:91, wind:14, dir:"SW", windAngle:35, windLabel:"OUT TO RF", dew:60, sky:"Rain risk", skyIcon:"🌧️", rain:64, cloud:92,
-   sample:15, hr:16, runs:10, ks:-3, hrGm:2.3, hrPark:2.0,
-   rainHist:{wet:{n:41,r:8.2,hr:1.7,so:17.6}, dry:{n:512,r:9.3,hr:2.1,so:16.9}, wetOver:34, wetUnder:59},
-   mlb:{hr:1, runs:4, ks:-8}, ou:{under:27, push:26, over:47}, total:8.5},
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FM = F.mlb, esc = D.esc;
+  D.shell({ section: "weather", sport: "mlb" });
 
-  {id:"wsh-chc", away:"WSH", home:"CHC", park:"Wrigley Field", time:"2:20 PM ET", sortTime:1420,
-   temp:84, wind:13, dir:"SSW", windAngle:10, windLabel:"OUT TO CF", dew:64, sky:"Sunny", skyIcon:"☀️", rain:4, cloud:12,
-   sample:49, hr:24, runs:14, ks:-4, hrGm:2.9, hrPark:2.3,
-   mlb:{hr:19, runs:11, ks:-6}, ou:{under:25, push:7, over:68}, total:9.0,
-   pitchers:{away:{name:"MacKenzie Gore", sim:{n:9,ip:51.3,k9:10.2,hr9:0.88,era:3.16}, all:{n:64,ip:340.2,k9:9.6,hr9:1.19,era:3.71}, note:"±8° temp, ±8 mph wind"},
-             home:{name:"Justin Steele", sim:{n:12,ip:70.1,k9:8.4,hr9:1.15,era:3.42}, all:{n:71,ip:398.0,k9:8.9,hr9:0.94,era:3.05}, note:"±8° temp, ±8 mph wind"}},
-   mvp:{away:{name:"James Wood", slg:0.612, hr:9, ab:98, games:27, allSlg:0.488},
-        home:{name:"Seiya Suzuki", slg:0.577, hr:7, ab:104, games:29, allSlg:0.503}},
-   hourly:[{lab:"1 PM",c:"☀️",t:85,dew:64,w:12,dir:"SSW",rel:8,rain:2,rh:55},{lab:"2 PM",fp:true,c:"☀️",t:84,dew:64,w:13,dir:"SSW",rel:10,rain:4,rh:58},
-           {lab:"3 PM",c:"⛅",t:83,dew:64,w:14,dir:"SSW",rel:14,rain:6,rh:60},{lab:"4 PM",c:"⛅",t:81,dew:63,w:12,dir:"SW",rel:28,rain:12,rh:64},
-           {lab:"5 PM",c:"☁️",t:79,dew:62,w:10,dir:"SW",rel:33,rain:18,rh:67}],
-   delay:{level:"clear", pct:18},
-   rh:58, pres:1014,
-   ump:{name:"Pat Hoberg", n:412, r:8.7, hr:2.3, so:18.1, dSo:6, dR:-4, dHr:-3},
-   windFx:{rating:"EXTREME", pct10:16}},
+  var S = { d: null, pd: null, filter: "all", sort: "time", member: false, freeKey: null };
+  var FILTERS = [["all", "All games"], ["watch", "Weather watch"], ["wind", "Wind"], ["rain", "Rain"], ["roof", "Roof"]];
 
-  {id:"nyy-bos", away:"NYY", home:"BOS", park:"Fenway Park", time:"7:10 PM ET", sortTime:1910,
-   temp:88, wind:11, dir:"SW", windAngle:325, windLabel:"OUT TO LF", dew:66, sky:"Partly cloudy", skyIcon:"⛅", rain:18, cloud:55,
-   sample:44, hr:12, runs:8, ks:-2, hrGm:2.5, hrPark:2.2,
-   mlb:{hr:8, runs:6, ks:-4}, ou:{under:30, push:12, over:58}, total:9.5},
+  function ctx() { return { d: S.d, pd: S.pd, member: S.member, freeKey: S.freeKey }; }
 
-  {id:"phi-nym", away:"PHI", home:"NYM", park:"Citi Field", time:"7:10 PM ET", sortTime:1910,
-   temp:86, wind:9, dir:"S", windAngle:170, windLabel:"IN FROM CF", dew:65, sky:"Clear", skyIcon:"🌙", rain:5, cloud:15,
-   sample:22, hr:-6, runs:-3, ks:1, hrGm:1.7, hrPark:1.8,
-   mlb:{hr:-9, runs:-5, ks:0}, ou:{under:51, push:9, over:40}, total:8.0},
-
-  {id:"cin-col", away:"CIN", home:"COL", park:"Coors Field", time:"8:40 PM ET", sortTime:2040,
-   temp:93, wind:10, dir:"S", windAngle:20, windLabel:"OUT TO RF", dew:48, sky:"Sunny", skyIcon:"☀️", rain:8, cloud:10,
-   sample:27, hr:9, runs:12, ks:-5, hrGm:3.1, hrPark:2.8,
-   mlb:{hr:28, runs:31, ks:-12}, ou:{under:33, push:9, over:58}, total:11.5},
-
-  {id:"cws-min", away:"CWS", home:"MIN", park:"Target Field", time:"7:40 PM ET", sortTime:1940,
-   temp:83, wind:10, dir:"SSW", windAngle:40, windLabel:"OUT TO RF", dew:61, sky:"Partly cloudy", skyIcon:"⛅", rain:24, cloud:60,
-   sample:19, hr:7, runs:4, ks:-2, hrGm:2.2, hrPark:2.1,
-   mlb:{hr:3, runs:1, ks:-3}, ou:{under:36, push:12, over:52}, total:9.0},
-
-  {id:"bal-tor", away:"BAL", home:"TOR", park:"Rogers Centre · roof open", time:"7:07 PM ET", sortTime:1907,
-   temp:81, wind:8, dir:"SE", windAngle:300, windLabel:"CROSS R→L", dew:63, sky:"Clear", skyIcon:"🌙", rain:2, cloud:8,
-   sample:12, hr:5, runs:3, ks:-1, hrGm:2.4, hrPark:2.3,
-   mlb:{hr:4, runs:2, ks:-2}, ou:{under:40, push:13, over:47}, total:8.5},
-
-  {id:"det-mil", away:"DET", home:"MIL", park:"Am Fam Field · roof open", time:"7:40 PM ET", sortTime:1940,
-   temp:78, wind:7, dir:"NW", windAngle:195, windLabel:"IN FROM LF", dew:56, sky:"Clear", skyIcon:"🌙", rain:3, cloud:10,
-   sample:31, hr:-4, runs:-2, ks:1, hrGm:2.1, hrPark:2.2,
-   mlb:{hr:-3, runs:-3, ks:0}, ou:{under:44, push:11, over:45}, total:8.0},
-
-  {id:"hou-tex", away:"HOU", home:"TEX", park:"Globe Life Field", time:"8:05 PM ET", sortTime:2005,
-   dome:true, temp:101, wind:0, dir:"—", windAngle:0, windLabel:"ROOF CLOSED", dew:70, sky:"Indoor", skyIcon:"🏟️",
-   sample:74, hr:0, runs:0, ks:0, hrGm:2.1, hrPark:2.1,
-   mlb:{hr:-6, runs:-4, ks:2}, ou:{under:46, push:10, over:44}, total:8.5},
-
-  {id:"lad-sd", away:"LAD", home:"SD", park:"Petco Park", time:"9:40 PM ET", sortTime:2140,
-   temp:71, wind:8, dir:"W", windAngle:185, windLabel:"IN FROM CF", dew:62, sky:"Marine layer", skyIcon:"🌫️", rain:12, cloud:78,
-   sample:61, hr:-14, runs:-9, ks:3, hrGm:1.6, hrPark:1.9,
-   mlb:{hr:-19, runs:-13, ks:5}, ou:{under:55, push:10, over:35}, total:7.5},
-
-  {id:"atl-sf", away:"ATL", home:"SF", park:"Oracle Park", time:"9:45 PM ET", sortTime:2145,
-   temp:63, wind:16, dir:"WSW", windAngle:160, windLabel:"IN FROM RF", dew:55, sky:"Fog rolling in", skyIcon:"🌫️", rain:15, cloud:88,
-   sample:58, hr:-18, runs:-10, ks:2, hrGm:1.3, hrPark:1.6,
-   mlb:{hr:-26, runs:-15, ks:4}, ou:{under:58, push:9, over:33}, total:7.0},
-
-  {id:"kc-sea", away:"KC", home:"SEA", park:"T-Mobile Park · roof open", time:"9:40 PM ET", sortTime:2140,
-   temp:72, wind:6, dir:"N", windAngle:210, windLabel:"IN FROM LF", dew:52, sky:"Clear", skyIcon:"🌙", rain:6, cloud:20,
-   sample:52, hr:-11, runs:-7, ks:3, hrGm:1.7, hrPark:1.9,
-   mlb:{hr:-15, runs:-10, ks:6}, ou:{under:57, push:8, over:35}, total:7.0}
-];
-
-let GAMES = [];
-let LIVE = null;   // the loaded data.json (null in demo mode or before it arrives)
-const DEMO = /[?&]demo=1(?:&|$)/.test(location.search);
-
-/* ==================================================================
-   ALL 30 PARKS — real outfield dimensions (ft) at LF line / LCF / CF /
-   RCF / RF line, wall heights (ft), roof flags. Signature quirks kept:
-   Green Monster, Crawford Boxes, Clemente Wall, Oracle's alley, etc.
-================================================================== */
-const PARKS = {
-  ARI:{name:"Chase Field",              dims:[330,374,407,374,334], walls:[8,8,25,8,9],    roof:true},
-  ATH:{name:"Sutter Health Park",       dims:[330,396,403,386,325], walls:[8,8,8,8,8]},
-  ATL:{name:"Truist Park",              dims:[335,385,400,375,325], walls:[8,8,8,8,16]},
-  BAL:{name:"Camden Yards",             dims:[333,364,410,373,318], walls:[7,7,7,8,21]},
-  BOS:{name:"Fenway Park",              dims:[310,379,390,380,302], walls:[37,37,17,5,3]},
-  CHC:{name:"Wrigley Field",            dims:[355,368,400,368,353], walls:[15,11,11,11,15]},
-  CIN:{name:"Great American Ball Park", dims:[328,379,404,370,325], walls:[12,8,8,8,8]},
-  CLE:{name:"Progressive Field",        dims:[325,370,405,375,325], walls:[19,19,9,9,9]},
-  COL:{name:"Coors Field",              dims:[347,390,415,375,350], walls:[8,8,8,13,14]},
-  CWS:{name:"Rate Field",               dims:[330,375,400,375,335], walls:[8,8,8,8,8]},
-  DET:{name:"Comerica Park",            dims:[345,370,412,365,330], walls:[8,8,9,9,8]},
-  HOU:{name:"Daikin Park",              dims:[315,362,409,373,326], walls:[19,19,9,9,7],   roof:true},
-  KC: {name:"Kauffman Stadium",         dims:[330,387,410,387,330], walls:[8,8,8,8,8]},
-  LAA:{name:"Angel Stadium",            dims:[330,387,396,370,330], walls:[8,8,8,18,18]},
-  LAD:{name:"Dodger Stadium",           dims:[330,385,395,385,330], walls:[8,8,8,8,8]},
-  MIA:{name:"loanDepot park",           dims:[344,386,400,387,335], walls:[10,10,10,10,10],roof:true},
-  MIL:{name:"American Family Field",    dims:[344,371,400,374,345], walls:[8,8,8,8,8],     retract:true},
-  MIN:{name:"Target Field",             dims:[339,377,404,367,328], walls:[8,8,8,23,23]},
-  NYM:{name:"Citi Field",               dims:[335,370,408,380,330], walls:[8,8,8,8,8]},
-  NYY:{name:"Yankee Stadium",           dims:[318,399,408,385,314], walls:[8,8,8,8,8]},
-  PHI:{name:"Citizens Bank Park",       dims:[329,374,401,369,330], walls:[12,12,6,12,12]},
-  PIT:{name:"PNC Park",                 dims:[325,389,399,375,320], walls:[6,10,10,21,21]},
-  SD: {name:"Petco Park",               dims:[336,390,396,391,322], walls:[4,8,8,8,10]},
-  SEA:{name:"T-Mobile Park",            dims:[331,378,401,381,326], walls:[8,8,8,8,8],     retract:true},
-  SF: {name:"Oracle Park",              dims:[339,364,391,415,309], walls:[8,8,8,8,25]},
-  STL:{name:"Busch Stadium",            dims:[336,375,400,375,335], walls:[8,8,8,8,8]},
-  TB: {name:"Tropicana Field",          dims:[315,370,404,370,322], walls:[10,10,10,10,10],roof:true},
-  TEX:{name:"Globe Life Field",         dims:[329,372,407,374,326], walls:[8,8,8,8,8],     roof:true},
-  TOR:{name:"Rogers Centre",            dims:[328,375,400,375,328], walls:[10,10,10,10,10],retract:true},
-  WSH:{name:"Nationals Park",           dims:[336,377,402,370,335], walls:[8,8,8,8,8]},
-};
-
-/* ---------- wind arrow colors ---------- */
-const WIND_COLORS = {out:"#22c55e", in:"#9bb6d6"};
-
-/* ---------- helpers ---------- */
-const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const pct = v => (v>0?"+":"")+v+"%";
-const cls = v => v>0?"pos":(v<0?"neg":"neu");
-/* summary cards: green/red by sign, neutral grey when within ±2% of the park's norm */
-const nearCls = v => Math.abs(v) < 3 ? "neu" : (v > 0 ? "pos" : "neg");
-/* "OUT TO CF" → "out to CF" mid-sentence, "Out to CF" with cap=true */
-function windTxt(lbl, cap){
-  const t = String(lbl||"").toLowerCase().replace(/\b(cf|lf|rf)\b/g, m=>m.toUpperCase()).replace(/[lr]→[lr]/g, m=>m.toUpperCase());
-  return cap ? t.charAt(0).toUpperCase() + t.slice(1) : t;
-}
-/* THE over/under lean rule — the board rows, the compare table and the summary
-   cards all read it from here, so a card can never call a lean the board
-   shows as EVEN SPLIT. Live data carries the builder's ouLean (median of the
-   matched sample clears the line by a full run); the demo sample falls back
-   to the old percentage rule. Domes never lean. */
-function ouLean(g){
-  if(g.dome) return null;
-  if(g.ouLean !== undefined) return g.ouLean;
-  if(!g.sample) return null;
-  return g.ou.over > g.ou.under + 3 ? "over" : (g.ou.under > g.ou.over + 3 ? "under" : null);
-}
-function sampleInfo(n){ if(n>=40) return {cls:"strong",word:"Strong sample"}; if(n>=15) return {cls:"fair",word:"Fair sample"}; return {cls:"limited",word:"Limited sample"}; }
-
-/* park diagram with wind arrow */
-function parkSVG(g, size){
-  const s = size, c = s/2;
-  if(g.dome){
-    return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true" focusable="false">
-      <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#3C4455" stroke="#4a5468"/>
-      <g transform="translate(${c},${c*1.12}) scale(${s/86})">
-        <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#454E61" stroke="#556074" stroke-width="2"/>
-        <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#3C4455" stroke="#556074" stroke-width="1.6"/>
-      </g>
-      <text x="${c}" y="${s*0.22}" text-anchor="middle" font-size="${s*0.14}" font-weight="800" fill="#8E97AD">🏟️</text>
-    </svg>`;
+  function summary(d) {
+    var g = d.games, open = g.filter(function (x) { return !x.dome; });
+    var parts = [];
+    parts.push(D.plural(g.length, "game") + " on the slate.");
+    var seen = {}, windy = open.filter(function (x) { var k = FM.windKind(x); return (k === "out" || k === "in") && x.wind >= 10; })
+      .sort(function (a, b) { return b.wind - a.wind; })
+      .filter(function (x) { var p = FM.park(x); if (seen[p]) return false; seen[p] = 1; return true; }).slice(0, 2);
+    if (windy.length) parts.push("Wind is the story at " + windy.map(function (x) { return FM.park(x) + " (" + x.wind + " mph " + FM.wind(x.windLabel) + ")"; }).join(" and ") + ".");
+    var wet = open.filter(function (x) { return x.delay && FM.delay[x.delay.level]; });
+    parts.push(wet.length ? D.plural(wet.length, "game") + " with rain in the forecast around first pitch." : "No rain threats worth a delay.");
+    if (open.length > 1) {
+      var t = open.filter(function (x) { return D.isNum(x.temp); }).sort(function (a, b) { return a.temp - b.temp; });
+      if (t.length > 1) parts.push("Temperatures run from " + t[0].temp + "° at " + FM.park(t[0]) + " to " + t[t.length - 1].temp + "° at " + FM.park(t[t.length - 1]) + ".");
+    }
+    var roofs = g.length - open.length;
+    if (roofs) parts.push(D.plural(roofs, "game") + " under a roof.");
+    return parts.join(" ");
   }
-  const ang = (g.windAngle-90)*Math.PI/180; // 0 => up
-  const len = s*0.30;
-  const x1 = c - Math.cos(ang)*len*0.55, y1 = c*1.08 - Math.sin(ang)*len*0.55;
-  const x2 = c + Math.cos(ang)*len,      y2 = c*1.08 + Math.sin(ang)*len;
-  const blowingIn = g.windAngle>120 && g.windAngle<240;
-  const arrColor = blowingIn ? WIND_COLORS.in : WIND_COLORS.out;
-  const mid = `arr-${g.id}-${size}`;
-  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true" focusable="false">
-    <defs><marker id="${mid}" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
-      <path d="M0,0 L7,3.5 L0,7 Z" fill="${arrColor}"/></marker></defs>
-    <rect x="1" y="1" width="${s-2}" height="${s-2}" rx="${s*0.18}" fill="#2b3a33" stroke="#3d5545"/>
-    <g transform="translate(${c},${c*1.12}) scale(${s/86})">
-      <path d="M0,-26 L26,0 L0,26 L-26,0 Z" fill="#2f4438" stroke="#4a6b55" stroke-width="2"/>
-      <path d="M0,10 L10,0 L0,-10 L-10,0 Z" fill="#eff1f7" stroke="#4a6b55" stroke-width="1.6"/>
-      <circle cx="0" cy="0" r="2.6" fill="#4a6b55"/>
-    </g>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${arrColor}" stroke-width="${Math.max(2,s*0.045)}" stroke-linecap="round" marker-end="url(#${mid})"/>
-  </svg>`;
-}
 
-/* ---------- slate summary ---------- */
-function edgeBadge(g){
-  if(g.dome) return `<span class="edge-badge edge-neutral">Roof closed</span>`;
-  if(g.delay && g.delay.level==="severe") return `<span class="edge-badge edge-rain" style="background:#a92525">PPD risk</span>`;
-  if(g.delay && g.delay.level==="likely") return `<span class="edge-badge edge-rain">Delay likely</span>`;
-  if((g.rain||0)>=55) return `<span class="edge-badge edge-rain">Rain risk</span>`;
-  if(g.hr>=12) return `<span class="edge-badge edge-hr">HR weather</span>`;
-  if(ouLean(g)==="under") return `<span class="edge-badge edge-under">Under weather</span>`;
-  return "";
-}
-function renderSummary(){
-  const el = document.getElementById("summary-strip");
-  const open = GAMES.filter(g=>!g.dome && g.sample);      // domes and no-history games have nothing to rank
-  if(!open.length){ el.innerHTML = ""; return; }
-  const tot = g => `${g.lineSource==="book"?"book total":"est. total"} ${Number(g.total).toFixed(1)}`;
-  const cards = [];
-  const bestHR = [...open].sort((a,b)=>b.hr-a.hr)[0];
-  cards.push({k:"Best HR conditions", v:`${bestHR.away} @ ${bestHR.home} <span class="${nearCls(bestHR.hr)}">${pct(bestHR.hr)}</span>`,
-              s:`${bestHR.wind} mph ${windTxt(bestHR.windLabel)} · ${bestHR.temp}°`, id:bestHR.id});
-  const over = open.filter(g=>ouLean(g)==="over").sort((a,b)=>b.ou.over-a.ou.over)[0];
-  if(over) cards.push({k:"Strongest over lean", v:`${over.away} @ ${over.home} <span class="over">${over.ou.over}%</span>`,
-              s:`went over in ${over.sample} similar games · ${tot(over)}`, id:over.id});
-  const under = open.filter(g=>ouLean(g)==="under").sort((a,b)=>b.ou.under-a.ou.under)[0];
-  if(under) cards.push({k:"Strongest under lean", v:`${under.away} @ ${under.home} <span class="under">${under.ou.under}%</span>`,
-              s:`went under in ${under.sample} similar games · ${tot(under)}`, id:under.id});
-  const bestK = [...open].sort((a,b)=>b.ks-a.ks)[0];
-  cards.push({k:"Best K conditions", v:`${bestK.away} @ ${bestK.home} <span class="${nearCls(bestK.ks)}">${pct(bestK.ks)} Ks</span>`,
-              s:`${bestK.temp}° · ${bestK.wind} mph ${windTxt(bestK.windLabel)} at first pitch`, id:bestK.id});
-  el.innerHTML = cards.map(c=>`<div class="sum-card" data-game="${c.id}" role="button" tabindex="0"><div class="k">${c.k}</div><div class="v">${c.v}</div><div class="s">${c.s}</div></div>`).join("");
-}
+  function inFilter(g, f, watchIds) {
+    if (f === "all") return true;
+    if (f === "roof") return !!g.dome;
+    if (g.dome) return false;
+    if (f === "watch") return watchIds[g.id];
+    if (f === "wind") { var k = FM.windKind(g); return k !== "calm" && g.wind >= 8; }
+    if (f === "rain") return (g.delay && FM.delay[g.delay.level]) || (g.rain || 0) >= 20;
+    return true;
+  }
+  function sorter(k) {
+    if (k === "impact") return function (a, b) { return (b.dome ? -1 : Math.abs(b.hr || 0)) - (a.dome ? -1 : Math.abs(a.hr || 0)); };
+    if (k === "wind") return function (a, b) { return (b.dome ? -1 : b.wind || 0) - (a.dome ? -1 : a.wind || 0); };
+    if (k === "rain") return function (a, b) { return (b.dome ? -1 : b.rain || 0) - (a.dome ? -1 : a.rain || 0); };
+    return function (a, b) { return (a.sortTime || 0) - (b.sortTime || 0); };
+  }
 
-/* ---------- hero + board ---------- */
-function gaugeSVG(g, size=48){
-  const r=17, c=2*Math.PI*r;
-  const o=g.ou.over/100*c, p=g.ou.push/100*c, u=g.ou.under/100*c;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 46 46" aria-hidden="true" focusable="false">
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#22d3ee" stroke-width="6" stroke-dasharray="${o} ${c}" transform="rotate(-90 23 23)"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#454E61" stroke-width="6" stroke-dasharray="${p} ${c}" stroke-dashoffset="${-o}" transform="rotate(-90 23 23)"/>
-    <circle cx="23" cy="23" r="${r}" fill="none" stroke="#93b4d8" stroke-width="6" stroke-dasharray="${u} ${c}" stroke-dashoffset="${-(o+p)}" transform="rotate(-90 23 23)"/>
-    <text x="23" y="27" text-anchor="middle" font-size="12" font-weight="800" fill="#EFF1F7">${g.total.toFixed(1)}</text>
-  </svg>`;
-}
-function leanTxt(g){
-  const L=ouLean(g);
-  return L==="over" ? `<b style="color:var(--gold-deep)">OVER ${g.ou.over}%</b>`
-    : L==="under" ? `<b style="color:var(--blue-deep)">UNDER ${g.ou.under}%</b>`
-    : `<b style="color:var(--muted)">EVEN SPLIT</b>`;
-}
-function rowHTML(g){
-  const si = sampleInfo(g.sample);
-  const imp = g.dome
-    ? `<span class="pill neu">HR —</span><span class="pill neu">R —</span><span class="pill neu">K —</span>`
-    : `<span class="pill ${cls(g.hr)}">HR ${pct(g.hr)}</span><span class="pill ${cls(g.runs)}">R ${pct(g.runs)}</span><span class="pill ${cls(g.ks)}">K ${pct(g.ks)}</span>`;
-  const wx = g.dome
-    ? `<div class="w">roof closed<br>weather sealed out</div>`
-    : `<div class="w">${g.wind} mph ${g.dir}<br>${windTxt(g.windLabel)} · dew ${g.dew}°${(g.rain!=null&&g.rain>=15)?`<br>Rain ${g.rain}%`:""}</div>`;
-  return `<div class="b-row" data-game="${g.id}" role="button" tabindex="0">
-    <div class="b-time">${g.time.replace(" ET","")}<span>ET</span></div>
-    <div class="b-match"><div class="b-teams">${g.away} <span class="at">@</span> ${g.home}</div><div class="b-park">${g.park}</div></div>
-    <div class="b-wx">${parkSVG(g,46)}<div><div class="t">${g.temp}° <span style="font-size:13px">${g.skyIcon}</span></div>${wx}</div></div>
-    <div class="b-imp">${imp}</div>
-    <div class="b-ou">${gaugeSVG(g)}<div class="txt">${leanTxt(g)}<span>${si.word} · ${g.sample} gms</span><span class="sr-only"> · total ${g.total.toFixed(1)}</span></div></div>
-    <div class="b-badge">${edgeBadge(g)}</div>
-  </div>`;
-}
-function renderBoard(){
-  const mode = document.getElementById("sort-select").value;
-  const sorted = [...GAMES].sort((a,b)=>{
-    switch(mode){
-      case "hr": return b.hr-a.hr;
-      case "runs": return b.runs-a.runs;
-      case "ks": return b.ks-a.ks;
-      case "over": return b.ou.over-a.ou.over;
-      case "under": return b.ou.under-a.ou.under;
-      default: return a.sortTime-b.sortTime;
-    }
-  });
-  document.getElementById("board").innerHTML = sorted.map(rowHTML).join("");
-}
-function heroBar(v){
-  const half = Math.min(Math.abs(v),35)/35*50;
-  const f = v>=0
-    ? `<div class="f" style="left:50%;width:${half}%;background:linear-gradient(90deg,var(--meterp1),var(--meterp2))"></div>`
-    : `<div class="f" style="right:50%;width:${half}%;background:linear-gradient(90deg,var(--metern2),var(--metern1))"></div>`;
-  return `<div class="hi-bar">${v===0?"":f}<div class="mid"></div></div>`;
-}
-function renderHero(){
-  const heroEl = document.getElementById("hero");
-  let live = GAMES.filter(x=>!x.dome);
-  if(!live.length) live = GAMES;
-  heroEl.hidden = !live.length;
-  if(!live.length){ disposeP3D(hero3D); hero3D = null; heroEl.innerHTML=""; return; }
-  const g = [...live].sort((a,b)=>Math.abs(b.hr)-Math.abs(a.hr))[0];
-  const si = sampleInfo(g.sample);
-  const pk = PARKS[g.home] || {dims:[335,375,400,375,335]};
-  document.getElementById("hero").innerHTML = `
-    <div class="hero-3d">
-      <div class="p3d-flat">${parkSVG(g,140)}</div>
-      <canvas id="hero3d" hidden></canvas>
-      <div class="p3d-hud"><div class="t">${g.park.split("·")[0].trim()} · live view</div>
-        <div class="w">Wind ${g.wind} mph ${g.dir} · ${windTxt(g.windLabel)}</div></div>
-      <div class="p3d-badge">${g.skyIcon} ${g.sky}</div>
-      <div class="p3d-dims">${pk.dims[0]}′ LF · ${pk.dims[2]}′ CF · ${pk.dims[4]}′ RF</div>
-      <div class="p3d-hint">drag to look around</div>
-    </div>
-    <div class="hero-info">
-      <div class="hero-tag">⚡ Edge of the day<span class="tip" data-tip="The open-air game where today's weather pushes home-run expectation furthest from that park's own average — the biggest weather signal on the slate, in either direction. Not a pick."><span class="info-i">i</span></span></div>
-      <div class="hero-teams">${g.away} <span class="at">@</span> ${g.home}</div>
-      <div class="hero-meta">${g.time} · ${g.park}</div>
-      <div class="hero-wx"><span><b>${g.temp}°F</b></span><span><b>${g.wind} mph</b> ${g.dir} · ${windTxt(g.windLabel)}</span><span>dew <b>${g.dew}°</b></span>${(!g.dome&&g.rain!=null)?`<span>rain <b>${g.rain}%</b></span>`:""}<span class="sample tip" data-tip="Matched games at this park since 2015 with weather like today's (±6° temp, ±6 mph wind, similar dew point, same wind direction — the window widens, dew band first, if fewer than 12 match). Strong = 40+, Fair = 15–39, Limited = under 15."><span class="dot ${si.cls}"></span>${si.word} · ${g.sample}<span class="info-i">i</span></span></div>
-      <div class="hero-imp">
-        <div class="hi-row"><span class="l">Home runs</span>${heroBar(g.hr)}<span class="hi-val ${cls(g.hr)}">${pct(g.hr)}</span></div>
-        <div class="hi-row"><span class="l">Runs</span>${heroBar(g.runs)}<span class="hi-val ${cls(g.runs)}">${pct(g.runs)}</span></div>
-        <div class="hi-row"><span class="l">Strikeouts</span>${heroBar(g.ks)}<span class="hi-val ${cls(g.ks)}">${pct(g.ks)}</span></div>
-      </div>
-      <div class="hero-foot">
-        <div class="hero-lean">${gaugeSVG(g,54)}<div class="txt">${leanTxt(g)}<span>in ${g.sample} similar games · ${g.lineSource==="book"?"book total":"est. total"} ${g.total.toFixed(1)}<span class="tip" data-tip="How often historically similar games at this park finished over or under today's total. The ring: royal = over share, slate = under, gray = push. Center number is the total — from real sportsbooks when available, otherwise the matched sample's balanced midpoint (marked est.)."><span class="info-i">i</span></span></span></div></div>
-        <button class="hero-cta" data-game="${g.id}">Full breakdown →</button>
-      </div>
-    </div>`;
-  const wrap = heroEl.querySelector(".hero-3d"), token = ++heroToken;
-  whenNear(wrap, ()=>loadThree().then(()=>{ if(token === heroToken) start3D(wrap, g, "hero"); }).catch(()=>{}));
-}/* ---------- weather report view ---------- */
-function renderWeather(){
-  const el = document.getElementById("wx-board");
-  if(!el) return;
-  const DL = {clear:["dl-clear","No delay concern"], watch:["dl-watch","Worth monitoring"],
-              likely:["dl-likely","Delay likely"], severe:["dl-severe","Postponement risk"]};
-  el.innerHTML = [...GAMES].sort((a,b)=>a.sortTime-b.sortTime).map(g=>{
-    const head = `<div class="wxc-head">
-      <div class="wxc-time">${g.time.replace(" ET","")}<span>ET</span></div>
-      <div><div class="wxc-teams">${g.away} <span class="at">@</span> ${g.home}</div>
-      <div class="wxc-park">${g.park.split(" ·")[0]}</div></div>`;
-    if(g.dome){
-      return `<div class="wxc" data-game="${g.id}" role="button" tabindex="0">${head}
-        <span class="edge-badge edge-neutral" style="margin-left:auto">Roof closed</span></div>
-        <div class="wxc-dome">Indoor baseline — weather sealed out. ${g.temp}° listed for reference only.</div></div>`;
-    }
-    const dl = g.delay ? DL[g.delay.level] : null;
-    const hours = (g.hourly||[]).map(h=>`
-      <div class="hr-cell ${h.fp?"hr-fp":""}">
-        <div class="hr-lab">${h.lab||""}${h.fp?" · 1st pitch":""}</div>
-        <div class="hr-t">${h.c?`<span class="hr-ic">${h.c}</span> `:""}${h.t}°</div>
-        <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
-        <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
-      </div>`).join("");
-    return `<div class="wxc" data-game="${g.id}" role="button" tabindex="0">${head}
-        ${dl?`<span class="delay-chip ${dl[0]}" style="margin:0 0 0 auto">${dl[1].toUpperCase()}${g.delay.pct?` · peak rain ${g.delay.pct}%`:""}</span>`:""}</div>
-      <div class="hourly" style="margin-top:11px">${hours}<div class="hr-note">Hour by hour at the park · local time</div></div>
-      <div class="wxc-foot">${g.windFx?`Wind factor here: <b class="wfx-${g.windFx.rating.toLowerCase()}">${g.windFx.rating}</b> · `:""}Wind ${g.wind} mph ${g.dir} (${windTxt(g.windLabel)}) · Humidity ${g.rh!=null?g.rh+"%":"—"} · Pressure ${g.pres!=null?g.pres+" hPa":"—"} · Dew ${g.dew}°<span class="wxc-link">Full breakdown →</span></div>
-    </div>`;
-  }).join("");
-}
-
-/* ---------- compare table ---------- */
-let cmpSort = {k:"hr", dir:-1};
-function chip(v){ return v===0 ? `<span class="cell-chip neu">—</span>` : `<span class="cell-chip ${cls(v)}">${pct(v)}</span>`; }
-function renderCompare(){
-  const rows = [...GAMES].sort((a,b)=>{
-    const k=cmpSort.k, d=cmpSort.dir;
-    const val = g => k==="teams" ? g.away : k==="time" ? g.sortTime : k==="wx" ? g.temp
-      : k==="lean" ? g.ou.over-g.ou.under : k==="total" ? g.total : g[k];
-    const va=val(a), vb=val(b);
-    return (va<vb?-1:va>vb?1:0)*d;
-  });
-  document.getElementById("cmp-body").innerHTML = rows.map(g=>{
-    const L2=ouLean(g);
-    const lean = L2==="over" ? `<span class="lean-cell over">OVER ${g.ou.over}%</span>`
-      : L2==="under" ? `<span class="lean-cell under">UNDER ${g.ou.under}%</span>`
-      : `<span class="lean-cell none">even</span>`;
-    return `<tr data-game="${g.id}">
-      <td><button type="button" class="tbl-teams tbl-open" data-game="${g.id}">${g.away} @ ${g.home}</button><br><span class="tbl-park">${g.park}</span></td>
-      <td>${g.time}</td>
-      <td>${g.dome?"Roof closed":`${g.temp}° · ${g.wind} mph ${g.dir}${(g.rain!=null&&g.rain>=15)?` · Rain ${g.rain}%`:""}`}</td>
-      <td>${g.dome?chip(0):chip(g.hr)}</td>
-      <td>${g.dome?chip(0):chip(g.runs)}</td>
-      <td>${g.dome?chip(0):chip(g.ks)}</td>
-      <td>${lean}</td>
-      <td><b>${g.total.toFixed(1)}</b></td>
-    </tr>`;
-  }).join("");
-  document.querySelectorAll("#cmp-table thead th").forEach(th=>{
-    const arr = th.querySelector(".arr"); if(arr) arr.remove();
-    if(th.dataset.k===cmpSort.k){
-      const s=document.createElement("span"); s.className="arr"; s.textContent=cmpSort.dir<0?"▼":"▲"; th.appendChild(s);
-    }
-  });
-}
-document.querySelectorAll("#cmp-table thead th").forEach(th=>{
-  th.addEventListener("click",()=>{
-    const k=th.dataset.k;
-    if(cmpSort.k===k) cmpSort.dir*=-1; else cmpSort={k,dir:k==="teams"||k==="time"||k==="wx"?1:-1};
-    renderCompare();
-  });
-});
-
-/* ---------- historical similar games — real matched games only ----------
-   (The old fallback invented a seeded "history" whenever a game had no
-   matches. It is gone: no matches means we say so.) */
-function histTable(g){
-  if(g.matches && g.matches.length){
-    const line = g.total;
-    const body = g.matches.map(m=>{
-      const dstr = `${m.d.slice(4,6)}/${m.d.slice(6,8)}/${m.d.slice(0,4)}`;
-      const res = m.r>line ? "over" : (m.r<line ? "under" : "push");
-      return `<tr><td>${dstr}</td><td>at ${g.home}</td><td>${m.t}°${m.p>=0.05?' <span class="wet-tag">wet</span>':''}</td><td>${m.w} mph</td><td>${line||"—"}</td><td><b>${m.r}</b></td><td><span class="res-chip ${res}">${res.toUpperCase()}</span></td></tr>`;
+  function renderGames() {
+    var d = S.d, c = ctx();
+    var watch = FM.watch(d), ids = {};
+    watch.forEach(function (w) { ids[w.id] = true; });
+    var list = d.games.filter(function (g) { return inFilter(g, S.filter, ids); }).sort(sorter(S.sort));
+    var now = list.filter(function (g) { return !FM.started(d, g); }), later = list.filter(function (g) { return FM.started(d, g); });
+    if (!now.length && later.length && S.sort === "time") { now = later; later = []; }
+    document.getElementById("games").innerHTML = now.length ? now.map(function (g) { return M.card(g, c); }).join("") :
+      '<div class="empty card" style="grid-column:1/-1"><h3>No games match this filter</h3><p>Try another filter above.</p></div>';
+    document.getElementById("later").hidden = !later.length;
+    document.getElementById("games-later").innerHTML = later.map(function (g) { return M.card(g, c); }).join("");
+    var fb = document.getElementById("filters");
+    fb.innerHTML = FILTERS.map(function (f) {
+      var n = d.games.filter(function (g) { return inFilter(g, f[0], ids); }).length;
+      if (f[0] !== "all" && !n) return "";
+      return '<button type="button" data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + ' <span class="ct">' + n + "</span></button>";
     }).join("");
-    return `
-    <div class="hit-summary">
-      <div class="hit-box over"><div class="n">${g.ou.over}%</div><div class="l">went over</div></div>
-      <div class="hit-box under"><div class="n">${g.ou.under}%</div><div class="l">went under</div></div>
-      <div class="hit-box push"><div class="n">${g.ou.push}%</div><div class="l">pushed</div></div>
-    </div>
-    <table class="hist-table"><thead><tr>
-      <th>Date</th><th>Game</th><th>Temp</th><th>Wind</th><th>Total</th><th>Final</th><th>Result</th>
-    </tr></thead><tbody>${body}</tbody></table>
-    <div class="hist-note">${g.sample>g.matches.length?`Showing ${g.matches.length} most recent of ${g.sample} matched games. `:""}${g.note?"Match window: "+g.note+". ":""}${g.lineSource==="est"?"Total is the matched-sample median (no book line pinned).":""}</div>`;
-  }
-  return `<div class="hist-note" style="margin-top:0">${g.sample
-      ? `The ${g.sample} matched game${g.sample===1?"":"s"} behind these numbers aren't listed for this game.`
-      : `No past game at ${esc(g.park.split("·")[0].trim())} matches these conditions yet, so there's no similar-weather history to show.`}
-    The first-pitch forecast above is live.</div>`;
-}
-
-/* ---------- hour-by-hour strip (modal forecast) ---------- */
-function hourlyStrip(g){
-  if(g.dome || !g.hourly || !g.hourly.length) return "";
-  const labs=["1st pitch","+1 hr","+2 hr","+3 hr"];
-  return `<div class="hourly">${g.hourly.map((h,i)=>`
-    <div class="hr-cell ${h.fp?"hr-fp":""}">
-      <div class="hr-lab">${h.lab||labs[i]||""}${h.fp?" · 1st pitch":""}</div>
-      <div class="hr-t">${h.c?`<span class="hr-ic">${h.c}</span> `:""}${h.t}°</div>
-      <div class="hr-w"><span class="hr-arrow" style="transform:rotate(${h.rel}deg)">↑</span> ${h.w} mph ${h.dir}</div>
-      <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}${h.rh!=null?` · Hum ${h.rh}%`:""}</div>
-    </div>`).join("")}
-    <div class="hr-note">Hour by hour at the park · local time<span class="tip tip-right" data-tip="The forecast from an hour before first pitch through the whole game window — wind can shift and rain can arrive mid-game. Arrows show where the wind is blowing toward, relative to the park (↑ = out to center field)."><span class="info-i">i</span></span></div>
-  </div>`;
-}
-function delayChip(g){
-  if(g.dome || !g.delay) return "";
-  const M={clear:["No delay concern","dl-clear"],
-           watch:["Worth monitoring","dl-watch"],
-           likely:["Delay likely","dl-likely"],
-           severe:["Postponement risk","dl-severe"]};
-  const [txt,cls2]=M[g.delay.level]||M.clear;
-  return `<div class="delay-chip ${cls2}">DELAY OUTLOOK: <b>${txt}</b> — peak ${g.delay.pct}% rain chance in the game window<span class="tip" data-tip="Rated from the worst rain probability across the whole game window (an hour before first pitch through +3 hours): under 20% = clear, 20–44% = worth monitoring, 45–69% = delay likely, 70%+ = postponement risk."><span class="info-i">i</span></span></div>`;
-}
-
-/* ---------- probable pitchers section (modal) ---------- */
-function pitcherCard(teamCode, p){
-  if(!p) return `<div class="p-card"><div class="p-side">${teamCode}</div><div class="p-name" style="color:var(--muted)">Probable not yet announced</div></div>`;
-  let simHtml;
-  if(p.sim){
-    const kUp = p.all && p.sim.k9 > p.all.k9, hrDown = p.all && p.sim.hr9 < p.all.hr9;
-    simHtml = `<div class="p-nums">
-      <span class="${p.all?(kUp?"pos":"neg"):""}"><b>${p.sim.k9}</b> K/9</span>
-      <span class="${p.all?(hrDown?"pos":"neg"):""}"><b>${p.sim.hr9}</b> HR/9</span>
-      <span><b>${p.sim.era}</b> ERA</span>
-      <span class="p-n">${p.sim.n} starts (${p.sim.ip} IP) in similar weather</span></div>`;
-  } else {
-    simHtml = `<div class="p-nums p-na">${p.note==="roof closed — weather-neutral"?"Roof closed — weather-neutral":"Not enough career starts in similar conditions yet"}</div>`;
-  }
-  const all = p.all ? `<div class="p-all">Overall: ${p.all.k9} K/9 · ${p.all.hr9} HR/9 · ${p.all.era} ERA over ${p.all.n} games</div>` : "";
-  return `<div class="p-card"><div class="p-side">${teamCode}</div><div><div class="p-name">${p.name}</div>${simHtml}${all}</div></div>`;
-}
-function pitcherBlock(g){
-  if(!g.pitchers || (!g.pitchers.away && !g.pitchers.home)) return "";
-  return `<div class="sub-h">Probable pitchers in these conditions<span class="tip" data-tip="Each pitcher's real starts from the last three seasons in weather like today's (±8° temp, ±8 mph wind), joined to our park weather history. Green = better than his overall number in these conditions, red = worse. Shown alongside the park data — not blended into it."><span class="info-i">i</span></span></div>
-    <div class="p-grid">${pitcherCard(g.away, g.pitchers.away)}${pitcherCard(g.home, g.pitchers.home)}</div>`;
-}
-
-/* ---------- conditions MVP section (modal) ---------- */
-function slg3(v){ return v.toFixed(3).replace(/^0\./, "."); }
-function mvpCard(teamCode, m){
-  if(!m) return `<div class="p-card"><div class="p-side">${teamCode}</div><div class="p-name" style="color:var(--muted)">No hitter with 25+ AB in similar weather yet</div></div>`;
-  return `<div class="p-card"><div class="p-side">${teamCode}</div><div>
-    <div class="p-name">🔥 ${m.name}</div>
-    <div class="p-nums">
-      <span class="${m.slg>m.allSlg?"pos":""}"><b>${slg3(m.slg)}</b> SLG</span>
-      <span><b>${m.hr}</b> HR</span>
-      <span><b>${m.ab}</b> AB</span>
-      <span class="p-n">${m.games} games in similar weather · overall SLG ${slg3(m.allSlg)}</span>
-    </div></div></div>`;
-}
-function mvpBlock(g){
-  if(!g.mvp || (!g.mvp.away && !g.mvp.home)) return "";
-  return `<div class="sub-h">Conditions MVP — hottest bat in this weather<span class="tip" data-tip="Each team's current hitter with the best slugging percentage in weather like today's (±8° temp, ±8 mph wind) — three seasons of real game logs across all parks, minimum 25 at-bats. Green = slugging better in these conditions than overall."><span class="info-i">i</span></span></div>
-    <div class="p-grid">${mvpCard(g.away, g.mvp.away)}${mvpCard(g.home, g.mvp.home)}</div>`;
-}
-function intelSec(g){
-  const parts = [pitcherBlock(g), umpBlock(g), mvpBlock(g)].filter(Boolean);
-  if(!parts.length) return "";
-  return `<div class="m-sec"><h5>Matchup intel</h5>${parts.join("")}</div>`;
-}
-
-/* ---------- behind the plate (modal) ---------- */
-function umpBlock(g){
-  if(!g.ump) return "";
-  const u = g.ump;
-  const tipTxt = "Tonight's home-plate umpire and what has actually happened in his games since 2015 — strikeouts, runs, and homers per game vs the league average. Zone size is real: some umps run K's several percent above or below the norm.";
-  const body = (u.n==null)
-    ? `<div class="p-all">Newer umpire — no 30+ game history in our data yet.</div>`
-    : `<div class="p-nums">
-        <span class="${cls(u.dSo)}"><b>${pct(u.dSo)}</b> K's</span>
-        <span class="${cls(u.dR)}"><b>${pct(u.dR)}</b> runs</span>
-        <span class="${cls(u.dHr)}"><b>${pct(u.dHr)}</b> HR</span>
-        <span class="p-n">${u.n} games behind the plate since 2015 · ${u.so} K/gm, ${u.r} runs/gm in his games vs league avg</span>
-      </div>`;
-  return `<div class="sub-h">Behind the plate<span class="tip" data-tip="${tipTxt}"><span class="info-i">i</span></span></div>
-    <div class="p-card"><div class="p-side">HP UMP</div><div><div class="p-name">${u.name}</div>${body}</div></div>`;
-}
-
-/* ---------- park wind-factor chip (modal forecast) ---------- */
-function windFxChip(g){
-  if(g.dome || !g.windFx) return "";
-  const f = g.windFx;
-  return `<div class="windfx fx-${f.rating.toLowerCase()}">WIND FACTOR AT THIS PARK: <b>${f.rating}</b> — 10 mph blowing out ${f.pct10>=0?"adds":"cuts"} ~${Math.abs(f.pct10)}% HR here historically<span class="tip" data-tip="How much wind actually matters at this stadium, measured from every game here since 2015: the relationship between outward wind (toward center field) and home runs. Open, exposed parks rate HIGH or EXTREME; wind-shielded stadiums rate LOW."><span class="info-i">i</span></span></div>`;
-}
-function tempFxChip(g){
-  const f=g.tempFx;
-  if(!f||g.dome) return "";
-  return `<div class="windfx fx-${f.rating.toLowerCase()}">HEAT FACTOR AT THIS PARK: <b>${f.rating}</b> — 10°F warmer ${f.pct10>=0?"adds":"cuts"} ~${Math.abs(f.pct10)}% HR here historically<span class="tip" data-tip="Warm air is less dense, so the same batted ball carries farther — but how much that matters varies by stadium. Measured from every game here since 2015: the relationship between game-time temperature and home runs at this park."><span class="info-i">i</span></span></div>`;
-}
-function dewChip(g){
-  if(g.dome||g.dew==null) return "";
-  if(g.dew>=68) return `<div class="windfx fx-medium">HUMID AIR TONIGHT: dew point ${g.dew}° — humid air is <b>less</b> dense than dry air, a slight extra-carry tailwind for hitters<span class="tip" data-tip="Counterintuitive but real: water vapor is lighter than the nitrogen and oxygen it displaces, so muggy air offers slightly less drag on a batted ball. A secondary factor — temperature and wind matter more — and it's part of how we match tonight to similar past games."><span class="info-i">i</span></span></div>`;
-  if(g.dew<=42) return `<div class="windfx fx-low">DRY AIR TONIGHT: dew point ${g.dew}° — dry air is denser, a touch more drag on fly balls<span class="tip" data-tip="Dry air packs more of the heavier nitrogen and oxygen molecules, adding drag. A secondary factor — temperature and wind matter more — and it's part of how we match tonight to similar past games."><span class="info-i">i</span></span></div>`;
-  return "";
-}
-
-/* ---------- rain history section (modal) ---------- */
-function rainSec(g){
-  if(g.dome || g.rain==null || g.rain<20 || !g.rainHist) return "";
-  const rh = g.rainHist;
-  const boxes = rh.wetOver!=null ? `
-    <div class="hit-summary">
-      <div class="hit-box over"><div class="n">${rh.wetOver}%</div><div class="l">over in wet games</div></div>
-      <div class="hit-box under"><div class="n">${rh.wetUnder}%</div><div class="l">under in wet games</div></div>
-      <div class="hit-box push"><div class="n">${rh.wet.n}</div><div class="l">wet games here</div></div>
-    </div>` : "";
-  return `<div class="m-sec">
-    <h5>Rain at ${g.park.split("·")[0].trim()} — ${g.rain}% chance at first pitch${g.rain>=55?' · <span style="color:var(--red)">delay risk</span>':''}</h5>
-    ${boxes}
-    <div class="rain-cmp">Wet games at this park average <b>${rh.wet.r.toFixed(1)} runs</b> and <b>${rh.wet.hr.toFixed(1)} HR</b>,
-    vs <b>${rh.dry.r.toFixed(1)} runs</b> / <b>${rh.dry.hr.toFixed(1)} HR</b> when dry —
-    against today's total of <b>${g.total?g.total.toFixed(1):"—"}</b>.
-    A wet game = measurable rain during the game window since 2015.</div>
-  </div>`;
-}
-
-/* ---------- meters (vs MLB average) ---------- */
-function meter(label, sub, v){
-  const max = 35; // scale bound
-  const half = Math.min(Math.abs(v), max)/max*50;
-  const fill = v>=0
-    ? `<div class="fill pos" style="left:50%;width:${half}%"></div>`
-    : `<div class="fill neg" style="right:50%;width:${half}%"></div>`;
-  return `<div class="meter-row">
-    <div class="meter-lab">${label}<span>${sub}</span></div>
-    <div class="meter">${v===0?"":fill}<div class="mid"></div></div>
-    <div class="meter-val ${cls(v)}">${v===0?"even":pct(v)}</div>
-  </div>`;
-}
-
-/* ---------- three.js on demand ----------
-   Not render-blocking any more: fetched only when a 3D view is about to be
-   seen (the hero when it nears the viewport, the park view when a game is
-   opened). Until it arrives — or if it never does, or WebGL is unavailable —
-   the flat park diagram shows in its place. */
-const THREE_SRC = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-const RM = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : {matches:false};
-let threeP = null, threeDead = false;
-function loadThree(){
-  if(window.THREE) return Promise.resolve(window.THREE);
-  if(threeDead) return Promise.reject(new Error("three.js unavailable"));
-  if(!threeP) threeP = new Promise((resolve, reject)=>{
-    const sc = document.createElement("script");
-    let settled = false;
-    const done = (ok, err)=>{ if(settled) return; settled = true; clearTimeout(timer); if(ok) resolve(window.THREE); else { threeP = null; reject(err); } };
-    const timer = setTimeout(()=>done(false, new Error("three.js timed out")), 12000);
-    sc.src = THREE_SRC; sc.async = true;
-    sc.onload = ()=>{ if(window.THREE) done(true); else { threeDead = true; done(false, new Error("three.js missing")); } };
-    sc.onerror = ()=>{ threeDead = true; done(false, new Error("three.js failed to load")); };
-    document.head.appendChild(sc);
-  });
-  return threeP;
-}
-function whenNear(el, fn){
-  if(!("IntersectionObserver" in window)){ fn(); return; }
-  const io = new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ io.disconnect(); fn(); } }, {rootMargin: "300px 0px"});
-  io.observe(el);
-}
-/* swap a view's flat diagram for the live 3D scene (keeps the flat one if 3D can't start) */
-function start3D(wrap, g, slot){
-  const cv = wrap && wrap.querySelector("canvas");
-  if(!cv || !document.contains(cv)) return;
-  cv.hidden = false;
-  if(initPark3D(g, cv, slot)){
-    wrap.classList.add("is-3d");
-  } else {
-    cv.hidden = true;
-  }
-}
-let heroToken = 0, modalToken = 0;
-
-/* ==================================================================
-   3D PARK ENGINE — stylized stadium from real dimensions + live wx
-================================================================== */
-let modal3D = null, hero3D = null;
-function disposeP3D(inst){
-  if(!inst) return;
-  cancelAnimationFrame(inst.raf);
-  inst.scene.traverse(o=>{
-    if(o.geometry) o.geometry.dispose();
-    const mats = Array.isArray(o.material)?o.material:(o.material?[o.material]:[]);
-    mats.forEach(m=>{ if(m.map) m.map.dispose(); m.dispose(); });
-  });
-  inst.renderer.dispose();
-}
-function destroyPark3D(){ disposeP3D(modal3D); modal3D = null; }
-function makeWallLabel(txt){
-  const cv=document.createElement("canvas"); cv.width=128; cv.height=64;
-  const cx=cv.getContext("2d");
-  cx.font="700 40px -apple-system,Segoe UI,Arial"; cx.textAlign="center"; cx.textBaseline="middle";
-  cx.fillStyle="rgba(20,28,44,0.92)"; cx.fillText(txt,64,34);
-  const tex=new THREE.CanvasTexture(cv);
-  return new THREE.Mesh(new THREE.PlaneGeometry(26,13),
-    new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false}));
-}
-function initPark3D(g, canvas, slot="modal"){
-  if(typeof THREE === "undefined") return false;
-  if(slot==="hero"){ disposeP3D(hero3D); hero3D = null; } else destroyPark3D();
-  const park = PARKS[g.home] || {dims:[335,375,400,375,335], walls:[8,8,8,8,8]};
-  const W = canvas.clientWidth || 780, H = canvas.clientHeight || 330;
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-  } catch(e) {
-    /* WebGL context unavailable (blocked, unsupported, or GPU exhausted) —
-       the caller keeps the flat park diagram instead of leaving a dead box. */
-    return false;
-  }
-  let dirty = true;          // reduced-motion mode renders only when something changed
-  renderer.setSize(W, H, false);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
-  const scene = new THREE.Scene();
-
-  const night = g.sortTime >= 1900;
-  const foggy = /fog|marine/i.test(g.sky);
-  const dome = !!g.dome;
-
-  /* ---- weather-tinted monochrome palette (Home Run Report style) ----
-     the whole scene lives in ONE hue; conditions pick it:
-     hot = ember/crimson · mild = deep navy · cool = steel · fog = misty slate · dome = graphite */
-  let hue, sat;
-  /* Anchored to the DFS Kitchen surfaces (#2E3240 is hue .625 / sat .16) so the
-     canvas sits inside its card instead of fighting it. Weather still moves the
-     hue, but toward the palette's own accents -- warm to the accent orange,
-     cold to the radar cyan -- and at a fraction of the old saturation. */
-  if(dome){ hue=0.625; sat=0.07; }
-  else if(foggy){ hue=0.58; sat=0.10; }
-  else if(g.temp>=88){ hue=0.075; sat=0.26; }
-  else if(g.temp<=72){ hue=0.525; sat=0.24; }
-  else { hue=0.625; sat=0.17; }
-  /* day games get an airy, brighter scene; night games go deep and floodlit —
-     the white wall and streamlines pop against the dark. Domes keep graphite. */
-  /* backgrounds lifted off near-black: at 0.055 the canvas read as a hole
-     punched in the card. These sit around the --inset surface instead. */
-  const LT = dome ? {bg:0.145, apron:0.235, grass:0.30, track:0.205, dirt:0.225, diamond:0.27, mound:0.19}
-           : night ? {bg:0.135, apron:0.215, grass:0.275, track:0.185, dirt:0.20, diamond:0.245, mound:0.17}
-                   : {bg:0.175, apron:0.285, grass:0.355, track:0.245, dirt:0.265, diamond:0.315, mound:0.23};
-  const L = (l)=> new THREE.Color().setHSL(hue, sat, Math.max(0.04, l));
-  const COL = {
-    bg:      L(LT.bg),
-    apron:   L(LT.apron),
-    grass:   L(LT.grass),
-    track:   L(LT.track),
-    dirt:    L(LT.dirt),
-    diamond: L(LT.diamond),
-    mound:   L(LT.mound),
-  };
-  /* The frame is always the radar cyan-slate; only the field carries weather. */
-  const SKY = new THREE.Color().setHSL(0.545, 0.30, dome ? 0.115 : (night ? 0.105 : 0.145));
-  scene.background = SKY;
-  scene.fog = foggy ? new THREE.Fog(SKY, 260, 900) : new THREE.Fog(SKY, 900, 1900);
-  const M = c => new THREE.MeshBasicMaterial({color:c});
-
-  /* geometry: 2D layout has +y toward CF; mapped to 3D as (x, 0, -y) */
-  const angles = [-45,-22.5,0,22.5,45].map(a=>a*Math.PI/180);
-  const pts2 = park.dims.map((r,i)=>new THREE.Vector2(Math.sin(angles[i])*r, Math.cos(angles[i])*r));
-  const curve = new THREE.SplineCurve(pts2);
-  const samples = curve.getPoints(72);
-
-  /* foul-territory apron — rounded pad the field sits on */
-  const apron = new THREE.Mesh(new THREE.CircleGeometry(148, 48), M(COL.apron));
-  apron.rotation.x = -Math.PI/2; apron.position.set(0,-0.15,-30); scene.add(apron);
-
-  /* outfield grass fan */
-  const shape = new THREE.Shape();
-  shape.moveTo(0,0);
-  samples.forEach(p=>shape.lineTo(p.x,p.y));
-  shape.lineTo(0,0);
-  const grass = new THREE.Mesh(new THREE.ShapeGeometry(shape), M(COL.grass));
-  grass.rotation.x = -Math.PI/2; grass.position.y = 0.05; scene.add(grass);
-
-  /* warning track — darker band hugging the wall */
-  const inner = samples.map(p=>{ const r=Math.hypot(p.x,p.y), s=(r-17)/r; return new THREE.Vector2(p.x*s,p.y*s); });
-  const ringPts = [...samples, ...inner.slice().reverse()];
-  const track = new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(ringPts)), M(COL.track));
-  track.rotation.x = -Math.PI/2; track.position.y = 0.12; scene.add(track);
-
-  /* infield dirt arc + inner diamond + mound */
-  const dirt = new THREE.Mesh(new THREE.CircleGeometry(95, 44), M(COL.dirt));
-  dirt.rotation.x = -Math.PI/2; dirt.position.set(0, 0.18, -60.5); scene.add(dirt);
-  const dShape = new THREE.Shape();
-  dShape.moveTo(0,10); dShape.lineTo(53.6,63.6); dShape.lineTo(0,117.3); dShape.lineTo(-53.6,63.6); dShape.lineTo(0,10);
-  const diamond = new THREE.Mesh(new THREE.ShapeGeometry(dShape), M(COL.diamond));
-  diamond.rotation.x = -Math.PI/2; diamond.position.y = 0.26; scene.add(diamond);
-  const mound = new THREE.Mesh(new THREE.CircleGeometry(9.5, 24), M(COL.mound));
-  mound.rotation.x = -Math.PI/2; mound.position.set(0, 0.34, -60.5); scene.add(mound);
-  const rubber = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.3,0.7), M(0xf4f6fa));
-  rubber.position.set(0, 0.6, -60.5); scene.add(rubber);
-
-  /* home plate circle + plate */
-  const homeC = new THREE.Mesh(new THREE.CircleGeometry(13, 24), M(COL.mound));
-  homeC.rotation.x = -Math.PI/2; homeC.position.set(0, 0.34, 0); scene.add(homeC);
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(1.9,0.3,1.9), M(0xf4f6fa));
-  plate.position.set(0, 0.6, 0); scene.add(plate);
-
-  /* bases — white pads rotated 45° */
-  [[63.64,-63.64],[0,-127.28],[-63.64,-63.64]].forEach(([x,z])=>{
-    const b = new THREE.Mesh(new THREE.BoxGeometry(3.6,0.7,3.6), M(0xf4f6fa));
-    b.rotation.y = Math.PI/4; b.position.set(x, 0.6, z); scene.add(b);
-  });
-
-  /* foul lines — crisp white chalk to each pole */
-  [[park.dims[0], 1],[park.dims[4], -1]].forEach(([len, side])=>{
-    const line = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.15, len), M(0xf4f6fa));
-    line.rotation.y = side * Math.PI/4;
-    line.position.set(-side*0.3536*len, 0.4, -0.3536*len);
-    scene.add(line);
-  });
-
-  /* outfield wall — glowing white ribbon with real per-section heights */
-  const hAt = t => { const f=t*4, i=Math.min(3,Math.floor(f)), u=f-i; return park.walls[i]*(1-u)+park.walls[i+1]*u; };
-  const wv=[], wi=[];
-  const HSCALE = 1.7;
-  samples.forEach((p,i)=>{ const h=hAt(i/(samples.length-1))*HSCALE; wv.push(p.x,0,-p.y, p.x,h,-p.y); });
-  for(let i=0;i<samples.length-1;i++){ const a=i*2; wi.push(a,a+2,a+1, a+1,a+2,a+3); }
-  const wallGeo = new THREE.BufferGeometry();
-  wallGeo.setAttribute("position", new THREE.Float32BufferAttribute(wv,3));
-  wallGeo.setIndex(wi); wallGeo.computeVertexNormals();
-  scene.add(new THREE.Mesh(wallGeo, new THREE.MeshBasicMaterial({color:0xf4f6fa, side:THREE.DoubleSide})));
-  /* wall cap — thin top edge catches the eye like the reference renders */
-  const capPts = samples.map((p,i)=>new THREE.Vector3(p.x, hAt(i/(samples.length-1))*HSCALE+0.25, -p.y));
-  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(capPts),
-    new THREE.LineBasicMaterial({color:0xffffff})));
-
-  /* wall shadow skirt — soft dark base line grounding the wall */
-  const skv=[], ski=[];
-  samples.forEach(p=>{ const r=Math.hypot(p.x,p.y), s=(r+7)/r; skv.push(p.x,0.02,-p.y, p.x*s,0.02,-p.y*s); });
-  for(let i=0;i<samples.length-1;i++){ const a=i*2; ski.push(a,a+2,a+1, a+1,a+2,a+3); }
-  const skirtGeo = new THREE.BufferGeometry();
-  skirtGeo.setAttribute("position", new THREE.Float32BufferAttribute(skv,3));
-  skirtGeo.setIndex(ski);
-  scene.add(new THREE.Mesh(skirtGeo, new THREE.MeshBasicMaterial({color:L(0.14), side:THREE.DoubleSide})));
-
-  /* foul poles — tall bright yellow */
-  [[0,1],[4,-1]].forEach(([di, side])=>{
-    const d = park.dims[di];
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.9,0.9,46,8), M(0xffd94a));
-    pole.position.set(-side*0.707*d, 23, -0.707*d); scene.add(pole);
-  });
-
-  /* wall distance markers — real numbers on the wall face */
-  [0,1,2,3,4].forEach(i=>{
-    const p = pts2[i], r = Math.hypot(p.x,p.y), s=(r-2.5)/r;
-    const lbl = makeWallLabel(String(park.dims[i]));
-    const h = park.walls[i]*HSCALE;
-    lbl.position.set(p.x*s, Math.min(h*0.55, h-3)+3.5, -p.y*s);
-    lbl.lookAt(0, lbl.position.y, 0);
-    scene.add(lbl);
-  });
-
-  /* team logo laid flat on the outfield grass */
-  const MLBID = {ARI:109,ATH:133,ATL:144,BAL:110,BOS:111,CHC:112,CIN:113,CLE:114,COL:115,
-    CWS:145,DET:116,HOU:117,KC:118,LAA:108,LAD:119,MIA:146,MIL:158,MIN:142,NYM:121,NYY:147,
-    PHI:143,PIT:134,SD:135,SEA:136,SF:137,STL:138,TB:139,TEX:140,TOR:141,WSH:120};
-  if(MLBID[g.home]){
-    new THREE.TextureLoader().load(
-      `https://midfield.mlbstatic.com/v1/team/${MLBID[g.home]}/spots/256`,
-      tex=>{
-        const logo=new THREE.Mesh(new THREE.PlaneGeometry(78,78),
-          new THREE.MeshBasicMaterial({map:tex, transparent:true, opacity:0.9, depthWrite:false}));
-        logo.rotation.x=-Math.PI/2;
-        logo.position.set(0, 0.3, -262);
-        scene.add(logo); dirty = true;
-      },
-      undefined, ()=>{} /* CORS/load failure → just skip the logo */);
   }
 
-  /* dome roof shell */
-  if(dome){
-    const roof = new THREE.Mesh(new THREE.SphereGeometry(400,36,18,0,Math.PI*2,0,Math.PI/2),
-      new THREE.MeshBasicMaterial({color:0xe8ecf2, transparent:true, opacity:0.10, side:THREE.DoubleSide}));
-    roof.scale.y = 0.45; roof.position.set(0,2,-140); scene.add(roof);
+  function renderWatch() {
+    var w = FM.watch(S.d);
+    var sec = document.getElementById("watch-sec");
+    sec.hidden = !w.length;
+    document.getElementById("watch").innerHTML = w.slice(0, 8).map(function (x) {
+      return '<a href="#g-' + esc(x.id) + '" data-jump="' + esc(x.id) + '"><span class="ic ' + (x.tone || "") + '" aria-hidden="true">' + x.icon + "</span>" +
+        '<span><span class="w" style="display:block;margin:0 0 4px">' + esc(x.game + " · " + x.when) + '</span><span class="t" style="display:block">' + esc(x.title) + "</span>" +
+        '<span class="s" style="display:block">' + esc(x.sub) + (x.also && x.also.length ? " Also: " + esc(x.also.join(" · ")) + "." : "") + "</span></span></a>";
+    }).join("");
   }
 
-  /* wind — nullschool-style particle flow: hundreds of thin streaks
-     drifting along the wind field with organic curl, trails fading behind */
-  let wind = null;
-  if(!dome && g.wind>2){
-    const N=130, TAIL=22;
-    const base=g.windAngle*Math.PI/180;
-    const spawn=()=>new THREE.Vector3((Math.random()-0.5)*700, 8+Math.random()*135, 115-Math.random()*660);
-    const parts=[];
-    for(let i=0;i<N;i++){
-      const p=spawn();
-      parts.push({p, age:Math.random()*3, life:3+Math.random()*2.6,
-                  hist:Array.from({length:TAIL},()=>p.clone())});
-    }
-    /* single solid ribbon per streak: each trail is a thin quad strip
-       (real geometric width — no stacked-line doubling) */
-    const RIBBON_W = 2.8;
-    const vCount=N*TAIL*2;
-    const geo=new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vCount*3),3));
-    /* RGBA vertex colors: constant wind-grey, alpha-only fades — the streak
-       never blends toward the background, so no dark tail */
-    const colArr=new Float32Array(vCount*4);
-    const GREY=new THREE.Color(0xa8b2c1);
-    for(let i=0;i<vCount;i++){ colArr[i*4]=GREY.r; colArr[i*4+1]=GREY.g; colArr[i*4+2]=GREY.b; colArr[i*4+3]=0; }
-    geo.setAttribute("color", new THREE.BufferAttribute(colArr,4));
-    const idx=[];
-    for(let p=0;p<N;p++){
-      const o=p*TAIL*2;
-      for(let i=0;i<TAIL-1;i++){
-        const a=o+i*2, b=o+i*2+1, c=o+i*2+2, d=o+i*2+3;
-        idx.push(a,b,c, b,d,c);
+  function renderProps() {
+    var pd = S.pd, band = document.getElementById("props-band");
+    if (!pd || !pd.targets || !pd.targets.length || pd.date !== S.d.date) { band.hidden = true; return; }
+    band.hidden = false;
+    var picks = FM.picks(pd);
+    var top = picks[0];
+    S.freeKey = top.player + "|" + top.game;
+    var cards = [pickCard(top, true)];
+    cards.push(S.member && picks[1] ? pickCard(picks[1], false) : lockedCard(picks.length - 1));
+    document.getElementById("props-cards").innerHTML = cards.join("");
+  }
+  function pickCard(p, free) {
+    return '<div class="pc' + (free ? " pc--free" : "") + '"><div class="pc__top"><span class="pc__sport">MLB · home run' + (free ? "" : " · #" + p.rank) + "</span>" +
+      (free ? '<span class="chip chip--free">FREE PICK</span>' : '<span class="chip chip--pro">PRO</span>') + "</div>" +
+      '<div class="pc__who">' + esc(p.player) + "<small>" + esc(p.team) + " · " + esc(p.game) + " · " + esc(p.why) + "</small></div>" +
+      '<div class="pc__nums"><div><div class="v cyan">' + p.oursTxt + '</div><div class="l">Our chance</div></div>' +
+      "<div><div class=\"v\">" + p.priceTxt + '</div><div class="l">Books\' price</div></div>' +
+      '<div><div class="v ' + (p.edge >= 2 ? "good" : p.edge <= -2 ? "bad" : "") + '">' + (D.isNum(p.edge) ? D.signed(p.edge, 1) : "—") + '</div><div class="l">Edge (pts)</div></div></div>' +
+      '<div class="chips">' + p.factors.map(function (f) { return '<span class="chip chip--sm">' + esc(f.label) + " " + esc(f.txt) + "</span>"; }).join("") + "</div>" +
+      '<div class="pc__cta"><span class="small dim">Books: ' + (D.isNum(p.implied) ? D.pct(p.implied) + " implied" : "no price yet") + "</span>" +
+      '<a href="../props/mlb/">Full board →</a></div></div>';
+  }
+  function lockedCard(n) {
+    return '<div class="pc pc--locked"><div class="pc__top"><span class="pc__sport">MLB · ' + D.plural(n, "more target") + '</span><span class="chip chip--pro">PRO</span></div>' +
+      '<div class="pc__who">Hidden Player<small>Team · Game · Batting 3rd vs someone</small></div>' +
+      '<div class="pc__nums"><div><div class="v">24.1%</div><div class="l">Our chance</div></div><div><div class="v">+320</div><div class="l">Books\' price</div></div><div><div class="v">+3.1</div><div class="l">Edge</div></div></div>' +
+      '<div class="pc__cta" style="filter:none;opacity:1"><span class="small muted">Every HR and K prop, ranked — $15/mo.</span>' +
+      '<a class="btn btn--sm btn--pro pay-cta" href="../pro/">Get PRO</a></div></div>';
+  }
+
+  function openGame(id, push) {
+    var g = S.d && S.d.games.filter(function (x) { return x.id === id; })[0];
+    if (!g) return;
+    var root = D.sheet.open(FM.name(g.away) + " at " + FM.name(g.home) + " · " + g.time, M.detail(g, ctx()), function () { M.dispose(); D.setHash("g", null); });
+    M.afterDetail(root, g);
+    if (push) D.setHash("g", id);
+  }
+
+  function route() {
+    var id = D.hashParam("g");
+    if (id) openGame(id, false); else D.sheet.close(true);
+  }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("[data-open],[data-jump],[data-f]");
+    if (!t) return;
+    if (t.hasAttribute("data-open")) { e.preventDefault(); openGame(t.getAttribute("data-open"), true); }
+    else if (t.hasAttribute("data-jump")) {
+      e.preventDefault();
+      var id = t.getAttribute("data-jump"), el = document.getElementById("g-" + id);
+      if (!el) { S.filter = "all"; renderGames(); el = document.getElementById("g-" + id); }
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.classList.add("is-hl"); setTimeout(function () { el.classList.remove("is-hl"); }, 2200);
       }
-    }
-    geo.setIndex(idx);
-    const mat=new THREE.MeshBasicMaterial({vertexColors:true, transparent:true,
-      opacity: foggy?0.5:0.7, side:THREE.DoubleSide, depthWrite:false});
-    wind={mesh:new THREE.Mesh(geo,mat), parts, tail:TAIL, base, spawn, t:0,
-          speed:46 + g.wind*6.5, w:RIBBON_W};
-    scene.add(wind.mesh);
-  }
-
-  /* rain — falling streaks, tilted with the wind, when rain risk is real */
-  let rain = null;
-  if(!dome && (g.rain||0) >= 45){
-    const RN = Math.round(90 + Math.min(1,(g.rain-45)/45)*130);
-    const a=g.windAngle*Math.PI/180;
-    const tilt = Math.min(0.45, (g.wind||0)*0.03);
-    const vel = new THREE.Vector3(Math.sin(a)*tilt, -1, -Math.cos(a)*tilt).normalize();
-    const drops=[];
-    for(let i=0;i<RN;i++)
-      drops.push(new THREE.Vector3((Math.random()-0.5)*680, Math.random()*185, 110-Math.random()*640));
-    const rgeo=new THREE.BufferGeometry();
-    rgeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(RN*6),3));
-    const rcol = new THREE.Color().setHSL(hue, Math.min(0.25,sat), night?0.55:0.72);
-    rain={mesh:new THREE.LineSegments(rgeo, new THREE.LineBasicMaterial({color:rcol, transparent:true, opacity:0.38})),
-          drops, vel, len:9, speed:330};
-    scene.add(rain.mesh);
-  }
-
-  /* camera + drag orbit — high angle behind home, like the reference */
-  const cam = new THREE.PerspectiveCamera(36, W/H, 1, 3200);
-  const target = new THREE.Vector3(0, 6, -150);
-  let theta=0, el=0.62, dragging=false, lastX=0, lastY=0, idleT=0;
-  function place(){
-    const r=545;
-    cam.position.set(target.x+Math.sin(theta)*Math.cos(el)*r, target.y+Math.sin(el)*r, target.z+Math.cos(theta)*Math.cos(el)*r);
-    cam.lookAt(target);
-  }
-  canvas.addEventListener("pointerdown", e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(e.pointerId); });
-  canvas.addEventListener("pointermove", e=>{
-    if(!dragging) return;
-    theta -= (e.clientX-lastX)*0.006;
-    el = Math.min(1.15, Math.max(0.22, el + (e.clientY-lastY)*0.004));
-    lastX=e.clientX; lastY=e.clientY; idleT=0; dirty = true;
+    } else if (t.hasAttribute("data-f")) { S.filter = t.getAttribute("data-f"); renderGames(); }
   });
-  canvas.addEventListener("pointerup", ()=>dragging=false);
-  canvas.addEventListener("pointercancel", ()=>dragging=false);
+  document.getElementById("sort").addEventListener("change", function (e) { S.sort = e.target.value; renderGames(); });
+  window.addEventListener("popstate", route);
 
-  const clock = new THREE.Clock();
-  const inst = {renderer, scene, raf:0};
-  if(slot==="hero") hero3D = inst; else modal3D = inst;
-  function advance(dt){
-    if(wind){
-      wind.t += dt;
-      const pos = wind.mesh.geometry.attributes.position.array;
-      const col = wind.mesh.geometry.attributes.color.array;
-      const fbPerpX = Math.cos(wind.base), fbPerpZ = Math.sin(wind.base);
-      wind.parts.forEach((pt, pi)=>{
-        pt.age += dt;
-        /* flow field: base wind direction + smooth positional curl so
-           neighbouring particles bend together like a fluid */
-        const curl = 0.42*Math.sin(pt.p.x*0.010 + wind.t*0.5)
-                   + 0.30*Math.sin(pt.p.z*0.0065 - wind.t*0.33);
-        const a = wind.base + curl;
-        pt.p.x += Math.sin(a)*wind.speed*dt;
-        pt.p.z += -Math.cos(a)*wind.speed*dt;
-        const out = Math.abs(pt.p.x)>390 || pt.p.z<-640 || pt.p.z>170;
-        if(pt.age>pt.life || out){
-          pt.p.copy(wind.spawn()); pt.age=0; pt.life=2.2+Math.random()*2.4;
-          pt.hist.forEach(h=>h.copy(pt.p));
-        }
-        const tailv = pt.hist.pop(); tailv.copy(pt.p); pt.hist.unshift(tailv);
-        /* alpha: quick fade-in, fade-out at end of life — no popping */
-        const env = Math.max(0, Math.min(1, pt.age/0.35, (pt.life-pt.age)/0.55));
-        const o = pi*wind.tail*2;
-        for(let ti=0; ti<wind.tail; ti++){
-          const P=pt.hist[ti];
-          const Q=pt.hist[ti+1] || pt.hist[ti-1] || P;
-          let dx=P.x-Q.x, dz=P.z-Q.z;
-          const len=Math.hypot(dx,dz);
-          let px, pz;
-          if(len>0.0001){ px=-dz/len; pz=dx/len; } else { px=fbPerpX; pz=fbPerpZ; }
-          /* solid grey stroke that tapers to a point — the taper IS the fade */
-          const u = ti/(wind.tail-1);
-          const half = wind.w*0.5*Math.pow(1-u, 0.65);
-          const v=(o+ti*2)*3;
-          pos[v]  =P.x+px*half; pos[v+1]=P.y; pos[v+2]=P.z+pz*half;
-          pos[v+3]=P.x-px*half; pos[v+4]=P.y; pos[v+5]=P.z-pz*half;
-          const a4=(o+ti*2)*4;
-          const alpha = env*(0.9-0.35*u);
-          col[a4+3]=alpha; col[a4+7]=alpha;
-        }
-      });
-      wind.mesh.geometry.attributes.position.needsUpdate = true;
-      wind.mesh.geometry.attributes.color.needsUpdate = true;
-    }
-    if(rain){
-      const pos = rain.mesh.geometry.attributes.position.array;
-      rain.drops.forEach((d,i)=>{
-        d.addScaledVector(rain.vel, rain.speed*dt);
-        if(d.y < 1){ d.set((Math.random()-0.5)*680, 170+Math.random()*20, 110-Math.random()*640); }
-        pos[i*6]=d.x;                       pos[i*6+1]=d.y;                       pos[i*6+2]=d.z;
-        pos[i*6+3]=d.x+rain.vel.x*rain.len; pos[i*6+4]=d.y+rain.vel.y*rain.len;   pos[i*6+5]=d.z+rain.vel.z*rain.len;
-      });
-      rain.mesh.geometry.attributes.position.needsUpdate = true;
-    }
-  }
-  /* reduced motion: no auto-rotation and no drifting particles — the wind and
-     rain are warmed up into a still frame; dragging still turns the view */
-  const still = RM.matches;
-  if(still) for(let i=0; i<90; i++) advance(1/60);
-  (function tick(){
-    inst.raf = requestAnimationFrame(tick);
-    const dt = Math.min(clock.getDelta(), 0.05);
-    if(still){
-      if(!dirty) return;
-      dirty = false; place(); renderer.render(scene, cam); return;
-    }
-    idleT += dt;
-    if(!dragging && idleT>2.5) theta += dt*0.07;
-    advance(dt);
-    place();
-    renderer.render(scene, cam);
-  })();
-  return true;
-}
-
-/* ---------- modal ---------- */
-const overlay = document.getElementById("overlay");
-const modal = document.getElementById("modal");
-function openModal(g){
-  const si = sampleInfo(g.sample);
-  const pk = PARKS[g.home] || {dims:[335,375,400,375,335]};
-  const mTiles = g.dome
-    ? `<div class="m-tile neu"><div class="t-lab">Home runs</div><div class="t-val">—</div><div class="t-sub"><span>Roof closed — no weather effect vs this park's indoor baseline</span></div></div>
-       <div class="m-tile neu"><div class="t-lab">Runs</div><div class="t-val">—</div><div class="t-sub"><span>Indoor baseline</span></div></div>
-       <div class="m-tile neu"><div class="t-lab">Strikeouts</div><div class="t-val">—</div><div class="t-sub"><span>Indoor baseline</span></div></div>`
-    : `<div class="m-tile ${cls(g.hr)}"><div class="t-lab">Home runs</div><div class="t-val">${pct(g.hr)}</div>
-         <div class="t-sub"><span><b>${g.hrGm.toFixed(1)}</b> HR/gm these conditions</span><span><b>${g.hrPark.toFixed(1)}</b> HR/gm park avg</span></div></div>
-       <div class="m-tile ${cls(g.runs)}"><div class="t-lab">Runs</div><div class="t-val">${pct(g.runs)}</div>
-         <div class="t-sub"><span>vs this park's average</span></div></div>
-       <div class="m-tile ${cls(g.ks)}"><div class="t-lab">Strikeouts</div><div class="t-val">${pct(g.ks)}</div>
-         <div class="t-sub"><span>vs this park's average</span></div></div>`;
-  modal.innerHTML = `
-    <div class="m-head">
-      <div><div class="teams" id="m-title">${g.away} <span style="font-weight:300;color:#93a1b8">@</span> ${g.home}</div>
-      <div class="meta">${g.time} · ${g.park}</div></div>
-      <button type="button" class="m-close" aria-label="Close game breakdown">✕</button>
-    </div>
-    <div class="m-body">
-      <div class="m-sec" style="padding:6px">
-        <div class="park3d-wrap">
-          <div class="p3d-flat">${parkSVG(g,140)}</div>
-          <canvas id="park3d-canvas" hidden></canvas>
-          <div class="p3d-hud">
-            <div class="t">${g.park.split("·")[0].trim()} · stylized live view</div>
-            <div class="w">${g.dome ? "Roof closed — weather sealed out" : `Wind ${g.wind} mph ${g.dir} · ${windTxt(g.windLabel)}`}</div>
-          </div>
-          <div class="p3d-badge">${g.skyIcon} ${g.sky}</div>
-          <div class="p3d-dims">${pk.dims[0]}′ LF · ${pk.dims[1]}′ LC · ${pk.dims[2]}′ CF · ${pk.dims[3]}′ RC · ${pk.dims[4]}′ RF</div>
-          <div class="p3d-hint">drag to look around</div>
-        </div>
-      </div>
-      <div class="m-sec">
-        <h5>First-pitch forecast</h5>
-        <div class="m-cond">
-          <div class="wx-item"><div class="big">${g.temp}<sup>°F</sup></div><div class="lab">${g.dome?"indoor":"temp"}</div></div>
-          <div class="wx-item"><div class="big">${g.dome?"—":g.wind}<sup>${g.dome?"":"mph"}</sup></div><div class="lab">${g.dome?"wind":g.dir+" · "+windTxt(g.windLabel)}</div></div>
-          <div class="wx-item"><div class="big">${g.dew}<sup>°</sup></div><div class="lab">dew point</div></div>
-          ${(!g.dome&&g.rain!=null)?`<div class="wx-item"><div class="big">${g.rain}<sup>%</sup></div><div class="lab">rain chance${g.rain>=55?' · <b style="color:var(--red)">delay risk</b>':''}</div></div>`:""}
-          ${(!g.dome&&g.rh!=null)?`<div class="wx-item"><div class="big">${g.rh}<sup>%</sup></div><div class="lab">humidity</div></div>`:""}
-          ${(!g.dome&&g.pres!=null)?`<div class="wx-item"><div class="big">${g.pres}<sup> hPa</sup></div><div class="lab">pressure</div></div>`:""}
-          <div style="margin-left:auto;text-align:right">
-            <div class="sky" style="font-weight:700;color:var(--info,var(--blue))">${g.skyIcon} ${g.sky}</div>
-            <div class="sample"><span class="dot ${si.cls}"></span>${si.word} · ${g.sample} games</div>
-          </div>
-        </div>
-        ${hourlyStrip(g)}
-        ${delayChip(g)}
-        ${windFxChip(g)}${tempFxChip(g)}${dewChip(g)}
-      </div>
-      <div class="m-sec">
-        <h5>Weather impact vs ${g.park.split("·")[0].trim()}<span class="tip" data-tip="How the matched similar-weather sample compares to this park's own all-conditions average. Every park plays differently, so this is the sharpest signal."><span class="info-i">i</span></span></h5>
-        <div class="m-tiles">${mTiles}</div>
-        <div class="league-row">On a league-wide scale (all parks, all games): HR <b class="${cls(g.mlb.hr)}">${pct(g.mlb.hr)}</b> · Runs <b class="${cls(g.mlb.runs)}">${pct(g.mlb.runs)}</b> · K's <b class="${cls(g.mlb.ks)}">${pct(g.mlb.ks)}</b> vs MLB average<span class="tip" data-tip="The same matched games measured against the league-wide average since 2015 — park and weather combined, so you can compare games across the whole slate on one scale."><span class="info-i">i</span></span></div>
-      </div>
-      ${intelSec(g)}
-      ${rainSec(g)}
-      <div class="m-sec">
-        <h5>What actually happened — ${g.sample?`${g.sample} historically similar games`:"similar games"} ${g.dome?"(indoor)":""}<span class="tip" data-tip="Real final scores from games at this park in weather like today's. Over/under is computed against today's total, so it updates when the line moves. A 'wet' tag marks games with measurable rain."><span class="info-i">i</span></span></h5>
-        ${histTable(g)}
-      </div>
-      <div class="kx-hook">⚡ Feed this edge into your lineups — <a href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=modal&utm_campaign=mlb" target="_blank" rel="noopener">try The Optimizer</a> · part of The DFS Kitchen</div>
-    </div>`;
-  overlay.classList.add("open");
-  document.body.style.overflow="hidden";
-  modal.querySelector(".m-close").addEventListener("click", closeModal);
-  dialogOpened();
-  const wrap3 = modal.querySelector(".park3d-wrap"), token = ++modalToken;
-  loadThree().then(()=>{ if(token === modalToken && overlay.classList.contains("open")) start3D(wrap3, g, "modal"); }).catch(()=>{});
-}
-function closeModal(){ modalToken++; destroyPark3D(); overlay.classList.remove("open"); document.body.style.overflow=""; dialogClosed(); }
-overlay.addEventListener("click", e=>{ if(e.target===overlay) closeModal(); });
-
-/* ---------- dialog focus ----------
-   Open: remember what opened it, lock the page behind (inert), move focus to
-   the close button. Tab stays inside. Esc / close / backdrop: restore focus
-   to the row or card that opened it. */
-const DLG = {open:false, opener:null, key:null};
-const DLG_BG = ["body > header", "main", "footer.site-foot"];
-function dialogOpened(){
-  const md = document.getElementById("modal");
-  if(!DLG.open){
-    const a = document.activeElement;
-    DLG.opener = (a && a !== document.body && !md.contains(a)) ? a : null;
-    const host = DLG.opener && DLG.opener.closest ? DLG.opener.closest("[data-game]") : null;
-    DLG.key = host ? host.dataset.game : null;
-    DLG.open = true;
-    DLG_BG.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.inert = true; });
-  }
-  document.getElementById("overlay").scrollTop = 0;
-  const c = md.querySelector(".m-close"); if(c) c.focus({preventScroll:true});
-}
-function dialogClosed(){
-  if(!DLG.open) return;
-  DLG.open = false;
-  DLG_BG.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.inert = false; });
-  let el = DLG.opener;
-  if((!el || !document.contains(el)) && DLG.key)
-    el = document.querySelector(`[data-game="${DLG.key}"][tabindex="0"], button[data-game="${DLG.key}"]`);
-  DLG.opener = null; DLG.key = null;
-  if(el && el.focus) el.focus();
-}
-document.addEventListener("keydown", e=>{
-  if(!DLG.open) return;
-  if(e.key === "Escape"){ e.preventDefault(); closeModal(); return; }
-  if(e.key !== "Tab") return;
-  const md = document.getElementById("modal");
-  const f = [...md.querySelectorAll('a[href],button:not([disabled]),select,input,textarea,[tabindex="0"]')]
-    .filter(x=>x.getClientRects().length);
-  if(!f.length) return;
-  const first = f[0], last = f[f.length-1], a = document.activeElement;
-  if(e.shiftKey && (a === first || !md.contains(a))){ e.preventDefault(); last.focus(); }
-  else if(!e.shiftKey && (a === last || !md.contains(a))){ e.preventDefault(); first.focus(); }
-});
-/* game rows and summary cards are role="button": Enter / Space open them */
-document.addEventListener("keydown", e=>{
-  if(e.key !== "Enter" && e.key !== " ") return;
-  const t = e.target;
-  if(!t || !t.matches || !t.matches('[data-game][role="button"]')) return;
-  e.preventDefault(); t.click();
-});
-
-
-/* ---------- interactions ---------- */
-document.addEventListener("click", e=>{
-  const el = e.target.closest("[data-game]");
-  if(el){ const g = GAMES.find(x=>x.id===el.dataset.game); if(g) openModal(g); }
-});
-document.getElementById("sort-select").addEventListener("change", renderBoard);
-document.querySelectorAll("nav button").forEach(b=>{
-  b.addEventListener("click",()=>{
-    document.querySelectorAll("nav button").forEach(x=>{ x.classList.remove("active"); x.setAttribute("aria-pressed","false"); });
-    b.classList.add("active"); b.setAttribute("aria-pressed","true");
-    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    document.getElementById("view-"+b.dataset.view).classList.add("active");
-  });
-});
-
-/* ---------- data states ----------
-   loading (skeleton) → live | empty (off day / offseason) | error (retry).
-   Nothing is painted from the demo slate unless ?demo=1 is in the URL. */
-const MAIN = document.querySelector("main");
-function setChip(html){ document.getElementById("date-chip").innerHTML = html; }
-function stateCard(title, body, retry){
-  return `<div class="state-card${retry?" err":""}" role="${retry?"alert":"status"}"><h3>${esc(title)}</h3>`
-    + (body?`<p>${esc(body)}</p>`:"")
-    + (retry?`<button type="button" class="retry-btn" data-retry>Try again</button>`:"") + `</div>`;
-}
-function setViews(boardHtml, wxHtml, cmpHtml){
-  document.getElementById("board").innerHTML = boardHtml;
-  document.getElementById("wx-board").innerHTML = wxHtml;
-  document.getElementById("cmp-state").innerHTML = cmpHtml;
-  document.getElementById("cmp-card").hidden = !!cmpHtml;
-  if(cmpHtml) document.getElementById("cmp-body").innerHTML = "";
-}
-function clearTop(){
-  GAMES = [];
-  document.querySelector(".sort-wrap").hidden = true;
-  document.getElementById("brief-card").style.display = "none";
-  document.getElementById("summary-strip").innerHTML = "";
-  renderHero();
-  hideTease();
-}
-function renderLoading(){
-  MAIN.setAttribute("aria-busy","true");
-  clearTop();
-  setChip("Loading today's slate…");
-  document.getElementById("fresh").hidden = true;
-  document.getElementById("summary-strip").innerHTML = '<div class="skel skel-card"></div>'.repeat(4);
-  const rows = '<div class="skel skel-row"></div>'.repeat(5);
-  setViews(rows + '<span class="sr-only" role="status">Loading today’s slate</span>', rows, "");
-}
-function renderError(){
-  MAIN.removeAttribute("aria-busy");
-  clearTop();
-  setChip("Slate unavailable");
-  document.getElementById("fresh").hidden = true;
-  const card = stateCard("We couldn't load today's slate",
-    "The radar data didn't come through — usually a brief network hiccup. Nothing is shown until the real numbers load.", true);
-  setViews(card, card, card);
-}
-/* "No MLB games today — the board returns Tuesday, September 29."
-   → title "No MLB games today", body "The board returns Tuesday, September 29." */
-function offDayCopy(d){
-  const note = String(d.note || "").trim();
-  const m = note.match(/^(.+?)\s+—\s+(.+)$/);
-  if(m) return {title: m[1].replace(/\.$/, ""), body: m[2].charAt(0).toUpperCase() + m[2].slice(1)};
-  if(note && !/^No MLB games today\.?$/i.test(note)) return {title: "No MLB games today", body: note};
-  return {title: "No MLB games today", body: "The board rebuilds automatically as soon as games are on the schedule."};
-}
-function renderEmpty(d){
-  MAIN.removeAttribute("aria-busy");
-  clearTop();
-  setChip(`Slate for <b>${esc(d.dateLabel || "today")}</b> · no games`);
-  renderBrief(d.brief);
-  const c = offDayCopy(d);
-  setViews(stateCard(c.title, c.body), stateCard(c.title, "No first-pitch forecasts to show."),
-           stateCard(c.title, "Nothing to compare today."));
-}
-/* "⚠ Not refreshed since 2026-09-22 22:56 ET — …" reads like the chip: "since Tue 10:56 PM ET" */
-function niceStamp(text){
-  return window.RadarFresh ? String(text).replace(/(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2}) ET/g,
-    (m, t)=>{ const d = RadarFresh.parseET(t); return d ? RadarFresh.fmt(d, true) : m; }) : String(text);
-}
-function renderBrief(text){
-  const card = document.getElementById("brief-card");
-  if(!text){ card.style.display = "none"; return; }
-  document.getElementById("brief-body").innerHTML = esc(niceStamp(text).replace(/\b(to|from) (cf|lf|rf)\b/gi, (m, a, b)=>a + " " + b.toUpperCase()))
-    .replace(/\b([A-Z]{2,3} @ [A-Z]{2,3})\b/g, "<b>$1</b>")
-    .replace(/(\d+°|\d+%|\d+ mph)/g, "<b>$1</b>");
-  card.style.display = "";
-}
-function renderLive(d){
-  MAIN.removeAttribute("aria-busy");
-  GAMES = d.games;
-  setChip(`Slate for <b>${esc(d.dateLabel || "today")}</b> · ${GAMES.length} game${GAMES.length===1?"":"s"}`);
-  renderBrief(d.brief);
-  setViews("", "", "");
-  renderAll();
-}
-function renderAll(){
-  document.querySelector(".sort-wrap").hidden = !GAMES.length;
-  renderSummary();
-  renderHero();
-  renderBoard();
-  renderWeather();
-  renderCompare();
-}
-/* freshness chip (shared /assets/fresh.js) + the brief's live/stale cue */
-function applyFreshness(){
-  const el = document.getElementById("fresh");
-  if(!LIVE){ el.hidden = true; return; }
-  const info = {built: LIVE.generated, stale: LIVE.stale, status: LIVE.status, maxAgeH: 8, forDate: LIVE.date};
-  let warn = !!(LIVE.stale || (LIVE.status && LIVE.status.ok === false));
-  if(window.RadarFresh){ const a = RadarFresh.render(el, info); warn = warn || !!(a && a.level === "warn"); renderBrief(LIVE.brief); }
-  document.getElementById("brief-card").classList.toggle("is-warn", warn);
-  document.getElementById("brief-label").textContent = warn ? "Latest read — from the radar" : "Today's read — live from the radar";
-}
-window.addEventListener("load", applyFreshness);   // fresh.js is deferred; re-apply once it has run
-async function load(){
-  if(DEMO){ renderDemo(); return; }
-  renderLoading();
-  let d = null;
-  try{
-    const res = await fetch("/data.json?_=" + Date.now(), {cache: "no-store"});
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    d = await res.json();
-    if(!d || !Array.isArray(d.games)) throw new Error("unexpected data.json");
-  }catch(e){ LIVE = null; renderError(); return; }
-  LIVE = d;
-  if(!d.games.length) renderEmpty(d); else renderLive(d);
-  applyFreshness();
-  if(d.games.length) loadPro();
-}
-function renderDemo(){
-  document.getElementById("demo-flag").hidden = false;
-  document.getElementById("brief-label").textContent = "Demo read — sample data";
-  GAMES = SAMPLE_GAMES;
-  setChip(`<b>Demo slate</b> · ${GAMES.length} games`);
-  setViews("", "", "");
-  renderAll();
-}
-document.addEventListener("click", e=>{ if(e.target.closest("[data-retry]")) load(); });
-
-/* ================= PRO teaser (#1 HR target, free) =================
-   Shown only when teaser.json is for the SAME slate date as the board and
-   isn't marked stale. The old live-ticker code that polled statsapi.mlb.com
-   every 60 s for a ticker no longer on the page is gone. */
-/* the rich teaser IS the PRO card when it's valid; otherwise the compact card shows */
-function showTease(on){
-  document.getElementById("pro-tease").style.display = on ? "" : "none";
-  document.getElementById("pro-card").hidden = !!on;
-  document.getElementById("cta-row").classList.toggle("has-tease", !!on);
-}
-function hideTease(){ showTease(false); }
-function renderTease(t, rec){
-  showTease(true);
-  document.getElementById("pt-name").textContent = t.top1.player;
-  document.getElementById("pt-sub").textContent = `${t.top1.team} · ${t.top1.game}${t.top1.price!=null?` · best price ${t.top1.price>0?"+":""}${t.top1.price}`:""}`;
-  document.getElementById("pt-prob").innerHTML = `${esc(t.top1.prob)}%<span>our HR chance</span>`;
-  const c = t.counts || {};
-  const more = c.targets > 1 ? `${c.targets - 1} more ranked targets tonight · ` : "";
-  document.getElementById("pt-locked").innerHTML = [2,3,4,5].map(r=>
-    `<div class="pt-lock-row" aria-hidden="true"><span class="rk">#${r}</span><div class="pt-blur${r%2?"":" b2"}"></div><span class="pr-blur"></span><span style="font-size:11px">🔒</span></div>`).join("")
-    + `<div class="pt-more">${more}${c.value?`<b style="color:#F08A3C">${c.value} VALUE flag${c.value>1?"s":""}</b> · `:""}live odds on every one</div>`;
-  const r = rec && rec.summary;
-  document.getElementById("pt-receipts").innerHTML = (r && r.nights && r.top1 && r.top1.n)
-    ? `Graded in public: <b>#1 target homered ${Math.round(r.top1.w/r.top1.n*100)}%</b> of nights (${r.top1.w}/${r.top1.n}) · ${r.graded} picks scored · every card archived`
-    : "";
-}
-async function loadPro(){
-  let t = null, rec = null;
-  try{ const r = await fetch("/teaser.json?_=" + Date.now()); if(r.ok) t = await r.json(); }catch(e){}
-  if(!LIVE || !t || !t.top1 || t.stale || (t.status && t.status.ok === false) || (t.date && t.date !== LIVE.date)){ hideTease(); return; }
-  try{ const r = await fetch("/pro/record.json?_=" + Date.now()); if(r.ok) rec = await r.json(); }catch(e){}
-  renderTease(t, rec);
-}
-/* ---------- info tips: hover (mouse), keyboard focus and tap (touch) ----------
-   One positioned #tipbox serves every .tip (the old CSS bubble was hover-only
-   and hidden on phones). Enter/Space or a tap pins it; Esc, a second tap or a
-   tap elsewhere closes it. */
-(function(){
-  const box = document.createElement("div");
-  box.id = "tipbox"; box.setAttribute("role", "tooltip"); box.hidden = true;
-  document.body.appendChild(box);
-  let cur = null, pinned = false;
-  function prep(){
-    document.querySelectorAll(".tip:not([data-tipready])").forEach(t=>{
-      t.setAttribute("data-tipready", ""); t.tabIndex = 0;
-      t.setAttribute("role", "button"); t.setAttribute("aria-expanded", "false");
-      const i = t.querySelector(".info-i"); if(i) i.setAttribute("aria-hidden", "true");
-      const own = [...t.childNodes].filter(n=>!(n.classList && n.classList.contains("info-i"))).map(n=>n.textContent).join("").trim();
-      if(!own) t.setAttribute("aria-label", "More info");
-    });
-  }
-  function place(){
-    if(!cur) return;
-    const r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
-    box.style.maxWidth = Math.min(300, vw - 24) + "px";
-    const bw = box.offsetWidth, bh = box.offsetHeight;
-    let x = r.left + r.width/2 - bw/2; x = Math.max(12, Math.min(x, vw - bw - 12));
-    let y = r.top - bh - 10; if(y < 8) y = r.bottom + 10; if(y + bh > vh - 8) y = Math.max(8, vh - bh - 8);
-    box.style.left = Math.round(x) + "px"; box.style.top = Math.round(y) + "px";
-  }
-  function show(t, pin){
-    if(cur && cur !== t) hide();
-    cur = t; pinned = !!pin;
-    box.textContent = t.getAttribute("data-tip") || "";
-    box.hidden = false; place();
-    t.setAttribute("aria-describedby", "tipbox"); t.setAttribute("aria-expanded", "true");
-  }
-  function hide(){
-    if(cur){ cur.removeAttribute("aria-describedby"); cur.setAttribute("aria-expanded", "false"); }
-    cur = null; pinned = false; box.hidden = true;
-  }
-  const tipOf = el => (el && el.closest) ? el.closest(".tip") : null;
-  document.addEventListener("mouseover", e=>{ const t = tipOf(e.target); if(t && !pinned && t !== cur) show(t, false); });
-  document.addEventListener("mouseout", e=>{ const t = tipOf(e.target); if(t && t === cur && !pinned && !t.contains(e.relatedTarget)) hide(); });
-  document.addEventListener("focusin", e=>{ const t = tipOf(e.target); if(t){ if(t !== cur) show(t, false); } else if(cur && !pinned) hide(); });
-  document.addEventListener("focusout", e=>{ if(cur && e.target === cur && !pinned) hide(); });
-  document.addEventListener("click", e=>{
-    if(box.contains(e.target)){ e.preventDefault(); e.stopPropagation(); hide(); return; }
-    const t = tipOf(e.target);
-    if(t){ e.preventDefault(); e.stopPropagation(); if(t === cur && pinned) hide(); else show(t, true); return; }
-    if(pinned) hide();
-  }, true);
-  document.addEventListener("keydown", e=>{
-    const t = tipOf(e.target);
-    if(t && t === e.target && (e.key === "Enter" || e.key === " ")){
-      e.preventDefault(); e.stopPropagation();
-      if(t === cur && pinned) hide(); else show(t, true);
+  Promise.all([D.get(FM.url), D.get(FM.proUrl)]).then(function (r) {
+    var d = r[0];
+    S.pd = r[1];
+    if (!d || !d.games) {
+      document.getElementById("lede").textContent = "Today's forecasts couldn't be loaded. Refresh in a minute — if it keeps happening, the morning build may still be running.";
+      document.getElementById("games").innerHTML = "";
       return;
     }
-    if(e.key === "Escape" && cur){ e.preventDefault(); e.stopImmediatePropagation(); hide(); }
-  }, true);
-  window.addEventListener("scroll", ()=>{ if(!cur) return; if(pinned) place(); else hide(); }, true);
-  window.addEventListener("resize", ()=>{ if(cur) hide(); });
-  new MutationObserver(prep).observe(document.body, {childList:true, subtree:true});
-  prep();
-})();
-/* reduced motion: pause the radar logo's SMIL sweep (held mid-sweep, both blips lit) */
-(function(){
-  if(!window.matchMedia) return;
-  const mq = matchMedia("(prefers-reduced-motion: reduce)");
-  function apply(){
-    document.querySelectorAll("svg.radar-logo").forEach(svg=>{
-      try{ if(mq.matches){ svg.setCurrentTime(0.6); svg.pauseAnimations(); } else svg.unpauseAnimations(); }catch(e){}
+    S.d = d;
+    document.getElementById("date").textContent = d.dateLabel || D.longDate(d.date);
+    var f = D.fresh(document.getElementById("fresh"), { built: d.generated, stale: d.stale, status: d.status, maxAgeH: 9, forDate: d.date });
+    if (f && f.level === "warn") { var st = document.getElementById("stale"); st.hidden = false; D.banner(st, f.text + ".", f.why); }
+    if (!d.games.length) {
+      document.getElementById("lede").textContent = d.note || "No MLB games today.";
+      document.getElementById("games").innerHTML = '<div class="empty card" style="grid-column:1/-1"><h3>No games today</h3><p>' + esc(d.note || "Check back tomorrow morning.") + "</p></div>";
+      return;
+    }
+    document.getElementById("lede").textContent = summary(d);
+    var domes = d.games.filter(function (g) { return g.dome; }).length;
+    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + D.plural(d.games.length, "game") + "</span>" +
+      (domes ? '<span class="chip">' + domes + " under a roof</span>" : "");
+    renderWatch();
+    renderProps();
+    renderGames();
+    route();
+    D.gate.on(function (st) {
+      var m = st === "member";
+      if (m !== S.member) { S.member = m; renderProps(); }
+      var gp = document.querySelector("[data-game-props]"), id = D.hashParam("g");
+      if (gp && id) { var g = S.d.games.filter(function (x) { return x.id === id; })[0]; if (g) gp.innerHTML = M.gameProps(g, ctx()); }
     });
-  }
-  apply();
-  if(mq.addEventListener) mq.addEventListener("change", apply); else if(mq.addListener) mq.addListener(apply);
-})();
-load();
+  });
+});
 </script>
 </body>
 </html>

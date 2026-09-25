@@ -1,947 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NASCAR Race Weather — Rain Delay Outlook & Track Temps | DFSRADAR</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NASCAR Weather This Week — Race-Day Forecast | DFSRADAR</title>
+<meta name="description" content="This week&#x27;s NASCAR race-day weather: temperature, wind, rain and the hours through the race — plus how the track&#x27;s heat changes the handling that wins.">
+<meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://dfsradar.com/nascar/">
+<meta name="theme-color" content="#2E3240">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DFSRADAR">
-<meta property="og:title" content="DFSRADAR NASCAR — Race-Day Weather">
-<meta property="og:description" content="Rain delay outlook, green-flag conditions and temp swings for every race weekend. Free.">
-<meta property="og:image" content="https://dfsradar.com/og-card.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:title" content="NASCAR Weather This Week — Race-Day Forecast | DFSRADAR">
+<meta property="og:description" content="This week&#x27;s NASCAR race-day weather: temperature, wind, rain and the hours through the race — plus how the track&#x27;s heat changes the handling that wins.">
 <meta property="og:url" content="https://dfsradar.com/nascar/">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="DFSRADAR NASCAR — Race-Day Weather">
-<meta name="twitter:description" content="Rain delay outlook, green-flag conditions and temp swings for every race weekend. Free.">
 <meta name="twitter:image" content="https://dfsradar.com/og-card.png">
-
-<meta name="description" content="NASCAR weather for this week's Cup race: hour-by-hour forecast, rain delay outlook, and track temperature swings that change the handling picture.">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="%232E3440"/><circle cx="22" cy="22" r="16" fill="none" stroke="%2322d3ee" stroke-width="1.8"/><circle cx="22" cy="22" r="10" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><circle cx="22" cy="22" r="4.5" fill="none" stroke="%2367e8f9" stroke-width="1.2"/><path d="M22,22 L22,6 A16,16 0 0 1 32.3,9.8 Z" fill="%2322d3ee" opacity="0.5"/><line x1="22" y1="22" x2="32.3" y2="9.8" stroke="%23a5f3fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="28" cy="15" r="2.4" fill="%23F08A3C"/><circle cx="22" cy="22" r="1.8" fill="%23EFF1F7"/></svg>'>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="../assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
-<style>
-  :root{
-    --navy:#2E3440; --navy2:#3A4356; --ink:#EFF1F7; --muted:#8E97AD; --faint:#7E8AA2;
-    --green:#22c55e; --green-deep:#22c55e; --green-bg:rgba(34,197,94,.15);
-    --red:#f87171; --red-deep:#fca5a5; --red-bg:rgba(248,113,113,.15);
-    --blue:#9bb6d6; --blue-deep:#bcd3ea; --blue-bg:rgba(155,182,214,.14);
-    --gold:#22d3ee; --gold-deep:#67e8f9; --gold-bg:rgba(34,211,238,.14);
-    --amber-bg:rgba(251,191,36,.15);
-    --gray-bg:#2A303D; --surface:#2E3240; --card:#323A4A; --line:#454E61;
-    --line-strong:#57627A; --body2:#C7CEDC;
-    --note-bg:rgba(251,191,36,.12); --note-border:rgba(251,191,36,.32); --note-text:#fbbf24;
-    --radius:14px;
-    --shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 2px rgba(0,0,0,.35),0 10px 26px rgba(0,0,0,.24);
-    --shadow-hover:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.3);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface);color:var(--ink);line-height:1.45}
-  header{position:relative;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 24px 22px}
-  .header-inner{max-width:1100px;margin:0 auto}
-  .brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .brand h1{font-size:26px;font-weight:800;letter-spacing:.6px;display:flex;align-items:center}
-  .brand h1 .radar-logo{margin-right:11px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
-  .brand h1 .brand-rad{font-weight:300;color:#93a1b8}
-  .brand h1 .sport{margin-left:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:3px 11px;font-size:14px;letter-spacing:1.5px}
-  .brand .tagline{margin-top:6px;font-size:13px;color:#95a1b5;letter-spacing:.3px}
-  .brand .tagline b{color:#22d3ee;font-weight:600}
-  .sport-tabs{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
-  .sport-tabs a{font-size:12px;font-weight:700;letter-spacing:.6px;padding:6px 14px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.22);color:#aeb9cf}
-  .sport-tabs a:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-  .sport-tabs .protab{background:#F08A3C;color:#1B1206 !important;border-color:transparent;font-weight:800}
-  .sport-tabs .protab:hover{filter:brightness(1.06)}
-  .sport-tabs .on{background:var(--card);color:var(--navy);border-color:#fff}
-  .kx-btn{position:absolute;right:22px;bottom:12px;display:inline-flex;align-items:center;background:#F08A3C;color:#fff !important;font-size:12px;font-weight:800;letter-spacing:.6px;padding:6px 15px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,.28);box-shadow:0 2px 10px rgba(255,107,26,.4)}
-  .kx-btn:hover{filter:brightness(1.1);color:#fff !important}
-  @media(max-width:760px){.kx-btn{position:static;margin:10px 0 12px}}
-  .kx-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy),var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 20px;margin-bottom:18px}
-  .kx-card .kx-k{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .kx-card .kx-t{font-size:14px;color:#dde5f5;margin-top:3px}
-  .kx-card .kx-t b{color:#fff}
-  .kx-card .kx-s{font-size:11px;color:#8b98b8;margin-top:2px}
-  .kx-card .kx-go{background:#F08A3C;color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.4px;padding:9px 18px;border-radius:22px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 10px rgba(255,107,26,.4)}
-  .kx-card .kx-go:hover{filter:brightness(1.1)}
-  .kx-hook{margin-top:12px;background:var(--card);border:1px dashed rgba(255,107,26,.55);border-radius:12px;padding:11px 15px;font-size:13px;color:var(--body2)}
-  .kx-hook a{color:#F08A3C;font-weight:800;text-decoration:none}
-  .kx-hook a:hover{text-decoration:underline}
-  main{max-width:1100px;margin:0 auto;padding:22px 24px 70px}
-  .date-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;font-size:13px;color:#c8d1de;white-space:nowrap}
-  .date-chip b{color:#fff}
-  .brief-card{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 85%);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:16px 22px 17px;margin-bottom:18px}
-  .brief-card::after{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;border:1.5px solid rgba(126,162,255,.28);box-shadow:0 0 0 38px rgba(126,162,255,.07),0 0 0 80px rgba(126,162,255,.045);pointer-events:none}
-  .brief-head{display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#F08A3C;margin-bottom:7px}
-  .brief-head .pulse{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:bpulse 2.2s ease-in-out infinite}
-  @keyframes bpulse{0%,100%{opacity:1}50%{opacity:.25}}
-  .brief-body{position:relative;z-index:1;font-size:14px;line-height:1.7;color:#dde5f5}
-  .brief-body b{color:#fff}
-  .tip{position:relative;cursor:help}
-  .info-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gray-bg);color:var(--muted);font-size:10px;font-weight:800;vertical-align:1px;margin-left:6px;border:1px solid var(--line-strong)}
-  .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);width:250px;background:var(--navy);color:#dbe4f5;font-size:11.5px;font-weight:500;line-height:1.55;text-transform:none;letter-spacing:.1px;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow-hover);opacity:0;pointer-events:none;transition:opacity .15s;z-index:90;text-align:left;white-space:normal}
-  .tip::before{content:"";position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--navy);opacity:0;transition:opacity .15s;z-index:90}
-  .tip:hover::after,.tip:hover::before{opacity:1}
-  .event-hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
-  .event-hero .name{font-size:22px;font-weight:800}
-  .event-hero .sub{font-size:13px;color:var(--muted);margin-top:3px}
-  .event-hero .when{text-align:right}
-  .event-hero .when b{font-size:16px}
-  .event-hero .when span{display:block;font-size:11.5px;color:var(--muted)}
-  .scene-card{position:relative;height:340px;background:#0d1830;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
-  .scene-card canvas{width:100%;height:100%;display:block}
-  .p3d-hud{position:absolute;left:16px;top:14px;color:#eaf1fb;text-shadow:0 1px 6px rgba(0,0,0,.5);pointer-events:none}
-  .p3d-hud .t{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;opacity:.85}
-  .p3d-hud .w{font-size:14px;font-weight:700;margin-top:3px}
-  .p3d-chip{position:absolute;right:14px;top:12px;background:rgba(10,18,38,.55);border:1px solid rgba(255,255,255,.18);color:#eaf1fb;font-size:11px;font-weight:700;border-radius:16px;padding:5px 12px;pointer-events:none}
-  .po-pill{display:inline-block;margin-left:10px;font-size:10px;font-weight:800;letter-spacing:.8px;background:var(--gold-bg);color:var(--gold-deep);border-radius:14px;padding:3px 10px;text-transform:uppercase;vertical-align:3px}
-  .sec-h{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin:20px 0 12px}
-  .wx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-  .wx-tile{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 16px}
-  .wx-tile .k{font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-  .wx-tile .v{font-size:25px;font-weight:800;margin-top:3px}
-  .wx-tile .s{font-size:11.5px;color:var(--muted);margin-top:2px}
-  .delay-hero{margin-top:14px;border-radius:var(--radius);padding:16px 20px;font-size:14px;font-weight:600;line-height:1.6}
-  .delay-hero b{font-size:16px}
-  .dl-clear{background:var(--green-bg);color:var(--green-deep)}
-  .dl-watch{background:var(--amber-bg);color:#fbbf24}
-  .dl-likely{background:#3a2f24;color:#fbbf24}
-  .dl-severe{background:var(--red-bg);color:var(--red-deep)}
-  .hourly{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px;margin-top:13px}
-  .hr-cell{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 6px;text-align:center;box-shadow:var(--shadow)}
-  .hr-fp{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-  .hr-lab{font-size:9.5px;font-weight:800;letter-spacing:.9px;color:var(--muted);text-transform:uppercase}
-  .hr-t{font-size:18px;font-weight:800;margin-top:2px}
-  .hr-w{font-size:11.5px;color:var(--body2);margin-top:3px}
-  .hr-rain{font-size:11px;color:var(--muted);margin-top:3px}
-  .hr-rain.warn{color:var(--red);font-weight:800}
-  .ondeck{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
-  .od-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
-  .od-card .k{font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-  .od-card .v{font-size:15px;font-weight:800;margin-top:3px}
-  .od-card .s{font-size:12px;color:var(--muted);margin-top:2px}
-  .m-sec{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-top:20px}
-  .m-sec h5{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:12px}
-  .empty-season{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:44px;text-align:center;color:var(--muted)}
-  .empty-season b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
-  footer.site-foot{max-width:1180px;margin:36px auto 0;padding:24px 24px 8px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:#A7B0C4;text-align:center}
-  footer.site-foot .fnav{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 4px;margin:0 0 10px}
-  footer.site-foot .fnav a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:20px;color:#C7CEDC;font-size:12.5px;font-weight:700;letter-spacing:.4px;text-decoration:none}
-  footer.site-foot .fnav a:hover{color:#fff;background:rgba(255,255,255,.06)}
-  footer.site-foot .fnav a[aria-current="page"]{color:#67e8f9}
-  footer.site-foot .fnav .f-pro{color:#F08A3C}
-  footer.site-foot p{margin:0 auto 6px;max-width:74ch}
-  footer.site-foot .f-rg b{color:#EFF1F7}
-  footer.site-foot .f-rg a{color:#67e8f9;font-weight:700;text-decoration:none}
-  footer.site-foot .f-rg a:hover{text-decoration:underline}
-
-  /* ===== DFS Kitchen family — cyan-forward chrome (appended) ===== */
-  .brand h1 .brand-rad{color:#22d3ee}
-  .sport-tabs .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
-  nav button.active{box-shadow:inset 0 -2px 0 #22d3ee}
-  .controls h2,.method h4,.sub-h,.hist-table th{color:#67e8f9}
-  .sum-card{border-top:2px solid rgba(34,211,238,.55)}
-  .sum-card:hover,.b-row:hover,.wxc:hover,.p-card:hover{border-color:rgba(34,211,238,.5)}
-  .hero-tag{color:#67e8f9;background:rgba(34,211,238,.14)}
-  .brief-card::after{border-color:rgba(34,211,238,.30)!important;box-shadow:0 0 0 38px rgba(34,211,238,.06),0 0 0 80px rgba(34,211,238,.04)!important}
-  .brief-head{color:#67e8f9}
-  .pro-nav .on{background:rgba(34,211,238,.14);color:#67e8f9;border-color:rgba(34,211,238,.5)}
-  .p3d-hud{max-width:calc(100% - 160px)}
-  .p3d-hud .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  a{color:#67e8f9}
-  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
-  :focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
-  .brand h1,.hero-teams,.b-teams,.m-head .teams,.method h3,.hero-tag,.sum-card .v{font-family:Sora,Ubuntu,-apple-system,sans-serif}
-  /* ===== v2: reading density + cyan lift =====
-     dfskitchen.com sets 19.5px body on a ~680px measure with 64px section
-     padding. A dense data board can't go that far, but 14px text inside 14px
-     card padding was the "clustered" complaint; this is the same intent at
-     table scale. ===== */
-  body{font-size:15.5px;
-    background-image:radial-gradient(1150px 470px at 50% -150px,rgba(34,211,238,.12),transparent 72%);
-    background-repeat:no-repeat;background-attachment:fixed;
-    padding:26px 26px 88px}
-  main{max-width:1180px}
-  .summary-strip{gap:16px;margin-bottom:30px}
-  .board{gap:14px}
-  .sum-card{padding:20px 22px}
-  .wxc{padding:20px 22px}
-  .m-sec{padding:22px 24px;margin-bottom:16px}
-  .p-card{padding:16px 18px}
-  .brief-card{padding:24px 28px 25px;margin-bottom:26px}
-  .pro-card,.kx-card,.pro-tease{padding:18px 22px;margin-bottom:26px}
-  .b-row{padding:17px 20px}
-  .method{padding:36px 40px}
-  .controls{margin-bottom:20px}
-  .controls h2{font-size:14px;letter-spacing:1.5px}
-  table td,table th{padding-top:11px;padding-bottom:11px}
-  /* prose keeps a readable measure instead of running the full 1180px */
-  .method p,.hist-note,.mx-note,.fcs-note,.empty-season,.tagline{max-width:70ch}
-
-  /* cyan lift -- all-grey was underwhelming; this is DFSRADAR's own colour
-     from the Kitchen system (--radar #22d3ee), spent only where the eye lands. */
-  .brief-card{border-left:3px solid rgba(34,211,238,.6)}
-  .sum-card{border-top:2px solid rgba(34,211,238,.5)}
-  .sum-card:hover,.b-row:hover,.wxc:hover{border-color:rgba(34,211,238,.45)}
-  .m-sec h5,.method h4,.sub-h{color:#67e8f9}
-  .m-head .teams{color:#EFF1F7}
-  ::selection{background:rgba(34,211,238,.32);color:#EFF1F7}
-  /* ===== v3: narrow-screen header =====
-     Four things pushed every sport page sideways on a phone: .sport-tabs was a
-     non-wrapping flex row holding the header open at a 400px minimum; the
-     .controls heading is a flex item that would not shrink below its own text;
-     .b-row is a fixed six-column grid; and .tip::after is a 250px absolutely
-     positioned tooltip that hangs past the viewport on any tip near the right
-     edge. The tooltip only appears on hover, which is unreliable on touch, so
-     it is suppressed rather than re-anchored. ===== */
-  .sport-tabs{flex-wrap:wrap}
-  .brand,.brand h1{min-width:0;max-width:100%}
-  .brand h1{flex-wrap:wrap;row-gap:6px}
-  .tagline{max-width:100%}
-  .controls h2{min-width:0;overflow-wrap:anywhere}
-  @media(max-width:680px){
-    body{padding-left:14px;padding-right:14px}
-    .brand h1{font-size:21px}
-    .tip::after,.tip::before{display:none}
-    nav{flex-wrap:wrap;row-gap:4px}
-    nav button{white-space:normal}
-    .b-row{grid-template-columns:1fr!important;gap:8px;row-gap:8px}
-    .b-row>*{min-width:0}
-    .summary-strip{grid-template-columns:1fr}
-    .m-tiles,.mx-grid{grid-template-columns:1fr!important}
-    table{display:block;overflow-x:auto;white-space:nowrap}
-    .method{padding:24px 20px}
-    .brief-card,.pro-card,.kx-card,.pro-tease{padding:18px 18px}
-  }
-
-  /* ===== v5: home =====
-     The wordmark is the link people reach for; the nav item is the one they
-     can see. Both go to the landing page. ===== */
-  .home-link{color:inherit;text-decoration:none;border-radius:4px}
-  .home-link:hover{opacity:.82}
-  .hometab{white-space:nowrap}
-
-  /* ===== v6: honest data states + freshness =====
-     The page used to paint a built-in sample first and keep it whenever
-     data.json failed or had no games. Now it paints a neutral skeleton, then
-     exactly one of: the live slate, a real empty state, or an error with a
-     retry. The sample only appears behind ?demo=1, labelled as demo data. ===== */
-  [hidden]{display:none!important}
-  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .slate-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .slate-meta .fresh{min-height:0}
-  .state-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:38px 28px;text-align:center}
-  .state-card h3{font:700 18px/1.35 Sora,Ubuntu,-apple-system,sans-serif;color:var(--ink);margin-bottom:8px}
-  .state-card p{font-size:14px;line-height:1.65;color:var(--body2);max-width:60ch;margin:0 auto}
-  .state-card.err{border-color:rgba(251,191,36,.38)}
-  .retry-btn{margin-top:18px;appearance:none;cursor:pointer;min-height:40px;padding:0 22px;border-radius:22px;border:1px solid rgba(34,211,238,.5);background:rgba(34,211,238,.12);color:#67e8f9;font:700 13px/1 Ubuntu,-apple-system,sans-serif;letter-spacing:.3px}
-  .retry-btn:hover{background:rgba(34,211,238,.2)}
-  .skel{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:12px}
-  .skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);animation:skel 1.5s ease-in-out infinite}
-  @keyframes skel{to{transform:translateX(100%)}}
-  .skel-row{height:84px}
-  .skel-card{height:108px;border-radius:var(--radius)}
-  .demo-flag{display:flex;align-items:center;gap:10px;border:1px dashed rgba(251,191,36,.55);background:rgba(251,191,36,.08);color:#fcd34d;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:20px}
-  .demo-flag b{letter-spacing:.8px;text-transform:uppercase;font-size:11.5px}
-  .summary-strip:empty{display:none}
-  .brief-card.is-warn .brief-head .pulse{background:#fbbf24;box-shadow:0 0 8px #fbbf24;animation:none}
-  @media(max-width:680px){.slate-meta{align-items:flex-start}}
-
-  /* ===== v6: Free → PRO path =====
-     One compact card per page pointing at THAT sport's Desk, with a member
-     log in. It sits beside The Optimizer card after the board, so the board
-     comes first. Orange stays reserved for PRO / The Optimizer. ===== */
-  .cta-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;margin-top:30px}
-  .cta-row>*{margin:0!important}
-  .cta-row .kx-card{align-content:center}
-  .pro-card{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;background:linear-gradient(120deg,#252A35,var(--navy2));border-left:4px solid #F08A3C;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px}
-  .pro-card .px-main{flex:1 1 300px;min-width:0}
-  .pro-card .px-k{font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#F08A3C}
-  .pro-card .px-t{font-size:14px;line-height:1.55;color:#dde5f5;margin-top:4px}
-  .pro-card .px-t b{color:#fff}
-  .pro-card .px-s{font-size:12px;color:#A7B0C4;margin-top:4px}
-  .pro-card .px-btns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .pro-card .px-go{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border-radius:22px;background:#F08A3C;color:#1B1206;font-size:13px;font-weight:800;letter-spacing:.3px;text-decoration:none;white-space:nowrap}
-  .pro-card .px-go:hover{filter:brightness(1.06)}
-  .pro-card .px-login{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:22px;border:1px solid rgba(255,255,255,.25);color:#C7CEDC;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap}
-  .pro-card .px-login:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-
-  /* ===== v6: keyboard, screen readers, touch =====
-     Info tips: the CSS-only bubble was hover-only and hidden ≤680px; a single
-     JS-positioned #tipbox now opens on hover, focus or tap. Icons keep their
-     15px look with a 40px hit area. ===== */
-  .tip::after,.tip::before{content:none!important;display:none!important}
-  .tip{cursor:pointer;border-radius:8px}
-  .info-i{position:relative}
-  .info-i::before{content:"";position:absolute;left:50%;top:50%;width:40px;height:40px;transform:translate(-50%,-50%)}
-  #tipbox{position:fixed;z-index:300;left:0;top:0;max-width:300px;background:#1F2430;color:#E6EAF2;border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.45);padding:10px 12px;font:500 12.5px/1.55 Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.1px;text-transform:none;text-align:left;white-space:normal}
-  [role="button"][data-game]{cursor:pointer}
-  [role="button"][data-game]:focus-visible{outline:2px solid #22d3ee;outline-offset:3px}
-  .m-close{display:inline-flex;align-items:center;justify-content:center}
-  .m-close:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
-
-  /* ===== v6: contrast + phone ergonomics =====
-     Small secondary text was #8E97AD on #323A4A (3.9:1); #A7B0C4 clears 4.5:1
-     on every card and header surface. Text on orange buttons is #1B1206 (7.4:1,
-     was white at 2.5:1). On phones every tab/chip/button is at least 40px tall. ===== */
-  :root{--muted:#A7B0C4;--faint:#A7B0C4}
-  .b-teams .at,.hero-teams .at,.wxc-teams .at{color:#8E97AD}
-  .brand .tagline,nav button{color:#A7B0C4}
-  .m-head .meta{color:#A7B0C4!important}
-  .kx-btn,.kx-btn:hover{color:#1B1206!important}
-  .kx-card .kx-go,.kx-card .kx-go:hover{color:#1B1206}
-  .kx-card .kx-s{color:#A7B0C4}
-  select{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%23C7CEDC"/></svg>')!important;background-repeat:no-repeat!important;background-position:right 12px center!important;padding-right:32px!important}
-  @media(max-width:680px),(pointer:coarse){
-    .sport-tabs a{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
-    select{min-height:40px}
-    .kx-btn{min-height:40px}
-    .kx-card .kx-go{min-height:40px;display:inline-flex;align-items:center;padding-top:0;padding-bottom:0}
-    .m-close{width:40px;height:40px}
-  }
-  @media(max-width:680px){
-    .summary-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-bottom:22px}
-    .sum-card{padding:14px 14px!important}
-    .sum-card .k{font-size:10.5px;letter-spacing:.8px}
-    .sum-card .v{font-size:15px!important;line-height:1.3}
-    .sum-card .s{font-size:12px}
-    .scene-card{height:220px}
-  }
-  @media(max-width:359px){.summary-strip{grid-template-columns:1fr!important}}
-  .p3d-load{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:rgba(234,241,251,.55);font-size:12px;pointer-events:none}
-  .is-3d .p3d-load{display:none}
-
-  /* ===== v6: reduced motion =====
-     Honour the OS setting: no CSS animation or transition, no smooth
-     scrolling, the radar logo's SMIL sweep is paused (see script) and the 3D
-     scenes stop orbiting and render still frames. ===== */
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
-    html{scroll-behavior:auto!important}
-    .brief-head .pulse{animation:none!important}
-    .skel::after{animation:none!important;display:none}
-    .b-row:hover{transform:none}
-  }
-</style>
-<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/pro/gate.js" defer></script>
+<script src="../assets/dr.js?v=a7b89034" defer></script>
+<script src="../assets/feeds.js?v=a7b89034" defer></script>
+<script src="../assets/props.js?v=a7b89034" defer></script>
 </head>
 <body>
-<header>
-  <div class="header-inner">
-    <div class="brand-row">
-      <div class="brand">
-        <h1><svg class="radar-logo" viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
-          <defs><linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0.35">
-            <stop offset="0" stop-color="#7ea2ff" stop-opacity="0.55"/><stop offset="1" stop-color="#7ea2ff" stop-opacity="0"/>
-          </linearGradient></defs>
-          <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#8fa8d8" stroke-width="1.7"/>
-          <circle cx="22" cy="22" r="13.5" fill="none" stroke="#5d75ab" stroke-width="1"/>
-          <circle cx="22" cy="22" r="7" fill="none" stroke="#5d75ab" stroke-width="1"/>
-          <line x1="3.5" y1="22" x2="40.5" y2="22" stroke="#44598c" stroke-width="0.9"/>
-          <line x1="22" y1="3.5" x2="22" y2="40.5" stroke="#44598c" stroke-width="0.9"/>
-          <g><path d="M22,22 L22,2 A20,20 0 0 1 36.7,8.6 Z" fill="url(#beamGrad)"/>
-          <line x1="22" y1="22" x2="22" y2="2.4" stroke="#cfe0ff" stroke-width="1.7" stroke-linecap="round"/>
-          <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="4.5s" repeatCount="indefinite"/></g>
-          <circle cx="29.5" cy="13.5" r="2.3" fill="#F08A3C"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" repeatCount="indefinite"/></circle>
-          <circle cx="13" cy="28.5" r="1.9" fill="#22c55e"><animate attributeName="opacity" values="0.1;1;0.35;0.1" keyTimes="0;0.13;0.6;1" dur="4.5s" begin="2.4s" repeatCount="indefinite"/></circle>
-          <circle cx="22" cy="22" r="1.7" fill="#e7eeff"/>
-        </svg><a class="home-link" href="/" aria-label="DFSRADAR home">DFS<span class="brand-rad">RADAR</span></a><span class="sport">NASCAR</span></h1>
-        <div class="tagline">Race-day weather edges for DFS. <b>Scan the slate. Find the edge.</b></div>
-        <div class="sport-tabs">
-          <a class="hometab" href="/">← Home</a><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a class="on" href="/nascar/">NASCAR</a><a class="protab" href="/pro/nascar/">★ PRO</a>
-        </div>
-      </div>
-      <div class="slate-meta">
-        <div class="date-chip" id="date-chip">Loading this week's race…</div>
-        <div class="fresh" id="fresh" hidden></div>
-      </div>
+<header id="dr-top" class="dr-top"></header>
+<div id="dr-sub" class="dr-sub"></div>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow"><span>NASCAR weather</span><span class="faint">·</span><span id="when">This week</span></div>
+    <h1 class="ph__title" id="h1">This week's race forecast</h1>
+    <p class="ph__lede" id="lede">Loading…</p>
+    <div class="ph__meta"><span class="fresh-slot" id="fresh"></span><span class="chips" id="meta-chips"></span></div>
+  </section>
+  <div id="stale" class="mt24" hidden></div>
+
+  <section class="sec" id="race-sec">
+    <div class="sec__h"><div><h2 class="sec__title">At the green flag</h2><p class="sec__sub" id="race-sub"></p></div></div>
+    <div id="race"><div class="skel"></div></div>
+  </section>
+
+  <section class="sec" id="hours-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">Through the race</h2><p class="sec__sub">Green-flag hour highlighted. A track that heats up or cools off mid-race changes grip — and the handling that wins.</p></div></div>
+    <div class="card card--flat" style="padding:10px 14px" id="hours"></div>
+  </section>
+
+  <section class="sec" id="deck-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title">Coming up</h2></div></div>
+    <div class="grid g3" id="deck"></div>
+  </section>
+
+  <section class="band" id="props-band" hidden>
+    <div class="wrap" style="padding:0">
+      <div class="sec__h"><div><div class="ph__eyebrow" style="margin-bottom:8px">Weather → props</div>
+        <h2 class="sec__title">Race targets: track history and heat</h2>
+        <p class="sec__sub">Drivers who keep finishing up front at this track and this kind of track, plus the drivers who get better when it's hot — graded on a top-10 finish.</p></div>
+        <a class="btn btn--cyan" href="../props/nascar/">Open NASCAR props</a></div>
+      <div class="grid g2" id="props-cards"></div>
     </div>
-  </div>
-  <a class="kx-btn" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=header&utm_campaign=nascar" target="_blank" rel="noopener">⚡ The Optimizer</a>
-</header>
-
-<main>
-
-  <div class="demo-flag" id="demo-flag" role="note" hidden><b>Demo data</b> A built-in sample race for design work — none of these forecasts or numbers are live.</div>
-
-  <div class="brief-card" id="brief-card" style="display:none">
-    <div class="brief-head"><span class="pulse"></span><span id="brief-label">Race-day read — live from the radar</span><span class="tip" data-tip="Auto-generated on every build from the race-window forecast — rain risk, green-flag conditions, and the temp swing straight from the numbers. No opinions."><span class="info-i">i</span></span></div>
-    <div class="brief-body" id="brief-body"></div>
-  </div>
-
-
-  <div id="content"></div>
-
-  <div class="cta-row">
-    <aside class="pro-card" id="pro-card" aria-label="DFSRADAR PRO NASCAR Desk">
-      <div class="px-main"><div class="px-k" id="pro-card-k">★ PRO · NASCAR Desk</div>
-      <div class="px-t" id="pro-card-txt">Driver track history with the Next Gen era split out, track-type form, and the heat edge — who gains spots when the track runs hot.</div>
-      <div class="px-s">$15/mo, every sport included · free with DFS Kitchen All-Access · graded in public</div></div>
-      <div class="px-btns"><a class="px-go" href="/pro/nascar/">See the NASCAR Desk →</a><a class="px-login" href="/pro/nascar/#login">Member log in</a></div>
-    </aside>
-    <div class="kx-card">
-      <div><div class="kx-k">⚡ Found your edge?</div>
-      <div class="kx-t">The radar finds the weather edge — <b>The Optimizer</b> turns it into lineups.</div>
-      <div class="kx-s">Part of The DFS Kitchen · Learn it. Build it. Track it.</div></div>
-      <a class="kx-go" href="https://dfskitchen.com/?utm_source=dfsradar&utm_medium=cta_card&utm_campaign=nascar" target="_blank" rel="noopener">Build lineups →</a>
-    </div>
-  </div>
-
-  <div class="m-sec" style="margin-top:26px">
-    <h5>How it works</h5>
-    <p style="font-size:14px;line-height:1.7;color:var(--body2)">Cup cars don't race ovals in the rain, so on an oval the rain number IS the story: showers push races into the night or to Monday, and a delayed race is a different DFS slate. We pull the hourly forecast at this week's track for the full race window: rain risk hour by hour (peak drives the delay outlook), green-flag conditions, wind and gusts, and the <b>temp swing</b> from green flag to the finish — the track cools, grip comes up, and handling changes with it. Rebuilt every morning as race day approaches.</p>
-  </div>
+  </section>
 </main>
-
-<footer class="site-foot">
-  <nav class="fnav" aria-label="DFSRADAR"><a href="/mlb/">MLB</a><a href="/nfl/">NFL</a><a href="/cfb/">CFB</a><a href="/pga/">PGA</a><a href="/nascar/" aria-current="page">NASCAR</a><a class="f-pro" href="/pro/">PRO</a><a href="/record/">Record</a><a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=nascar" target="_blank" rel="noopener">DFS Kitchen</a></nav>
-  <p>DFSRADAR · NASCAR race-day weather for DFS · part of The DFS Kitchen family.</p>
-  <p class="f-rg">Weather-adjusted insights are informational, not betting advice. <b>21+.</b> If you or someone you know has a gambling problem, call <a href="tel:+18004262537">1-800-GAMBLER</a>.</p>
-</footer>
+<footer id="dr-foot" class="dr-foot"></footer>
 
 <script>
-/* DEMO DATA — used ONLY with ?demo=1 (design work) and always labelled "Demo
-   data" on the page. The live page never falls back to it. */
-const SAMPLE = {generated:"preview",
- brief:"Iowa Corn 350 at Iowa Speedway: 88° and sunny at the green flag, wind 9 mph (gusts 16). No rain threat — this one runs on time. Track cools 13° through the window — grip picks up late, watch for handling swings.",
- race:{shape:{kind:"oval",mi:0.875,bank:14}, name:"Iowa Corn 350", track:"Iowa Speedway", city:"Newton, IA", playoff:false,
-  day:"Sunday, August 9", time:"3:30 PM ET", inWindow:true,
-  temp:88, wind:9, gust:16, rain:10, rh:48, sky:"Sunny", tempSwing:13,
-  delay:{level:"clear", pct:10},
-  hourly:[{lab:"1 PM",t:86,w:8,rain:5},{lab:"2 PM",t:88,w:9,rain:8},{lab:"3 PM",fp:true,t:88,w:9,rain:10},{lab:"4 PM",t:87,w:10,rain:10},{lab:"5 PM",t:84,w:9,rain:8},{lab:"6 PM",t:80,w:8,rain:5},{lab:"7 PM",t:75,w:6,rain:4}]},
- onDeck:[{name:"Cook Out 400", track:"Richmond Raceway", city:"Richmond, VA", date:"Sat Aug 15", playoff:false},
-         {name:"Dollar Tree 301", track:"New Hampshire Motor Speedway", city:"Loudon, NH", date:"Sun Aug 23", playoff:false},
-         {name:"Coke Zero Sugar 400", track:"Daytona International Speedway", city:"Daytona Beach, FL", date:"Sat Aug 29", playoff:false}]};
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR, FN = F.nascar, esc = D.esc, isNum = D.isNum;
+  D.shell({ section: "weather", sport: "nascar" });
 
-let DATA = null, LIVE = null;
-const DEMO = /[?&]demo=1(?:&|$)/.test(location.search);
-const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const DL={clear:["RUNS ON TIME","No delay concern — rain stays away from the race window.","dl-clear"],
-          watch:["WORTH MONITORING","Some rain around the window. Ovals don't run wet — keep an eye on it.","dl-watch"],
-          likely:["DELAY LIKELY","Real rain risk in the window. Expect stoppages — late-race strategy changes everything.","dl-likely"],
-          severe:["POSTPONEMENT RISK","Heavy rain risk. Ovals can't run in it — Monday is in play.","dl-severe"]};
-/* ---------- data states ----------
-   loading (skeleton) → live | between races / season complete | error (retry). */
-const MAIN = document.querySelector("main");
-function setChip(html){ document.getElementById("date-chip").innerHTML = html; }
-function stateCard(title, body, retry){
-  return `<div class="state-card${retry?" err":""}" role="${retry?"alert":"status"}"><h3>${esc(title)}</h3>`
-    + (body?`<p>${esc(body)}</p>`:"")
-    + (retry?`<button type="button" class="retry-btn" data-retry>Try again</button>`:"") + `</div>`;
-}
-function niceStamp(text){
-  return window.RadarFresh ? String(text).replace(/(\d{4}-\d{2}-\d{2}[ T]\d{1,2}:\d{2}) ET/g,
-    (m, t)=>{ const d = RadarFresh.parseET(t); return d ? RadarFresh.fmt(d, true) : m; }) : String(text);
-}
-function renderBrief(text){
-  const card = document.getElementById("brief-card");
-  if(!text){ card.style.display = "none"; return; }
-  document.getElementById("brief-body").innerHTML = esc(niceStamp(text)).replace(/(\d+°|\d+%|\d+ mph)/g,"<b>$1</b>");
-  card.style.display = "";
-}
-/* "The 2026 Cup season is complete — the radar returns …" → title + body (keeps any ⚠ stale prefix in the body) */
-function seasonCopy(brief, title, fallback){
-  const b = niceStamp(brief || "");
-  const m = b.match(/^(.*?)(The \d{4} [^—]*? season is complete)\s*—\s*(.+)$/);
-  if(m) return {title: m[2], body: (m[1] + m[3].charAt(0).toUpperCase() + m[3].slice(1)).trim()};
-  return {title: title, body: b || fallback};
-}
-function renderLoading(){
-  MAIN.setAttribute("aria-busy","true");
-  setChip("Loading this week's race…");
-  document.getElementById("fresh").hidden = true;
-  renderBrief("");
-  document.getElementById("content").innerHTML = '<div class="skel skel-card" style="margin-bottom:18px"></div>'
-    + '<div class="wx-grid">' + '<div class="skel skel-card"></div>'.repeat(4) + '</div>'
-    + '<span class="sr-only" role="status">Loading this week’s race</span>';
-}
-function renderError(){
-  MAIN.removeAttribute("aria-busy");
-  setChip("Race unavailable");
-  document.getElementById("fresh").hidden = true;
-  renderBrief("");
-  document.getElementById("content").innerHTML = stateCard("We couldn't load this week's race",
-    "The radar data didn't come through — usually a brief network hiccup. Nothing is shown until the real numbers load.", true);
-}
-function renderAll(){
-  MAIN.removeAttribute("aria-busy");
-  const c=document.getElementById("content");
-  let html="";
-  if(DATA.race){
-    const g=DATA.race;
-    setChip(`${DEMO ? "<b>Demo race</b> · " : "Race day · "}<b>${esc(g.day)}</b>`);
-    renderBrief(DATA.brief);
-    html+=`<div class="event-hero">
-      <div><div class="name">${g.name}${g.playoff?'<span class="po-pill">Playoffs</span>':""}</div>
-      <div class="sub">${g.track} · ${g.city}</div></div>
-      <div class="when"><b>${g.day}</b><span>Green flag ${g.time}</span></div>
-    </div>`;
-    html+=`<div class="scene-card" id="n3d-wrap"><canvas id="n3d-canvas"></canvas><div class="p3d-load">Loading 3D view…</div><div class="p3d-hud"><div class="t" id="n3d-t"></div><div class="w" id="n3d-w"></div></div><div class="p3d-chip" id="n3d-chip"></div></div>`;
-    if(g.inWindow){
-      const [dt,ds,dc]=DL[g.delay.level]||DL.clear;
-      html+=`<div class="delay-hero ${dc}"><b>DELAY OUTLOOK: ${dt}</b> — peak ${g.delay.pct}% rain in the race window. ${ds}</div>`;
-      html+=`<div class="sec-h">Green-flag conditions</div>
-      <div class="wx-grid">
-        <div class="wx-tile"><div class="k">Temp</div><div class="v">${g.temp}°</div><div class="s">${g.sky}</div></div>
-        <div class="wx-tile"><div class="k">Wind</div><div class="v">${g.wind} mph</div><div class="s">${(g.gust!=null&&g.gust>=g.wind)?`gusts to ${g.gust}`:"at the green flag"}</div></div>
-        <div class="wx-tile"><div class="k">Rain chance</div><div class="v">${g.rain!=null?g.rain+"%":"—"}</div><div class="s">at the green flag</div></div>
-        <div class="wx-tile"><div class="k">Temp swing</div><div class="v">${g.tempSwing}°</div><div class="s">green flag → finish · grip comes up as it cools<span class="tip" data-tip="Track temperature falls through the race window. Cooler track = more grip. A big swing means handling changes lap by lap — an edge for drivers who adjust."><span class="info-i">i</span></span></div></div>
-      </div>`;
-      if(g.hourly&&g.hourly.length){
-        html+=`<div class="sec-h">Race window · hour by hour (track local time)</div>
-        <div class="hourly">${g.hourly.map(h=>`
-          <div class="hr-cell ${h.fp?"hr-fp":""}">
-            <div class="hr-lab">${h.lab}${h.fp?" · green":""}</div>
-            <div class="hr-t">${h.t}°</div>
-            <div class="hr-w">${h.w} mph wind</div>
-            <div class="hr-rain ${h.rain>=45?"warn":""}">Rain ${h.rain!=null?h.rain+"%":"—"}</div>
-          </div>`).join("")}</div>`;
-      }
-    } else {
-      html+=`<div class="empty-season"><b>Forecast window opens soon</b>Race-day forecasts appear once race day is inside the 16-day horizon — then sharpen daily.</div>`;
-    }
-  } else if(DATA.seasonComplete){
-    /* the builder's brief carries the season-complete sentence; it becomes the card, not a duplicate */
-    setChip("Season complete");
-    renderBrief("");
-    const sc = seasonCopy(DATA.brief, "The Cup season is complete", "The radar returns when the new schedule begins.");
-    html+=stateCard(sc.title, sc.body);
-  } else {
-    setChip("Between races");
-    renderBrief(DATA.brief);
-    html+=stateCard("Between races", "The next race loads here automatically — race-day forecasts follow once it's inside the 16-day horizon.");
+  /* stylized track outline from its shape */
+  function trackSVG(sh) {
+    var kind = (sh && sh.kind) || "oval";
+    var path = kind === "road" ? "M40 120 L60 60 L120 40 L170 70 L220 45 L270 80 L250 130 L180 150 L130 125 L80 150 Z"
+      : kind === "trioval" ? "M80 150 C30 150 30 50 80 50 L240 50 C290 50 290 150 240 150 L170 150 L160 162 L150 150 Z"
+      : kind === "triangle" ? "M60 150 L160 40 L260 150 Z"
+      : "M80 150 C30 150 30 50 80 50 L240 50 C290 50 290 150 240 150 Z";
+    return '<svg viewBox="0 0 320 190" width="100%" style="max-width:360px" role="img" aria-label="Track outline"><path d="' + path + '" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="22" stroke-linejoin="round"/>' +
+      '<path d="' + path + '" fill="none" stroke="#22d3ee" stroke-width="2.2" stroke-linejoin="round" stroke-dasharray="6 7" opacity=".85"/>' +
+      '<text x="160" y="104" text-anchor="middle" font-size="15" font-weight="700" fill="#EFF1F7" font-family="Sora,sans-serif">' + (sh && sh.mi ? sh.mi + " mi" : "") + "</text>" +
+      (sh && sh.bank ? '<text x="160" y="124" text-anchor="middle" font-size="11.5" fill="#8E97AD" font-family="Ubuntu,sans-serif">' + sh.bank + "° banking</text>" : "") + "</svg>";
   }
-  if(DATA.onDeck && DATA.onDeck.length){
-    html+=`<div class="sec-h">On deck</div><div class="ondeck">${DATA.onDeck.map(o=>`
-      <div class="od-card"><div class="k">${esc(o.date)}${o.playoff?" · Playoffs":""}</div><div class="v">${esc(o.name)}</div><div class="s">${esc(o.track)} · ${esc(o.city)}</div></div>`).join("")}</div>`;
-  }
-  c.innerHTML=html;
-  mountScene("n3d-wrap", nascarScene);
-}
-/* freshness chip (shared /assets/fresh.js) + the brief's live/stale cue */
-function applyFreshness(){
-  const el = document.getElementById("fresh");
-  if(!LIVE){ el.hidden = true; return; }
-  let warn = !!(LIVE.stale || (LIVE.status && LIVE.status.ok === false));
-  if(window.RadarFresh){
-    const a = RadarFresh.render(el, {built: LIVE.generated, stale: LIVE.stale, status: LIVE.status, maxAgeH: 36});
-    warn = warn || !!(a && a.level === "warn");
-    if(LIVE.race || !LIVE.seasonComplete) renderBrief(LIVE.brief);
-  }
-  document.getElementById("brief-card").classList.toggle("is-warn", warn);
-  document.getElementById("brief-label").textContent = warn ? "Latest read — from the radar" : "Race-day read — live from the radar";
-}
-window.addEventListener("load", applyFreshness);   // fresh.js is deferred; re-apply once it has run
-async function load(){
-  if(DEMO){
-    document.getElementById("demo-flag").hidden = false;
-    document.getElementById("brief-label").textContent = "Demo read — sample data";
-    DATA = SAMPLE; renderAll(); return;
-  }
-  renderLoading();
-  let d = null;
-  try{
-    const r = await fetch("data.json?_=" + Date.now(), {cache: "no-store"});
-    if(!r.ok) throw new Error("HTTP " + r.status);
-    d = await r.json();
-    if(!d || typeof d !== "object" || !("race" in d)) throw new Error("unexpected data.json");
-  }catch(e){ LIVE = null; renderError(); return; }
-  DATA = d; LIVE = d;
-  renderAll();
-  applyFreshness();
-}
-document.addEventListener("click", e=>{ if(e.target.closest("[data-retry]")) load(); });
-/* ---------- three.js on demand ----------
-   Not render-blocking any more: fetched when the scene card nears the
-   viewport. If it can't load, or WebGL is unavailable, the scene card is
-   removed rather than left as an empty dark box. */
-const THREE_SRC = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
-const RM = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : {matches:false};
-let threeP = null, threeDead = false, sceneToken = 0;
-function loadThree(){
-  if(window.THREE) return Promise.resolve(window.THREE);
-  if(threeDead) return Promise.reject(new Error("three.js unavailable"));
-  if(!threeP) threeP = new Promise((resolve, reject)=>{
-    const sc = document.createElement("script");
-    let settled = false;
-    const done = (ok, err)=>{ if(settled) return; settled = true; clearTimeout(timer); if(ok) resolve(window.THREE); else { threeP = null; reject(err); } };
-    const timer = setTimeout(()=>done(false, new Error("three.js timed out")), 12000);
-    sc.src = THREE_SRC; sc.async = true;
-    sc.onload = ()=>{ if(window.THREE) done(true); else { threeDead = true; done(false, new Error("three.js missing")); } };
-    sc.onerror = ()=>{ threeDead = true; done(false, new Error("three.js failed to load")); };
-    document.head.appendChild(sc);
-  });
-  return threeP;
-}
-function whenNear(el, fn){
-  if(!("IntersectionObserver" in window)){ fn(); return; }
-  const io = new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ io.disconnect(); fn(); } }, {rootMargin: "300px 0px"});
-  io.observe(el);
-}
-function mountScene(id, build){
-  const wrap = document.getElementById(id);
-  if(!wrap) return;
-  sceneHud();
-  const token = ++sceneToken;
-  whenNear(wrap, ()=>loadThree().then(()=>{
-    if(token !== sceneToken || !document.contains(wrap)) return;
-    let ok = false; try{ ok = build(); }catch(e){ ok = false; }
-    if(ok) wrap.classList.add("is-3d"); else wrap.hidden = true;
-  }).catch(()=>{ if(token === sceneToken) wrap.hidden = true; }));
-}
-/* scene labels are filled from the data up front, so the card never sits empty */
-function sceneHud(){
-  const g = DATA && DATA.race; if(!g) return;
-  const sh = g.shape, t = document.getElementById("n3d-t"), w = document.getElementById("n3d-w"), chip = document.getElementById("n3d-chip");
-  const bits = [];
-  if(sh) bits.push(`${sh.mi} mi · ${sh.bank}° banking`);
-  if(g.inWindow){ if(g.temp!=null) bits.push(`${g.temp}°`); if(g.wind!=null) bits.push(`wind ${g.wind} mph`); }
-  if(t) t.textContent = (g.track||"") + " · stylized view";
-  if(w) w.textContent = bits.join(" · ");
-  const Mm = {clear:"RUNS ON TIME", watch:"RAIN NEARBY", likely:"DELAY LIKELY", severe:"PPD RISK"};
-  if(chip) chip.textContent = g.inWindow && g.delay ? `RAIN ${g.delay.pct}% · ${Mm[g.delay.level]||""}` : "Forecast opens near race day";
-}
-/* ---- 3D track (weather-tinted monochrome, radar style) ---- */
-let T3=null;
-function trkSpriteTex(big,small){
-  const c=document.createElement("canvas");c.width=640;c.height=150;
-  const x=c.getContext("2d");
-  const r=26;x.fillStyle="rgba(13,24,48,0.92)";
-  x.beginPath();x.moveTo(r,0);x.lineTo(640-r,0);x.arcTo(640,0,640,r,r);x.lineTo(640,150-r);x.arcTo(640,150,640-r,150,r);
-  x.lineTo(r,150);x.arcTo(0,150,0,150-r,r);x.lineTo(0,r);x.arcTo(0,0,r,0,r);x.fill();
-  x.fillStyle="#F08A3C";x.fillRect(0,0,9,150);
-  x.fillStyle="#f4f6fa";x.font="800 52px -apple-system,Segoe UI,Arial";x.textBaseline="middle";
-  x.fillText(big.slice(0,22),32,56);
-  x.fillStyle="#8fa8d8";x.font="700 30px -apple-system,Segoe UI,Arial";
-  x.fillText(small,32,112);
-  const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;
-}
-function checker2Tex(){
-  const c=document.createElement("canvas");c.width=96;c.height=24;
-  const x=c.getContext("2d");
-  for(let i=0;i<12;i++)for(let j=0;j<3;j++){x.fillStyle=(i+j)%2?"#141821":"#f4f6fa";x.fillRect(i*8,j*8,8,8);}
-  return new THREE.CanvasTexture(c);
-}
-function trackCenter(kind){
-  const N=300,pts=[];
-  let Lh=1.0,R=0.55,bumpF=0,bumpB=0,egg=1;
-  if(kind==="paperclip"){Lh=1.35;R=0.3;}
-  else if(kind==="bullring"){Lh=0.62;R=0.5;}
-  else if(kind==="egg"){Lh=0.95;R=0.56;egg=0.72;}
-  else if(kind==="trioval"){Lh=1.05;R=0.52;bumpF=0.42;}
-  else if(kind==="quadoval"){Lh=1.05;R=0.52;bumpF=0.26;}
-  else if(kind==="dshape"){Lh=0.9;R=0.52;bumpF=0.3;}
-  else if(kind==="dogleg"){Lh=0.95;R=0.5;bumpB=0.38;}
-  else if(kind==="flat"){Lh=1.15;R=0.46;}
-  const straight=2*Lh, arc=Math.PI*R, total=2*straight+2*arc;
-  for(let i=0;i<N;i++){
-    /* counter-clockwise: front stretch (y=-R) runs -x -> +x */
-    const s=(i/N)*total;let x,y;
-    if(s<straight){x=-Lh+s;y=-R;}
-    else if(s<straight+arc){const a=-Math.PI/2+(s-straight)/R;x=Lh+Math.cos(a)*R;y=Math.sin(a)*R;}
-    else if(s<2*straight+arc){x=Lh-(s-straight-arc);y=R;}
-    else{const a=Math.PI/2+(s-2*straight-arc)/R;x=-Lh+Math.cos(a)*R;y=Math.sin(a)*R;}
-    if(egg<1&&x>0){const f=1-(1-egg)*Math.min(1,x/(Lh+R));y*=f;}
-    if(bumpF&&y<-R*0.55&&Math.abs(x)<Lh){
-      if(kind==="quadoval"){
-        const g=Math.exp(-Math.pow((Math.abs(x)-Lh*0.45)/(Lh*0.28),2));
-        y-=bumpF*R*g;
-      }else{
-        y-=bumpF*R*Math.pow(Math.cos(Math.min(1,Math.abs(x)/Lh)*Math.PI/2),1.4);
-      }
-    }
-    if(bumpB&&y>R*0.55&&Math.abs(x)<Lh){
-      const g=Math.exp(-Math.pow((x+Lh*0.25)/(Lh*0.4),2));
-      y+=bumpB*R*g;
-    }
-    pts.push(new THREE.Vector2(x,y));
-  }
-  return pts;
-}
-function nascarScene(){
-  const wrap=document.getElementById("n3d-wrap");
-  if(!wrap||typeof THREE==="undefined")return false;
-  if(T3){cancelAnimationFrame(T3.raf);T3.renderer.dispose();T3=null;}
-  const canvas=document.getElementById("n3d-canvas");
-  const W=wrap.clientWidth||1000,H=wrap.clientHeight||340;
-  let renderer;
-  try{ renderer=new THREE.WebGLRenderer({canvas,antialias:true}); }catch(e){ return false; }   // WebGL unavailable
-  renderer.setSize(W,H,false);renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
-  const scene=new THREE.Scene();
-  const g=DATA.race||{};
-  const shape=g.shape||{kind:"oval",mi:1.0,bank:15};
-  const rainPct=g.delay?g.delay.pct:(g.rain||0);
-  const hrM=(g.time||"").match(/(\d+):(\d+) PM/);
-  const night=hrM?(+hrM[1]>=7&&+hrM[1]<12):false;
-  const wet=rainPct>=45, temp=g.temp!=null?g.temp:80;
-  /* one weather-tinted hue */
-  let hue,sat;
-  if(wet){hue=0.58;sat=0.12;}
-  else if(temp>=90){hue=0.985;sat=0.30;}
-  else if(temp<=60){hue=0.575;sat=0.35;}
-  else{hue=0.62;sat=0.40;}
-  const LT=night?{bg:0.045,field:0.115,infield:0.145,track:0.20,groove:0.155,apron:0.17}
-              :wet?{bg:0.09,field:0.155,infield:0.185,track:0.235,groove:0.185,apron:0.205}
-                  :{bg:0.105,field:0.165,infield:0.195,track:0.325,groove:0.255,apron:0.26};
-  const L=l=>new THREE.Color().setHSL(hue,sat,Math.max(0.035,l));
-  const M=c=>new THREE.MeshBasicMaterial({color:c,side:THREE.DoubleSide});
-  scene.background=L(LT.bg);
-  scene.fog=new THREE.Fog(L(LT.bg),wet?220:420,wet?560:950);
-  const cam=new THREE.PerspectiveCamera(34,W/H,2,700);
-  const SC=48*Math.pow(Math.max(0.5,Math.min(2.7,shape.mi)),0.42);
-  const ground=new THREE.Mesh(new THREE.CircleGeometry(SC*3.4,56),M(L(LT.field)));
-  ground.rotation.x=-Math.PI/2;ground.position.y=-0.2;scene.add(ground);
-  const c2=trackCenter(shape.kind).map(p=>new THREE.Vector2(p.x*SC,p.y*SC));
-  const N=c2.length,TW=SC*0.17;
-  const bankMax=Math.tan(Math.min(33,shape.bank)*Math.PI/180)*TW*0.95;
-  const kw=[];
-  for(let i=0;i<N;i++){
-    const a=c2[(i-1+N)%N],b=c2[i],c=c2[(i+1)%N];
-    const v1=new THREE.Vector2().subVectors(b,a).normalize(),v2=new THREE.Vector2().subVectors(c,b).normalize();
-    kw.push(Math.abs(v1.x*v2.y-v1.y*v2.x));
-  }
-  const smooth=kw.map((_,i)=>{let s=0;for(let o=-9;o<=9;o++)s+=kw[(i+o+N)%N];return s/19;});
-  const smax=Math.max.apply(null,smooth);
-  const inner=[],outer=[],mid1=[],mid2=[];
-  for(let i=0;i<N;i++){
-    const p=c2[i],q=c2[(i+1)%N];
-    let dx=q.x-p.x,dy=q.y-p.y;const l2=Math.hypot(dx,dy)||1;dx/=l2;dy/=l2;
-    let nx=-dy,ny=dx;
-    if(p.x*nx+p.y*ny<0){nx=-nx;ny=-ny;}
-    const bh=bankMax*Math.min(1,smooth[i]/smax*1.5);
-    inner.push([p.x-nx*TW/2,0.12,p.y-ny*TW/2]);
-    outer.push([p.x+nx*TW/2,0.12+bh,p.y+ny*TW/2]);
-    mid1.push([p.x-nx*TW*0.1,0.32+bh*0.4,p.y-ny*TW*0.1]);
-    mid2.push([p.x+nx*TW*0.28,0.32+bh*0.78,p.y+ny*TW*0.28]);
-  }
-  function ribbon(edgeA,edgeB,mat,lift){
-    const pos=[],idx=[];
-    for(let i=0;i<N;i++){
-      pos.push(edgeA[i][0],edgeA[i][1]+(lift||0),edgeA[i][2],edgeB[i][0],edgeB[i][1]+(lift||0),edgeB[i][2]);
-      const k=i*2,k2=((i+1)%N)*2;
-      idx.push(k,k+1,k2,k+1,k2+1,k2);
-    }
-    const geo=new THREE.BufferGeometry();
-    geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
-    geo.setIndex(idx);
-    const m=new THREE.Mesh(geo,mat);scene.add(m);return m;
-  }
-  ribbon(inner,outer,new THREE.MeshBasicMaterial({color:L(LT.track),side:THREE.DoubleSide}));
-  ribbon(mid1,mid2,new THREE.MeshBasicMaterial({color:L(LT.groove),side:THREE.DoubleSide}),0.015);   /* rubbered-in groove */
-  /* infield */
-  const inf=[];c2.forEach(p=>inf.push(new THREE.Vector2(p.x*0.9,p.y*0.9)));
-  const infMesh=new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape(inf)),new THREE.MeshBasicMaterial({color:L(LT.infield),side:THREE.DoubleSide}));
-  infMesh.rotation.x=-Math.PI/2;infMesh.scale.z=-1;infMesh.position.y=0.005;scene.add(infMesh);
-  /* apron between infield and track */
-  const ap=[];c2.forEach((p,i)=>ap.push([p.x*0.9,0.06,p.y*0.9]));
-  ribbon(ap,inner,new THREE.MeshBasicMaterial({color:L(LT.apron),side:THREE.DoubleSide}));
-  /* white outer wall — the radar signature */
-  const wallT=[],wallB=[];
-  for(let i=0;i<N;i++){
-    wallB.push([outer[i][0],outer[i][1],outer[i][2]]);
-    wallT.push([outer[i][0],outer[i][1]+SC*0.02,outer[i][2]]);
-  }
-  ribbon(wallB,wallT,new THREE.MeshBasicMaterial({color:0xe9edf4,side:THREE.DoubleSide}));
-  /* white line at inner edge */
-  const ilp=[];inner.forEach(e=>ilp.push(e[0],e[1]+0.22,e[2]));
-  const ilg=new THREE.BufferGeometry();ilg.setAttribute("position",new THREE.Float32BufferAttribute(ilp,3));
-  scene.add(new THREE.LineLoop(ilg,new THREE.LineBasicMaterial({color:0xf4f6fa,transparent:true,opacity:0.85})));
-  /* start/finish: checkered band conformed to the banked surface */
-  /* find index nearest x=0 on front stretch (min y) */
-  let sfBest=0,sfScore=1e9;
-  for(let i=0;i<N;i++){const sc=Math.abs(c2[i].x)+ (c2[i].y>0?1e6:0);if(sc<sfScore){sfScore=sc;sfBest=i;}}
-  const cpos=[],cidx=[],cuv=[];
-  for(let k=0;k<=4;k++){
-    const i=(sfBest+k)%N;
-    cpos.push(inner[i][0],inner[i][1]+0.30,inner[i][2],outer[i][0],outer[i][1]+0.30,outer[i][2]);
-    cuv.push(0,k/4,1,k/4);
-    if(k<4){const a=k*2;cidx.push(a,a+1,a+2,a+1,a+3,a+2);}
-  }
-  const cgeo=new THREE.BufferGeometry();
-  cgeo.setAttribute("position",new THREE.Float32BufferAttribute(cpos,3));
-  cgeo.setAttribute("uv",new THREE.Float32BufferAttribute(cuv,2));
-  cgeo.setIndex(cidx);
-  scene.add(new THREE.Mesh(cgeo,new THREE.MeshBasicMaterial({map:checker2Tex(),side:THREE.DoubleSide})));
-  /* flag stand */
-  const sfOut=outer[sfBest];
-  const fpx=sfOut[0], fpz=sfOut[2]-SC*0.055;
-  const fpole=new THREE.Mesh(new THREE.CylinderGeometry(SC*0.005,SC*0.005,SC*0.10,6),M(0xf4f6fa));
-  fpole.position.set(fpx,SC*0.05,fpz);scene.add(fpole);
-  const fbox=new THREE.Mesh(new THREE.BoxGeometry(SC*0.045,SC*0.03,SC*0.005),new THREE.MeshBasicMaterial({map:checker2Tex()}));
-  fbox.position.set(fpx,SC*0.105,fpz);scene.add(fbox);
-  /* pit road: light strip inside front stretch */
-  const pit=new THREE.Mesh(new THREE.PlaneGeometry(SC*1.3,SC*0.06),M(L(LT.apron)));
-  pit.rotation.x=-Math.PI/2;pit.position.set(0,0.14,-SC*0.36);scene.add(pit);
-  /* night: light poles */
-  if(night){
-    for(let i=0;i<6;i++){
-      const idx=Math.floor(i*N/6);
-      const px=outer[idx][0]*1.12,pz=outer[idx][2]*1.12;
-      const lp=new THREE.Mesh(new THREE.CylinderGeometry(SC*0.005,SC*0.005,SC*0.24,5),M(0x5a6a8c));
-      lp.position.set(px,SC*0.12,pz);scene.add(lp);
-      const gl=new THREE.Mesh(new THREE.SphereGeometry(SC*0.018,8,8),M(0xf4f6fa));
-      gl.position.set(px,SC*0.245,pz);scene.add(gl);
-    }
-  }
-  /* event billboard sprite */
-  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:trkSpriteTex((g.name||"DFSRADAR").toUpperCase(),(g.track||"")+"  ·  DFSRADAR"),transparent:true}));
-  spr.scale.set(SC*0.95,SC*0.223,1);spr.position.set(0,SC*0.3,0);scene.add(spr);
-  /* cars: CCW, banked, smooth */
-  const carCols=[0xff6b1a,0xf4f6fa,0xffd94a];
-  const CS=SC*0.05;
-  function makeCar(col){
-    const grp=new THREE.Group();
-    const body=new THREE.Mesh(new THREE.BoxGeometry(CS*1.1,CS*0.42,CS*2.4),M(col));
-    body.position.y=CS*0.36;grp.add(body);
-    const cab=new THREE.Mesh(new THREE.BoxGeometry(CS*0.86,CS*0.36,CS*1.05),M(0x141821));
-    cab.position.set(0,CS*0.72,-CS*0.1);grp.add(cab);
-    const sp2=new THREE.Mesh(new THREE.BoxGeometry(CS*1.08,CS*0.3,CS*0.08),M(col));
-    sp2.position.set(0,CS*0.7,-CS*1.15);grp.add(sp2);
-    [[-1,1],[1,1],[-1,-1],[1,-1]].forEach(w=>{
-      const wh=new THREE.Mesh(new THREE.CylinderGeometry(CS*0.22,CS*0.22,CS*0.16,10),M(0x141821));
-      wh.rotation.z=Math.PI/2;
-      wh.position.set(w[0]*CS*0.62,CS*0.22,w[1]*CS*0.78);grp.add(wh);
-    });
-    scene.add(grp);return grp;
-  }
-  const cars=carCols.map((cc,ci)=>({grp:makeCar(cc),t:ci*0.29+0.05,lane:0.3+ci*0.22,
-    sp:(0.0019-ci*0.00025)*Math.pow(1.6/Math.max(0.6,shape.mi),0.35)}));
-  function lanePt(t,lane){
-    const f=((t%1)+1)%1,fi=f*N,i=Math.floor(fi)%N,fr=fi-Math.floor(fi);
-    const i2=(i+1)%N;
-    const ax=inner[i][0]+(outer[i][0]-inner[i][0])*lane,
-          ay=inner[i][1]+(outer[i][1]-inner[i][1])*lane,
-          az=inner[i][2]+(outer[i][2]-inner[i][2])*lane;
-    const bx=inner[i2][0]+(outer[i2][0]-inner[i2][0])*lane,
-          by=inner[i2][1]+(outer[i2][1]-inner[i2][1])*lane,
-          bz=inner[i2][2]+(outer[i2][2]-inner[i2][2])*lane;
-    return {p:new THREE.Vector3(ax+(bx-ax)*fr,ay+(by-ay)*fr,az+(bz-az)*fr),i};
-  }
-  const mUp=new THREE.Vector3(),mLat=new THREE.Vector3(),mFwd=new THREE.Vector3(),rot=new THREE.Matrix4(),qT=new THREE.Quaternion();
-  function orient(car,t,lane){
-    const a=lanePt(t,lane),b=lanePt(t+0.014,lane),c0=lanePt(t-0.014,lane);
-    mFwd.subVectors(b.p,c0.p).normalize();
-    const i=a.i;
-    mLat.set(outer[i][0]-inner[i][0],outer[i][1]-inner[i][1],outer[i][2]-inner[i][2]).normalize();
-    mUp.crossVectors(mLat,mFwd).normalize();
-    if(mUp.y<0)mUp.negate();
-    mLat.crossVectors(mFwd,mUp).normalize();
-    rot.makeBasis(mLat,mUp,mFwd);
-    qT.setFromRotationMatrix(rot);
-    if(car.init)car.grp.quaternion.slerp(qT,0.14);
-    else{car.grp.quaternion.copy(qT);car.init=true;}
-    car.grp.position.lerp(a.p,car.posInit?0.6:1);car.posInit=true;
-  }
-  /* rain */
-  let rain=null;
-  if(rainPct>=20){
-    const RN=rainPct>=45?420:150,rp=new Float32Array(RN*6);
-    for(let i=0;i<RN;i++){const x=(Math.random()-0.5)*SC*4.5,y=Math.random()*SC,z=(Math.random()-0.5)*SC*4.5;
-      rp.set([x,y,z,x+0.4,y-SC*0.06,z],i*6);}
-    const rg=new THREE.BufferGeometry();rg.setAttribute("position",new THREE.BufferAttribute(rp,3));
-    rain=new THREE.LineSegments(rg,new THREE.LineBasicMaterial({color:0x9db4d4,transparent:true,opacity:rainPct>=45?0.5:0.28}));
-    scene.add(rain);
-  }
-  let t0=0;
-  function step(){
-    t0+=1;
-    const ang=Math.PI+Math.sin(t0*0.0014)*0.55;
-    cam.position.set(Math.sin(ang)*SC*2.1,SC*0.95,Math.cos(ang)*SC*2.1);
-    cam.lookAt(0,0,-SC*0.1);
-    cars.forEach(c=>{c.t+=c.sp;orient(c,c.t,c.lane);});
-    if(rain){
-      const rp=rain.geometry.attributes.position.array;
-      for(let i=0;i<rp.length;i+=6){
-        rp[i+1]-=SC*0.022;rp[i+4]-=SC*0.022;
-        if(rp[i+1]<0){rp[i+1]=SC;rp[i+4]=SC*0.94;}
-      }
-      rain.geometry.attributes.position.needsUpdate=true;
-    }
-  }
-  function tick(){ step(); renderer.render(scene,cam); T3.raf=requestAnimationFrame(tick); }
-  T3={renderer,raf:0};
-  /* reduced motion: no swinging camera or circling cars — one still frame */
-  if(RM.matches){ for(let i=0;i<60;i++) step(); renderer.render(scene,cam); return true; }
-  tick();
-  return true;
-}
-/* ---------- info tips: hover (mouse), keyboard focus and tap (touch) ----------
-   One positioned #tipbox serves every .tip (the old CSS bubble was hover-only
-   and hidden on phones). Enter/Space or a tap pins it; Esc, a second tap or a
-   tap elsewhere closes it. */
-(function(){
-  const box = document.createElement("div");
-  box.id = "tipbox"; box.setAttribute("role", "tooltip"); box.hidden = true;
-  document.body.appendChild(box);
-  let cur = null, pinned = false;
-  function prep(){
-    document.querySelectorAll(".tip:not([data-tipready])").forEach(t=>{
-      t.setAttribute("data-tipready", ""); t.tabIndex = 0;
-      t.setAttribute("role", "button"); t.setAttribute("aria-expanded", "false");
-      const i = t.querySelector(".info-i"); if(i) i.setAttribute("aria-hidden", "true");
-      const own = [...t.childNodes].filter(n=>!(n.classList && n.classList.contains("info-i"))).map(n=>n.textContent).join("").trim();
-      if(!own) t.setAttribute("aria-label", "More info");
-    });
-  }
-  function place(){
-    if(!cur) return;
-    const r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
-    box.style.maxWidth = Math.min(300, vw - 24) + "px";
-    const bw = box.offsetWidth, bh = box.offsetHeight;
-    let x = r.left + r.width/2 - bw/2; x = Math.max(12, Math.min(x, vw - bw - 12));
-    let y = r.top - bh - 10; if(y < 8) y = r.bottom + 10; if(y + bh > vh - 8) y = Math.max(8, vh - bh - 8);
-    box.style.left = Math.round(x) + "px"; box.style.top = Math.round(y) + "px";
-  }
-  function show(t, pin){
-    if(cur && cur !== t) hide();
-    cur = t; pinned = !!pin;
-    box.textContent = t.getAttribute("data-tip") || "";
-    box.hidden = false; place();
-    t.setAttribute("aria-describedby", "tipbox"); t.setAttribute("aria-expanded", "true");
-  }
-  function hide(){
-    if(cur){ cur.removeAttribute("aria-describedby"); cur.setAttribute("aria-expanded", "false"); }
-    cur = null; pinned = false; box.hidden = true;
-  }
-  const tipOf = el => (el && el.closest) ? el.closest(".tip") : null;
-  document.addEventListener("mouseover", e=>{ const t = tipOf(e.target); if(t && !pinned && t !== cur) show(t, false); });
-  document.addEventListener("mouseout", e=>{ const t = tipOf(e.target); if(t && t === cur && !pinned && !t.contains(e.relatedTarget)) hide(); });
-  document.addEventListener("focusin", e=>{ const t = tipOf(e.target); if(t){ if(t !== cur) show(t, false); } else if(cur && !pinned) hide(); });
-  document.addEventListener("focusout", e=>{ if(cur && e.target === cur && !pinned) hide(); });
-  document.addEventListener("click", e=>{
-    if(box.contains(e.target)){ e.preventDefault(); e.stopPropagation(); hide(); return; }
-    const t = tipOf(e.target);
-    if(t){ e.preventDefault(); e.stopPropagation(); if(t === cur && pinned) hide(); else show(t, true); return; }
-    if(pinned) hide();
-  }, true);
-  document.addEventListener("keydown", e=>{
-    const t = tipOf(e.target);
-    if(t && t === e.target && (e.key === "Enter" || e.key === " ")){
-      e.preventDefault(); e.stopPropagation();
-      if(t === cur && pinned) hide(); else show(t, true);
+
+  Promise.all([D.get(FN.url), D.get(FN.proUrl)]).then(function (r) {
+    var d = r[0], pro = r[1];
+    if (!d || !d.race) {
+      document.getElementById("lede").textContent = (d && d.brief) || "No race on the schedule this week.";
+      document.getElementById("race").innerHTML = '<div class="empty card"><h3>No race this week</h3></div>';
       return;
     }
-    if(e.key === "Escape" && cur){ e.preventDefault(); e.stopImmediatePropagation(); hide(); }
-  }, true);
-  window.addEventListener("scroll", ()=>{ if(!cur) return; if(pinned) place(); else hide(); }, true);
-  window.addEventListener("resize", ()=>{ if(cur) hide(); });
-  new MutationObserver(prep).observe(document.body, {childList:true, subtree:true});
-  prep();
-})();
-/* reduced motion: pause the radar logo's SMIL sweep (held mid-sweep, both blips lit) */
-(function(){
-  if(!window.matchMedia) return;
-  const mq = matchMedia("(prefers-reduced-motion: reduce)");
-  function apply(){
-    document.querySelectorAll("svg.radar-logo").forEach(svg=>{
-      try{ if(mq.matches){ svg.setCurrentTime(0.6); svg.pauseAnimations(); } else svg.unpauseAnimations(); }catch(e){}
-    });
-  }
-  apply();
-  if(mq.addEventListener) mq.addEventListener("change", apply); else if(mq.addListener) mq.addListener(apply);
-})();
-load();
+    var rc = d.race;
+    var f = D.fresh(document.getElementById("fresh"), { built: d.generated, stale: d.stale, status: d.status, maxAgeH: 30 });
+    if (f && f.level === "warn") { var st = document.getElementById("stale"); st.hidden = false; D.banner(st, f.text + ".", f.why); }
+    document.getElementById("when").textContent = rc.day + " · " + rc.time;
+    document.getElementById("h1").textContent = rc.name;
+    document.getElementById("lede").textContent = d.brief || "";
+    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + esc(rc.track) + "</span>" + '<span class="chip">' + esc(rc.city) + "</span>" + (rc.playoff ? '<span class="chip chip--cyan">Playoff race</span>' : "");
+    document.getElementById("race-sub").textContent = rc.track + " · " + rc.city;
+    /* the track: live in 3D when it's an oval layout we can draw, the outline otherwise */
+    var sh = rc.shape || {}, drawable = /^(oval|flat|paperclip|bullring|trioval|quadoval|dshape|egg|dogleg)$/.test(sh.kind || "");
+    var KIND = { oval: "oval", flat: "flat oval", paperclip: "paperclip oval", bullring: "short oval", trioval: "tri-oval", quadoval: "quad-oval", dshape: "D-shaped oval", egg: "egg-shaped oval", dogleg: "oval with a dogleg" };
+    var trackBlock = '<div class="sec__h mt32"><div><h3 class="sec__title" style="font-size:20px">The track</h3><p class="sec__sub">' + esc(rc.track) +
+      (sh.mi ? " · " + sh.mi + "-mile " + (KIND[sh.kind] || "track") : "") + (sh.bank ? " · " + sh.bank + "° banking in the turns" : "") + "</p></div>" + (drawable ? D.btn3d("View the track in 3D") : "") + "</div>" +
+      '<div class="card card--flat" data-3d-box style="display:flex;align-items:center;justify-content:center;padding:18px;overflow:hidden"><div data-flat style="width:100%;display:flex;justify-content:center">' + trackSVG(rc.shape) + "</div></div>";
+    var wire3d = function () {
+      if (!drawable) return;
+      var box = document.querySelector("#race [data-3d-box]"), hot = isNum(rc.temp) && rc.temp >= 88;
+      D.view3d({ auto: true, onLabel: "Show the outline", btn: document.querySelector("#race [data-3d]"), box: box, flat: box.querySelector("[data-flat]"),
+        spec: { sport: "nascar", g: rc },
+        chips: rc.inWindow ? ['<span class="chip' + (hot ? " chip--warn" : "") + '">' + D.wx("temp") + rc.temp + "°" + (hot ? " · hot track" : " at the green flag") + "</span>",
+          '<span class="chip">' + D.wx("wind") + rc.wind + " mph, gusts " + rc.gust + "</span>"].concat(rc.rain >= 40 ? ['<span class="chip chip--warn">' + D.wx("drop") + rc.rain + "% rain</span>"] : []) :
+          ['<span class="chip">Race-day forecast not in range yet</span>'],
+        cap: "Drawn from the track's layout, length and banking (banking and track width exaggerated so they read). The forecast has no wind direction, so wind shows only in the flag.",
+        label: "3D view of " + rc.track });
+    };
+    if (!rc.inWindow) {
+      document.getElementById("race").innerHTML = '<div class="note">' + D.IC.info + "<div>The race-day forecast arrives once it's inside our window — usually 3–5 days out.</div></div>" + trackBlock;
+      wire3d();
+    } else {
+      var dl = rc.delay && rc.delay.level !== "clear";
+      var stat = function (v, l, s, c) { return '<div class="stat"><div class="stat__v ' + (c || "") + '">' + v + '</div><div class="stat__l">' + l + "</div>" + (s ? '<div class="stat__s">' + s + "</div>" : "") + "</div>"; };
+      document.getElementById("race").innerHTML = '<div class="stats">' +
+        stat(rc.temp + "°", "Temperature", esc(rc.sky || "") + (isNum(rc.tempSwing) && rc.tempSwing >= 4 ? " · swings " + rc.tempSwing + "° during the race" : "")) +
+        stat(rc.wind + "<small>mph</small>", "Wind", "Gusts to " + rc.gust + " mph") +
+        stat(rc.rain + "<small>%</small>", "Rain chance", dl ? (rc.delay.level === "watch" ? "Rain watch" : "Delay risk") + " — up to " + rc.delay.pct + "% in the window" : "No delay concern", dl ? "warn" : "") +
+        stat((isNum(rc.rh) ? rc.rh : "—") + "<small>%</small>", "Humidity", "") + "</div>" + trackBlock;
+      wire3d();
+      if (rc.hourly && rc.hourly.length) {
+        document.getElementById("hours-sec").hidden = false;
+        document.getElementById("hours").innerHTML = D.hourly(rc.hourly, [
+          { k: "Temp", f: function (h) { return isNum(h.t) ? h.t + "°" : null; } },
+          { k: "Wind", f: function (h) { return isNum(h.w) ? h.w + " mph" : null; } },
+          { k: "Rain", f: function (h) { return isNum(h.rain) ? h.rain + "%" : null; }, cls: function (h) { return D.rainCls(h.rain); } }], { full: true });
+      }
+    }
+    if (d.onDeck && d.onDeck.length) {
+      document.getElementById("deck-sec").hidden = false;
+      document.getElementById("deck").innerHTML = d.onDeck.map(function (e) {
+        return '<div class="card card--pad card--flat"><div class="label">' + esc(e.date || "") + (e.playoff ? " · playoffs" : "") + '</div><div style="font:700 17px/1.3 var(--display);margin-top:8px">' + esc(e.name) + '</div><div class="small dim mt8">' + esc(e.track) + " · " + esc(e.city) + "</div></div>";
+      }).join("");
+    }
+    var picks = FN.picks(pro);
+    if (picks.length) {
+      document.getElementById("props-band").hidden = false;
+      var mk = function (p, free) {
+        return P.topCard({ sportLabel: "NASCAR · " + p.market.toLowerCase() + " · " + (pro.race ? pro.race.track : ""), player: p.player, side: "TARGET", sub: p.factor, why: esc(p.why), href: "../props/nascar/", hrefLabel: "All race targets" }, free ? {} : { tag: "PRO", pro: true, plain: true });
+      };
+      D.gate.on(function (st) {
+        document.getElementById("props-cards").innerHTML = mk(picks[0], true) + (st === "member" && picks[1] ? mk(picks[1], false) : P.lockedCard("NASCAR · " + D.plural(picks.length - 1, "more target"), picks.length - 1, "Track history, track-type form and the heat board."));
+      });
+    }
+  });
+});
 </script>
 </body>
 </html>

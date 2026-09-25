@@ -2,176 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Page not found · DFSRADAR</title>
-<meta name="description" content="That page isn't on the radar. Find the free MLB, NFL, CFB, PGA and NASCAR radars, the PRO desks and the public record from here.">
+<meta name="description" content="That page isn&#x27;t on the radar. Find today&#x27;s weather, the props desks, the record and PRO from here.">
 <meta name="robots" content="noindex">
+<link rel="canonical" href="https://dfsradar.com/404.html">
+<meta name="theme-color" content="#2E3240">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DFSRADAR">
+<meta property="og:title" content="Page not found · DFSRADAR">
+<meta property="og:description" content="That page isn&#x27;t on the radar. Find today&#x27;s weather, the props desks, the record and PRO from here.">
+<meta property="og:url" content="https://dfsradar.com/404.html">
+<meta property="og:image" content="https://dfsradar.com/og-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dfsradar.com/og-card.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><circle cx='22' cy='22' r='20' fill='%232E3440' stroke='%2322d3ee' stroke-width='2'/><circle cx='22' cy='22' r='11' fill='none' stroke='%2367e8f9' stroke-width='1.4'/><line x1='22' y1='22' x2='22' y2='3' stroke='%23EFF1F7' stroke-width='2'/><circle cx='29' cy='14' r='2.6' fill='%23F08A3C'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
-<script defer data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
-<style>
-  /* GitHub Pages serves this file for a missing path at any depth, so every
-     link and asset here is absolute. Tokens are the landing page's. */
-  :root{
-    --bg:#2E3240; --panel:#323A4A; --inset:#252A35; --border:#454E61;
-    --text:#EFF1F7; --muted:#C7CEDC; --dim:#8E97AD; --dim2:#A7B0C4;
-    --accent:#F08A3C; --accent-soft:#FFA05A; --accent-bg:rgba(255,160,90,.13); --on-accent:#1B1206;
-    --radar:#22d3ee; --radar-soft:#67e8f9; --radar-bg:rgba(34,211,238,.11);
-    --font:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --display:Sora,Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --surface:linear-gradient(180deg,rgba(255,255,255,.045) 0%,rgba(255,255,255,0) 60%),var(--panel);
-    --elev:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.28);
-    --elev-hi:inset 0 1px 0 rgba(255,255,255,.1),0 2px 4px rgba(0,0,0,.35),0 26px 56px rgba(0,0,0,.36);
-    --ease:cubic-bezier(.22,1,.36,1);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;
-    overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
-  a{color:var(--radar-soft);text-decoration:none}
-  h1,h2{font-family:var(--display);margin:0}
-
-  .nav{border-bottom:1px solid rgba(255,255,255,.07);background:rgba(46,50,64,.86)}
-  .nav-in{max-width:1200px;margin:0 auto;padding:12px 32px;display:flex;align-items:center;gap:16px}
-  .brand{display:flex;align-items:center;gap:11px;color:var(--text)}
-  .brand svg{width:34px;height:34px;flex-shrink:0}
-  .brand .n{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.4px;line-height:1.1}
-  .brand .n b{color:var(--radar);font-weight:800}
-  .brand .t{display:block;font-size:9.5px;font-weight:700;letter-spacing:2.6px;text-transform:uppercase;color:var(--dim);margin-top:3px}
-  .nav-cta{margin-left:auto;background:var(--accent);color:var(--on-accent);font-weight:800;font-size:13.5px;padding:10px 18px;border-radius:9px;white-space:nowrap;
-    background-image:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 22px rgba(240,138,60,.28)}
-
-  main{flex:1;position:relative;overflow:hidden;padding:72px 32px 40px}
-  main::before{content:"";position:absolute;left:50%;top:-240px;width:1000px;height:600px;margin-left:-500px;
-    background:radial-gradient(closest-side,rgba(34,211,238,.15),transparent 70%);filter:blur(24px);pointer-events:none}
-  .in{position:relative;max-width:980px;margin:0 auto;text-align:center}
-  .scope{width:168px;height:168px;margin:0 auto 26px;display:block}
-  .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 12px;border-radius:999px;background:var(--surface);
-    border:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;margin:0 0 18px}
-  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--radar);box-shadow:0 0 10px rgba(34,211,238,.85)}
-  h1{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.06;letter-spacing:-.035em;margin:0 0 16px;text-wrap:balance}
-  .sub{color:var(--muted);font-size:17.5px;line-height:1.7;max-width:560px;margin:0 auto 38px}
-
-  .go{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:left}
-  .go a{display:flex;align-items:center;gap:13px;min-height:64px;padding:14px 16px;border-radius:14px;background:var(--surface);
-    border:1px solid rgba(255,255,255,.08);box-shadow:var(--elev);color:var(--text);
-    transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s var(--ease)}
-  .go a:hover{transform:translateY(-2px);box-shadow:var(--elev-hi);border-color:rgba(34,211,238,.45)}
-  .go .ic{width:36px;height:36px;border-radius:10px;background:var(--radar-bg);border:1px solid rgba(34,211,238,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .go .ic svg{width:19px;height:19px;fill:none;stroke:var(--radar-soft);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .go b{display:block;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.01em;line-height:1.25}
-  .go small{display:block;color:var(--dim2);font-size:12.5px;line-height:1.35;margin-top:2px}
-  .go a.pro{border-color:rgba(240,138,60,.35)}
-  .go a.pro:hover{border-color:rgba(240,138,60,.6)}
-  .go a.pro .ic{background:var(--accent-bg);border-color:rgba(240,138,60,.35)}
-  .go a.pro .ic svg{stroke:var(--accent-soft)}
-
-  footer{border-top:1px solid rgba(255,255,255,.07);padding:26px 32px 32px;text-align:center;color:var(--dim2);font-size:12.5px;line-height:1.7}
-  footer a{color:var(--muted)}
-  .nowrap{white-space:nowrap}
-  :focus-visible{outline:2px solid var(--radar);outline-offset:3px;border-radius:4px}
-
-  @media (max-width:860px){ .go{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:640px){
-    .nav-in{padding:12px 20px}
-    .brand .t{display:none}
-    main{padding:44px 20px 32px}
-    .scope{width:132px;height:132px;margin-bottom:20px}
-    .sub{font-size:16px;margin-bottom:28px}
-    .go{gap:8px}
-    .go a{padding:12px 12px;gap:10px}
-    .go .ic{width:32px;height:32px}
-    .go small{display:none}
-    footer{padding-left:20px;padding-right:20px}
-  }
-  @media (max-width:340px){ .go{grid-template-columns:1fr} }
-  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="/assets/dr.css?v=a7b89034">
+<script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
+<script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
+<script src="/assets/fresh.js" defer></script>
+<script src="/pro/gate.js" defer></script>
+<script src="/assets/dr.js?v=a7b89034" defer></script>
+<script src="/assets/feeds.js?v=a7b89034" defer></script>
 </head>
 <body>
-
-<nav class="nav" aria-label="Main">
-  <div class="nav-in">
-    <a class="brand" href="/" aria-label="DFSRADAR home">
-      <svg viewBox="0 0 44 44" aria-hidden="true">
-        <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,.05)" stroke="#22d3ee" stroke-width="1.8"/>
-        <circle cx="22" cy="22" r="13.5" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".7"/>
-        <circle cx="22" cy="22" r="7" fill="none" stroke="#67e8f9" stroke-width="1" opacity=".5"/>
-        <line x1="22" y1="22" x2="22" y2="2.6" stroke="#EFF1F7" stroke-width="1.8" stroke-linecap="round"/>
-        <circle cx="29.5" cy="13.5" r="2.4" fill="#F08A3C"/>
-        <circle cx="22" cy="22" r="1.7" fill="#EFF1F7"/>
-      </svg>
-      <span><span class="n">DFS<b>RADAR</b></span><span class="t">Scan · Match · Measure · Grade</span></span>
-    </a>
-    <a class="nav-cta" href="/pro/">Get PRO</a>
-  </div>
-</nav>
-
-<main>
-  <div class="in">
-    <!-- the scope, swept clean: the one blip is outside the outer ring -->
-    <svg class="scope" viewBox="0 0 200 200" role="img" aria-label="A radar scope with nothing on it">
-      <defs>
-        <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#22d3ee" stop-opacity=".14"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>
-        <linearGradient id="wake" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee" stop-opacity="0"/><stop offset="1" stop-color="#22d3ee" stop-opacity=".28"/></linearGradient>
-      </defs>
-      <circle cx="100" cy="100" r="96" fill="url(#glow)"/>
-      <circle cx="100" cy="100" r="80" fill="none" stroke="#67e8f9" stroke-opacity=".38" stroke-width="1.2"/>
-      <circle cx="100" cy="100" r="60" fill="none" stroke="#67e8f9" stroke-opacity=".18"/>
-      <circle cx="100" cy="100" r="40" fill="none" stroke="#67e8f9" stroke-opacity=".18"/>
-      <circle cx="100" cy="100" r="20" fill="none" stroke="#67e8f9" stroke-opacity=".18"/>
-      <path d="M20 100H180M100 20V180" stroke="#67e8f9" stroke-opacity=".12"/>
-      <path d="M100 100 L100 20 A80 80 0 0 1 156.6 43.4 Z" fill="url(#wake)"/>
-      <line x1="100" y1="100" x2="156.6" y2="43.4" stroke="#EFF1F7" stroke-opacity=".9" stroke-width="1.8" stroke-linecap="round"/>
-      <circle cx="100" cy="100" r="2.6" fill="#EFF1F7"/>
-      <circle cx="178" cy="160" r="9" fill="#F08A3C" fill-opacity=".18"/>
-      <circle cx="178" cy="160" r="4" fill="#F08A3C"/>
-    </svg>
-    <span class="eyebrow">404 · Not found</span>
-    <h1>That page isn't on the radar.</h1>
-    <p class="sub">The link may be old, or the page may have moved. Everything on DFSRADAR is one tap from here.</p>
-
-    <nav class="go" aria-label="Where to go">
-      <a href="/">
-        <span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12V3"/></svg></span>
-        <span><b>Home</b><small>Start from the top</small></span>
-      </a>
-      <a href="/mlb/">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z"/><path d="M6.5 5.5c3 2 4 5 4 6.5s-1 4.5-4 6.5M17.5 5.5c-3 2-4 5-4 6.5s1 4.5 4 6.5"/></svg></span>
-        <span><b>MLB radar</b><small>Weather, park and umpire</small></span>
-      </a>
-      <a href="/nfl/">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8Z"/><path d="M9 9l6 6M15 9l-6 6M12 4v3M12 17v3M4 12h3M17 12h3"/></svg></span>
-        <span><b>NFL radar</b><small>Wind and cold by stadium</small></span>
-      </a>
-      <a href="/cfb/">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 18V9l9-5 9 5v9"/><path d="M3 18h18M7 18v-5h4v5M13 18v-5h4v5"/></svg></span>
-        <span><b>CFB radar</b><small>Power 4 venue history</small></span>
-      </a>
-      <a href="/pga/">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M7 21V4l10 4-10 4"/><path d="M4 21h9"/></svg></span>
-        <span><b>PGA radar</b><small>Wind by tee-time wave</small></span>
-      </a>
-      <a href="/nascar/">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M5 21V4h14l-3 4 3 4H5"/><path d="M8 4v8M11 4v8M14 6v4"/></svg></span>
-        <span><b>NASCAR radar</b><small>Track and conditions</small></span>
-      </a>
-      <a class="pro" href="/pro/">
-        <span class="ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 10h17M8 14.5h3"/></svg></span>
-        <span><b>PRO desks</b><small>The player-level boards</small></span>
-      </a>
-      <a href="/record/">
-        <span class="ic"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 9l2 2 4-4M9 15h6"/></svg></span>
-        <span><b>The record</b><small>Every call, graded</small></span>
-      </a>
-    </nav>
-  </div>
+<header id="dr-top" class="dr-top"></header>
+<main class="wrap">
+  <section class="ph">
+    <div class="ph__eyebrow">Page not found</div>
+    <h1 class="ph__title">That page isn't on the radar.</h1>
+    <p class="ph__lede">It may have moved when the site was rebuilt. Everything lives in one of these now.</p>
+  </section>
+  <section class="sec" style="margin-top:28px">
+    <div class="grid g4" id="nf-links"></div>
+  </section>
 </main>
+<footer id="dr-foot" class="dr-foot"></footer>
 
-<footer>
-  DFSRADAR · part of <a href="https://dfskitchen.com/?utm_source=dfsradar&amp;utm_medium=footer&amp;utm_campaign=404" target="_blank" rel="noopener">The DFS Kitchen</a> family.
-  Informational, not betting advice. 21+. If gambling is a problem for you, call <span class="nowrap">1-800-GAMBLER</span>.
-</footer>
-
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  "use strict";
+  var D = DR;
+  D.shell({ section: "" });
+  var L = [
+    ["Weather", "/weather/", "Today's forecast for every game, race and round — the watch list first."],
+    ["Props", "/props/", "Our number beside the books' for MLB, NFL, college football, golf and NASCAR."],
+    ["The record", "/record/", "Every call we've made, graded in public."],
+    ["PRO", "/pro/", "Every board and every desk — $15/mo."]
+  ];
+  document.getElementById("nf-links").innerHTML = L.map(function (x) {
+    return '<a class="card card--pad" href="' + D.u(x[1]) + '"><div style="font:700 18px/1.3 var(--display)">' + x[0] + ' →</div><p class="small dim mt8">' + x[2] + "</p></a>";
+  }).join("");
+});
+</script>
 </body>
 </html>
