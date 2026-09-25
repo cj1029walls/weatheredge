@@ -70,7 +70,10 @@ def wind_label(rel):
     if 15 < rel <= 45:           return "OUT TO RF"
     if 315 <= rel < 345:         return "OUT TO LF"
     if 165 <= rel <= 195:        return "IN FROM CF"
-    if 135 <= rel < 165:         return "IN FROM RF"
-    if 195 < rel <= 225:         return "IN FROM LF"
+    # rel is the direction the wind blows TOWARD (0 = out to CF, 90 = toward
+    # the right-field side), so wind blowing in toward the right side of the
+    # plate is coming from left field, and vice versa.
+    if 135 <= rel < 165:         return "IN FROM LF"
+    if 195 < rel <= 225:         return "IN FROM RF"
     if 45 < rel < 135:           return "CROSS L→R"
     return "CROSS R→L"
