@@ -415,5 +415,6 @@ function initPark3D(g, canvas){
 }
 
 
-window.Park3D = { load: loadThree, mount: initPark3D, dispose: disposeP3D, PARKS: PARKS };
+/* initPark3D keeps the original radar's (game, canvas) order; the public API is (canvas, game) */
+window.Park3D = { load: loadThree, mount: function (canvas, g) { return initPark3D(g, canvas); }, dispose: disposeP3D, PARKS: PARKS };
 })();
