@@ -24,8 +24,9 @@ that has started keeps the last pre-game prices from the previous feed.
 
 No third-party dependencies.
 """
-import functools, json, os, statistics, sys, time, urllib.request
+import functools, json, os, sys, time, urllib.request
 from datetime import datetime, timedelta, timezone, time as dtime
+from prices import best_price, consensus_line, median_price, implied_pct
 
 print = functools.partial(print, flush=True)
 
@@ -68,15 +69,6 @@ def get_json(url, tries=4):
                 raise
             print(f"    retry {i+1}/{tries}: {e}")
             time.sleep(6 * (i + 1))
-
-
-def implied_pct(american):
-    """American odds -> implied probability, in percent."""
-    if american is None:
-        return None
-    a = float(american)
-    p = 100.0 / (a + 100.0) if a > 0 else -a / (-a + 100.0)
-    return round(p * 100, 1)
 
 
 def main():
@@ -145,8 +137,12 @@ def main():
         except Exception as e:
             print(f"  {ev['away']}@{ev['home']}: props unavailable ({e})")
             continue
+        # per-book rows, so the consensus is taken in probability space (a
+        # median of raw American prices across -100/+100 isn't a price) and
+        # the best number on the board can be shown with its book
         hr_prices, ks_lines, alt_prices = {}, {}, {}
         for bk in data.get("bookmakers", []):
+            book = bk.get("title") or bk.get("key") or "book"
             for mk in bk.get("markets", []):
                 for oc in mk.get("outcomes", []):
                     player = oc.get("description")
@@ -154,42 +150,84 @@ def main():
                         continue
                     if mk["key"] == "batter_home_runs" and oc.get("name") == "Over" \
                             and (oc.get("point") in (0.5, None)):
-                        hr_prices.setdefault(player, []).append(oc["price"])
+                        hr_prices.setdefault(player, []).append((oc["price"], book))
                     elif mk["key"] == "batter_home_runs_alternate" and oc.get("name") == "Over" \
                             and oc.get("point") == 1.5:
-                        alt_prices.setdefault(player, []).append(oc["price"])
-                    elif mk["key"] == "pitcher_strikeouts":
-                        d = ks_lines.setdefault(player, {"points": [], "over": [], "under": []})
-                        if oc.get("point") is not None:
-                            d["points"].append(oc["point"])
-                        if oc.get("name") == "Over":
-                            d["over"].append(oc["price"])
-                        elif oc.get("name") == "Under":
-                            d["under"].append(oc["price"])
+                        alt_prices.setdefault(player, []).append((oc["price"], book))
+                    elif mk["key"] == "pitcher_strikeouts" and oc.get("point") is not None \
+                            and oc.get("name") in ("Over", "Under"):
+                        ks_lines.setdefault(player, []).append(
+                            dict(point=oc["point"], side=oc["name"], price=oc["price"], book=book))
         hr = []
-        for p, v in hr_prices.items():
-            row = dict(player=p, price=round(statistics.median(v)), books=len(v),
-                       implied=implied_pct(statistics.median(v)))
+        for p, rows in hr_prices.items():
+            med = median_price([a for a, _ in rows])
+            if med is None:
+                continue
+            row = dict(player=p, price=med, books=len(rows), implied=implied_pct(med))
+            b = best_price(rows)
+            if b and len(rows) > 1:
+                row["best"] = dict(price=b[0], book=b[1])
             av = alt_prices.get(p)
-            if av:
-                row["alt"] = dict(price=round(statistics.median(av)), books=len(av),
-                                  implied=implied_pct(statistics.median(av)))
+            am = median_price([a for a, _ in av]) if av else None
+            if am is not None:
+                row["alt"] = dict(price=am, books=len(av), implied=implied_pct(am))
+                ab = best_price(av)
+                if ab and len(av) > 1:
+                    row["alt"]["best"] = dict(price=ab[0], book=ab[1])
             hr.append(row)
         hr.sort(key=lambda x: -(x["implied"] or 0))
         ks = []
-        for p, d in ks_lines.items():
-            if not d["points"]:
+        for p, outs in ks_lines.items():
+            # the line most books hang, priced from the books at that line only
+            # (a median across 4.5 and 5.5 lines is a 5.0 nobody offers)
+            line = consensus_line([o["point"] for o in outs])
+            if line is None:
                 continue
-            ks.append(dict(player=p, line=statistics.median(d["points"]),
-                           over=round(statistics.median(d["over"])) if d["over"] else None,
-                           under=round(statistics.median(d["under"])) if d["under"] else None,
-                           impliedOver=implied_pct(statistics.median(d["over"])) if d["over"] else None))
+            at = [o for o in outs if o["point"] == line]
+            ov = [(o["price"], o["book"]) for o in at if o["side"] == "Over"]
+            un = [(o["price"], o["book"]) for o in at if o["side"] == "Under"]
+            over, under = median_price([a for a, _ in ov]), median_price([a for a, _ in un])
+            row = dict(player=p, line=line, over=over, under=under,
+                       impliedOver=implied_pct(over) if over is not None else None,
+                       books=len({o["book"] for o in at}))
+            bo, bu = best_price(ov), best_price(un)
+            if (bo and len(ov) > 1) or (bu and len(un) > 1):
+                row["best"] = dict(over=dict(price=bo[0], book=bo[1]) if bo else None,
+                                   under=dict(price=bu[0], book=bu[1]) if bu else None)
+            others = sorted({o["point"] for o in outs} - {line})
+            if others:
+                row["otherLines"] = others
+            ks.append(row)
         ks.sort(key=lambda x: -(x["impliedOver"] or 0))
         games.append(dict(id=ev["id"], away=ev["away"], home=ev["home"],
                           commence=ev["t"].astimezone(ET).strftime("%Y-%m-%d %H:%M ET"),
                           hr=hr, ks=ks))
         print(f"  {ev['away']}@{ev['home']}: {len(hr)} HR props, {len(ks)} K props")
         time.sleep(0.6)
+
+    # opening number = the first pull of the day. Carried forward from the
+    # previous feed when it was built earlier today, so the board can show how
+    # far a price has moved since the morning.
+    same_day = False
+    try:
+        same_day = bool(prev) and prev.get("generated", "")[:10] == datetime.now(ET).strftime("%Y-%m-%d")
+    except Exception:
+        same_day = False
+    prev_rows = {}
+    if same_day:
+        for pg in prev.get("games", []):
+            for r in pg.get("hr", []):
+                prev_rows[(pg.get("id"), "hr", r.get("player"))] = r
+            for r in pg.get("ks", []):
+                prev_rows[(pg.get("id"), "k", r.get("player"))] = r
+    for g in games:
+        for r in g["hr"]:
+            pr = prev_rows.get((g["id"], "hr", r["player"]))
+            r["open"] = (pr.get("open") or dict(price=pr.get("price"))) if pr else dict(price=r["price"])
+        for r in g["ks"]:
+            pr = prev_rows.get((g["id"], "k", r["player"]))
+            r["open"] = (pr.get("open") or dict(line=pr.get("line"), over=pr.get("over"), under=pr.get("under"))) \
+                if pr else dict(line=r["line"], over=r["over"], under=r["under"])
 
     prev_games = {g.get("id"): g for g in (prev or {}).get("games", [])}
     kept = [dict(prev_games[ev["id"]], pregame=True) for ev in started if ev["id"] in prev_games]
@@ -198,9 +236,9 @@ def main():
     games = sorted(games + kept, key=lambda g: g.get("commence") or "")
 
     payload = dict(generated=datetime.now(ET).strftime("%Y-%m-%d %H:%M ET"),
-                   source="The Odds API · median across US books",
-                   note="Implied % straight from median Over price (vig included, "
-                        "~5-7 pts on one-sided HR markets)",
+                   source="The Odds API · median across US books (best price noted per prop)",
+                   note="Implied % from the median Over price (vig included, "
+                        "~5-7 pts on one-sided HR markets); open = today's first pull",
                    creditsRemaining=REMAINING["v"], games=games)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:
