@@ -52,10 +52,10 @@
     var rainL = dl ? dl[0] : "Rain chance";
     var ouOk = g.ou && g.ou.n >= 8;
     var tiles =
-      tile('<span class="ico" aria-hidden="true">' + (g.skyIcon || "🌤️") + "</span>", g.temp + "°", g.sky ? esc(g.sky) : "At kickoff") +
+      tile('<span class="ico" aria-hidden="true">' + D.sky(g) + "</span>", g.temp + "°", g.sky ? esc(g.sky) : "At kickoff") +
       tile(D.fieldWind(g.ax, g.wind, false, 52), (isNum(g.wind) ? g.wind : "—") + "<small>mph</small>", esc(F.cap(FN.axis(g))), g.wind >= 15 ? "warn" : "") +
-      tile('<span class="ico" aria-hidden="true">💧</span>', (isNum(g.rain) ? g.rain : "—") + "%", rainL, dl ? dl[1] : "") +
-      tile('<span class="ico" aria-hidden="true">🏈</span>', ouOk ? g.ou.over + "%" : "—", ouOk ? "Overs in similar games" : "Too little history");
+      tile('<span class="ico" aria-hidden="true">' + D.wx("drop") + "</span>", (isNum(g.rain) ? g.rain : "—") + "%", rainL, dl ? dl[1] : "") +
+      tile('<span class="ico" aria-hidden="true">' + D.wx("football") + "</span>", ouOk ? g.ou.over + "%" : "—", ouOk ? "Overs in similar games" : "Too little history");
     var chips = [];
     ((g.edge && g.edge.badges) || []).forEach(function (b) { chips.push('<span class="chip" title="' + esc(b.txt + (b.rec ? " — " + b.rec : "")) + '">' + esc(F.cap(b.k.toLowerCase())) + " · " + esc(b.team) + "</span>"); });
     if (g.windFx && /HIGH|EXTREME/.test(g.windFx.rating) && g.wind >= 10) chips.push('<span class="chip">Wind-sensitive stadium</span>');
@@ -144,7 +144,7 @@
       (g.windFx ? '<span class="chip">Stadium wind factor: ' + esc(g.windFx.rating.toLowerCase()) + "</span>" : "") + badges + "</div></div>");
 
     h.push('<div class="sec"><div class="sec__h"><h3 class="sec__title">At kickoff</h3></div><div class="stats">' +
-      statTile((g.skyIcon ? g.skyIcon + " " : "") + g.temp + "°", "Temperature", esc(g.sky || "")) +
+      statTile(D.sky(g) + g.temp + "°", "Temperature", esc(g.sky || "")) +
       statTile((isNum(g.wind) ? g.wind : "—") + "<small>mph</small>", "Wind", esc(F.cap(FN.axis(g)))) +
       statTile((isNum(g.rain) ? g.rain : "—") + "<small>%</small>", "Rain chance", g.delay && FN.delay[g.delay.level] ? FN.delay[g.delay.level][0] + (isNum(g.delay.pct) ? " — up to " + g.delay.pct + "%" : "") : "Dry") +
       statTile((isNum(g.dew) ? g.dew : "—") + "°", "Dew point", isNum(g.rh) ? g.rh + "% humidity" : "") +

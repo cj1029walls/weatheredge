@@ -74,21 +74,21 @@
       if (g.dome) return;
       var game = g.away + " @ " + g.home, pk = parkName(g), R = [];
       var dl = g.delay && DELAY[g.delay.level];
-      if (dl) R.push({ sev: g.delay.level === "watch" ? 3 : 4, icon: "🌧️", tone: dl[1], title: dl[0],
+      if (dl) R.push({ sev: g.delay.level === "watch" ? 3 : 4, icon: D.wx("rain"), tone: dl[1], title: dl[0],
         sub: "Rain chance peaks near " + (g.delay.pct != null ? g.delay.pct : g.rain) + "% during the game window at " + pk + ".", short: dl[0].toLowerCase() });
       var k = windKind(g);
       if ((k === "out" || k === "in") && g.wind >= 10) {
         var fx = g.windFx && /HIGH|EXTREME/.test(g.windFx.rating) ? " " + pk + " is one of the parks where wind matters most." : "";
-        R.push({ sev: g.wind >= 15 ? 3 : 2, icon: "🌬️", tone: k === "out" ? "good" : "cool", title: g.wind + " mph, " + mlbWind(g.windLabel),
+        R.push({ sev: g.wind >= 15 ? 3 : 2, icon: D.wx("wind"), tone: k === "out" ? "good" : "cool", title: g.wind + " mph, " + mlbWind(g.windLabel),
           sub: (k === "out" ? "Carries fly balls toward the seats." : "Knocks fly balls down.") + fx, short: g.wind + " mph " + mlbWind(g.windLabel) });
       } else if (k === "cross" && g.wind >= 18) {
-        R.push({ sev: 1, icon: "🌬️", tone: "", title: g.wind + " mph crosswind", sub: "Blowing " + mlbWind(g.windLabel) + " at " + pk + ".", short: g.wind + " mph crosswind" });
+        R.push({ sev: 1, icon: D.wx("wind"), tone: "", title: g.wind + " mph crosswind", sub: "Blowing " + mlbWind(g.windLabel) + " at " + pk + ".", short: g.wind + " mph crosswind" });
       }
-      if (isNum(g.temp) && g.temp >= 88) R.push({ sev: 2, icon: "🔥", tone: "good", title: "Hot one: " + g.temp + "°", sub: "Warm air lets the ball travel.", short: g.temp + "° heat" });
-      if (isNum(g.temp) && g.temp <= 50) R.push({ sev: 2, icon: "🥶", tone: "cool", title: "Cold one: " + g.temp + "°", sub: "Dense, cold air holds fly balls in.", short: g.temp + "° cold" });
+      if (isNum(g.temp) && g.temp >= 88) R.push({ sev: 2, icon: D.wx("hot"), tone: "good", title: "Hot one: " + g.temp + "°", sub: "Warm air lets the ball travel.", short: g.temp + "° heat" });
+      if (isNum(g.temp) && g.temp <= 50) R.push({ sev: 2, icon: D.wx("cold"), tone: "cool", title: "Cold one: " + g.temp + "°", sub: "Dense, cold air holds fly balls in.", short: g.temp + "° cold" });
       if (isNum(g.hr) && (g.sample || 0) >= 10 && Math.abs(g.hr) >= 20) {
         var up = g.hr > 0;
-        R.push({ sev: 1, icon: up ? "💥" : "🧊", tone: up ? "good" : "cool", title: (up ? "Home-run weather: " : "Home-run drag: ") + D.signed(g.hr, 0, "%"),
+        R.push({ sev: 1, icon: D.wx(up ? "up" : "down"), tone: up ? "good" : "cool", title: (up ? "Home-run weather: " : "Home-run drag: ") + D.signed(g.hr, 0, "%"),
           sub: "Across " + g.sample + " past games at " + pk + " in weather like this, vs the park's normal.", short: "HR " + D.signed(g.hr, 0, "%") + " in similar weather" });
       }
       if (!R.length) return;
@@ -168,18 +168,18 @@
       var dl = g.delay && NDELAY[g.delay.level];
       if (dl || (g.rain || 0) >= 40) {
         var pctv = Math.max(g.rain || 0, (g.delay && g.delay.pct) || 0);
-        R.push({ sev: pctv >= 70 ? 4 : 3, icon: "🌧️", tone: pctv >= 70 ? "bad" : "warn", title: "Rain: " + pctv + "% around kickoff",
+        R.push({ sev: pctv >= 70 ? 4 : 3, icon: D.wx("rain"), tone: pctv >= 70 ? "bad" : "warn", title: "Rain: " + pctv + "% around kickoff",
           sub: "A wet ball means more fumbles and fewer completions downfield.", short: pctv + "% rain" });
       }
       if (isNum(g.wind) && g.wind >= 15) {
         var fx = g.windFx && /HIGH|EXTREME/.test(g.windFx.rating) ? " " + venue + " is a " + g.windFx.rating.toLowerCase() + "-wind stadium." : "";
-        R.push({ sev: g.wind >= 20 ? 4 : 3, icon: "🌬️", tone: "cool", title: g.wind + " mph wind, " + nflAxis(g),
+        R.push({ sev: g.wind >= 20 ? 4 : 3, icon: D.wx("wind"), tone: "cool", title: g.wind + " mph wind, " + nflAxis(g),
           sub: "Deep passing and long kicks are what wind takes away first." + fx, short: g.wind + " mph " + nflAxis(g) });
       }
-      if (isNum(g.temp) && g.temp <= 32) R.push({ sev: 3, icon: "🥶", tone: "cool", title: "Freezing: " + g.temp + "°", sub: "Cold games have run lower-scoring at most stadiums.", short: g.temp + "°" });
-      if (isNum(g.temp) && g.temp >= 88) R.push({ sev: 2, icon: "🔥", tone: "warn", title: "Heat: " + g.temp + "°", sub: "Heat wears down defenses late — and tempo teams notice.", short: g.temp + "° heat" });
+      if (isNum(g.temp) && g.temp <= 32) R.push({ sev: 3, icon: D.wx("cold"), tone: "cool", title: "Freezing: " + g.temp + "°", sub: "Cold games have run lower-scoring at most stadiums.", short: g.temp + "°" });
+      if (isNum(g.temp) && g.temp >= 88) R.push({ sev: 2, icon: D.wx("hot"), tone: "warn", title: "Heat: " + g.temp + "°", sub: "Heat wears down defenses late — and tempo teams notice.", short: g.temp + "° heat" });
       if (isNum(g.pts) && (g.sample || 0) >= 10 && Math.abs(g.pts) >= 8) {
-        R.push({ sev: 1, icon: g.pts > 0 ? "📈" : "📉", tone: g.pts > 0 ? "good" : "cool", title: "Scoring " + D.signed(g.pts, 0, "%") + " in weather like this",
+        R.push({ sev: 1, icon: D.wx(g.pts > 0 ? "up" : "down"), tone: g.pts > 0 ? "good" : "cool", title: "Scoring " + D.signed(g.pts, 0, "%") + " in weather like this",
           sub: "Across " + g.sample + " games at " + venue + " in similar conditions.", short: "points " + D.signed(g.pts, 0, "%") });
       }
       if (!R.length) return;
@@ -229,11 +229,11 @@
       if (g.dome) return;
       var lv = g.edge && CLEVEL[g.edge.level];
       var R = [];
-      if ((g.rain || 0) >= 50) R.push({ sev: 3, icon: "🌧️", tone: "warn", title: "Rain: " + g.rain + "% around kickoff", sub: "Wet ball, shorter passing game.", short: g.rain + "% rain" });
-      if (isNum(g.wind) && g.wind >= 16) R.push({ sev: g.wind >= 22 ? 4 : 3, icon: "🌬️", tone: "cool", title: g.wind + " mph wind", sub: "Deep balls and long field goals suffer first.", short: g.wind + " mph wind" });
-      if (isNum(g.temp) && g.temp <= 35) R.push({ sev: 2, icon: "🥶", tone: "cool", title: "Cold: " + g.temp + "°", sub: "Cold, dense air — kicks and deep throws come up short.", short: g.temp + "°" });
-      if (isNum(g.temp) && g.temp >= 90) R.push({ sev: 2, icon: "🔥", tone: "warn", title: "Heat: " + g.temp + "°", sub: "Depth gets tested in the second half.", short: g.temp + "° heat" });
-      if (!R.length && lv && lv[2] >= 3) R.push({ sev: lv[2], icon: "⚠️", tone: lv[1], title: lv[0], sub: "The forecast here is strong enough to move this game's numbers.", short: lv[0].toLowerCase() });
+      if ((g.rain || 0) >= 50) R.push({ sev: 3, icon: D.wx("rain"), tone: "warn", title: "Rain: " + g.rain + "% around kickoff", sub: "Wet ball, shorter passing game.", short: g.rain + "% rain" });
+      if (isNum(g.wind) && g.wind >= 16) R.push({ sev: g.wind >= 22 ? 4 : 3, icon: D.wx("wind"), tone: "cool", title: g.wind + " mph wind", sub: "Deep balls and long field goals suffer first.", short: g.wind + " mph wind" });
+      if (isNum(g.temp) && g.temp <= 35) R.push({ sev: 2, icon: D.wx("cold"), tone: "cool", title: "Cold: " + g.temp + "°", sub: "Cold, dense air — kicks and deep throws come up short.", short: g.temp + "°" });
+      if (isNum(g.temp) && g.temp >= 90) R.push({ sev: 2, icon: D.wx("hot"), tone: "warn", title: "Heat: " + g.temp + "°", sub: "Depth gets tested in the second half.", short: g.temp + "° heat" });
+      if (!R.length && lv && lv[2] >= 3) R.push({ sev: lv[2], icon: D.wx("warn"), tone: lv[1], title: lv[0], sub: "The forecast here is strong enough to move this game's numbers.", short: lv[0].toLowerCase() });
       if (!R.length) return;
       R.sort(function (a, b) { return b.sev - a.sev; });
       var top = R[0];
@@ -259,9 +259,9 @@
     d.rounds.forEach(function (r) {
       if (!r.inWindow) return;
       var R = [];
-      if (isNum(r.gust) && r.gust >= 25 || isNum(r.wind) && r.wind >= 15) R.push({ sev: 3, icon: "🌬️", tone: "cool", title: (r.wind || 0) + " mph, gusts " + (r.gust || "—"), sub: "Scoring climbs and ball-strikers separate.", short: "gusts " + r.gust });
-      if ((r.rain || 0) >= 40 || r.delay === "likely" || r.delay === "severe") R.push({ sev: 3, icon: "🌧️", tone: "warn", title: "Rain: " + r.rain + "%", sub: "Soft greens and possible delays.", short: r.rain + "% rain" });
-      if (isNum(r.temp) && r.temp <= 50) R.push({ sev: 1, icon: "🥶", tone: "cool", title: "Cold: " + r.temp + "°", sub: "The ball won't fly as far.", short: r.temp + "°" });
+      if (isNum(r.gust) && r.gust >= 25 || isNum(r.wind) && r.wind >= 15) R.push({ sev: 3, icon: D.wx("wind"), tone: "cool", title: (r.wind || 0) + " mph, gusts " + (r.gust || "—"), sub: "Scoring climbs and ball-strikers separate.", short: "gusts " + r.gust });
+      if ((r.rain || 0) >= 40 || r.delay === "likely" || r.delay === "severe") R.push({ sev: 3, icon: D.wx("rain"), tone: "warn", title: "Rain: " + r.rain + "%", sub: "Soft greens and possible delays.", short: r.rain + "% rain" });
+      if (isNum(r.temp) && r.temp <= 50) R.push({ sev: 1, icon: D.wx("cold"), tone: "cool", title: "Cold: " + r.temp + "°", sub: "The ball won't fly as far.", short: r.temp + "°" });
       if (!R.length) return;
       R.sort(function (a, b) { return b.sev - a.sev; });
       var t = R[0];
@@ -282,10 +282,10 @@
     if (!r || !r.inWindow) return out;
     var R = [];
     var dl = r.delay && r.delay.level && r.delay.level !== "clear";
-    if (dl || (r.rain || 0) >= 30) R.push({ sev: r.delay && (r.delay.level === "likely" || r.delay.level === "severe") ? 4 : 2, icon: "🌧️", tone: "warn",
+    if (dl || (r.rain || 0) >= 30) R.push({ sev: r.delay && (r.delay.level === "likely" || r.delay.level === "severe") ? 4 : 2, icon: D.wx("rain"), tone: "warn",
       title: "Rain risk: " + Math.max(r.rain || 0, (r.delay && r.delay.pct) || 0) + "%", sub: "Ovals don't race wet — a delay or a shortened race changes strategy.", short: "rain" });
-    if (isNum(r.temp) && r.temp >= 88) R.push({ sev: 2, icon: "🔥", tone: "warn", title: "Hot track: " + r.temp + "°", sub: "Slick, greasy track — tire wear and handling decide it.", short: r.temp + "°" });
-    if (isNum(r.gust) && r.gust >= 25) R.push({ sev: 1, icon: "🌬️", tone: "cool", title: "Gusts to " + r.gust + " mph", sub: "Crosswinds unsettle cars in the corners.", short: "gusts" });
+    if (isNum(r.temp) && r.temp >= 88) R.push({ sev: 2, icon: D.wx("hot"), tone: "warn", title: "Hot track: " + r.temp + "°", sub: "Slick, greasy track — tire wear and handling decide it.", short: r.temp + "°" });
+    if (isNum(r.gust) && r.gust >= 25) R.push({ sev: 1, icon: D.wx("wind"), tone: "cool", title: "Gusts to " + r.gust + " mph", sub: "Crosswinds unsettle cars in the corners.", short: "gusts" });
     if (!R.length) return out;
     R.sort(function (a, b) { return b.sev - a.sev; });
     var t = R[0];

@@ -52,10 +52,10 @@
     var rainCls = g.delay && FM.delay[g.delay.level] ? FM.delay[g.delay.level][1] : "";
     var hrOk = isNum(g.hr) && (g.sample || 0) >= 5;
     var tiles =
-      tile('<span class="ico" aria-hidden="true">' + (g.skyIcon || "🌤️") + "</span>", g.temp + "°", g.sky ? esc(g.sky) : "At first pitch") +
+      tile('<span class="ico" aria-hidden="true">' + D.sky(g) + "</span>", g.temp + "°", g.sky ? esc(g.sky) : "At first pitch") +
       tile(D.parkWind(g.windAngle, g.wind, false, 52), (isNum(g.wind) ? g.wind : "—") + "<small>mph</small>", esc(windL), k === "out" && g.wind >= 8 ? "good" : "") +
-      tile('<span class="ico" aria-hidden="true">💧</span>', (isNum(g.rain) ? g.rain : "—") + "%", rainL, rainCls) +
-      tile('<span class="ico" aria-hidden="true">⚾</span>', hrOk ? '<span class="' + hrTone(g.hr) + '">' + D.signed(g.hr, 0, "%") + "</span>" : "—",
+      tile('<span class="ico" aria-hidden="true">' + D.wx("drop") + "</span>", (isNum(g.rain) ? g.rain : "—") + "%", rainL, rainCls) +
+      tile('<span class="ico" aria-hidden="true">' + D.wx("ball") + "</span>", hrOk ? '<span class="' + hrTone(g.hr) + '">' + D.signed(g.hr, 0, "%") + "</span>" : "—",
         hrOk ? "HR in weather like this" : "Too little history");
     var chips = [];
     if (started) chips.push('<span class="chip">Underway</span>');
@@ -116,7 +116,7 @@
 
     /* conditions */
     h.push('<div class="sec"><div class="sec__h"><h3 class="sec__title">At first pitch</h3></div><div class="stats">' +
-      statTile((g.skyIcon ? g.skyIcon + " " : "") + g.temp + "°", "Temperature", esc(g.sky || "")) +
+      statTile(D.sky(g) + g.temp + "°", "Temperature", esc(g.sky || "")) +
       statTile((isNum(g.wind) ? g.wind : "—") + "<small>mph</small>", "Wind", g.dome ? "Roof closed" : esc(F.cap(FM.wind(g.windLabel))) + (g.dir ? " (from " + esc(g.dir) + ")" : "")) +
       statTile((isNum(g.rain) ? g.rain : "—") + "<small>%</small>", "Rain chance", g.delay && FM.delay[g.delay.level] ? FM.delay[g.delay.level][0] + (isNum(g.delay.pct) ? " — peaks " + g.delay.pct + "% in the game window" : "") : "No delay concern") +
       statTile((isNum(g.dew) ? g.dew : "—") + "°", "Dew point", isNum(g.rh) ? g.rh + "% humidity" : "") +

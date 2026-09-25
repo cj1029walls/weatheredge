@@ -30,6 +30,8 @@
     return (F[k].watch(w) || []).map(function (x) { x.sport = k; return x; });
   }
 
+  function roofs(n) { return n ? n + " under a roof" : "all open-air"; }
+
   function status(k, s) {
     var w = s.wx, sp = D.sport(k), r = { k: k, name: sp.name, href: D.u(sp.weather), watch: watchOf(k, s), head: "", sub: "", fresh: null };
     if (!w) { r.head = "Forecast unavailable"; r.sub = "The feed didn't load — refresh in a minute."; return r; }
@@ -37,12 +39,12 @@
       var n = (w.games || []).length;
       r.head = n ? D.plural(n, "game") + " · " + D.longDate(w.date).replace(/^(\w+),.*/, "$1") : "No games today";
       var first = (w.games || []).slice().sort(function (a, b) { return a.sortTime - b.sortTime; })[0];
-      r.sub = n ? "First pitch " + first.time + " · " + (w.games.filter(function (g) { return g.dome; }).length || "no") + " under a roof" : (w.note || "Back tomorrow.");
+      r.sub = n ? "First pitch " + first.time + " · " + roofs(w.games.filter(function (g) { return g.dome; }).length) : (w.note || "Back tomorrow.");
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 9, forDate: w.date };
     } else if (k === "nfl") {
       var g = w.games || [];
       r.head = g.length ? "Week " + (g[0].week || "") + " · " + D.plural(g.length, "game") : "Between weeks";
-      r.sub = g.length ? g.filter(function (x) { return x.dome; }).length + " under a roof · kickoffs " + g[0].day.split(" ")[0] + "–" + g[g.length - 1].day.split(" ")[0] : "Next slate appears as its forecasts come into range.";
+      r.sub = g.length ? roofs(g.filter(function (x) { return x.dome; }).length) + " · kickoffs " + g[0].day.split(" ")[0] + "–" + g[g.length - 1].day.split(" ")[0] : "Next slate appears as its forecasts come into range.";
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 30 };
     } else if (k === "cfb") {
       var c = w.games || [];

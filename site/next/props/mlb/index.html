@@ -20,14 +20,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
-<link rel="stylesheet" href="../../assets/dr.css?v=67f5b7a3">
+<link rel="stylesheet" href="../../assets/dr.css?v=0ad74600">
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
 <script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
 <script src="/pro/gate.js" defer></script>
-<script src="../../assets/dr.js?v=67f5b7a3" defer></script>
-<script src="../../assets/feeds.js?v=67f5b7a3" defer></script>
-<script src="../../assets/props.js?v=67f5b7a3" defer></script>
+<script src="../../assets/dr.js?v=0ad74600" defer></script>
+<script src="../../assets/feeds.js?v=0ad74600" defer></script>
+<script src="../../assets/props.js?v=0ad74600" defer></script>
 </head>
 <body>
 <header id="dr-top" class="dr-top"></header>
@@ -70,7 +70,7 @@
       <p class="small dim mt12">Our HR chance blends our model (60%) with the market's own price (40%). <b>Edge</b> = our chance minus the books' chance with their margin taken out — the number we grade value flags on.</p>
     </div>
     <div data-panel="k" hidden>
-      <div class="note mb" style="margin-bottom:16px">⚾<div><b>Projections, not calls.</b> We stopped making strikeout over/under calls on Aug 25 after they went 27–30 — the projection and the books' line stay here for reference until the model is rebuilt. That record stays on the <a href="../../record/#mlb">Record</a> page.</div></div>
+      <div class="note mb" style="margin-bottom:16px"><svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5M10 6.2v.1" stroke-linecap="round"/></svg><div><b>Projections, not calls.</b> We stopped making strikeout over/under calls on Aug 25 after they went 27–30 — the projection and the books' line stay here for reference until the model is rebuilt. That record stays on the <a href="../../record/#mlb">Record</a> page.</div></div>
       <div id="b-k"></div>
     </div>
     <div data-panel="env" hidden><div id="b-env"></div>
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var pd = S.pd, el = document.getElementById("b-intel"), items = pd.intel || [];
     if (!S.member) { el.innerHTML = '<div class="tbl-wrap">' + D.lockbar({ title: D.plural(items.length, "intel note") + " for tonight — unlock with PRO", sub: "The slate's standout spots in plain English: top HR environments, weather swings, umpire-and-park combos." }) + "</div>"; return; }
     el.innerHTML = items.length ? '<div class="watch">' + items.map(function (x) {
-      return '<a href="#" onclick="return false" style="cursor:default"><span class="ic" aria-hidden="true">' + esc(x.icon || "•") + '</span><span><span class="w" style="display:block;margin:0 0 4px">' + esc(x.tag || "") + (x.game ? " · " + esc(x.game) : "") +
+      return '<a href="#" onclick="return false" style="cursor:default"><span class="ic" aria-hidden="true">' + D.emo(x.icon) + '</span><span><span class="w" style="display:block;margin:0 0 4px">' + esc(x.tag || "") + (x.game ? " · " + esc(x.game) : "") +
         '</span><span class="t" style="display:block">' + esc(x.title) + '</span><span class="s" style="display:block">' + esc(x.text || "") + "</span></span></a>";
     }).join("") + "</div>" : '<div class="tbl-wrap"><div class="empty"><p>No intel notes tonight.</p></div></div>';
   }

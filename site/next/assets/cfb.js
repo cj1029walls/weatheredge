@@ -28,10 +28,10 @@
     return '<article class="gc" id="g-' + esc(g.id) + '"><div class="gc__h"><div><div class="gc__teams">' + teams(g) + '</div><div class="gc__where">' + where(g) + "</div></div>" +
       '<div class="gc__when"><div class="t">' + esc(g.time) + '</div><div class="l">' + esc(String(g.day || "").replace(/^(\w+) .*/, "$1")) + "</div></div></div>" +
       '<div class="gc__tiles">' +
-      tile('<span class="ico" aria-hidden="true">' + (g.skyIcon || "🌤️") + "</span>", g.temp + "°", esc(g.sky || "At kickoff")) +
+      tile('<span class="ico" aria-hidden="true">' + D.sky(g) + "</span>", g.temp + "°", esc(g.sky || "At kickoff")) +
       tile(D.compassWind(g.windDir, g.wind, 52), (isNum(g.wind) ? g.wind : "—") + "<small>mph</small>", g.windDir != null && g.wind >= 3 ? "From the " + D.compass(g.windDir) : "Wind", g.wind >= 16 ? "warn" : "") +
-      tile('<span class="ico" aria-hidden="true">💧</span>', (isNum(g.rain) ? g.rain : "—") + "%", "Rain chance", g.rain >= 50 ? "warn" : "") +
-      tile('<span class="ico" aria-hidden="true">🏈</span>', g.ou && g.ou.n >= 8 ? g.ou.over + "%" : "—", g.ou && g.ou.n >= 8 ? "Overs in similar games" : "Too little history") +
+      tile('<span class="ico" aria-hidden="true">' + D.wx("drop") + "</span>", (isNum(g.rain) ? g.rain : "—") + "%", "Rain chance", g.rain >= 50 ? "warn" : "") +
+      tile('<span class="ico" aria-hidden="true">' + D.wx("football") + "</span>", g.ou && g.ou.n >= 8 ? g.ou.over + "%" : "—", g.ou && g.ou.n >= 8 ? "Overs in similar games" : "Too little history") +
       "</div>" + D.hourly(g.hourly || [], hourRows(false)) +
       '<div class="gc__foot"><button class="dr-link" type="button" data-open="' + esc(g.id) + '">Full forecast &amp; history →</button>' + level(g) + "</div></article>";
   }
@@ -40,7 +40,7 @@
     return '<tr data-open="' + esc(g.id) + '" tabindex="0" style="cursor:pointer"><td class="who">' + esc(g.away) + ' <span class="dim">@</span> ' + esc(g.home) +
       "<small>" + esc(String(g.stadium || "").split("·")[0].trim()) + (g.conf && g.conf !== "Other" ? " · " + esc(g.conf) : "") + "</small></td>" +
       '<td class="num">' + esc(g.time.replace(" ET", "")) + "</td>" +
-      '<td class="num">' + (g.dome ? '<span class="dim">roof</span>' : (g.skyIcon || "") + " " + g.temp + "°") + "</td>" +
+      '<td class="num">' + (g.dome ? '<span class="dim">roof</span>' : D.sky(g) + " " + g.temp + "°") + "</td>" +
       '<td class="num">' + (g.dome ? "—" : "<b" + (g.wind >= 16 ? ' class="warn"' : "") + ">" + g.wind + '</b> <span class="dim">mph</span>') + "</td>" +
       '<td class="num ' + (g.dome ? "" : D.rainCls(g.rain)) + '">' + (g.dome ? "—" : g.rain + "%") + "</td>" +
       '<td class="num">' + (level(g) || '<span class="dim">—</span>') + "</td></tr>";
@@ -52,7 +52,7 @@
       '<h2 style="font-size:clamp(22px,3vw,30px)">' + teams(g) + '</h2><div class="chips mt12">' + (g.dome ? '<span class="chip">Indoors</span>' : "") + level(g) +
       (g.p4 ? '<span class="chip">Power 4</span>' : "") + (isNum(g.total) ? '<span class="chip">Total ' + g.total + "</span>" : "") + "</div></div>");
     h.push('<div class="sec"><div class="sec__h"><h3 class="sec__title">At kickoff</h3></div><div class="stats">' +
-      statTile((g.skyIcon ? g.skyIcon + " " : "") + g.temp + "°", "Temperature", isNum(g.feels) && g.feels !== g.temp ? "Feels like " + g.feels + "°" : esc(g.sky || "")) +
+      statTile(D.sky(g) + g.temp + "°", "Temperature", isNum(g.feels) && g.feels !== g.temp ? "Feels like " + g.feels + "°" : esc(g.sky || "")) +
       statTile((isNum(g.wind) ? g.wind : "—") + "<small>mph</small>", "Wind", g.windDir != null ? "From the " + D.compass(g.windDir) : "") +
       statTile((isNum(g.rain) ? g.rain : "—") + "<small>%</small>", "Rain chance", g.delay && g.delay.level && g.delay.level !== "clear" ? "Up to " + g.delay.pct + "% in the game window" : "") +
       statTile((isNum(g.dew) ? g.dew : "—") + "°", "Dew point", isNum(g.rh) ? g.rh + "% humidity" : "") +

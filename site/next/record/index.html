@@ -20,15 +20,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
-<link rel="stylesheet" href="../assets/dr.css?v=67f5b7a3">
+<link rel="stylesheet" href="../assets/dr.css?v=0ad74600">
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
 <script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
 <script src="/pro/gate.js" defer></script>
-<script src="../assets/dr.js?v=67f5b7a3" defer></script>
-<script src="../assets/feeds.js?v=67f5b7a3" defer></script>
-<script src="../assets/props.js?v=67f5b7a3" defer></script>
-<script src="../assets/hub.js?v=67f5b7a3" defer></script>
+<script src="../assets/dr.js?v=0ad74600" defer></script>
+<script src="../assets/feeds.js?v=0ad74600" defer></script>
+<script src="../assets/props.js?v=0ad74600" defer></script>
+<script src="../assets/hub.js?v=0ad74600" defer></script>
 </head>
 <body>
 <header id="dr-top" class="dr-top"></header>
@@ -90,6 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var D = DR, esc = D.esc, isNum = D.isNum;
   D.shell({ section: "record" });
   var wl = function (w, n) { return n ? w + "–" + (n - w) : "—"; };
+  // calibration bands arrive as "15–20" and "25–+": show them as "15–20%" and "25%+"
+  var band = function (r) { r = String(r || "").replace(/-/g, "–"); return /–\+$/.test(r) ? r.replace(/–\+$/, "") + "%+" : r + "%"; };
   var rate = function (w, n) { return n ? D.pct(w / n * 100, 0) : ""; };
   function dayLab(iso) { return D.longDate(iso).replace(/^(\w{3})\w*,/, "$1,"); }
   function none(id, msg) { document.getElementById(id).innerHTML = '<div class="note">' + D.IC.info + "<div>" + esc(msg) + "</div></div>"; }
@@ -106,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var cal = (s.cal || []).map(function (c) {
       var mx = 35;
       return '<div style="display:grid;grid-template-columns:110px 1fr 150px;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line2)">' +
-        '<span class="small"><b>' + esc(c.range) + "%</b> said</span>" +
+        '<span class="small"><b>' + esc(band(c.range)) + "</b> said</span>" +
         '<span style="display:grid;gap:5px"><span class="meter"><i style="width:' + (c.exp / mx * 100).toFixed(1) + '%;background:#8E97AD"></i></span><span class="meter"><i style="width:' + (c.act / mx * 100).toFixed(1) + '%"></i></span></span>' +
         '<span class="small num">' + D.pct(c.exp) + ' <span class="dim">said</span> · <b class="cyan">' + D.pct(c.act) + '</b> <span class="dim">hit · ' + c.n + "</span></span></div>";
     }).join("");

@@ -88,6 +88,62 @@
     arrow: '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
   };
 
+  /* weather + sport glyphs: drawn line icons that take the text color, so they
+     read the same on every device (emoji render differently everywhere) */
+  var WXP = {
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6L6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/>',
+    moon: '<path d="M19.5 14.2A7.5 7.5 0 1 1 9.8 4.5a6 6 0 0 0 9.7 9.7z"/>',
+    partly: '<path d="M8.5 2.8v1.4M3.6 7.7H5M5 4.3l1 1M12 4.3l-1 1"/><path d="M11.6 9.4A3.6 3.6 0 0 0 5 9.3"/><path d="M8 20.5a3.8 3.8 0 0 1-.3-7.6 5.2 5.2 0 0 1 9.9-1.2 4.4 4.4 0 0 1-.1 8.8z"/>',
+    cloud: '<path d="M7 19.5a4.3 4.3 0 0 1-.4-8.6 6 6 0 0 1 11.5-1.1 4.9 4.9 0 0 1-.2 9.7z"/>',
+    rain: '<path d="M7 15.5a4 4 0 0 1-.4-8 5.6 5.6 0 0 1 10.8-1 4.5 4.5 0 0 1 .1 9z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>',
+    storm: '<path d="M7 15.5a4 4 0 0 1-.4-8 5.6 5.6 0 0 1 10.8-1 4.5 4.5 0 0 1 .1 9"/><path d="M12.5 13.5L10 17.5h3.5L11 21.5"/>',
+    snow: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/><path d="M9.8 4.6L12 6.4l2.2-1.8M9.8 19.4l2.2-1.8 2.2 1.8"/>',
+    fog: '<path d="M4 8.5h16M3 12.5h18M5 16.5h14M8 20.5h8"/>',
+    wind: '<path d="M3 8.5h10.5a2.8 2.8 0 1 0-2.8-2.8"/><path d="M3 12.5h15a3 3 0 1 1-3 3"/><path d="M3 16.5h7"/>',
+    drop: '<path d="M12 3.2s6 6.4 6 10.8a6 6 0 0 1-12 0c0-4.4 6-10.8 6-10.8z"/>',
+    temp: '<path d="M10 13.6V5.5a2 2 0 1 1 4 0v8.1a4 4 0 1 1-4 0z"/><path d="M12 10v6"/>',
+    hot: '<path d="M8.5 13.6V5.5a2 2 0 1 1 4 0v8.1a4 4 0 1 1-4 0z"/><path d="M10.5 8v8"/><path d="M17.5 4.5v5M15 7h5"/>',
+    cold: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/><path d="M9.8 4.6L12 6.4l2.2-1.8M9.8 19.4l2.2-1.8 2.2 1.8"/>',
+    up: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+    down: '<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>',
+    warn: '<path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17.3v.1"/>',
+    roof: '<path d="M3 12.5a9 6.5 0 0 1 18 0"/><path d="M3 12.5V19h18v-6.5"/><path d="M9 19v-3.5h6V19"/>',
+    ball: '<circle cx="12" cy="12" r="8.5"/><path d="M7.2 5.2c2.3 2.3 2.3 11.3 0 13.6M16.8 5.2c-2.3 2.3-2.3 11.3 0 13.6"/>',
+    football: '<path d="M5 19c-1.6-4.6 1-11 7-13.6 3-1.3 5.6-1.2 7-.4 1.6 4.6-1 11-7 13.6-3 1.3-5.6 1.2-7 .4z"/><path d="M9.5 14.5l5-5M10.6 11l2.4 2.4M12.4 9.2l2.4 2.4"/>',
+    flag: '<path d="M6.5 21V3"/><path d="M6.5 3.5l10.5 3.7-10.5 3.7"/><path d="M3.5 21h8"/>',
+    scale: '<path d="M12 4v16M8 20h8M5 7.5h14"/><path d="M5 7.5l-2.5 6a2.5 2.5 0 0 0 5 0zM19 7.5l-2.5 6a2.5 2.5 0 0 0 5 0z"/>',
+    target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
+    eye: '<path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+    chart: '<path d="M5 20v-8M11 20V5M17 20v-6M3 20h18"/>',
+    stop: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 12h7"/>',
+    dot: '<circle cx="12" cy="12" r="2.5"/>'
+  };
+  // emoji the data feeds still carry -> the matching line icon
+  var EMO = {
+    "☀": "sun", "🌤": "partly", "⛅": "partly", "🌥": "cloud", "☁": "cloud", "🌦": "rain", "🌧": "rain", "⛈": "storm",
+    "🌩": "storm", "🌨": "snow", "❄": "snow", "🌫": "fog", "🌙": "moon", "🏟": "roof", "🌬": "wind", "💧": "drop",
+    "🔥": "up", "💣": "up", "🚀": "up", "💥": "up", "📈": "up", "📉": "down", "🧊": "down", "🥶": "cold",
+    "🎯": "target", "👀": "eye", "🛑": "stop", "📊": "chart", "⚠": "warn"
+  };
+  function wx(k, size) {
+    var s = size || "1em";
+    return '<svg class="wxi" viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (WXP[k] || WXP.dot) + "</svg>";
+  }
+  function emo(e, size) { return wx(EMO[String(e || "").replace(/\uFE0F/g, "")] || "dot", size); }
+  function sky(g, size) {
+    var s = String((g && g.sky) || "").toLowerCase(), e = String((g && g.skyIcon) || "").replace(/\uFE0F/g, ""), k;
+    if (g && g.dome || /indoor|roof|dome/.test(s)) k = "roof";
+    else if (/thunder|storm/.test(s)) k = "storm";
+    else if (/snow|flurr|sleet/.test(s)) k = "snow";
+    else if (/rain|shower|drizzle/.test(s)) k = "rain";
+    else if (/fog|mist|haze/.test(s)) k = "fog";
+    else if (/partly|mostly sunny|few clouds|mixed/.test(s)) k = "partly";
+    else if (/overcast|cloud/.test(s)) k = "cloud";
+    else if (/clear|sunny|fair/.test(s)) k = e === "🌙" ? "moon" : "sun";
+    else k = EMO[e] || "partly";
+    return wx(k, size);
+  }
+
   /* ---------------------------------------------------------------- sports */
   var SPORTS = [
     { k: "mlb", name: "MLB", weather: "/mlb/", props: "/props/mlb/" },
@@ -341,7 +397,7 @@
     opt = opt || {};
     if (!hours || !hours.length) return "";
     var head = "<tr><th></th>" + hours.map(function (h) {
-      return '<th class="' + (h.fp ? "fp" : "") + '">' + (h.c ? '<span class="ic" aria-hidden="true">' + h.c + "</span>" : "") + esc(h.lab) + "</th>";
+      return '<th class="' + (h.fp ? "fp" : "") + '">' + (h.c ? '<span class="ic" aria-hidden="true">' + emo(h.c) + "</span>" : "") + esc(h.lab) + "</th>";
     }).join("") + "</tr>";
     var body = rows.map(function (r) {
       return "<tr><th scope=\"row\">" + esc(r.k) + "</th>" + hours.map(function (h) {
@@ -550,7 +606,7 @@
   window.DR = {
     BASE: BASE, u: u, esc: esc, $: $, $$: $$, isNum: isNum, fixed: fixed, signed: signed, pct: pct, odds: odds, validOdds: validOdds,
     implied: implied, payout: payout, plural: plural, tone: tone, MINUS: MINUS,
-    get: get, IC: IC, SPORTS: SPORTS, sport: sport, shell: shell, gate: gate, lockbar: lockbar, fakeRows: fakeRows,
+    get: get, IC: IC, wx: wx, emo: emo, sky: sky, SPORTS: SPORTS, sport: sport, shell: shell, gate: gate, lockbar: lockbar, fakeRows: fakeRows,
     fresh: fresh, banner: banner, sheet: { open: openSheet, close: closeSheet }, hashParam: hashParam, setHash: setHash,
     hourly: hourly, rainCls: rainCls, compass: compass, parkWind: parkWind, parkWindBig: parkWindBig, fieldWindBig: fieldWindBig, fieldWind: fieldWind, compassWind: compassWind,
     impact: impact, tabs: tabs, longDate: longDate, todayET: todayET, etParts: etParts

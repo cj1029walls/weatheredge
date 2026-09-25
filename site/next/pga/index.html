@@ -20,14 +20,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
-<link rel="stylesheet" href="../assets/dr.css?v=67f5b7a3">
+<link rel="stylesheet" href="../assets/dr.css?v=0ad74600">
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
 <script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
 <script src="/pro/gate.js" defer></script>
-<script src="../assets/dr.js?v=67f5b7a3" defer></script>
-<script src="../assets/feeds.js?v=67f5b7a3" defer></script>
-<script src="../assets/props.js?v=67f5b7a3" defer></script>
+<script src="../assets/dr.js?v=0ad74600" defer></script>
+<script src="../assets/feeds.js?v=0ad74600" defer></script>
+<script src="../assets/props.js?v=0ad74600" defer></script>
 </head>
 <body>
 <header id="dr-top" class="dr-top"></header>
@@ -91,11 +91,11 @@ document.addEventListener("DOMContentLoaded", function () {
     var tile = function (ico, v, l, c) { return '<div class="gc__tile">' + ico + '<div><div class="v">' + v + '</div><div class="l ' + (c || "") + '">' + l + "</div></div></div>"; };
     var wave = function (lab, w) { return w ? '<div class="stat" style="padding:14px 16px;background:var(--panel3);border-radius:12px"><div class="stat__l">' + lab + '</div><div class="stat__v" style="font-size:22px">' + w.wind + '<small>mph</small></div><div class="stat__s">gusts ' + w.gust + " · " + w.temp + "° · " + w.rain + "% rain</div></div>" : ""; };
     return '<article class="gc">' + head + '<div class="gc__tiles">' +
-      tile('<span class="ico" aria-hidden="true">🌡️</span>', r.temp + "°", esc(r.sky || "Average")) +
-      tile('<span class="ico" aria-hidden="true">🌬️</span>', r.wind + "<small>mph</small>", "Gusts to " + r.gust, r.wind >= 12 || r.gust >= 25 ? "warn" : "") +
-      tile('<span class="ico" aria-hidden="true">💧</span>', r.rain + "%", "Rain chance", r.rain >= 45 ? "warn" : "") +
-      (TEAM ? tile('<span class="ico" aria-hidden="true">⛳</span>', r.pm ? r.pm.temp + "°" : "—", "Afternoon high") :
-        tile('<span class="ico" aria-hidden="true">⛳</span>', r.am && r.pm ? (r.pm.wind - r.am.wind > 0 ? "AM" : r.pm.wind - r.am.wind < 0 ? "PM" : "Even") : "—", r.am && r.pm ? "Calmer wave" : "Waves")) +
+      tile('<span class="ico" aria-hidden="true">' + DR.wx("temp") + "</span>", r.temp + "°", esc(r.sky || "Average")) +
+      tile('<span class="ico" aria-hidden="true">' + DR.wx("wind") + "</span>", r.wind + "<small>mph</small>", "Gusts to " + r.gust, r.wind >= 12 || r.gust >= 25 ? "warn" : "") +
+      tile('<span class="ico" aria-hidden="true">' + DR.wx("drop") + "</span>", r.rain + "%", "Rain chance", r.rain >= 45 ? "warn" : "") +
+      (TEAM ? tile('<span class="ico" aria-hidden="true">' + DR.wx("flag") + "</span>", r.pm ? r.pm.temp + "°" : "—", "Afternoon high") :
+        tile('<span class="ico" aria-hidden="true">' + DR.wx("flag") + "</span>", r.am && r.pm ? (r.pm.wind - r.am.wind > 0 ? "AM" : r.pm.wind - r.am.wind < 0 ? "PM" : "Even") : "—", r.am && r.pm ? "Calmer wave" : "Waves")) +
       "</div>" +
       (r.am || r.pm ? '<div class="gc__impact"><div class="grid g2" style="gap:10px">' + wave(TEAM ? "Morning" : "Morning wave", r.am) + wave(TEAM ? "Afternoon" : "Afternoon wave", r.pm) + "</div>" +
         (r.waveEdge ? '<div class="note note--cyan">' + D.IC.info + "<div><b>Wave edge:</b> " + esc(r.waveEdge.txt) + ".</div></div>" : "") + "</div>" : "") +
