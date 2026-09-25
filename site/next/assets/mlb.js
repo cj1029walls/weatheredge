@@ -132,7 +132,7 @@
       var fx = g.windFx ? " At " + pk(g) + ", 10 mph blowing straight out has " + (g.windFx.pct10 >= 0 ? "added" : "cut") + " about " + Math.abs(g.windFx.pct10) +
         "% to home runs historically (" + esc(g.windFx.rating.toLowerCase()) + " wind factor)." : "";
       h.push('<div class="sec"><div class="sec__h"><div><h3 class="sec__title">Wind at ' + pk(g) + '</h3><p class="sec__sub">' + esc(windTxt) + fx + "</p></div>" +
-        '<button class="btn btn--sm btn--ghost" type="button" data-3d>View in 3D</button></div>' +
+        D.btn3d("View in 3D") + "</div>" +
         '<div class="card card--flat" style="padding:18px;display:flex;align-items:center;justify-content:center;min-height:220px;position:relative;overflow:hidden" data-3d-box>' +
         '<div data-flat style="width:100%;display:flex;justify-content:center">' + D.parkWindBig(g.windAngle, g.wind, false) + '</div></div></div>');
     }
@@ -269,28 +269,19 @@
       '<td class="num">' + (isNum(b.edge) ? '<span class="edge ' + (b.edge >= 2 ? "edge--pos" : b.edge <= -2 ? "edge--neg" : "edge--flat") + '">' + D.signed(b.edge, 1) + "</span>" : "—") + "</td></tr>";
   }
 
-  /* ------------------------------------------------------------ 3D hook */
-  var p3 = null;
+  /* ------------------------------------------------------------ 3D view */
+  var v3 = null;
   function afterDetail(root, g) {
     var btn = root.querySelector("[data-3d]"), box = root.querySelector("[data-3d-box]");
-    if (!btn || !box || !window.Park3D) { if (btn) btn.hidden = true; return; }
-    btn.addEventListener("click", function () {
-      if (btn.getAttribute("data-on") === "1") { dispose(); box.querySelector("[data-flat]").hidden = false; var c = box.querySelector("canvas"); if (c) c.remove(); btn.textContent = "View in 3D"; btn.removeAttribute("data-on"); box.style.height = ""; return; }
-      btn.disabled = true; btn.textContent = "Loading 3D…";
-      window.Park3D.load().then(function () {
-        var cv = document.createElement("canvas");
-        cv.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none";
-        box.style.height = "360px";
-        box.appendChild(cv);
-        dispose();
-        p3 = window.Park3D.mount(cv, g);
-        if (!p3) { cv.remove(); box.style.height = ""; btn.textContent = "3D unavailable"; return; }
-        box.querySelector("[data-flat]").hidden = true;
-        btn.disabled = false; btn.textContent = "Back to diagram"; btn.setAttribute("data-on", "1");
-      }).catch(function () { btn.textContent = "3D unavailable"; });
-    });
+    if (!btn || !box) return;
+    var k = FM.windKind(g), park = FM.park(g), w = FM.wind(g.windLabel);
+    v3 = D.view3d({ btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "mlb", g: g },
+      chips: ['<span class="chip' + (k === "calm" ? "" : " chip--cyan") + '">' + D.wx("wind") + (k === "calm" ? "Light wind" : g.wind + " mph " + esc(w)) + "</span>",
+        '<span class="chip">' + (isNum(g.temp) ? g.temp + "°" : "") + " at first pitch</span>"],
+      cap: "Wind drawn against " + park + "'s real field layout at the forecast angle. Walls shown 1.5× taller so they read.",
+      label: "3D view of " + park + (k === "calm" ? " in light wind" : " with the wind blowing " + w) });
   }
-  function dispose() { if (p3 && window.Park3D) { window.Park3D.dispose(p3); } p3 = null; }
+  function dispose() { if (v3) v3.close(); v3 = null; }
 
   window.M = { card: card, detail: detail, afterDetail: afterDetail, dispose: dispose, gameProps: gameProps, proGame: proGame, batters: batters, kFor: kFor, propCount: propCount, hrRow: hrRow };
 })();

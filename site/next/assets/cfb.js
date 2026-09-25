@@ -57,6 +57,15 @@
       statTile((isNum(g.rain) ? g.rain : "—") + "<small>%</small>", "Rain chance", g.delay && g.delay.level && g.delay.level !== "clear" ? "Up to " + g.delay.pct + "% in the game window" : "") +
       statTile((isNum(g.dew) ? g.dew : "—") + "°", "Dew point", isNum(g.rh) ? g.rh + "% humidity" : "") +
       statTile((isNum(g.pres) ? g.pres : "—") + "<small>hPa</small>", "Pressure", "") + "</div></div>");
+    if (!g.dome) {
+      var stad = String(g.stadium || "").split("·")[0].trim(), calm = !isNum(g.wind) || g.wind < 3;
+      h.push('<div class="sec"><div class="sec__h"><div><h3 class="sec__title">Wind at ' + esc(stad) + '</h3><p class="sec__sub">' +
+        (calm ? "Barely a breeze." : g.wind + " mph" + (g.windDir != null ? " from the " + D.compass(g.windDir) : "") + ".") +
+        " We don't have this stadium's orientation on file, so the wind is shown by compass direction rather than against the field.</p></div>" + D.btn3d("View in 3D") + "</div>" +
+        '<div class="card card--flat" style="padding:18px;display:flex;justify-content:center;overflow:hidden" data-3d-box><div data-flat style="display:flex;align-items:center;gap:18px">' +
+        D.compassWind(g.windDir, g.wind, 104) + '<div><div class="stat__v">' + (isNum(g.wind) ? g.wind : "—") + '<small>mph</small></div><div class="small dim">' +
+        (g.windDir != null && !calm ? "From the " + D.compass(g.windDir) : "Light and variable") + "</div></div></div></div></div>");
+    }
     h.push('<div class="sec"><div class="sec__h"><div><h3 class="sec__title">Hour by hour</h3><p class="sec__sub">Kickoff hour highlighted.</p></div></div>' +
       '<div class="card card--flat" style="padding:10px 14px">' + D.hourly(g.hourly || [], hourRows(true), { full: true }) + "</div></div>");
     if (g.metrics && g.metrics.length) {
@@ -84,5 +93,19 @@
     return h.join("");
   }
 
-  window.C = { card: card, row: row, detail: detail, teams: teams };
+  /* ------------------------------------------------------------ 3D view */
+  var v3 = null;
+  function afterDetail(root, g) {
+    var btn = root.querySelector("[data-3d]"), box = root.querySelector("[data-3d-box]");
+    if (!btn || !box) return;
+    var calm = !isNum(g.wind) || g.wind < 3, stad = String(g.stadium || "").split("·")[0].trim();
+    v3 = D.view3d({ btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "cfb", g: g },
+      chips: ['<span class="chip' + (calm ? "" : " chip--cyan") + '">' + D.wx("wind") + (calm ? "Light wind" : g.wind + " mph" + (g.windDir != null ? " from the " + D.compass(g.windDir) : "")) + "</span>",
+        '<span class="chip">' + (isNum(g.temp) ? g.temp + "°" : "") + " at kickoff</span>"],
+      cap: "Field drawn north–south with wind by compass: we don't have each stadium's orientation, so this isn't the real field angle.",
+      label: "3D view of " + stad + (calm ? " in light wind" : " with a " + g.wind + " mph wind from the " + D.compass(g.windDir)) });
+  }
+  function dispose() { if (v3) v3.close(); v3 = null; }
+
+  window.C = { card: card, row: row, detail: detail, teams: teams, afterDetail: afterDetail, dispose: dispose };
 })();

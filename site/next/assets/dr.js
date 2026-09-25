@@ -85,7 +85,8 @@
     lock: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="8" rx="2"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9"/></svg>',
     info: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5M10 6.2v.1" stroke-linecap="round"/></svg>',
     warn: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M10 3l8 14H2z"/><path d="M10 8.5v4M10 14.6v.1" stroke-linecap="round"/></svg>',
-    arrow: '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>'
+    arrow: '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>',
+    cube: '<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5l6.5 3.7v7.6L10 17.5l-6.5-3.7V6.2z"/><path d="M3.5 6.2L10 10l6.5-3.8M10 10v7.5"/></svg>'
   };
 
   /* weather + sport glyphs: drawn line icons that take the text color, so they
@@ -601,6 +602,61 @@
     return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getUTCDay()] + ", " +
       ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()] + " " + d.getUTCDate();
   }
+  /* ---------------------------------------------------------------- 3D venues
+     venue3d.js (and three.js) load only when someone asks for the 3D view. */
+  var v3dP = null;
+  function load3d() {
+    if (!v3dP) v3dP = new Promise(function (res, rej) {
+      if (window.Venue3D) { res(); return; }
+      var q = /\?[^#]*/.exec(me), sc = document.createElement("script");
+      sc.src = u("/assets/venue3d.js") + (q ? q[0] : ""); sc.async = true;
+      sc.onload = function () { if (window.Venue3D) res(); else rej(new Error("3D missing")); };
+      sc.onerror = function () { rej(new Error("3D failed to load")); };
+      document.head.appendChild(sc);
+    }).then(function () { return window.Venue3D.load(); }).catch(function (e) { v3dP = null; throw e; });
+    return v3dP;
+  }
+  var COARSE = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  /* view3d({ btn, box, flat, spec, chips, cap, label, onLabel, hideBox })
+     wires a "View in 3D" button: the first press builds the 3D stage inside
+     `box` (hiding `flat`), the second puts the flat view back. */
+  function view3d(o) {
+    var inst = null, stage = null, offHtml = o.btn.innerHTML;
+    o.btn.setAttribute("aria-pressed", "false");
+    function close() {
+      if (inst && window.Venue3D) window.Venue3D.dispose(inst);
+      inst = null;
+      if (stage && stage.parentNode) stage.parentNode.removeChild(stage);
+      stage = null;
+      if (o.flat) o.flat.hidden = false;
+      o.box.classList.remove("is-3d");
+      if (o.hideBox) o.box.hidden = true;
+      o.btn.innerHTML = offHtml; o.btn.setAttribute("aria-pressed", "false");
+    }
+    o.btn.addEventListener("click", function () {
+      if (stage) { close(); return; }
+      o.btn.disabled = true; o.btn.textContent = "Loading 3D…";
+      load3d().then(function () {
+        stage = document.createElement("div");
+        stage.className = "v3d-wrap";
+        stage.innerHTML = '<div class="v3d"><canvas role="img" aria-label="' + esc(o.label || "3D view") + '"></canvas>' +
+          (o.chips && o.chips.length ? '<div class="v3d__hud">' + o.chips.join("") + "</div>" : "") +
+          (COARSE ? "" : '<div class="v3d__hint">Drag to turn · Ctrl + scroll to zoom · double-click to reset</div>') + "</div>" +
+          '<p class="v3d__note">' + (COARSE ? "<b>Swipe sideways to turn, pinch to zoom.</b> " : "") + esc(o.cap || "") + "</p>";
+        if (o.hideBox) o.box.hidden = false;
+        o.box.classList.add("is-3d");
+        if (o.flat) o.flat.hidden = true;
+        o.box.appendChild(stage);
+        inst = window.Venue3D.mount(stage.querySelector("canvas"), o.spec);
+        o.btn.disabled = false;
+        if (!inst) { close(); o.btn.textContent = "3D isn't available on this device"; o.btn.disabled = true; return; }
+        o.btn.textContent = o.onLabel || "Back to diagram"; o.btn.setAttribute("aria-pressed", "true");
+      }).catch(function () { o.btn.disabled = false; o.btn.textContent = "3D didn't load — try again"; });
+    });
+    return { close: close };
+  }
+  function btn3d(label, attr) { return '<button class="btn btn--sm btn--ghost btn--3d" type="button" ' + (attr || "data-3d") + ">" + IC.cube + esc(label || "View in 3D") + "</button>"; }
+
   function todayET() { return window.RadarFresh ? window.RadarFresh.todayET() : new Date().toISOString().slice(0, 10); }
 
   window.DR = {
@@ -609,6 +665,6 @@
     get: get, IC: IC, wx: wx, emo: emo, sky: sky, SPORTS: SPORTS, sport: sport, shell: shell, gate: gate, lockbar: lockbar, fakeRows: fakeRows,
     fresh: fresh, banner: banner, sheet: { open: openSheet, close: closeSheet }, hashParam: hashParam, setHash: setHash,
     hourly: hourly, rainCls: rainCls, compass: compass, parkWind: parkWind, parkWindBig: parkWindBig, fieldWindBig: fieldWindBig, fieldWind: fieldWind, compassWind: compassWind,
-    impact: impact, tabs: tabs, longDate: longDate, todayET: todayET, etParts: etParts
+    impact: impact, tabs: tabs, longDate: longDate, todayET: todayET, etParts: etParts, view3d: view3d, btn3d: btn3d
   };
 })();

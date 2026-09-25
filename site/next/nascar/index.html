@@ -20,14 +20,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
-<link rel="stylesheet" href="../assets/dr.css?v=7d71cb8d">
+<link rel="stylesheet" href="../assets/dr.css?v=9f91068e">
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
 <script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
 <script src="/pro/gate.js" defer></script>
-<script src="../assets/dr.js?v=7d71cb8d" defer></script>
-<script src="../assets/feeds.js?v=7d71cb8d" defer></script>
-<script src="../assets/props.js?v=7d71cb8d" defer></script>
+<script src="../assets/dr.js?v=9f91068e" defer></script>
+<script src="../assets/feeds.js?v=9f91068e" defer></script>
+<script src="../assets/props.js?v=9f91068e" defer></script>
 </head>
 <body>
 <header id="dr-top" class="dr-top"></header>
@@ -102,8 +102,21 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("lede").textContent = d.brief || "";
     document.getElementById("meta-chips").innerHTML = '<span class="chip">' + esc(rc.track) + "</span>" + '<span class="chip">' + esc(rc.city) + "</span>" + (rc.playoff ? '<span class="chip chip--cyan">Playoff race</span>' : "");
     document.getElementById("race-sub").textContent = rc.track + " · " + rc.city;
+    var trackCard = '<div class="card card--flat" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px">' + trackSVG(rc.shape) + D.btn3d("View the track in 3D") + "</div>";
+    var wire3d = function () {
+      var hot = isNum(rc.temp) && rc.temp >= 88;
+      D.view3d({ btn: document.querySelector("#race [data-3d]"), box: document.getElementById("track3d"), hideBox: true, onLabel: "Hide the 3D track",
+        spec: { sport: "nascar", g: rc },
+        chips: rc.inWindow ? ['<span class="chip' + (hot ? " chip--warn" : "") + '">' + D.wx("temp") + rc.temp + "°" + (hot ? " · hot track" : " at the green flag") + "</span>",
+          '<span class="chip">' + D.wx("wind") + rc.wind + " mph, gusts " + rc.gust + "</span>"].concat(rc.rain >= 40 ? ['<span class="chip chip--warn">' + D.wx("drop") + rc.rain + "% rain</span>"] : []) :
+          ['<span class="chip">Race-day forecast not in range yet</span>'],
+        cap: "Drawn from the track's layout, length and banking (banking and track width exaggerated so they read). The forecast has no wind direction, so wind shows only in the flag.",
+        label: "3D view of " + rc.track });
+    };
     if (!rc.inWindow) {
-      document.getElementById("race").innerHTML = '<div class="note">' + D.IC.info + "<div>The race-day forecast arrives once it's inside our window — usually 3–5 days out.</div></div>";
+      document.getElementById("race").innerHTML = '<div class="note">' + D.IC.info + "<div>The race-day forecast arrives once it's inside our window — usually 3–5 days out.</div></div>" +
+        '<div class="mt16">' + trackCard + '</div><div class="card card--flat mt16" id="track3d" style="overflow:hidden" hidden></div>';
+      wire3d();
     } else {
       var dl = rc.delay && rc.delay.level !== "clear";
       var stat = function (v, l, s, c) { return '<div class="stat"><div class="stat__v ' + (c || "") + '">' + v + '</div><div class="stat__l">' + l + "</div>" + (s ? '<div class="stat__s">' + s + "</div>" : "") + "</div>"; };
@@ -112,7 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
         stat(rc.wind + "<small>mph</small>", "Wind", "Gusts to " + rc.gust + " mph") +
         stat(rc.rain + "<small>%</small>", "Rain chance", dl ? (rc.delay.level === "watch" ? "Rain watch" : "Delay risk") + " — up to " + rc.delay.pct + "% in the window" : "No delay concern", dl ? "warn" : "") +
         stat((isNum(rc.rh) ? rc.rh : "—") + "<small>%</small>", "Humidity", "") + "</div>" +
-        '<div class="card card--flat" style="display:flex;align-items:center;justify-content:center;padding:18px">' + trackSVG(rc.shape) + "</div></div>";
+        trackCard + '</div><div class="card card--flat mt16" id="track3d" style="overflow:hidden" hidden></div>';
+      wire3d();
       if (rc.hourly && rc.hourly.length) {
         document.getElementById("hours-sec").hidden = false;
         document.getElementById("hours").innerHTML = D.hourly(rc.hourly, [

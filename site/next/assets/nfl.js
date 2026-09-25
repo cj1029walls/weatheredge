@@ -153,8 +153,8 @@
     if (!g.dome) {
       var wtxt = !isNum(g.wind) || g.wind < 4 ? "Barely a breeze." : g.wind + " mph, " + FN.axis(g) + (g.windClass === "cross" ? " — crosswinds hurt kickers and deep throws the most." : g.windClass === "along" ? " — one team gets it at its back each quarter." : ".");
       var fx = g.windFx && isNum(g.windFx.pct10) ? " At " + esc(FN.venue(g)) + ", each extra 10 mph has moved scoring about " + D.signed(g.windFx.pct10, 0, "%") + " historically." : "";
-      h.push('<div class="sec"><div class="sec__h"><div><h3 class="sec__title">Wind at ' + esc(FN.venue(g)) + '</h3><p class="sec__sub">' + esc(wtxt) + fx + "</p></div></div>" +
-        '<div class="card card--flat" style="padding:18px;display:flex;justify-content:center">' + D.fieldWindBig(g.ax, g.wind, false) + "</div></div>");
+      h.push('<div class="sec"><div class="sec__h"><div><h3 class="sec__title">Wind at ' + esc(FN.venue(g)) + '</h3><p class="sec__sub">' + esc(wtxt) + fx + "</p></div>" + D.btn3d("View in 3D") + "</div>" +
+        '<div class="card card--flat" style="padding:18px;display:flex;justify-content:center;overflow:hidden" data-3d-box><div data-flat style="width:100%;display:flex;justify-content:center">' + D.fieldWindBig(g.ax, g.wind, false) + "</div></div></div>");
     }
     h.push('<div class="sec"><div class="sec__h"><div><h3 class="sec__title">Hour by hour</h3><p class="sec__sub">Kickoff hour highlighted.</p></div></div>' +
       '<div class="card card--flat" style="padding:10px 14px">' + D.hourly(g.hourly || [], hourRows(true), { full: true }) + "</div></div>");
@@ -223,5 +223,19 @@
       '<p class="small dim mt12">' + L.map(function (p) { return "<b>" + esc(p.player) + ":</b> " + esc(p.why); }).join("<br>") + "</p>";
   }
 
-  window.N = { card: card, detail: detail, gameProps: gameProps, leanRow: leanRow, bestLine: bestLine, leansFor: leansFor, proGame: proGame, cond: cond };
+  /* ------------------------------------------------------------ 3D view */
+  var v3 = null;
+  function afterDetail(root, g) {
+    var btn = root.querySelector("[data-3d]"), box = root.querySelector("[data-3d-box]");
+    if (!btn || !box) return;
+    var calm = !isNum(g.wind) || g.wind < 4;
+    v3 = D.view3d({ btn: btn, box: box, flat: box.querySelector("[data-flat]"), spec: { sport: "nfl", g: g },
+      chips: ['<span class="chip' + (calm ? "" : " chip--cyan") + '">' + D.wx("wind") + (calm ? "Light wind" : g.wind + " mph · " + esc(FN.axis(g))) + "</span>",
+        '<span class="chip">' + (isNum(g.temp) ? g.temp + "°" : "") + " at kickoff</span>"],
+      cap: "Wind drawn at its forecast angle to the field. The forecast gives the angle, not which end it blows toward.",
+      label: "3D view of " + FN.venue(g) + (calm ? " in light wind" : " with a " + g.wind + " mph wind " + FN.axis(g)) });
+  }
+  function dispose() { if (v3) v3.close(); v3 = null; }
+
+  window.N = { card: card, detail: detail, afterDetail: afterDetail, dispose: dispose, gameProps: gameProps, leanRow: leanRow, bestLine: bestLine, leansFor: leansFor, proGame: proGame, cond: cond };
 })();

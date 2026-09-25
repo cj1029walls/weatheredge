@@ -20,14 +20,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Sora:wght@600;700&display=swap">
-<link rel="stylesheet" href="../assets/dr.css?v=7d71cb8d">
+<link rel="stylesheet" href="../assets/dr.css?v=9f91068e">
 <script data-memberstack-app="app_cmos1ov2900kh0swuf8r49fo1" src="https://static.memberstack.com/scripts/v2/memberstack.js" type="text/javascript" async></script>
 <script async data-domain="dfsradar.com" src="https://plausible.io/js/script.js"></script>
 <script src="/assets/fresh.js" defer></script>
 <script src="/pro/gate.js" defer></script>
-<script src="../assets/dr.js?v=7d71cb8d" defer></script>
-<script src="../assets/feeds.js?v=7d71cb8d" defer></script>
-<script src="../assets/props.js?v=7d71cb8d" defer></script>
+<script src="../assets/dr.js?v=9f91068e" defer></script>
+<script src="../assets/feeds.js?v=9f91068e" defer></script>
+<script src="../assets/props.js?v=9f91068e" defer></script>
 </head>
 <body>
 <header id="dr-top" class="dr-top"></header>
@@ -44,6 +44,11 @@
   <section class="sec" id="watch-sec" hidden>
     <div class="sec__h"><div><h2 class="sec__title">Weather watch</h2><p class="sec__sub">The rounds where wind or rain changes the golf.</p></div></div>
     <div class="watch" id="watch"></div>
+  </section>
+
+  <section class="sec" id="hole-sec" hidden>
+    <div class="sec__h"><div><h2 class="sec__title" id="hole-t">The signature hole</h2><p class="sec__sub" id="hole-sub"></p></div><span id="hole-btn" data-3d-solo></span></div>
+    <div class="card card--flat" id="hole-box" style="overflow:hidden"><div class="v3d-launch" data-flat id="hole-launch"></div></div>
   </section>
 
   <section class="sec">
@@ -106,6 +111,30 @@ document.addEventListener("DOMContentLoaded", function () {
       "</article>";
   }
 
+  /* the signature hole, in 3D on request */
+  function hole(ev, rounds) {
+    var H = ev.hole, water = H.water && H.water !== "none" ? H.water : null;
+    var shape = [H.dl ? (H.dl < 0 ? "Doglegs left" : "Doglegs right") : "Plays straight",
+      water ? (water === "front" ? "water in front of the green" : "water down the " + water) : H.desert ? "desert waste areas" : "no water in play"];
+    document.getElementById("hole-sec").hidden = false;
+    document.getElementById("hole-t").textContent = "The signature hole: No. " + H.n;
+    document.getElementById("hole-sub").textContent = ev.course + " · par " + H.par + " · " + H.yds + " yards. " + shape.join(", ") + ".";
+    document.getElementById("hole-btn").innerHTML = D.btn3d("View in 3D");
+    var today = D.todayET(), rd = null;
+    rounds.forEach(function (r, i) { if (!rd && r.inWindow && (roundDate(i) || "") >= today) rd = r; });
+    if (!rd) rounds.forEach(function (r) { if (!rd && r.inWindow) rd = r; });
+    document.getElementById("hole-launch").innerHTML = '<div class="t">No. ' + H.n + " · Par " + H.par + " · " + H.yds + " yds</div>" +
+      '<div class="s">' + esc(shape.join(", ")) + ". Fly the hole in 3D, with the flag moving in " + (rd ? esc(rd.name.split(" · ")[0].toLowerCase()) + "'s forecast wind" : "a light breeze") + ".</div>" +
+      '<button class="btn btn--cyan btn--sm" type="button" data-launch style="gap:8px">' + D.IC.cube + "View the hole in 3D</button>";
+    var btn = document.querySelector("#hole-btn [data-3d]");
+    D.view3d({ btn: btn, box: document.getElementById("hole-box"), flat: document.getElementById("hole-launch"), onLabel: "Hide 3D",
+      spec: { sport: "pga", g: rd ? { wind: rd.wind, gust: rd.gust, rain: rd.rain } : { wind: 6 }, event: ev },
+      chips: rd ? ['<span class="chip chip--cyan">' + D.wx("wind") + esc(rd.name.split(" · ")[0]) + ": " + rd.wind + " mph, gusts " + rd.gust + "</span>"] : ['<span class="chip">Round forecasts not in range yet</span>'],
+      cap: "Drawn from the hole's par, length, dogleg and water: an illustration, not a survey. No wind direction in the forecast, so the flag shows speed only.",
+      label: "3D illustration of hole " + H.n + " at " + ev.course });
+    document.querySelector("#hole-launch [data-launch]").addEventListener("click", function () { btn.click(); });
+  }
+
   Promise.all([D.get(FP.url), D.get(FP.proUrl)]).then(function (r) {
     var d = r[0], pro = r[1];
     if (!d) { document.getElementById("lede").textContent = "This week's forecast couldn't be loaded — refresh in a minute."; return; }
@@ -123,6 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("lede").textContent = ev.team ? "Team match play this week, so there's no morning-versus-afternoon wave edge — but wind and rain still shape every match." : (d.brief || "");
       document.getElementById("meta-chips").innerHTML = '<span class="chip">' + esc(ev.city || "") + "</span>" + (ev.hole ? '<span class="chip">Signature hole: No. ' + ev.hole.n + " · par " + ev.hole.par + " · " + ev.hole.yds + " yds" + (ev.hole.water ? " · water " + esc(ev.hole.water) : "") + "</span>" : "");
       document.getElementById("rounds").innerHTML = (d.rounds || []).map(roundCard).join("") || '<div class="empty card" style="grid-column:1/-1"><p>No rounds in the forecast window yet.</p></div>';
+      if (ev.hole) hole(ev, d.rounds || []);
     }
     var w = FP.watch(d);
     document.getElementById("watch-sec").hidden = !w.length;
