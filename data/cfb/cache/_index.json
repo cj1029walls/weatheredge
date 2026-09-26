@@ -1,19 +1,77 @@
 {
  "_meta": {
-  "down": {
-   "at": "2026-09-26T02:07:56Z",
-   "reason": "CollegeFootballData refused the call (HTTP 429 \u2014 monthly call quota exhausted or rate-limited)",
-   "until": 1790410076
-  },
   "key": {
    "at": "2026-09-26T02:07:56Z",
    "level": 0,
    "remaining": 0
   },
   "remaining": {
-   "at": "2026-09-26T02:07:56Z",
-   "n": 0,
-   "t": 1790388476
+   "at": "2026-09-26T02:34:42Z",
+   "n": 4989,
+   "t": 1790390082
   }
+ },
+ "games__seasonType-regular__year-2026": {
+  "at": "2026-09-26T02:34:19Z",
+  "bytes": 354726,
+  "endpoint": "/games?seasonType=regular&year=2026",
+  "rows": 888,
+  "sha": "d2bfee8c1a07",
+  "t": 1790390059,
+  "ttl": 21600
+ },
+ "lines__seasonType-regular__year-2026": {
+  "at": "2026-09-26T02:34:21Z",
+  "bytes": 226508,
+  "endpoint": "/lines?seasonType=regular&year=2026",
+  "rows": 1086,
+  "sha": "7d5d153ff80b",
+  "t": 1790390061,
+  "ttl": 21600
+ },
+ "roster__year-2026": {
+  "at": "2026-09-26T02:34:30Z",
+  "bytes": 1262226,
+  "endpoint": "/roster?year=2026",
+  "rows": 11614,
+  "sha": "cc638a13734e",
+  "t": 1790390070,
+  "ttl": 604800
+ },
+ "stats_player_season__category-rushing__year-2025": {
+  "at": "2026-09-26T02:34:42Z",
+  "bytes": 925355,
+  "endpoint": "/stats/player/season?category=rushing&year=2025",
+  "rows": 6820,
+  "sha": "0b30afed2e79",
+  "t": 1790390082,
+  "ttl": null
+ },
+ "stats_season__year-2025": {
+  "at": "2026-09-26T02:34:32Z",
+  "bytes": 35755,
+  "endpoint": "/stats/season?year=2025",
+  "rows": 408,
+  "sha": "6fa6167ba64c",
+  "t": 1790390072,
+  "ttl": null
+ },
+ "teams_fbs__year-2026": {
+  "at": "2026-09-26T02:34:28Z",
+  "bytes": 161749,
+  "endpoint": "/teams/fbs?year=2026",
+  "rows": 138,
+  "sha": "5dc158325843",
+  "t": 1790390068,
+  "ttl": 1209600
+ },
+ "venues": {
+  "at": "2026-09-26T02:34:21Z",
+  "bytes": 148695,
+  "endpoint": "/venues",
+  "rows": 852,
+  "sha": "4cbbb1d04f26",
+  "t": 1790390061,
+  "ttl": 2592000
  }
 }
