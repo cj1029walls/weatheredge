@@ -59,13 +59,13 @@ def gv(d, *names):
     return None
 
 
-def get_json(url, tries=5):
+def get_json(url, tries=5, timeout=45):
     """Open-Meteo fetch with retries (CFBD goes through cfbd_cache, never here)."""
     hdrs = {"User-Agent": "dfsradar-build/1.0", "Accept": "application/json"}
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers=hdrs)
-            with urllib.request.urlopen(req, timeout=45) as r:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.loads(r.read())
         except Exception as e:
             if i == tries - 1:
@@ -195,6 +195,42 @@ def forecast(lat, lon):
         _FC[k] = get_json(FC_URL.format(lat=lat, lon=lon))
         time.sleep(0.8)
     return _FC[k]
+
+
+def prefetch_forecasts(points, size=40):
+    """Fetch many venues' forecasts per Open-Meteo request (it takes comma-
+    separated coordinates and answers with a list in the same order), so
+    forecast() then answers from memory. One request per venue meant ~110
+    TLS handshakes on a Saturday slate; when each stalls for the 45-second
+    timeout, as they did on Sept 25, 2026, the build cannot finish inside
+    the job's time limit. Any batch that fails is left to forecast()."""
+    todo, seen = [], set()
+    for lat, lon in points:
+        k = (round(lat, 3), round(lon, 3))
+        if k not in _FC and k not in seen:
+            seen.add(k)
+            todo.append((k, lat, lon))
+    got = 0
+    for i in range(0, len(todo), size):
+        chunk = todo[i:i + size]
+        url = FC_URL.format(lat=",".join(str(p[1]) for p in chunk),
+                            lon=",".join(str(p[2]) for p in chunk))
+        try:
+            res = get_json(url)
+        except Exception as e:
+            print(f"    forecast batch of {len(chunk)} failed ({e}) — fetching those one by one")
+            continue
+        res = res if isinstance(res, list) else [res]
+        if len(res) != len(chunk) or not all(
+                isinstance(r, dict) and "hourly" in r and int(r.get("location_id") or 0) == j
+                for j, r in enumerate(res)):
+            print(f"    forecast batch answered {len(res)} of {len(chunk)} venues — fetching those one by one")
+            continue
+        for (k, _, _), r in zip(chunk, res):
+            _FC[k] = r
+        got += len(chunk)
+        time.sleep(0.8)
+    print(f"  forecasts: {got} of {len(todo)} venues in {-(-len(todo) // size)} request(s)")
 
 
 def sky_of(cloud, pp, hour):
@@ -391,6 +427,14 @@ def main():
     upcoming, yr = ([], season_year(datetime.now(ET))) if args.offline else load_upcoming()
     sts = sorted({g["_season_type"] for g in upcoming}) or ["regular"]
     totals = {} if (args.offline or not upcoming) else fetch_totals(yr, sts)
+
+    pts = []
+    for g in upcoming:
+        vid = gv(g, "venueId", "venue_id")
+        meta = venue_meta(vid) if vid else None
+        if meta and gv(meta, "latitude") is not None:
+            pts.append((meta["latitude"], meta["longitude"]))
+    prefetch_forecasts(pts)
 
     games, skipped = [], 0
     for g in upcoming:
