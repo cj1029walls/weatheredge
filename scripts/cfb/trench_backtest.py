@@ -45,7 +45,7 @@ def gv(d, *names):
 
 def fetch(url, tries=4, timeout=90):
     hdrs = {"User-Agent": "dfsradar-build/1.0", "Accept": "application/json",
-            "Authorization": f"Bearer {os.environ.get('CFBD_API_KEY','')}"}
+            "Authorization": "Bearer " + "".join(os.environ.get("CFBD_API_KEY", "").split())}
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers=hdrs)

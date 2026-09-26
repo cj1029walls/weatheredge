@@ -287,6 +287,13 @@ def _et(ts):
 
 
 # ---------------------------------------------------------------- network
+def _api_key():
+    # A CFBD key is one run of base64 text. A key pasted into the GitHub secret
+    # with a line break or space around it makes every request fail before it
+    # is sent ("Invalid header value"), so drop any whitespace.
+    return re.sub(r"\s+", "", os.environ.get("CFBD_API_KEY", ""))
+
+
 def _note_remaining(v):
     try:
         n = int(v)
@@ -300,7 +307,7 @@ def _fetch(path, params):
     url = BASE + path + ("?" + urllib.parse.urlencode(params) if params else "")
     req = urllib.request.Request(url, headers={
         "User-Agent": "dfsradar-build/1.0", "Accept": "application/json",
-        "Authorization": f"Bearer {os.environ.get('CFBD_API_KEY', '')}"})
+        "Authorization": f"Bearer {_api_key()}"})
     for attempt in (1, 2):
         _STATS["calls"] += 1
         try:
@@ -332,7 +339,7 @@ def _key_info():
     try:
         req = urllib.request.Request(BASE + "/info", headers={
             "User-Agent": "dfsradar-build/1.0", "Accept": "application/json",
-            "Authorization": f"Bearer {os.environ.get('CFBD_API_KEY', '')}"})
+            "Authorization": f"Bearer {_api_key()}"})
         with urllib.request.urlopen(req, timeout=20) as r:
             d = json.loads(r.read())
         d = d if isinstance(d, dict) else {}
@@ -354,7 +361,7 @@ def _key_info():
 
 def _blocked():
     """Why the network must not be used right now, or None."""
-    if not os.environ.get("CFBD_API_KEY"):
+    if not _api_key():
         return "no CFBD_API_KEY configured"
     if _STATS["netfail"] >= 2:
         return "CollegeFootballData is not responding"

@@ -83,7 +83,7 @@ def gv(d, *names):
 def fetch(url, tries=4, timeout=60, auth=False, backoff_429=45):
     hdrs = {"User-Agent": "dfsradar-build/1.0", "Accept": "application/json"}
     if auth:
-        key = os.environ.get("CFBD_API_KEY")
+        key = "".join((os.environ.get("CFBD_API_KEY") or "").split())   # no stray line breaks
         if not key:
             raise SystemExit("CFBD_API_KEY not set")
         hdrs["Authorization"] = f"Bearer {key}"
