@@ -83,6 +83,7 @@ _REFUSED = []             # a refusal in this process: no more calls this run
 # A run someone starts by hand (Run workflow) tries CFBD even inside the down
 # window: they are usually checking whether the key works again.
 MANUAL = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
+_KEYINFO = []             # CFBD's own view of the key, asked once after a refusal
 _DEGRADED = []            # [{endpoint, reason, asOf}] for this process
 
 
@@ -321,6 +322,36 @@ def _fetch(path, params):
         time.sleep(5)
 
 
+def _key_info():
+    """What CFBD says about the key: its Patreon level (0 = the free plan) and
+    calls left, from GET /info (not a billed call). Asked only after a refusal,
+    so the log shows whether a Patreon upgrade has reached this key."""
+    if _KEYINFO:
+        return _KEYINFO[0]
+    now = _iso(time.time())
+    try:
+        req = urllib.request.Request(BASE + "/info", headers={
+            "User-Agent": "dfsradar-build/1.0", "Accept": "application/json",
+            "Authorization": f"Bearer {os.environ.get('CFBD_API_KEY', '')}"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            d = json.loads(r.read())
+        d = d if isinstance(d, dict) else {}
+        info = dict(level=d.get("patronLevel", d.get("patron_level")),
+                    remaining=d.get("remainingCalls", d.get("remaining_calls")), at=now)
+        plan = "free plan" if info["level"] == 0 else "Patreon tier"
+        print(f"  cfbd key: Patreon level {info['level']} ({plan}), "
+              f"{info['remaining']} calls left this month")
+    except urllib.error.HTTPError as e:
+        info = dict(error=f"HTTP {e.code}", at=now)
+        print(f"  cfbd key: /info answered HTTP {e.code}")
+    except Exception as e:
+        info = dict(error=type(e).__name__, at=now)
+        print(f"  cfbd key: /info failed ({type(e).__name__})")
+    _KEYINFO.append(info)
+    _index()["_meta"]["key"] = info
+    return info
+
+
 def _blocked():
     """Why the network must not be used right now, or None."""
     if not os.environ.get("CFBD_API_KEY"):
@@ -392,6 +423,7 @@ def _refresh(path, params, key, label, ttl, cached):
         data = _fetch(path, params)
     except _Refused as e:
         _REFUSED.append(str(e))
+        _key_info()
         _index()["_meta"]["down"] = dict(reason=str(e), at=_iso(time.time()),
                                          until=int(time.time() + DOWN_FOR))
         _save_index()
@@ -476,6 +508,10 @@ def report(tag="cfbd"):
     rem = _STATS.get("remaining", (_index()["_meta"].get("remaining") or {}).get("n"))
     line = (f"{tag}: {_STATS['calls']} CFBD call(s), {_STATS['hits']} cache hit(s), "
             f"{_STATS['stale']} served stale; X-CallLimit-Remaining={rem if rem is not None else '?'}")
+    if _KEYINFO:
+        k = _KEYINFO[0]
+        line += (f"; key on Patreon level {k['level']}" if "level" in k
+                 else f"; key check failed ({k['error']})")
     print(line)
     if _index()["_meta"]:
         _save_index()           # persist remaining-calls reading even on all-hit runs
