@@ -79,6 +79,10 @@ class _Refused(Exception):
 
 _IDX = None
 _STATS = {"calls": 0, "hits": 0, "stale": 0, "netfail": 0}
+_REFUSED = []             # a refusal in this process: no more calls this run
+# A run someone starts by hand (Run workflow) tries CFBD even inside the down
+# window: they are usually checking whether the key works again.
+MANUAL = os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
 _DEGRADED = []            # [{endpoint, reason, asOf}] for this process
 
 
@@ -323,10 +327,14 @@ def _blocked():
         return "no CFBD_API_KEY configured"
     if _STATS["netfail"] >= 2:
         return "CollegeFootballData is not responding"
+    if _REFUSED:
+        return _REFUSED[0]
     down = _index()["_meta"].get("down")
     if down and time.time() < down.get("until", 0):
-        print(f"  cfbd: marked down at {down.get('at')} — no calls before {_et(down['until'])}")
-        return down.get("reason") or "CollegeFootballData unavailable"
+        if not MANUAL:
+            print(f"  cfbd: marked down at {down.get('at')} — no calls before {_et(down['until'])}")
+            return down.get("reason") or "CollegeFootballData unavailable"
+        print(f"  cfbd: marked down at {down.get('at')}, but this run was started by hand — trying anyway")
     return None
 
 
@@ -383,6 +391,7 @@ def _refresh(path, params, key, label, ttl, cached):
     try:
         data = _fetch(path, params)
     except _Refused as e:
+        _REFUSED.append(str(e))
         _index()["_meta"]["down"] = dict(reason=str(e), at=_iso(time.time()),
                                          until=int(time.time() + DOWN_FOR))
         _save_index()
@@ -398,6 +407,7 @@ def _refresh(path, params, key, label, ttl, cached):
             and len(data) < len(cached) / 2):
         return (f"CollegeFootballData returned {len(data)} rows for {path} "
                 f"(cached copy has {len(cached)}) — kept the cached copy")
+    _index()["_meta"].pop("down", None)       # it answered: no longer down
     _store(key, path, params, data, ttl)
     print(f"  cfbd {label}: fetched" + (f" ({len(data)} rows)" if isinstance(data, list) else ""))
     return None
