@@ -6,18 +6,18 @@
    "remaining": 0
   },
   "remaining": {
-   "at": "2026-10-15T14:23:14Z",
-   "n": 4891,
-   "t": 1792074194
+   "at": "2026-10-16T14:12:33Z",
+   "n": 4889,
+   "t": 1792159953
   }
  },
  "games__seasonType-regular__year-2026": {
-  "at": "2026-10-15T14:23:13Z",
-  "bytes": 353855,
+  "at": "2026-10-16T14:12:32Z",
+  "bytes": 353840,
   "endpoint": "/games?seasonType=regular&year=2026",
   "rows": 888,
-  "sha": "9603e0671afa",
-  "t": 1792074193,
+  "sha": "66560578f6fd",
+  "t": 1792159952,
   "ttl": 21600
  },
  "games_teams__seasonType-regular__week-4__year-2026": {
@@ -48,12 +48,12 @@
   "ttl": 259200
  },
  "lines__seasonType-regular__year-2026": {
-  "at": "2026-10-15T14:23:14Z",
-  "bytes": 266662,
+  "at": "2026-10-16T14:12:34Z",
+  "bytes": 267058,
   "endpoint": "/lines?seasonType=regular&year=2026",
-  "rows": 1187,
-  "sha": "65a0414d37bc",
-  "t": 1792074194,
+  "rows": 1188,
+  "sha": "46d178056813",
+  "t": 1792159954,
   "ttl": 21600
  },
  "roster__year-2026": {
