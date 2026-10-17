@@ -6,9 +6,9 @@
    "remaining": 0
   },
   "remaining": {
-   "at": "2026-10-17T13:10:16Z",
-   "n": 4887,
-   "t": 1792242616
+   "at": "2026-10-17T17:15:57Z",
+   "n": 4886,
+   "t": 1792257357
   }
  },
  "games__seasonType-regular__year-2026": {
@@ -57,12 +57,12 @@
   "ttl": 21600
  },
  "roster__year-2026": {
-  "at": "2026-10-10T15:34:03Z",
-  "bytes": 1263678,
+  "at": "2026-10-17T17:15:57Z",
+  "bytes": 1263898,
   "endpoint": "/roster?year=2026",
-  "rows": 11627,
-  "sha": "ff8fac2c9a57",
-  "t": 1791646443,
+  "rows": 11629,
+  "sha": "3f13c77fb8f9",
+  "t": 1792257357,
   "ttl": 604800
  },
  "stats_player_season__category-rushing__year-2025": {
