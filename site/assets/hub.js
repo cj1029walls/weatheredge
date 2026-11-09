@@ -67,6 +67,8 @@
       r.idle = !w.race;
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 30 };
     }
+    var ss = sp.season || {};
+    if (!ss.on && ss.back && r.idle) { r.off = true; r.head = "Off-season"; r.sub = "Back " + ss.back + (ss.what ? " · " + ss.what : ""); }
     return r;
   }
 
@@ -116,7 +118,10 @@
     var r = s.rec;
     if (!r || !r.summary) return { v: "—", s: "No graded calls yet" };
     var x = r.summary;
-    if (k === "mlb") return { v: x.value && x.value.n ? D.signed(x.value.units, 2, "u") : "—", s: "HR value flags · " + (x.value ? x.value.w + " of " + x.value.n + " hit" : ""), cls: x.value && x.value.units >= 0 ? "good" : "bad" };
+    if (k === "mlb") {      // the nightly top HR pick, like every other sport's record; units ride along because HR props pay long odds
+      var t = x.top1 || {}, vf = x.value || {};
+      return { v: t.n ? t.w + "–" + (t.n - t.w) : "—", s: "Top HR pick each night" + (t.priced ? " · " + D.signed(t.units, 2, "u") + " at the books' prices" : "") + (vf.n ? " · value flags " + D.signed(vf.units, 2, "u") : "") };
+    }
     var o = x.overall || {};
     var lab = { nfl: "NFL leans", cfb: "CFB trench leans", pga: "Golf targets · top-20", nascar: "NASCAR targets · top-10" }[k];
     return { v: o.n ? o.w + "–" + (o.n - o.w) : "—", s: lab + (o.n ? " · " + D.pct(o.w / o.n * 100, 0) : "") };

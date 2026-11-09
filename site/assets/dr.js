@@ -155,6 +155,37 @@
   ];
   function sport(k) { for (var i = 0; i < SPORTS.length; i++) if (SPORTS[i].k === k) return SPORTS[i]; return null; }
 
+  /* Season calendar: [first event, last event, what comes back]. In-season
+     sports lead every list on the site; the rest follow, soonest back first.
+     A sport counts as in season from a week before its first event, which is
+     when its first forecast appears. Add next year's dates when the schedules
+     are announced (MLB 2027 is the announced Opening Day; fall golf is not out). */
+  var SEASON = {
+    mlb: [["2026-03-25", "2026-10-28"], ["2027-03-25", "2027-10-31", "Opening Day"]],
+    nfl: [["2026-09-09", "2027-02-14"], ["2027-09-09", "2028-02-13", "Kickoff"]],
+    cfb: [["2026-08-29", "2027-01-25"], ["2027-08-28", "2028-01-24", "Week 0"]],
+    pga: [["2026-01-01", "2026-11-22"], ["2027-01-21", "2027-08-29", "The American Express"]],
+    nascar: [["2026-02-15", "2026-11-08"], ["2027-02-21", "2027-11-14", "Daytona 500"]]
+  };
+  function season(k) {
+    var t = todayET(), w = SEASON[k] || [], i, a;
+    for (i = 0; i < w.length; i++) {
+      a = new Date(w[i][0] + "T12:00:00Z"); a.setUTCDate(a.getUTCDate() - 7);
+      if (t >= a.toISOString().slice(0, 10) && t <= w[i][1]) return { on: true };
+    }
+    for (i = 0; i < w.length; i++) if (w[i][0] > t) {
+      return { on: false, date: w[i][0], what: w[i][2] || "",
+        back: new Date(w[i][0] + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }) };
+    }
+    return { on: true };      // the table ran out: never hide a sport on a stale calendar
+  }
+  SPORTS.forEach(function (s, i) { s.i = i; s.season = season(s.k); });
+  SPORTS.sort(function (a, b) {
+    if (a.season.on !== b.season.on) return a.season.on ? -1 : 1;
+    if (a.season.on || a.season.date === b.season.date) return a.i - b.i;
+    return a.season.date < b.season.date ? -1 : 1;
+  });
+
   /* ---------------------------------------------------------------- shell */
   var NAV = [
     { k: "weather", label: "Weather", href: "/weather/" },
@@ -207,8 +238,11 @@
     var isW = o.section === "weather";
     var links = '<a href="' + u(isW ? "/weather/" : "/props/") + '"' + (!o.sport ? ' aria-current="page"' : "") + ">" + (isW ? "All sports" : "All sports") + "</a>" +
       '<span class="sep" aria-hidden="true"></span>' +
-      SPORTS.map(function (s) {
-        return '<a href="' + u(isW ? s.weather : s.props) + '"' + (o.sport === s.k ? ' aria-current="page"' : "") + ">" + s.name + "</a>";
+      SPORTS.map(function (s, i) {
+        var off = !s.season.on;
+        return (off && i && SPORTS[i - 1].season.on ? '<span class="sep" aria-hidden="true"></span>' : "") +
+          '<a href="' + u(isW ? s.weather : s.props) + '"' + (o.sport === s.k ? ' aria-current="page"' : "") +
+          (off ? ' style="opacity:.6" title="Off-season — back ' + s.season.back + '"' : "") + ">" + s.name + "</a>";
       }).join("");
     return '<div class="wrap dr-sub__in"><span class="lab">' + (isW ? "Weather" : "Props") + "</span>" + links + "</div>";
   }
@@ -719,7 +753,7 @@
   window.DR = {
     BASE: BASE, u: u, esc: esc, $: $, $$: $$, isNum: isNum, fixed: fixed, signed: signed, pct: pct, odds: odds, validOdds: validOdds,
     implied: implied, payout: payout, plural: plural, tone: tone, MINUS: MINUS,
-    get: get, IC: IC, wx: wx, emo: emo, sky: sky, SPORTS: SPORTS, sport: sport, shell: shell, gate: gate, lockbar: lockbar, fakeRows: fakeRows,
+    get: get, IC: IC, wx: wx, emo: emo, sky: sky, SPORTS: SPORTS, sport: sport, season: season, shell: shell, gate: gate, lockbar: lockbar, fakeRows: fakeRows,
     fresh: fresh, banner: banner, sheet: { open: openSheet, close: closeSheet }, hashParam: hashParam, setHash: setHash,
     hourly: hourly, rainCls: rainCls, compass: compass, parkWind: parkWind, parkWindBig: parkWindBig, fieldWindBig: fieldWindBig, fieldWind: fieldWind, compassWind: compassWind,
     impact: impact, tabs: tabs, longDate: longDate, todayET: todayET, etParts: etParts,

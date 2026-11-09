@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
   "use strict";
   var D = DR, esc = D.esc;
   D.shell({ section: "pro" });
-  var ORDER = ["mlb", "nfl", "cfb", "pga", "nascar"];
+  var ORDER = D.SPORTS.map(function (s) { return s.k; });      // in-season sports first
   var buy = document.getElementById("buy-box");
   D.gate.on(function (st) {
     var m = st === "member";

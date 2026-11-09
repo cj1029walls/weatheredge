@@ -155,7 +155,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   Promise.all([H.load(["rec"]), D.get("/accuracy.json")]).then(function (r) {
     var all = r[0];
-    document.getElementById("summary").innerHTML = ["mlb", "nfl", "cfb", "pga", "nascar"].map(function (k) {
+    D.SPORTS.forEach(function (s) { var el = document.getElementById(s.k), fr = document.getElementById("free"); if (el && fr) fr.parentNode.insertBefore(el, fr); });   // in-season sports first
+    document.getElementById("summary").innerHTML = D.SPORTS.map(function (s) { return s.k; }).map(function (k) {
       var x = H.recordLine(k, all[k]);
       return '<a class="card card--pad" href="#' + k + '" style="padding:18px"><div class="label" style="color:var(--cyan2)">' + D.sport(k).name + '</div><div class="rec-big ' + (x.cls || "") + '" style="font-size:30px;margin-top:10px">' + x.v + '</div><div class="small dim mt8">' + esc(x.s) + "</div></a>";
     }).join("");

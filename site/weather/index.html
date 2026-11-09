@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
     D.SPORTS.forEach(function (sp) {
       var st = H.status(sp.k, all[sp.k]);
       watch = watch.concat(st.watch);
-      cards.push('<a class="card card--pad" href="' + st.href + '" style="display:flex;flex-direction:column;gap:14px">' +
+      cards.push('<a class="card card--pad" href="' + st.href + '" style="display:flex;flex-direction:column;gap:14px' + (st.off ? ";opacity:.72" : "") + '">' +
         '<div class="row between"><span class="label" style="color:var(--cyan2)">' + sp.name + ' weather</span><span class="fresh-slot" data-fresh="' + sp.k + '"></span></div>' +
         '<div><div style="font:700 21px/1.25 var(--display)">' + esc(st.head) + '</div><div class="small dim mt8">' + esc(st.sub) + "</div></div>" +
         (st.watch.length ? '<div class="stack">' + st.watch.slice(0, 3).map(function (x) { return '<div class="row small" style="gap:10px;align-items:flex-start"><span aria-hidden="true">' + x.icon + '</span><span><b>' + esc(x.title) + '</b> <span class="dim">· ' + esc(x.game || "") + "</span></span></div>"; }).join("") + "</div>"

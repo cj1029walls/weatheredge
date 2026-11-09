@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
   "use strict";
   var D = DR, F2 = F, esc = D.esc, isNum = D.isNum;
   D.shell({ section: "props" });
-  var ORDER = ["mlb", "nfl", "cfb", "pga", "nascar"];
+  var ORDER = D.SPORTS.map(function (s) { return s.k; });      // in-season sports first
   var BLURB = {
     mlb: "Home run and strikeout props for every game, game environments, umpires and nightly intel.",
     nfl: "Weather leans on passing, rushing, receiving and kicking — with every player's wind and cold splits.",
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pga: "Top-20 targets from course history, play in the wind and current form.",
     nascar: "Top-10 targets from track history, track-type form and heat."
   };
-  function counts(k, s) {
+  function counts0(k, s) {
     var p = s.pro;
     if (!p) return "Board not posted yet";
     if (k === "mlb") {
@@ -104,6 +104,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (k === "pga") return p.seasonComplete ? "Season complete" : D.plural((p.leans || []).length, "target") + (p.event ? " · " + p.event.name : "");
     if (k === "nascar") return p.seasonComplete ? "Season complete" : D.plural((p.leans || []).length, "target") + (p.race ? " · " + p.race.name : "");
     return "";
+  }
+  function counts(k, s) {
+    var c = counts0(k, s), ss = D.sport(k).season || {};
+    return !ss.on && ss.back && (c === "No games today" || c === "Season complete") ? "Off-season · back " + ss.back : c;
   }
   H.load(["pro", "rec"]).then(function (all) {
     var gate = function (st) {

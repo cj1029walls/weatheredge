@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
   "use strict";
   var D = DR, esc = D.esc;
   D.shell({ section: "home" });
-  var ORDER = ["mlb", "nfl", "cfb", "pga", "nascar"];
+  var ORDER = D.SPORTS.map(function (s) { return s.k; });      // in-season sports first
   var AUTO = D.auto3d();
   if (AUTO) D.load3d().catch(function () {});            // fetch the 3D engine alongside the feeds
 
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var watch = [];
     document.getElementById("now").innerHTML = ORDER.map(function (k) {
       var st = H.status(k, all[k]); watch = watch.concat(st.watch);
-      return '<a class="card card--pad" href="' + st.href + '" style="display:flex;flex-direction:column;gap:8px;padding:18px"><span class="label" style="color:var(--cyan2)">' + D.sport(k).name + "</span>" +
+      return '<a class="card card--pad" href="' + st.href + '" style="display:flex;flex-direction:column;gap:8px;padding:18px' + (st.off ? ";opacity:.72" : "") + '"><span class="label" style="color:var(--cyan2)">' + D.sport(k).name + "</span>" +
         '<span style="font:700 16.5px/1.3 var(--display)">' + esc(st.head) + '</span><span class="small dim">' + esc(st.sub) + "</span>" +
         (function () {
           var a = st.fresh && window.RadarFresh ? RadarFresh.assess(st.fresh) : null;
