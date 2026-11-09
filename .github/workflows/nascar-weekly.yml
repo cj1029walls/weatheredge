@@ -2,8 +2,11 @@ name: NASCAR weekly build
 
 on:
   workflow_dispatch:
+  # Started by the Clock workflow (scripts/ci/clock.py) at 6:19 AM Eastern
+  # every day. The schedule below is only a fallback for a stopped clock
+  # (GitHub delivers it 5-10 hours late).
   schedule:
-    - cron: "19 10 * * *"   # daily ~6:19 AM ET — race-day forecasts sharpen
+    - cron: "19 10 * * *"
 
 permissions:
   contents: write

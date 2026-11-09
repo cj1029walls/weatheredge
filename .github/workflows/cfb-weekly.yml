@@ -2,10 +2,12 @@ name: CFB weekly slate build
 
 on:
   workflow_dispatch:
+  # Started by the Clock workflow (scripts/ci/clock.py): 5:37 AM Eastern every
+  # day, plus Saturday refreshes at 10:22 AM (before the noon kicks) and
+  # 2:22 PM (before the 3:30 window). GitHub delivers `schedule:` triggers
+  # here 5-10 hours late, so the one below is only a fallback for a stopped clock.
   schedule:
-    - cron: "37 9 * * *"    # daily ~5:37 AM ET — forecasts sharpen as kickoff nears
-    - cron: "22 14 * * 6"   # Saturdays ~10:22 AM ET — final pre-kick refresh (GitHub
-                            # cron has landed after the noon kicks; use the dispatcher)
+    - cron: "37 9 * * *"
 
 permissions:
   contents: write

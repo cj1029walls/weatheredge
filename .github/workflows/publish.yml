@@ -64,13 +64,19 @@ jobs:
     steps:
       - name: Wait for any daily build to finish
         # Up to 50 min (a daily run is capped at 45). If the check itself
-        # fails, publish anyway rather than hold the update back.
+        # fails, publish anyway rather than hold the update back. Only a run
+        # that is actually moving counts: on Oct 6, 2026 a daily run's deploy
+        # job hung in "waiting" for 30 days, and every publish in that month
+        # sat out the full 50 minutes behind it. A run that is waiting,
+        # pending behind another, or silent for 45+ minutes is not one to
+        # wait for (the Clock workflow cancels it).
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           for i in $(seq 1 150); do
             if ! n=$(gh run list -R "$GITHUB_REPOSITORY" --workflow daily.yml --limit 10 \
-                       --json status --jq '[.[] | select(.status != "completed")] | length'); then
+                       --json status,updatedAt \
+                       --jq '[.[] | select(.status == "in_progress" or .status == "queued") | select((now - (.updatedAt | fromdateiso8601)) < 2700)] | length'); then
               echo "::warning title=Could not check for a daily build::publishing now"
               exit 0
             fi

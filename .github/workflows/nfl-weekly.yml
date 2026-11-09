@@ -2,11 +2,12 @@ name: NFL weekly slate build
 
 on:
   workflow_dispatch:
+  # Started by the Clock workflow (scripts/ci/clock.py): 5:23 AM Eastern every
+  # day, plus a refresh before each kickoff window (Thu 6:07 PM, Sun 11:07 AM
+  # and 3:07 PM, Mon 6:07 PM). GitHub delivers `schedule:` triggers here 5-10
+  # hours late, so the one below is only a fallback for a stopped clock.
   schedule:
-    - cron: "23 9 * * *"    # daily ~5:23 AM ET — forecasts sharpen as kickoff nears
-    - cron: "7 15 * * 0"    # Sundays ~11:07 AM ET — final pre-kick refresh (GitHub
-                            # cron has landed after the 1 PM kicks; the external
-                            # dispatcher is the reliable clock for this one)
+    - cron: "23 9 * * *"
 
 permissions:
   contents: write

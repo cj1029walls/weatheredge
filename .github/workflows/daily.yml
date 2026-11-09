@@ -2,14 +2,12 @@ name: Daily slate build & deploy
 
 on:
   workflow_dispatch:
+  # Started by the Clock workflow (scripts/ci/clock.py) at 6:08 AM, 10:37 AM,
+  # 12:07 PM and 4:52 PM Eastern. GitHub delivers `schedule:` triggers here
+  # 5-10 hours late, so the one below is only a fallback: if the clock ever
+  # stops, the slate still builds once a day.
   schedule:
-    # Off the top/half hour: GitHub delays schedules there the most (these ran
-    # 2-4.5 h late). ET below is EDT; subtract an hour after DST ends. For
-    # reliable times use the external dispatcher (see the review notes).
-    - cron: "8 10 * * *"    # ~6:08 AM ET — morning slate build
-    - cron: "37 14 * * *"   # ~10:37 AM ET — first card with posted prop lines
-    - cron: "7 16 * * *"    # ~12:07 PM ET — refresh before day games
-    - cron: "52 20 * * *"   # ~4:52 PM ET — refresh before night games (odds-props lands ~4:23)
+    - cron: "8 10 * * *"
 
 permissions:
   contents: write
@@ -53,7 +51,10 @@ jobs:
         continue-on-error: true
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-          PROPS_REUSE_MIN: "75"    # odds-props.yml ran <75 min ago: reuse, 0 credits
+          # odds-props.yml ran <75 min ago: reuse its lines, 0 credits. The
+          # fallback schedule run (see `on:`) lands at no particular time, so it
+          # reuses anything from the last 6 hours rather than buying again.
+          PROPS_REUSE_MIN: ${{ github.event_name == 'schedule' && '360' || '75' }}
         run: python scripts/odds/props_build.py
       - name: Mark props feed stale
         if: steps.props.outcome == 'failure'

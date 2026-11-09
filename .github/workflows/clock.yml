@@ -1,0 +1,41 @@
+name: Clock
+# Starts every build when it is due (Eastern time), cancels a run that is
+# stuck holding the queue, and checks the live feeds' timestamps. The logic
+# and the schedule table live in scripts/ci/clock.py -- read its header.
+#
+# GitHub delivers `schedule:` triggers for this repository hours late, so the
+# builds no longer hang on any one of them: whenever a tick does arrive, the
+# script starts whatever has come due since. For to-the-minute timing, have an
+# outside scheduler (cron-job.org or similar) call this workflow every 10-15
+# minutes:
+#   POST https://api.github.com/repos/cj1029walls/weatheredge/actions/workflows/clock.yml/dispatches
+#   headers  Authorization: Bearer <fine-grained token: this repo, Actions read+write>
+#            Accept: application/vnd.github+json
+#   body     {"ref":"main"}
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "12,42 * * * *"
+
+permissions:
+  actions: write      # start the build workflows, cancel a stuck run
+  contents: read
+
+# One tick at a time: a tick that arrives while another is running waits for
+# it (and is replaced if a newer one arrives meanwhile).
+concurrency:
+  group: clock
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ci
+      - name: Start what is due, unblock the queue, check the live feeds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/clock.py

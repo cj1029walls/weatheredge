@@ -2,8 +2,11 @@ name: PGA weekly build
 
 on:
   workflow_dispatch:
+  # Started by the Clock workflow (scripts/ci/clock.py) at 5:52 AM Eastern
+  # every day. The schedule below is only a fallback for a stopped clock
+  # (GitHub delivers it 5-10 hours late).
   schedule:
-    - cron: "52 9 * * *"    # daily ~5:52 AM ET — tee-time wave forecasts sharpen
+    - cron: "52 9 * * *"
 
 permissions:
   contents: write
