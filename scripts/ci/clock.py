@@ -32,6 +32,11 @@ clock ever stops, they still run once a day, late.
 
     python scripts/ci/clock.py             # act
     python scripts/ci/clock.py --dry-run   # print what it would do
+    START=pga-weekly.yml python scripts/ci/clock.py   # also start that build now
+
+A build started here asks for its own publish when it finishes (the "Ask for
+a publish" step in each sport workflow): GitHub raises no workflow_run event
+for a run that github-actions[bot] started, so publish.yml would not hear of it.
 
 Needs `gh` (preinstalled on runners) and GH_TOKEN with actions:write.
 No third-party dependencies.
@@ -325,6 +330,12 @@ def main():
     started = [wf for wf, when, late in todo if dispatch(wf, when, late)]
     if not todo:
         print("  nothing to start")
+    asked = os.environ.get("START", "").strip()
+    if asked in SLOTS and asked not in started:
+        if dispatch(asked, "on request", 0):
+            started.append(asked)
+    elif asked and asked not in SLOTS:
+        note("warning", "clock", f"START={asked!r} is not a build this clock runs ({', '.join(SLOTS)})")
 
     print("results:")
     try:
