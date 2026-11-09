@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function render() {
     var pro = S.pro, m = S.member, picks = FN.picks(pro);
     document.getElementById("ct-t").textContent = picks.length;
-    P.board(document.getElementById("b-t"), { cols: T_COLS, rows: picks, key: function (p) { return p.player + p.k; }, member: m, free: 1, lock: { what: "target" }, emptyTitle: "No targets this week" });
+    P.board(document.getElementById("b-t"), { cols: T_COLS, rows: picks, key: function (p) { return p.player + p.k; }, member: m, free: 1, lock: { what: "target" }, emptyTitle: pro.seasonComplete ? "Season complete" : "No targets this week" });
     var hb = (pro.board || []).slice();
     document.getElementById("ct-h").textContent = hb.length;
     P.board(document.getElementById("b-h"), { cols: H_COLS, rows: hb, key: function (r) { return r.driver; }, member: m, free: 0, sort: { k: "avgFin", dir: "desc" }, lock: { what: "driver", title: "Track history for " + D.plural(hb.length, "driver") + " — unlock with PRO" } });
@@ -138,11 +138,12 @@ document.addEventListener("DOMContentLoaded", function () {
     S.pro = r[0] || {}; S.rec = r[1];
     renderRecord();
     var pro = S.pro;
-    document.getElementById("ev").textContent = pro.race ? pro.race.name : "This week";
+    document.getElementById("ev").textContent = pro.race ? pro.race.name : pro.seasonComplete ? "Off-season" : "This week";
     D.fresh(document.getElementById("fresh"), { built: pro.updated, stale: pro.stale, status: pro.status, maxAgeH: 40 });
     if (pro.note) { var n = document.getElementById("note"); n.hidden = false; n.className = "note mt24"; n.innerHTML = D.IC.info + "<div>" + esc(pro.note) + "</div>"; }
     document.getElementById("meta-chips").innerHTML = pro.race ? '<span class="chip">' + esc(pro.race.track) + "</span>" + (pro.race.playoff ? '<span class="chip chip--cyan">Playoff race</span>' : "") +
       (pro.delay && pro.delay.level && pro.delay.level !== "clear" ? '<span class="chip chip--warn">Rain watch · ' + pro.delay.pct + "%</span>" : "") : "";
+    document.getElementById("boards").hidden = !!pro.seasonComplete;
     D.tabs(document.getElementById("tabs"), null, "nascar-props-tab");
     D.gate.on(function (st) { S.member = st === "member"; render(); });
   });

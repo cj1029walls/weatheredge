@@ -210,16 +210,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     /* non-members: the free #1 is the top of the full board, not of a filter */
     if (!m) list = rows.slice(0, 1).concat(rows.slice(1).filter(function (r) { return D.validOdds(r.price); }));
-    document.getElementById("hr-tools").style.display = m ? "" : "none";
+    /* no games (an off day, or the off-season): say that, not "no hitters match these filters" */
+    var dark = !pd.games.length, why = dark ? esc(pd.brief || "No MLB games today.") : "";
+    document.getElementById("hr-tools").style.display = m && !dark ? "" : "none";
     P.board(document.getElementById("b-hr"), { cols: HR_COLS, rows: list, key: function (r) { return r.player + "|" + r.gamePk; }, expand: hrExpand,
       member: m, free: 1, limit: 40, sort: { k: "prob", dir: "desc" }, lock: { what: "more home run prop" },
-      empty: "No hitters match these filters.", foot: list.length + " hitters · sorted by our chance" });
+      emptyTitle: dark ? "No games today" : null, empty: dark ? why : "No hitters match these filters.", foot: list.length + " hitters · sorted by our chance" });
     var ks = (pd.kprops || []).slice();
     P.board(document.getElementById("b-k"), { cols: K_COLS, rows: ks, key: function (k) { return k.pitcher; }, member: m, free: 0,
-      sort: { k: "diff", dir: "desc" }, lock: { what: "strikeout line", title: D.plural(ks.length, "strikeout projection") + " — unlock with PRO" }, emptyTitle: "No strikeout lines yet" });
+      sort: { k: "diff", dir: "desc" }, lock: { what: "strikeout line", title: D.plural(ks.length, "strikeout projection") + " — unlock with PRO" },
+      emptyTitle: dark ? "No games today" : "No strikeout lines yet", empty: why });
     var env = pd.games.slice().sort(function (a, b) { return (b.expHr || 0) - (a.expHr || 0); });
     P.board(document.getElementById("b-env"), { cols: ENV_COLS, rows: env, key: function (g) { return String(g.gamePk); }, member: m, free: 0,
-      sort: { k: "expHr", dir: "desc" }, lock: { what: "game", title: D.plural(env.length, "game environment") + " — unlock with PRO" } });
+      sort: { k: "expHr", dir: "desc" }, lock: { what: "game", title: D.plural(env.length, "game environment") + " — unlock with PRO" },
+      emptyTitle: dark ? "No games today" : null, empty: why });
     renderUmps();
     renderIntel();
     document.getElementById("ct-hr").textContent = rows.filter(function (r) { return D.validOdds(r.price); }).length;
@@ -332,7 +336,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (f && f.level === "warn") { var st = document.getElementById("stale"); st.hidden = false; D.banner(st, f.text + ".", f.why); }
     var rows = hrRows(pd);
     var priced = rows.filter(function (x) { return D.validOdds(x.price); }).length;
-    document.getElementById("meta-chips").innerHTML = '<span class="chip">' + priced + " HR props priced</span>" +
+    document.getElementById("meta-chips").innerHTML = !pd.games.length ? '<span class="chip">No games today</span>' :
+      '<span class="chip">' + priced + " HR props priced</span>" +
       '<span class="chip">' + (pd.kprops || []).filter(function (k) { return isNum(k.line); }).length + " strikeout lines</span>" +
       '<span class="chip">' + D.plural(pd.games.length, "game") + "</span>";
     fillGames();

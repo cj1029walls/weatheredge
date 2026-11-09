@@ -1166,7 +1166,7 @@ function buildPGA(T, K, st, spec, env) {
   const cx = (x0 + x1) / 2, cz = -(y0 + y1) / 2, ext = Math.max(x1 - x0, y1 - y0) / 2;
   return {
     center: K.V3(cx, 0, cz), S: ext + 160,
-    grp, cam: { target: K.V3(cx, 0, cz), el: 0.66, theta: 0.2, wide: Math.PI / 2, sway: 0.22 },
+    grp, cam: { target: K.V3(cx, 0, cz), el: 0.66, theta: 0.2, wide: Math.PI / 2, sway: 0.22, crop: 1 },   // crop 1: a hole's tee and green are its two ends — never trimmed
     box: null, dir: null, anims: anims.concat([(dt, t) => flag.update(t)])
   };
 }
@@ -1225,7 +1225,9 @@ function mount(canvas, spec) {
     v.cam.theta = best;
   }
   const W = canvas.clientWidth || 800, H = canvas.clientHeight || 400;
-  if (v.cam.wide != null && W / H > 1.5) v.cam.theta = v.cam.wide;
+  /* a long venue (a golf hole) is shown side-on in any landscape box: looked
+     at down its length it is a thin strip that only a tall box can hold */
+  if (v.cam.wide != null && W / H > 1.22) v.cam.theta = v.cam.wide;
   const cam = new T.PerspectiveCamera(34, W / H, 2, env.S * 9);
   /* frame the venue from its own geometry: the closest camera distance that
      keeps every part of it in view across the whole sway, for this box's shape */
@@ -1257,8 +1259,15 @@ function mount(canvas, spec) {
     for (let k = -2; k <= 2; k++) d = Math.max(d, need(v.cam.theta + sway * k / 2, el, aspect));
     return { d: d * (aspect < 1.35 ? (v.cam.crop || 0.88) : 1), el };
   }
+  /* the haze is set from where the camera ends up, not from the venue's size
+     alone: a long hole in a narrow box sits far from the lens, and under a
+     fixed fog range more than half of it faded into the card behind it */
+  function hazeFor(d) {
+    const k = Math.max(1, d / (env.S * 2.3));
+    st.scene.fog.near = env.S * (env.fog ? 1.1 : 1.7) * k; st.scene.fog.far = env.S * (env.fog ? 3.2 : 4.6) * k;
+  }
   const f0 = fitTo(W / H);
-  v.cam.el = f0.el; v.cam.dist = f0.d;
+  v.cam.el = f0.el; v.cam.dist = f0.d; hazeFor(f0.d);
   const ctl = orbit(canvas, cam, v.cam);
   ctl.place();
   const still = RM.matches;
@@ -1270,7 +1279,7 @@ function mount(canvas, spec) {
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
-    st.renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); ctl.rebase(fitTo(w / h).d); dirty = true;
+    st.renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); const nd = fitTo(w / h).d; ctl.rebase(nd); hazeFor(nd); dirty = true;
   }
   if ("ResizeObserver" in window) { inst.ro = new ResizeObserver(resize); inst.ro.observe(canvas); }
   const clock = new T.Clock();

@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
         '<div class="row between"><span class="label" style="color:var(--cyan2)">' + sp.name + ' weather</span><span class="fresh-slot" data-fresh="' + sp.k + '"></span></div>' +
         '<div><div style="font:700 21px/1.25 var(--display)">' + esc(st.head) + '</div><div class="small dim mt8">' + esc(st.sub) + "</div></div>" +
         (st.watch.length ? '<div class="stack">' + st.watch.slice(0, 3).map(function (x) { return '<div class="row small" style="gap:10px;align-items:flex-start"><span aria-hidden="true">' + x.icon + '</span><span><b>' + esc(x.title) + '</b> <span class="dim">· ' + esc(x.game || "") + "</span></span></div>"; }).join("") + "</div>"
-          : '<div class="small muted">Nothing on the watch list — the weather shouldn\'t be a factor.</div>') +
+          : (st.idle ? "" : '<div class="small muted">Nothing on the watch list — the weather shouldn\'t be a factor.</div>')) +
         '<div class="row between" style="margin-top:auto"><span class="small dim">' + (st.watch.length ? D.plural(st.watch.length, "item") + " on watch" : "") + '</span><span class="cyan small" style="font-weight:600">Open ' + sp.name + " weather →</span></div></a>");
       st._fresh = st.fresh; all[sp.k]._st = st;
     });

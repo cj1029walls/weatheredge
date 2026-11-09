@@ -96,12 +96,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!p) return "Board not posted yet";
     if (k === "mlb") {
       var n = 0; (p.games || []).forEach(function (g) { Object.keys(g.lineup || {}).forEach(function (t) { (g.lineup[t] || []).forEach(function (b) { if (D.validOdds(b.price)) n++; }); }); });
+      if (!(p.games || []).length) return "No games today";
       return n + " HR props priced · " + (p.kprops || []).filter(function (x) { return isNum(x.line); }).length + " strikeout lines";
     }
     if (k === "nfl") { var L = F2.nfl.picks(p); return D.plural(L.length, "lean") + " · " + L.filter(function (x) { return x.priced; }).length + " priced" + (p.week ? " · week " + p.week : ""); }
     if (k === "cfb") return p.paused ? "Paused — data source down" : D.plural((p.leans || []).length, "rushing lean");
-    if (k === "pga") return D.plural((p.leans || []).length, "target") + (p.event ? " · " + p.event.name : "");
-    if (k === "nascar") return D.plural((p.leans || []).length, "target") + (p.race ? " · " + p.race.name : "");
+    if (k === "pga") return p.seasonComplete ? "Season complete" : D.plural((p.leans || []).length, "target") + (p.event ? " · " + p.event.name : "");
+    if (k === "nascar") return p.seasonComplete ? "Season complete" : D.plural((p.leans || []).length, "target") + (p.race ? " · " + p.race.name : "");
     return "";
   }
   H.load(["pro", "rec"]).then(function (all) {

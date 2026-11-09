@@ -1,6 +1,7 @@
 /* DFSRADAR · cross-sport summaries for Home, the Weather hub and the Props hub.
  *   H.load(parts)          -> Promise<{mlb:{…}, nfl:{…}, …}>  parts: "wx","pro","rec"
- *   H.status(k, s)         -> {k, name, head, sub, watch:[…], fresh:{…}, href}
+ *   H.status(k, s)         -> {k, name, head, sub, watch:[…], fresh:{…}, href, idle}
+ *                             idle: nothing to forecast right now (off day, between weeks, off-season)
  *   H.pickCard(k, s, opt)  -> the sport's free #1 as a card (or a note why there isn't one)
  *   H.recordLine(k, s)     -> one-line record summary
  */
@@ -40,24 +41,30 @@
       r.head = n ? D.plural(n, "game") + " · " + D.longDate(w.date).replace(/^(\w+),.*/, "$1") : "No games today";
       var first = (w.games || []).slice().sort(function (a, b) { return a.sortTime - b.sortTime; })[0];
       r.sub = n ? "First pitch " + first.time + " · " + roofs(w.games.filter(function (g) { return g.dome; }).length) : (w.note || "Back tomorrow.");
+      r.idle = !n;
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 9, forDate: w.date };
     } else if (k === "nfl") {
       var g = w.games || [];
       r.head = g.length ? "Week " + (g[0].week || "") + " · " + D.plural(g.length, "game") : "Between weeks";
-      r.sub = g.length ? roofs(g.filter(function (x) { return x.dome; }).length) + " · kickoffs " + g[0].day.split(" ")[0] + "–" + g[g.length - 1].day.split(" ")[0] : "Next slate appears as its forecasts come into range.";
+      var d0 = g.length ? g[0].day.split(" ")[0] : "", d1 = g.length ? g[g.length - 1].day.split(" ")[0] : "";
+      r.sub = g.length ? roofs(g.filter(function (x) { return x.dome; }).length) + (d0 === d1 ? " · kickoff " + d0 + " " + (g[0].time || "") : " · kickoffs " + d0 + "–" + d1) : "Next slate appears as its forecasts come into range.";
+      r.idle = !g.length;
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 30 };
     } else if (k === "cfb") {
       var c = w.games || [];
       r.head = c.length ? "Week " + (c[0].week || "") + " · " + D.plural(c.length, "game") : "Between weeks";
       r.sub = (w.counts && (w.counts.severe || w.counts.elevated) ? (w.counts.severe || 0) + " severe · " + (w.counts.elevated || 0) + " elevated" : "Inside the forecast window");
+      r.idle = !c.length;
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 30 };
     } else if (k === "pga") {
       r.head = w.event ? w.event.name : "No event this week";
       r.sub = w.event ? w.event.course + " · " + (w.event.dates || "") : (w.brief || "");
+      r.idle = !w.event;
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 30 };
     } else if (k === "nascar") {
       r.head = w.race ? w.race.name : "No race this week";
       r.sub = w.race ? w.race.track + " · " + w.race.day.split(",")[0] + " " + w.race.time : (w.brief || "");
+      r.idle = !w.race;
       r.fresh = { built: w.generated, stale: w.stale, status: w.status, maxAgeH: 30 };
     }
     return r;

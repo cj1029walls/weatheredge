@@ -91,6 +91,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var d = r[0], pro = r[1];
     if (!d || !d.race) {
       document.getElementById("lede").textContent = (d && d.brief) || "No race on the schedule this week.";
+      var off = !!(d && d.seasonComplete);
+      if (off) { document.getElementById("when").textContent = "Off-season"; document.getElementById("h1").textContent = "The Cup season is complete"; }
+      document.getElementById("race-sec").hidden = off;
       document.getElementById("race").innerHTML = '<div class="empty card"><h3>No race this week</h3></div>';
       return;
     }

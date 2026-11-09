@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
         (function () {
           var a = st.fresh && window.RadarFresh ? RadarFresh.assess(st.fresh) : null;
           if (a && a.level === "warn") return '<span class="small" style="margin-top:auto;color:var(--warn2)">' + esc(a.text) + "</span>";
-          return '<span class="small" style="margin-top:auto;color:' + (st.watch.length ? "var(--warn2)" : "var(--dim)") + '">' + (st.watch.length ? D.plural(st.watch.length, "weather watch", "weather watches") : "No weather concerns") + "</span>";
+          return '<span class="small" style="margin-top:auto;color:' + (st.watch.length ? "var(--warn2)" : "var(--dim)") + '">' + (st.watch.length ? D.plural(st.watch.length, "weather watch", "weather watches") : st.idle ? "" : "No weather concerns") + "</span>";
         })() + "</a>";
     }).join("");
     watch.sort(function (a, b) { return b.sev - a.sev; });

@@ -103,11 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function render() {
     var pro = S.pro, m = S.member;
     var picks = FP.picks(pro);
+    var hn = (pro.event && pro.event.histNote) || "";
+    var why0 = (hn ? hn + (/[.!?]$/.test(hn) ? "" : ".") + " " : "") + ((pro.form || []).length ? "Current form is on the Form board." : "");
     document.getElementById("ct-t").textContent = picks.length;
-    P.board(document.getElementById("b-t"), { cols: T_COLS, rows: picks, key: function (p) { return p.player + p.k; }, member: m, free: 1, lock: { what: "target" }, emptyTitle: "No targets this week" });
+    P.board(document.getElementById("b-t"), { cols: T_COLS, rows: picks, key: function (p) { return p.player + p.k; }, member: m, free: 1, lock: { what: "target" }, emptyTitle: "No targets this week", empty: esc(why0) });
     var cb = (pro.course || []).slice();
     document.getElementById("ct-c").textContent = cb.length;
-    P.board(document.getElementById("b-c"), { cols: C_COLS, rows: cb, key: function (r) { return r.player; }, member: m, free: 0, sort: { k: "score", dir: "desc" }, lock: { what: "player", title: "Course history for " + D.plural(cb.length, "player") + " — unlock with PRO" }, emptyTitle: "No course history on file" });
+    P.board(document.getElementById("b-c"), { cols: C_COLS, rows: cb, key: function (r) { return r.player; }, member: m, free: 0, sort: { k: "score", dir: "desc" }, lock: { what: "player", title: "Course history for " + D.plural(cb.length, "player") + " — unlock with PRO" }, emptyTitle: "No course history on file", empty: esc(hn) });
     var wp = (pro.wind && pro.wind.proof) || [], wf = (pro.wind && pro.wind.fade) || [];
     document.getElementById("ct-w").textContent = wp.length + wf.length;
     P.board(document.getElementById("b-w"), { cols: W_COLS, rows: wp, key: function (r) { return r.player; }, member: m, free: 0, sort: { k: "delta", dir: "desc" },
@@ -148,6 +150,9 @@ document.addEventListener("DOMContentLoaded", function () {
     D.fresh(document.getElementById("fresh"), { built: pro.updated, stale: pro.stale, status: pro.status, maxAgeH: 40 });
     if (pro.note) { var n = document.getElementById("note"); n.hidden = false; n.className = "note mt24"; n.innerHTML = D.IC.info + "<div>" + esc(pro.note) + "</div>"; }
     document.getElementById("meta-chips").innerHTML = pro.event ? '<span class="chip">' + esc(pro.event.course) + "</span>" + '<span class="chip">' + esc(pro.event.city) + "</span>" : "";
+    var first = FP.picks(pro).length ? "t" : (pro.course || []).length ? "c" : (pro.form || []).length ? "f" : "t";
+    document.getElementById("boards").hidden = !!pro.seasonComplete;
+    var fb0 = document.querySelector('#tabs [data-tab="' + first + '"]'); if (fb0) fb0.setAttribute("aria-selected", "true");
     D.tabs(document.getElementById("tabs"), null, "pga-props-tab");
     D.gate.on(function (st) { S.member = st === "member"; render(); });
   });
