@@ -65,8 +65,19 @@ NEUTRAL_VENUES = [
          lat=-37.8200, lon=144.9834, tz="Australia/Melbourne", bearing=None, roof="open"),
     dict(match=("olympiastadion",), name="Olympiastadion", city="Berlin",
          lat=52.5147, lon=13.2395, tz="Europe/Berlin", bearing=None, roof="open"),
-    dict(match=("allianz arena",), name="Allianz Arena", city="Munich",
+    # The schedule feed uses the NFL's sponsor-free names: the Nov 15, 2026
+    # Patriots-Lions game is listed at "FC Bayern Munich Stadium", which the
+    # old "allianz arena" fragment didn't match -- the card would have been
+    # skipped. Same for Paris: Steelers-Saints (Oct 25, 2026) at Stade de
+    # France was skipped for that reason.
+    dict(match=("allianz arena", "bayern", "munich"), name="Allianz Arena", city="Munich",
          lat=48.2188, lon=11.6247, tz="Europe/Berlin", bearing=None, roof="open"),
+    dict(match=("stade de france", "saint-denis"), name="Stade de France", city="Paris",
+         lat=48.9245, lon=2.3602, tz="Europe/Paris", bearing=None, roof="open"),
+    dict(match=("frankfurt", "deutsche bank park", "waldstadion"), name="Deutsche Bank Park", city="Frankfurt",
+         lat=50.0686, lon=8.6455, tz="Europe/Berlin", bearing=None, roof="retract"),
+    dict(match=("corinthians", "neo qu", "itaquera"), name="Arena Corinthians", city="São Paulo",
+         lat=-23.5453, lon=-46.4742, tz="America/Sao_Paulo", bearing=None, roof="open"),
     dict(match=("azteca", "banorte"), name="Estadio Azteca", city="Mexico City",
          lat=19.3029, lon=-99.1505, tz="America/Mexico_City", bearing=None, roof="open"),
 ]

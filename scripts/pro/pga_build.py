@@ -59,17 +59,16 @@ def current_event():
     # Team match-play weeks (Presidents/Ryder Cup) are skipped: stroke-play
     # course-horse and field-percentile wind leans mean nothing there, and a
     # 24-man "top-20 finish" grade would inflate the public record.
+    #
+    # The board belongs to the event being played or the next one up: once an
+    # event's final round is behind us it moves on, the same day the free
+    # radar does. It used to hold a finished event one more day (end + 1), so
+    # every Monday -- and Tuesday until that day's build -- the desk and the
+    # home page's free golf pick still showed last week's tournament.
     today = datetime.now(ET).date()
-    for ev in EVENTS:
-        if ev.get("team"):
-            continue
-        r1 = datetime.strptime(ev["r1"], "%Y-%m-%d").date()
-        end = datetime.strptime(ev["end"], "%Y-%m-%d").date()
-        if r1 - timedelta(days=8) <= today <= end + timedelta(days=1):
-            return ev
-    future = [e for e in EVENTS if not e.get("team")
-              and datetime.strptime(e["r1"], "%Y-%m-%d").date() > today]
-    return min(future, key=lambda e: e["r1"]) if future else None
+    live = [e for e in EVENTS if not e.get("team")
+            and datetime.strptime(e["end"], "%Y-%m-%d").date() >= today]
+    return min(live, key=lambda e: e["r1"]) if live else None
 
 
 def team_week():

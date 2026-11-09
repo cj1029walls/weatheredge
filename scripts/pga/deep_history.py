@@ -91,9 +91,10 @@ CANON = [
     # differently, the field lookup silently finds nothing, and next year's
     # editions would never file under the same key as this one.
     (r"biltmore", "biltmore"),
-    # Next in line for the same bug: the Nov 12-15 debut. Anchor it before
-    # ESPN's name and ours drift apart ("The Good Good Championship ...").
-    (r"good good", "good-good"),
+    # Next in line for the same bug: the Nov 12-15, 2026 debut in Austin. It was
+    # announced as the Good Good Championship and renamed the Austin Championship
+    # presented by Compliance Solutions before it was played.
+    (r"austin championship|compliance solutions|good good", "austin"),
 ]
 
 # stable-course coordinates for wind tagging (lat, lon, tz)

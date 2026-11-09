@@ -53,7 +53,10 @@ EVENTS = [
          city="Los Cabos, Mexico", lat=22.903, lon=-110.021, tz="America/Mazatlan",
          r1="2026-11-05", end="2026-11-08", team=False),
     dict(hole=dict(n=18, par=5, yds=570, dl=-1, water="front"),
-         name="Good Good Championship", course="Omni Barton Creek (Fazio Canyons)",
+         # Announced as the Good Good Championship; Good Good withdrew as title
+         # sponsor in Aug 2026 and the TOUR renamed it (presented by Compliance
+         # Solutions since Nov 2).
+         name="Austin Championship", course="Omni Barton Creek (Fazio Canyons)",
          city="Austin, TX", lat=30.293, lon=-97.872, tz="America/Chicago",
          r1="2026-11-12", end="2026-11-15", team=False),
     dict(hole=dict(n=17, par=3, yds=180, dl=0,  water="left"),
