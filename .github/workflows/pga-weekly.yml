@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: write      # to ask for a publish (see the last steps)
 
 concurrency:
   group: ${{ github.workflow }}
@@ -54,6 +55,15 @@ jobs:
           bash scripts/ci/commit_push.sh "PGA refresh"
           site/pga/data.json site/pro/pga.json site/pro/pga_record.json
           data/pga data/pro/pga_predictions data/pro/pga_results.json
+      - name: Ask for a publish
+        # A run the Clock started belongs to github-actions[bot], and GitHub
+        # raises no workflow_run event for it, so publish.yml would never hear
+        # that new data was committed. (Scheduled and hand-started runs still
+        # reach publish.yml through workflow_run.)
+        if: ${{ !cancelled() && github.actor == 'github-actions[bot]' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publish.yml -R "$GITHUB_REPOSITORY" --ref main
       - name: Report
         if: ${{ !cancelled() }}
         run: >-

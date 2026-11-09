@@ -14,6 +14,11 @@ name: Clock
 #   body     {"ref":"main"}
 on:
   workflow_dispatch:
+    inputs:
+      start:
+        description: "Also start this build now (e.g. pga-weekly.yml). Leave empty for a normal tick."
+        required: false
+        default: ""
   schedule:
     - cron: "12,42 * * * *"
 
@@ -38,4 +43,5 @@ jobs:
       - name: Start what is due, unblock the queue, check the live feeds
         env:
           GH_TOKEN: ${{ github.token }}
+          START: ${{ inputs.start }}
         run: python3 scripts/ci/clock.py

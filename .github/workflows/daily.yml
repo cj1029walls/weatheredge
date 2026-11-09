@@ -101,12 +101,28 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url || steps.retry2.outputs.page_url }}
     steps:
       - id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      # Pages refuses a deployment while another one is still finishing, and
+      # "finishing" outlasts the job that made it (Nov 9, 2026: a publish was
+      # refused 74 s after a daily deploy had reported success). Wait and try
+      # again instead of dropping the update.
+      - if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - id: retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - if: steps.retry.outcome == 'failure'
+        run: sleep 150
+      - id: retry2
+        if: steps.retry.outcome == 'failure'
         uses: actions/deploy-pages@v4
 
   report:
