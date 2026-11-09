@@ -1,0 +1,29 @@
+name: CFB line-play dataset (one-off research)
+
+# Pulls the history the trench rebuild is tested on (scripts/cfb/line_dataset.py):
+# about 220 CollegeFootballData calls, once. Run by hand only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  dataset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pull line-play stats
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: python scripts/cfb/line_dataset.py
+      - name: Commit the dataset
+        run: bash scripts/ci/commit_push.sh "CFB line-play dataset" data/cfb/line_games.csv.gz data/cfb/line_weights.json
