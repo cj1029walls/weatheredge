@@ -1,0 +1,36 @@
+name: Venue Atlas
+
+# Rebuilds site/atlas/ (data.json, one page per venue, the sitemap) from the
+# history files the sport builders already keep -- scripts/atlas/build.py.
+# Nothing is fetched and no API credits are spent. Weekly, or by hand.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "40 11 * * 2"     # Tuesdays; a late trigger does not matter here
+
+permissions:
+  contents: write
+  actions: write      # to ask for the publish
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  atlas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the Atlas
+        run: python scripts/atlas/build.py
+      - name: Commit
+        run: bash scripts/ci/commit_push.sh "Venue Atlas refresh" site/atlas
+      - name: Ask for a publish
+        # a push made with the workflow token starts no other workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run publish.yml -R "$GITHUB_REPOSITORY" --ref main

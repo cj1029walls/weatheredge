@@ -3,3 +3,4 @@ Allow: /
 Disallow: /next/
 
 Sitemap: https://dfsradar.com/sitemap.xml
+Sitemap: https://dfsradar.com/atlas/sitemap.xml

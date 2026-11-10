@@ -190,6 +190,7 @@
   var NAV = [
     { k: "weather", label: "Weather", href: "/weather/" },
     { k: "props", label: "Props", href: "/props/" },
+    { k: "atlas", label: "Atlas", href: "/atlas/" },
     { k: "record", label: "Record", href: "/record/" },
     { k: "pro", label: "PRO", href: "/pro/" }
   ];
@@ -206,7 +207,7 @@
       "</div>" +
       '<div class="dr-sheet" id="dr-sheet" hidden>' +
       NAV.map(function (n) {
-        var sub = { weather: "Forecasts for every game, race and round", props: "Our number vs the books' number", record: "Every call, graded in public", pro: "$15/mo · what you get" }[n.k];
+        var sub = { weather: "Forecasts for every game, race and round", props: "Our number vs the books' number", atlas: "Every venue in 3D, with its weather history", record: "Every call, graded in public", pro: "$15/mo · what you get" }[n.k];
         return '<a href="' + u(n.href) + '"><span>' + n.label + "</span><small>" + sub + "</small></a>";
       }).join("") +
       '<div class="row" id="dr-sheet-acts"></div></div>';
@@ -259,7 +260,7 @@
       '<p style="margin-top:14px;max-width:34ch">The forecast at every venue, measured against what actually happened there in weather like it — and every call graded in public.</p></div>' +
       col("Weather", SPORTS.map(function (s) { return [s.name + " weather", u(s.weather)]; })) +
       col("Props", [["All props", u("/props/")]].concat(SPORTS.map(function (s) { return [s.name + " props", u(s.props)]; }))) +
-      col("DFSRADAR", [["The record", u("/record/")], ["PRO membership", u("/pro/")], ["Log in", u("/pro/") + "#login"],
+      col("DFSRADAR", [["Venue Atlas", u("/atlas/")], ["The record", u("/record/")], ["PRO membership", u("/pro/")], ["Log in", u("/pro/") + "#login"],
         ["DFS Kitchen", "https://dfskitchen.com/?utm_source=dfsradar&utm_medium=footer", 1], ["DFSPREP", "https://dfsprep.com", 1],
         ["DFS Books", "https://dfsbooks.com", 1], ["The Optimizer", "https://dfskitchen.com/optimizer", 1]]) +
       "</div>" +
