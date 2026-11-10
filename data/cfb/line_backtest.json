@@ -1,0 +1,114 @@
+{
+ "seasons": [
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "n": 7110,
+ "targets": {
+  "n": 587,
+  "w": 467,
+  "rate": 0.796
+ },
+ "fades": {
+  "n": 850,
+  "w": 633,
+  "rate": 0.745
+ },
+ "bySeason": [
+  {
+   "season": 2022,
+   "games": 1466,
+   "targets": 143,
+   "targetHit": 0.79,
+   "fades": 202,
+   "fadeHit": 0.767
+  },
+  {
+   "season": 2023,
+   "games": 1500,
+   "targets": 105,
+   "targetHit": 0.771,
+   "fades": 193,
+   "fadeHit": 0.684
+  },
+  {
+   "season": 2024,
+   "games": 1496,
+   "targets": 153,
+   "targetHit": 0.778,
+   "fades": 165,
+   "fadeHit": 0.697
+  },
+  {
+   "season": 2025,
+   "games": 1524,
+   "targets": 104,
+   "targetHit": 0.837,
+   "fades": 192,
+   "fadeHit": 0.807
+  },
+  {
+   "season": 2026,
+   "games": 1124,
+   "targets": 82,
+   "targetHit": 0.817,
+   "fades": 98,
+   "fadeHit": 0.776
+  }
+ ],
+ "ladder": [
+  {
+   "label": "Q1 worst edge",
+   "n": 1662,
+   "ypc": 3.37,
+   "beat": 0.298
+  },
+  {
+   "label": "Q2",
+   "n": 1546,
+   "ypc": 3.84,
+   "beat": 0.418
+  },
+  {
+   "label": "Q3",
+   "n": 1277,
+   "ypc": 4.26,
+   "beat": 0.514
+  },
+  {
+   "label": "Q4",
+   "n": 1417,
+   "ypc": 4.5,
+   "beat": 0.603
+  },
+  {
+   "label": "Q5 best edge",
+   "n": 1208,
+   "ypc": 5.13,
+   "beat": 0.743
+  }
+ ],
+ "ownNorm": {
+  "soft": {
+   "n": 586,
+   "rate": 0.676
+  },
+  "tough": {
+   "n": 846,
+   "rate": 0.283
+  }
+ },
+ "weightEdge": {
+  "top": {
+   "n": 1591,
+   "rate": 0.533
+  },
+  "bottom": {
+   "n": 1155,
+   "rate": 0.521
+  }
+ }
+}

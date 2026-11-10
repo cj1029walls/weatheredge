@@ -138,6 +138,7 @@ def main():
                   f"flagged teams final) — will retry")
             continue
         results["weeks"][key] = grade_week(pred, rush)
+        results["weeks"][key]["model"] = pred.get("model") or "weight"
         g = results["weeks"][key]["leans"]
         w = sum(1 for x in g if x["hit"])
         n = sum(1 for x in g if x["hit"] is not None)
@@ -155,6 +156,16 @@ def main():
         targets=rec([x for x in allg if x["side"] == "TARGET"]),
         fades=rec([x for x in allg if x["side"] == "FADE"]),
         stacked=rec([x for x in allg if x["k"] == "STACKED RUSH"]))
+    # the board changed models in Week 11, 2026 (roster weight -> line play):
+    # the old calls stay in the record, and each model also shows its own
+    for name in ("line", "weight"):
+        rows = [x for wk in results["weeks"].values() if (wk.get("model") or "weight") == name
+                for x in wk["leans"] if x["hit"] is not None]
+        results["summary"][name] = dict(weeks=sum(1 for wk in results["weeks"].values()
+                                                  if (wk.get("model") or "weight") == name),
+                                        overall=rec(rows),
+                                        targets=rec([x for x in rows if x["side"] == "TARGET"]),
+                                        fades=rec([x for x in rows if x["side"] == "FADE"]))
     os.makedirs(os.path.dirname(RESULTS), exist_ok=True)
     json.dump(results, open(RESULTS, "w"), separators=(",", ":"))
 

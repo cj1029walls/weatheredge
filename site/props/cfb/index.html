@@ -55,7 +55,7 @@
       <button type="button" data-tab="bt">The backtest</button>
     </div></div>
     <div data-panel="leans"><div id="b-leans"></div>
-      <p class="small dim mt12"><b>Trench edge</b> = how far this offensive line's run blocking outgrades the defensive front it faces, against the league. Targets are the biggest edges; fades the biggest deficits; stacked means the weather points the same way.</p></div>
+      <p class="small dim mt12"><b>Trench edge</b> = how this offense has actually run the ball this season — yards per carry, rushing success rate and line yards — against what the defensive front it faces has allowed, measured against the league, plus home field. Targets are the biggest edges; fades the biggest deficits; stacked means the weather points the same way.</p></div>
     <div data-panel="wind" hidden><div id="b-wind"></div><div id="b-wind-games" class="mt24"></div></div>
     <div data-panel="bt" hidden><div id="b-bt"></div></div>
   </section>
@@ -127,10 +127,14 @@ document.addEventListener("DOMContentLoaded", function () {
     var bt = S.pro && S.pro.backtest, el = document.getElementById("b-bt");
     if (!bt || !bt.ladder) { el.innerHTML = '<div class="empty card"><p>Backtest not loaded.</p></div>'; return; }
     var max = Math.max.apply(null, bt.ladder.map(function (x) { return x.ypc; }));
-    el.innerHTML = '<div class="card card--pad"><div class="label" style="margin-bottom:16px">Yards per carry by trench-edge quintile · ' + bt.n.toLocaleString() + " team-games, " + esc(bt.seasons.join(", ")) + "</div>" +
+    var pc = function (x) { return x && x.n ? Math.round(x.rate * 100) + "%" : "—"; };
+    el.innerHTML = '<div class="card card--pad"><div class="label" style="margin-bottom:16px">Yards per carry by trench-edge fifth · ' + bt.n.toLocaleString() + " team-games, " + esc(bt.seasons[0] + "–" + bt.seasons[bt.seasons.length - 1]) + "</div>" +
       bt.ladder.map(function (q) {
         return '<div class="imp" style="grid-template-columns:150px 1fr 70px"><span class="k">' + esc(q.label) + '</span><span class="bar" style="background:rgba(255,255,255,.05)"><i style="left:0;width:' + (q.ypc / max * 100).toFixed(1) + '%;background:var(--cyan)"></i></span><span class="v">' + q.ypc.toFixed(2) + "</span></div>";
-      }).join("") + '<p class="small dim mt16">The heavier the line\'s edge, the more yards per carry — a steady climb from ' + bt.ladder[0].ypc + " to " + bt.ladder[bt.ladder.length - 1].ypc + ". That gradient is what the board is built on.</p></div>";
+      }).join("") + '<p class="small dim mt16">Every game was rated only from games played before it. ' +
+      (bt.targets ? "Edges in the top tenth beat the week's median yards per carry <b>" + pc(bt.targets) + "</b> of the time (" + bt.targets.w + " of " + bt.targets.n + "); edges in the bottom tenth finished under it <b>" + pc(bt.fades) + "</b> of the time (" + bt.fades.w + " of " + bt.fades.n + "). " : "") +
+      (bt.ownNorm ? "The matchup alone moves a team off its own form: against the softest tenth of run defenses, offenses beat their own season average " + pc(bt.ownNorm.soft) + " of the time; against the toughest tenth, " + pc(bt.ownNorm.tough) + ". " : "") +
+      (bt.weightEdge ? "The roster-weight edge this board used through Week 10 of 2026 managed " + pc(bt.weightEdge.top) + " for its heaviest fifth on the same games — which is why it was rebuilt." : "") + "</p></div>";
   }
 
   function renderRecord() {
@@ -140,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     el.innerHTML = P.recordStrip([
       { v: t(r.overall), l: "All leans", s: r.overall.n ? D.pct(r.overall.w / r.overall.n * 100, 0) + " over " + D.plural(r.weeks, "week") : "" },
       { v: t(r.targets), l: "Rush targets", s: "" }, { v: t(r.fades), l: "Rush fades", s: "" }, { v: t(r.stacked), l: "Stacked (weather + trenches)", s: "" }]);
+    if (r.line && r.weight && r.weight.overall.n) el.innerHTML += '<p class="small dim mt12">The trench edge was rebuilt in Week 11 of 2026 on how each line has actually played. Since the rebuild: <b>' + (r.line.overall.n ? t(r.line.overall) : "no graded weeks yet") + "</b>. Before it, on roster weights (" + D.plural(r.weight.weeks, "week") + "): " + t(r.weight.overall) + ". Every call from both stays in the record.</p>";
     var list = [];
     (S.rec.recent || []).slice(0, 2).forEach(function (w) { (w.leans || []).forEach(function (l) {
       list.push({ res: l.hit ? "w" : "l", title: esc(l.who) + " · " + esc(String(l.side).toLowerCase()) + ' <span class="dim">' + D.signed(l.cd, 1) + "</span>",

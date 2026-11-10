@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """DFSRADAR PRO — CFB Trench Edge board -> site/pro/cfb.json
 
-The layer the backtest validated (2021-2024, 5,916 FBS offense-games):
-OL-vs-opposing-DL weight edge, centered against the league norm, splits
-rushing output into a monotone ladder — top-quintile edges rush for
-+0.4 yards per carry over bottom-quintile. That, plus our weather layer,
-is the board: per-game trench edges quintile-ranked, RUSH EDGE / RUSH FADE
-flags, and STACKED flags when a big trench edge meets a windy (run-script)
-forecast. No ATS or totals claims — the backtest said no, so we don't.
+The trench edge is a run-game matchup rating built from how each line has
+actually played (scripts/cfb/linemodel.py): the offense's yards per carry,
+rushing success rate and line yards to date against what the defense it faces
+has allowed, plus home field. It replaced the roster-weight edge in Week 11,
+2026: replayed on 2022-2026 (scripts/cfb/line_backtest.py), the top tenth of
+edges beat the week's median yards per carry about 80% of the time, where the
+heaviest fifth of weight edges did 53%. Flags: RUSH EDGE / RUSH FADE, and
+STACKED when a big edge meets a windy (run-script) forecast. No ATS or totals
+claims — the first backtest said no, so we don't.
 
 Data: CollegeFootballData.com (CFBD_API_KEY — already a repo secret), read
 through scripts/cfb/cfbd_cache.py. Almost everything the board needs is
@@ -16,7 +18,7 @@ when CFBD is down the board is still built for the right week from cache and its
 note says which data is not fresh; with no cache at all, the last board is kept
 and labelled "not refreshed" instead of silently showing last week.
 Weather joined from the free radar's site/cfb/data.json (same game ids).
-Backtest receipts embedded from data/cfb/trench_backtest.json.
+Backtest receipts embedded from data/cfb/line_backtest.json.
 
 Leans archived to data/pro/cfb_predictions/ for public grading against
 actual rushing box scores once games complete.
@@ -32,9 +34,12 @@ print = functools.partial(print, flush=True)
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 sys.path.insert(0, os.path.join(ROOT, "scripts", "cfb"))
 import cfbd_cache as cfbd       # noqa: E402 — every CFBD call goes through the cache
+import linemodel as lm          # noqa: E402 — the trench edge
 OUT = os.path.join(ROOT, "site", "pro", "cfb.json")
 FREE = os.path.join(ROOT, "site", "cfb", "data.json")
-BACKTEST = os.path.join(ROOT, "data", "cfb", "trench_backtest.json")
+BACKTEST = os.path.join(ROOT, "data", "cfb", "line_backtest.json")
+LINE_CSV = os.path.join(ROOT, "data", "cfb", "line_games.csv.gz")
+LINE_MODEL = os.path.join(ROOT, "data", "cfb", "line_model.json")
 ARCH = os.path.join(ROOT, "data", "pro", "cfb_predictions")
 TEASER = os.path.join(ROOT, "site", "cfb", "teaser.json")
 PASS_FIRST = 0.44   # run rate below this = pass-first; no rushing-prop TARGET
@@ -248,11 +253,55 @@ def attach_rush_props(leans):
     print(f"rush props: priced {priced}/{len(named)} named backs from {used} event calls")
 
 
+def season_rows(season, hist, games, before_week=99, fetch=True):
+    """One season's finished FBS team-games in linemodel's row format: the
+    committed dataset first, then (for weeks it does not hold) CFBD through the
+    cache — one box-score and one line-stats call per finished week, kept
+    forever. Returns (rows, last week covered)."""
+    rows = [r for r in hist if r["season"] == season and r["week"] < before_week]
+    have = {r["week"] for r in rows}
+    fbs = {}
+    for g in games:
+        hc = (gv(g, "homeClassification", "home_division") or "").lower()
+        ac = (gv(g, "awayClassification", "away_division") or "").lower()
+        if hc == "fbs" and ac == "fbs" and gv(g, "homePoints", "home_points") is not None:
+            fbs[gv(g, "id")] = g
+    raw = []
+    for w in sorted({gv(g, "week") for g in fbs.values()} - have):
+        if w is None or w >= before_week:
+            continue
+        q = dict(year=season, week=w, seasonType="regular")
+        try:
+            box = cfbd.get("/games/teams", ttl=cfbd.FOREVER, **q) if fetch else cfbd.peek("/games/teams", **q)
+            adv = (cfbd.get("/stats/game/advanced", ttl=cfbd.FOREVER, **q) if fetch
+                   else cfbd.peek("/stats/game/advanced", **q))
+        except cfbd.Unavailable as e:
+            print(f"  run-game form: week {w} not available ({e})")
+            continue
+        stats = {(a.get("gameId"), a.get("team")): a for a in adv or []}
+        for b in box or []:
+            gid = gv(b, "id", "gameId")
+            g = fbs.get(gid)
+            if not g:
+                continue
+            home, away = gv(g, "homeTeam", "home_team"), gv(g, "awayTeam", "away_team")
+            for t in b.get("teams") or []:
+                name = gv(t, "team", "school")
+                st = {x.get("category"): x.get("stat") for x in (t.get("stats") or [])}
+                a = stats.get((gid, name)) or {}
+                raw.append(dict(season=season, week=w, team=name, opp=away if name == home else home,
+                                home=1 if name == home else 0,
+                                neutral=1 if gv(g, "neutralSite", "neutral_site") else 0,
+                                att=st.get("rushingAttempts"), yds=st.get("rushingYards"),
+                                rSR=a.get("rSR"), ly=a.get("ly")))
+    rows += lm.clean(raw)
+    return rows, max([r["week"] for r in rows], default=0)
+
+
 def main():
     now = datetime.now(ET)
     season = now.year if now.month >= 7 else now.year - 1
     trench, lg_ol, lg_dl, roster_names, roster_backs = build_trench(season)
-    lg_diff = lg_ol - lg_dl
     identity = rush_identity(season - 1)
     rbs = top_rushers(season - 1, roster_names, roster_backs)
 
@@ -264,17 +313,12 @@ def main():
         if hc == "fbs" and ac == "fbs":
             fbs_games.append(g)
 
-    # quintile cuts from the FULL season's matchup set (stable, not weekly-noisy)
-    all_cd = []
-    for g in fbs_games:
-        h, a = gv(g, "homeTeam", "home_team"), gv(g, "awayTeam", "away_team")
-        th, ta = trench.get(h), trench.get(a)
-        if th and ta:
-            all_cd.append(round(th["ol"] - ta["dl"] - lg_diff, 1))
-            all_cd.append(round(ta["ol"] - th["dl"] - lg_diff, 1))
-    all_cd.sort()
-    qs = [all_cd[int(len(all_cd) * k / 5)] for k in range(1, 5)] if len(all_cd) >= 50 else [-4, -1, 1, 4]
-    print(f"season quintile cuts (lbs/man vs league norm): {qs}")
+    # the edge's scaling and cut-offs come from the backtested seasons
+    model = json.load(open(LINE_MODEL))
+    qs, t_cut, f_cut = model["cuts"]["quintiles"], model["cuts"]["target"], model["cuts"]["fade"]
+    bt = json.load(open(BACKTEST))
+    t_rate, f_rate = round(bt["targets"]["rate"] * 100), round(bt["fades"]["rate"] * 100)
+    years = f"{bt['seasons'][0]}–{bt['seasons'][-1]}"
 
     def qlabel(cd):
         if cd < qs[0]: return 1
@@ -311,6 +355,19 @@ def main():
                       key=lambda g: gv(g, "startDate", "start_date") or "")
     print(f"target: {season} week {week} — {len(wk_games)} FBS games")
 
+    # run-game form going into this week: this season's games before it,
+    # pulled toward last season early on (scripts/cfb/linemodel.py)
+    form, thru = None, 0
+    try:
+        hist = lm.load_csv(LINE_CSV)
+        cur, thru = season_rows(season, hist, games, before_week=week)
+        last, _ = season_rows(season - 1, hist, [], fetch=False)
+        form = lm.Form(cur, lm.season_avgs(last), lm.league(last) or lm.league(cur))
+        print(f"run-game form: {len(cur)} team-games through week {thru} · "
+              f"prior from {len(last)} team-games last season")
+    except Exception as e:
+        print(f"::warning title=No trench edges this build::run-game form unavailable ({e})")
+
     # lines for the week (median across books) — filtered from the season-wide
     # response the free slate build already cached this run (no extra call)
     lines = {}
@@ -341,19 +398,22 @@ def main():
     out_games, leans = [], []
     for g in wk_games:
         h, a = gv(g, "homeTeam", "home_team"), gv(g, "awayTeam", "away_team")
-        th, ta = trench.get(h), trench.get(a)
         gid = gv(g, "id")
         d = gdate(g)
         et_dt = d.astimezone(ET) if d else None
         ln = lines.get(gid) or {}
         w = wx.get(str(gid))
-        def edge(off, deff, off_t, def_t):
-            if not off_t or not def_t:
+        neutral = bool(gv(g, "neutralSite", "neutral_site"))
+        def edge(off, deff, at_home):
+            if form is None:
                 return None
-            cd = round(off_t["ol"] - def_t["dl"] - lg_diff, 1)
-            return dict(team=off, cdiff=cd, q=qlabel(cd),
-                        ol=off_t["ol"], oppDl=def_t["dl"])
-        ae, he = edge(a, h, ta, th), edge(h, a, th, ta)
+            sc, p = form.edge(off, deff, 0.5 if neutral else (1 if at_home else 0), model["sd"])
+            sc = round(sc, 1)
+            return dict(team=off, cdiff=sc, q=qlabel(sc), games=p["o_n"],
+                        ypc=round(p["o_ypc"], 1), sr=round(p["o_rSR"] * 100), ly=round(p["o_ly"], 1),
+                        oppYpc=round(p["d_ypc"], 1), oppSr=round(p["d_rSR"] * 100),
+                        oppLy=round(p["d_ly"], 1))
+        ae, he = edge(a, h, False), edge(h, a, True)
         entry = dict(
             id=gid, away=a, home=h, week=week,
             day=(et_dt.strftime("%a %b %-d") if et_dt else "TBD"),
@@ -375,15 +435,18 @@ def main():
             windy_kick = bool(w and not w.get("dome") and (w.get("wind") or 0) >= WINDY)
             ident = identity.get(e["team"])
             rb = rbs.get(e["team"])
-            if e["q"] == 5 and ident and ident["rate"] < PASS_FIRST:
+            if e["cdiff"] >= t_cut and ident and ident["rate"] < PASS_FIRST:
                 # stacked line on a pass-first offense: real edge, wrong market.
                 # Stays on the board with its quintile; no rushing-prop TARGET.
                 print(f"  demoted (pass-first {ident['rate']:.0%}): {e['team']}")
                 continue
-            if e["q"] == 5:
-                why = (f"+{e['cdiff']} lbs/man trench edge vs league norm "
-                       f"(their OL {e['ol']} vs {opp} DL {e['oppDl']}) — "
-                       f"top-quintile edges rushed for +0.4 YPC in our 4-season backtest")
+            form_txt = (f"{e['team']} has run for {e['ypc']} a carry ({e['sr']}% success, "
+                        f"{e['ly']} line yards); {opp}'s front has allowed {e['oppYpc']} "
+                        f"({e['oppSr']}%, {e['oppLy']})"
+                        + (" — early season, blended with last year's form" if e["games"] < 3 else ""))
+            if e["cdiff"] >= t_cut:
+                why = (f"+{e['cdiff']} trench edge. {form_txt}. Edges this big beat the week's "
+                       f"median yards per carry {t_rate}% of the time in our {years} backtest")
                 if windy_kick:
                     leans.append(dict(k="STACKED RUSH", side="TARGET", who=e["team"],
                         rush=ident, rb=rb,
@@ -393,13 +456,12 @@ def main():
                     leans.append(dict(k="RUSH EDGE", side="TARGET", who=e["team"],
                         rush=ident, rb=rb,
                                       game=f"{a} @ {h}", cd=e["cdiff"], why=why))
-            elif e["q"] == 1:
+            elif e["cdiff"] <= f_cut:
                 leans.append(dict(k="RUSH FADE", side="FADE", who=e["team"],
                         rush=ident, rb=rb,
                     game=f"{a} @ {h}", cd=e["cdiff"],
-                    why=(f"{e['cdiff']} lbs/man vs league norm (their OL {e['ol']} vs "
-                         f"{opp} DL {e['oppDl']}) — bottom-quintile edges averaged "
-                         f"0.4 fewer YPC in the backtest")))
+                    why=(f"{e['cdiff']} trench edge. {form_txt}. Edges this low finished under "
+                         f"the week's median yards per carry {f_rate}% of the time in our {years} backtest")))
     # keep the board scannable: biggest edges first, targets and fades each capped
     # so one side never crowds the other off the board
     order = {"STACKED RUSH": 0, "RUSH EDGE": 1}
@@ -414,14 +476,9 @@ def main():
     # normal and shown honestly; guarded so odds failures never break a build.
     attach_rush_props(leans)
 
-    backtest = None
-    if os.path.exists(BACKTEST):
-        try:
-            bt = json.load(open(BACKTEST))
-            backtest = dict(seasons=bt.get("seasons"), n=bt.get("offenseGames"),
-                            ladder=bt.get("centeredBuckets"))
-        except Exception:
-            pass
+    backtest = dict(model="line", seasons=bt["seasons"], n=bt["n"], ladder=bt["ladder"],
+                    targets=bt["targets"], fades=bt["fades"], ownNorm=bt["ownNorm"],
+                    weightEdge=bt["weightEdge"])
 
     fc_missing = sum(1 for g2 in out_games if g2["wx"] is None)
     notes = []
@@ -429,11 +486,15 @@ def main():
     if st:
         notes.append(f"⚠ {cfbd.stale_note('schedule, rosters & lines')} "
                      f"Board rebuilt from that cached data {now.strftime('%a %-I:%M %p ET')}.")
+    if form is None:
+        notes.append("⚠ Run-game form could not be loaded, so this build has no trench edges.")
+    elif thru < week - 1:
+        notes.append(f"Run-game form is through week {thru}.")
     if fc_missing:
         notes.append(f"Forecasts join as kickoffs enter the free radar's window "
                      f"({fc_missing} of {len(out_games)} games still outside it).")
     out = dict(updated=now.strftime("%Y-%m-%d %H:%M ET"), season=season, week=week,
-               lg=dict(ol=lg_ol, dl=lg_dl), cuts=qs,
+               model="line", formThru=thru, cuts=dict(target=t_cut, fade=f_cut, quintiles=qs),
                games=out_games, leans=leans, backtest=backtest,
                note=" ".join(notes))
     if st:
@@ -475,8 +536,8 @@ def main():
         arch_games += [g2 for g2 in prev.get("games") or [] if g2.get("id") not in seen]
         print(f"archive: {len(frozen)} lean(s) frozen at kickoff, "
               f"{len(arch_leans) - len(frozen)} still open")
-    json.dump(dict(built=out["updated"], season=season, week=week, leans=arch_leans,
-                   games=arch_games),
+    json.dump(dict(built=out["updated"], season=season, week=week, model="line",
+                   leans=arch_leans, games=arch_games),
               open(arch_path, "w"), separators=(",", ":"))
     print("archived predictions")
 

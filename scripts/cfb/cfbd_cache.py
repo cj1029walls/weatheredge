@@ -62,6 +62,7 @@ TTL = {
     "/games": 6 * HOUR,
     "/lines": 6 * HOUR,
     "/games/teams": 3 * DAY,
+    "/stats/game/advanced": 3 * DAY,
 }
 
 
@@ -204,11 +205,23 @@ def _trim_box(rows):
     return sorted(out, key=lambda g: g.get("id") or 0)
 
 
+def _trim_adv(rows):
+    """Per-game advanced stats: only the two line-play numbers the trench edge reads."""
+    out = []
+    for r in rows:
+        o = r.get("offense") or {}
+        rp = o.get("rushingPlays") or o.get("rushing_plays") or {}
+        out.append(dict(gameId=r.get("gameId", r.get("game_id")), team=r.get("team"),
+                        ly=o.get("lineYards", o.get("line_yards")),
+                        rSR=rp.get("successRate", rp.get("success_rate"))))
+    return sorted(out, key=lambda x: (x.get("gameId") or 0, x.get("team") or ""))
+
+
 TRIM = {
     "/games": _trim_games, "/lines": _trim_lines, "/venues": _trim_venues,
     "/teams/fbs": _trim_teams, "/roster": _trim_roster,
     "/stats/season": _trim_season_stats, "/stats/player/season": _trim_player_stats,
-    "/games/teams": _trim_box,
+    "/games/teams": _trim_box, "/stats/game/advanced": _trim_adv,
 }
 
 
