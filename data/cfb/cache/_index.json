@@ -6,18 +6,18 @@
    "remaining": 0
   },
   "remaining": {
-   "at": "2026-11-14T10:57:04Z",
-   "n": 4612,
-   "t": 1794653824
+   "at": "2026-11-15T15:54:00Z",
+   "n": 4609,
+   "t": 1794758040
   }
  },
  "games__seasonType-regular__year-2026": {
-  "at": "2026-11-14T10:57:02Z",
-  "bytes": 352755,
+  "at": "2026-11-15T15:53:53Z",
+  "bytes": 352467,
   "endpoint": "/games?seasonType=regular&year=2026",
   "rows": 888,
-  "sha": "bfaf5731241c",
-  "t": 1794653822,
+  "sha": "740d2c1c0dc2",
+  "t": 1794758033,
   "ttl": 21600
  },
  "games_teams__seasonType-regular__week-10__year-2026": {
@@ -84,21 +84,21 @@
   "ttl": 259200
  },
  "lines__seasonType-regular__year-2026": {
-  "at": "2026-11-14T10:57:04Z",
-  "bytes": 355231,
+  "at": "2026-11-15T15:53:54Z",
+  "bytes": 356135,
   "endpoint": "/lines?seasonType=regular&year=2026",
   "rows": 1477,
-  "sha": "23fd4edc19b2",
-  "t": 1794653824,
+  "sha": "b72f1203e4a6",
+  "t": 1794758034,
   "ttl": 21600
  },
  "roster__year-2026": {
-  "at": "2026-11-07T18:49:53Z",
-  "bytes": 1259209,
+  "at": "2026-11-15T15:54:00Z",
+  "bytes": 1259546,
   "endpoint": "/roster?year=2026",
-  "rows": 11587,
-  "sha": "210e10991e89",
-  "t": 1794077393,
+  "rows": 11590,
+  "sha": "dca780a14b63",
+  "t": 1794758040,
   "ttl": 604800
  },
  "stats_player_season__category-rushing__year-2025": {
