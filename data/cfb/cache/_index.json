@@ -6,9 +6,9 @@
    "remaining": 0
   },
   "remaining": {
-   "at": "2026-11-22T15:41:50Z",
-   "n": 4527,
-   "t": 1795362110
+   "at": "2026-11-22T17:22:36Z",
+   "n": 4526,
+   "t": 1795368156
   }
  },
  "games__seasonType-regular__year-2026": {
@@ -111,12 +111,12 @@
   "ttl": 21600
  },
  "roster__year-2026": {
-  "at": "2026-11-15T15:54:00Z",
-  "bytes": 1259546,
+  "at": "2026-11-22T17:22:38Z",
+  "bytes": 1259673,
   "endpoint": "/roster?year=2026",
-  "rows": 11590,
-  "sha": "dca780a14b63",
-  "t": 1794758040,
+  "rows": 11591,
+  "sha": "6f678e4ce2de",
+  "t": 1795368158,
   "ttl": 604800
  },
  "stats_game_advanced__seasonType-regular__week-11__year-2026": {
