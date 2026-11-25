@@ -30,7 +30,7 @@
 {"city":"Washington","dome":false,"elevation":"3.029993296","id":3491,"latitude":38.88981,"longitude":-76.971809,"name":"RFK Stadium","state":"DC","timezone":"America/New_York"},
 {"city":"New Orleans","dome":true,"elevation":"0.508185744","id":3493,"latitude":29.950833,"longitude":-90.081111,"name":"Caesars Superdome","state":"LA","timezone":"America/Chicago"},
 {"city":"Saint Louis","dome":true,"elevation":null,"id":3494,"latitude":38.6264256,"longitude":-90.1995853,"name":"The Dome at America's Center","state":"MO","timezone":null},
-{"city":"Atlanta","dome":false,"elevation":"303.1637268","id":3495,"latitude":33.7576897,"longitude":-84.4008285,"name":"Georgia Dome","state":"GA","timezone":"America/New_York"},
+{"city":"Atlanta","dome":true,"elevation":"303.1637268","id":3495,"latitude":33.7576897,"longitude":-84.4008285,"name":"Georgia Dome","state":"GA","timezone":"America/New_York"},
 {"city":"Dublin","dome":false,"elevation":"2.264276505","id":3504,"latitude":53.33523,"longitude":-6.228447,"name":"Aviva Stadium","state":"","timezone":"Europe/Dublin"},
 {"city":"Ann Arbor","dome":false,"elevation":"255.5500031","id":3558,"latitude":42.2658365,"longitude":-83.7486956,"name":"Michigan Stadium","state":"MI","timezone":"America/Detroit"},
 {"city":"Lexington","dome":false,"elevation":"294.958252","id":3597,"latitude":37.788983,"longitude":-79.43505,"name":"Alumni Memorial Field","state":"VA","timezone":"America/New_York"},
@@ -340,7 +340,7 @@
 {"city":"El Paso","dome":false,"elevation":"1183.697876","id":3946,"latitude":31.7733353,"longitude":-106.507957,"name":"Sun Bowl","state":"TX","timezone":"America/Denver"},
 {"city":"Tempe","dome":false,"elevation":"360.1569519","id":3947,"latitude":33.4264471,"longitude":-111.9325005,"name":"Mountain America Stadium","state":"AZ","timezone":"America/Phoenix"},
 {"city":"Miami Gardens","dome":false,"elevation":"2.624486446","id":3948,"latitude":25.9579665,"longitude":-80.2388604,"name":"Hard Rock Stadium","state":"FL","timezone":"America/New_York"},
-{"city":"Marquette","dome":false,"elevation":"186.4","id":3950,"latitude":46.560589,"longitude":-87.393741,"name":"Superior Dome","state":"MI","timezone":"America/Detroit"},
+{"city":"Marquette","dome":true,"elevation":"186.4","id":3950,"latitude":46.560589,"longitude":-87.393741,"name":"Superior Dome","state":"MI","timezone":"America/Detroit"},
 {"city":"Aberdeen","dome":false,"elevation":null,"id":3951,"latitude":45.4649805,"longitude":-98.487813,"name":"Swisher Field","state":"SD","timezone":null},
 {"city":"Savannah","dome":false,"elevation":"6.564679146","id":3952,"latitude":32.0274346,"longitude":-81.0687492,"name":"Ted Wright Stadium","state":"GA","timezone":"America/New_York"},
 {"city":"Minneapolis","dome":false,"elevation":"254.3902283","id":3953,"latitude":44.976525,"longitude":-93.2245462,"name":"Huntington Bank Stadium","state":"MN","timezone":"America/Chicago"},
@@ -850,5 +850,7 @@
 {"city":"Scranton","dome":false,"elevation":null,"id":11955,"latitude":null,"longitude":null,"name":"PENFED Field at Scranton Memorial Stadium","state":"PA","timezone":null},
 {"city":"Kerrville","dome":false,"elevation":null,"id":11956,"latitude":null,"longitude":null,"name":"Antler Stadium","state":"TX","timezone":null},
 {"city":"Glendive","dome":false,"elevation":null,"id":12022,"latitude":null,"longitude":null,"name":"Oakland Athletic Complex Perham Field","state":"MT","timezone":null},
-{"city":"Rocky Mount","dome":false,"elevation":null,"id":12023,"latitude":null,"longitude":null,"name":"Stallings Field","state":"NC","timezone":null}
+{"city":"Rocky Mount","dome":false,"elevation":null,"id":12023,"latitude":null,"longitude":null,"name":"Stallings Field","state":"NC","timezone":null},
+{"city":"Neenah","dome":false,"elevation":null,"id":13096,"latitude":null,"longitude":null,"name":"Neenah Rocket Stadium","state":"WI","timezone":null},
+{"city":"Florence","dome":null,"elevation":null,"id":13107,"latitude":null,"longitude":null,"name":"Bank Independent Stadium","state":"AL","timezone":null}
 ]
